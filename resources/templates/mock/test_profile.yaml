@@ -1,0 +1,7 @@
+profile: "{profile_name}"
+description: "{profile_description}"
+dataset: "{dataset_name}"
+scenario: "{scenario_name}"
+error_inject: "{error_inject_name}"
+delay_inject: "{delay_inject_name}"
+contract_ref: "hs_dev_docs/_00_project/_13_mock_contract/{contract_file}.json"

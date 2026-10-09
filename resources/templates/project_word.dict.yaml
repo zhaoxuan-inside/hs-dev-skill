@@ -1,0 +1,24 @@
+# 项目术语与命名统一词典 (Project Term Dictionary)
+# 作用：确保团队开发与 AI Agent 在命名、实体设计、接口字段、缩写上保持 100% 一致。
+
+terms:
+  - term: "交易订单"
+    en_name: "order"
+    abbr: "ord"
+    scope: "domain_model"
+    desc: "用户在平台发起的商品交易购买单据"
+    forbidden_alias: ["trade_info", "indent", "bill_order"]
+
+  - term: "库存锁定"
+    en_name: "stock_lock"
+    abbr: "stk_lck"
+    scope: "method"
+    desc: "下单时预占库存的操作"
+    forbidden_alias: ["reserve_stock", "hold_inventory"]
+
+  - term: "支付凭证"
+    en_name: "payment_receipt"
+    abbr: "pay_rcpt"
+    scope: "domain_model"
+    desc: "第三方支付渠道返回的成功凭据"
+    forbidden_alias: ["pay_voucher", "trans_proof"]

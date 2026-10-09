@@ -1,0 +1,2 @@
+{"version": "1.0", "category": "payment_interface", "root": "_01_payment"}
+{"id": "if_payment_process", "title": "支付处理接口", "path": "_01_payment_process_design.md", "status": "active", "digest": "f0ccf7d8"}

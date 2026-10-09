@@ -1,0 +1,9 @@
+{
+  "code": "ORDER_STOCK_LOCK_TIMEOUT",
+  "msg": "下游库存服务响应超时",
+  "retryable": true,
+  "details": {
+    "item_id": "item_uuid_12345",
+    "requested_qty": 1
+  }
+}
