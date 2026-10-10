@@ -14,8 +14,13 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 |------|------|
 | **动手前：装载门闩（反合理化 × Token）** | `load_latch.md` |
 | **任何需求第一步：变更分级 S/M/L** | `right_sizing.md` |
+| **审讯式 DESIGN 对齐 / grilling** | `grill_orchestration.md` |
 | 设计多问 / 实现少问 / work_mode | `confidence_decision.md` |
+| **测试方法（一等公民）/ TDD / seam** | `testing.md` |
+| 提交前门禁 / 九级测试分层 | `quality_gates.md` |
+| **深模块 / seam / Adapter / 删除测试** | `deep_modules.md` |
 | 满配阶段细则 0～6 | `spec_driven_lifecycle.md`（可只读当前阶段节） |
+| **UI 默认审美（本地 Anthropic 蒸馏）** | `frontend_aesthetic.md` |
 | UI 视觉方向 / DESIGN.md / 品牌对标 | `design_md.md` |
 | UI 手艺高频（anti-slop / 动效 / a11y） | `frontend_craft.md` |
 | **阶段 1～2：按规模/类型选开发范式（先于 DDD）** | `dev_paradigm.md` |
@@ -29,6 +34,5 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | 四级 JSONL 路由 | `four_level_routing.md` |
 | 任务状态机 | `task_state_machine.md` |
 | Mock Profile | `mock_contract_guide.md` |
-| 提交前门禁 | `quality_gates.md` |
 | 学习笔记 / 偏好 / GitHub 对标 | `learn_and_prefer.md` |
 | Win/Linux/macOS 路径与解释器 | `cross_platform.md` |

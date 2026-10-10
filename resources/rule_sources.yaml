@@ -7,11 +7,35 @@ policy:
   cache_ttl_hours: 168
 
 sources:
+  - id: local.frontend.aesthetic
+    kind: local
+    path: references/frontend_aesthetic.md
+    tags: [UI, aesthetic, design, anti-slop, typography, hero, Anthropic]
+    when: UI 默认审美 — 本地优先于远程 anthropic.frontend-design
+
   - id: local.frontend.core
     kind: local
     path: references/frontend_craft.md
     tags: [UI, frontend, a11y, design, React, anti-slop, motion]
-    when: 改 UI/组件/页面 — 本地高频必守（先于远程）
+    when: 改 UI/组件/页面手艺 — 本地高频（先 aesthetic / DESIGN.md）
+
+  - id: local.testing
+    kind: local
+    path: references/testing.md
+    tags: [test, TDD, seam, quality, 测试, 质量]
+    when: 实现/门禁 — 测试方法一等公民
+
+  - id: local.deep.modules
+    kind: local
+    path: references/deep_modules.md
+    tags: [module, seam, adapter, depth, architecture, 深模块, 重构]
+    when: 模块接口 / 可测性 / 日常重构对话
+
+  - id: local.grill
+    kind: local
+    path: references/grill_orchestration.md
+    tags: [grill, DESIGN, 审讯, 对齐, 澄清]
+    when: DESIGN 审讯式对齐
 
   - id: local.api.core
     kind: local
@@ -41,7 +65,7 @@ sources:
     kind: local
     path: references/frontend_arch.md
     tags: [frontend, architecture, FSD, feature, 模块]
-    when: 前端模块/FSD/与 BC 对齐 — 本地高频（视觉仍走 design_md）
+    when: 前端模块/FSD/与 BC 对齐 — 本地高频（审美走 aesthetic；身份走 design_md）
 
   - id: vercel.react-rules
     kind: github_tree
@@ -59,7 +83,7 @@ sources:
     ref: main
     file: skills/frontend-design/SKILL.md
     tags: [UI, design, aesthetic, typography, hero]
-    when: 审美方向 / 反模板皮深化（本地 craft 不够时）
+    when: 审美深化 / 对齐上游原文（先 local.frontend.aesthetic；search-cache，勿整灌）
 
   - id: addy.api-design
     kind: github_raw

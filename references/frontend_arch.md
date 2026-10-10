@@ -1,7 +1,7 @@
 # 前端架构方案清单（本地高频 · 指导设计）
 
 **何时读**：[`dev_paradigm.md`](dev_paradigm.md) 选定前端阶之后；划模块；与后端边界对齐；每会话最多一次。  
-**分工**：本文 = **前端结构与依赖**；范式总表 → `dev_paradigm`；视觉 → [`design_md.md`](design_md.md)；手艺 → [`frontend_craft.md`](frontend_craft.md)；DDD 档边界 → [`ddd_design.md`](ddd_design.md)。
+**分工**：本文 = **前端结构与依赖**；范式总表 → `dev_paradigm`；深模块/seam → [`deep_modules.md`](deep_modules.md)；默认审美 → [`frontend_aesthetic.md`](frontend_aesthetic.md)；DESIGN.md → [`design_md.md`](design_md.md)；手艺 → [`frontend_craft.md`](frontend_craft.md)；DDD 档边界 → [`ddd_design.md`](ddd_design.md)。
 
 ```bash
 python scripts/rule_fetch.py resolve --id local.frontend.arch

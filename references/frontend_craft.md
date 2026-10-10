@@ -1,13 +1,14 @@
 # 前端手艺清单（本地高频 · 按需加载）
 
 **何时读**：阶段 3/5 或 S/M 实现涉及 UI/组件/页面/样式/动效时；每会话最多一次。  
-**分层**：视觉方向 / `DESIGN.md` → [`design_md.md`](design_md.md)；本文 = **手艺与反 slop 高频**；更深 → [`rule_library.md`](rule_library.md) + `rule_fetch`。
+**分层**：**默认审美** → [`frontend_aesthetic.md`](frontend_aesthetic.md)；项目 `DESIGN.md` / 品牌对标 → [`design_md.md`](design_md.md)；本文 = **手艺与反 slop 高频**；更深 → [`rule_library.md`](rule_library.md) + `rule_fetch`。
 
 ```bash
-python scripts/rule_fetch.py resolve --id local.design.md          # 视觉方向协议
+python scripts/rule_fetch.py resolve --id local.frontend.aesthetic # 本地默认审美
+python scripts/rule_fetch.py resolve --id local.design.md          # DESIGN.md 协议
+python scripts/rule_fetch.py resolve --id anthropic.frontend-design # 远程原文（本地不够时）
 python scripts/rule_fetch.py resolve --id voltagent.design-md --rule stripe
 python scripts/rule_fetch.py search --q anti-slop
-python scripts/rule_fetch.py resolve --id anthropic.frontend-design
 python scripts/rule_fetch.py resolve --id antislop.core
 python scripts/rule_fetch.py resolve --id lottie.motion-design
 python scripts/rule_fetch.py resolve --id vercel.web-interface
@@ -20,10 +21,10 @@ python scripts/rule_fetch.py resolve --id vercel.react-rules --rule async-parall
 
 ## 1. 开工前（≤1 屏）
 
-1. **先方向后手艺**：项目根有 `DESIGN.md` → 先读/切片；无则按 [`design_md.md`](design_md.md) 用 awesome-design-md **≥2 品牌**对标后落盘，再编码。
+1. **先审美后手艺**：无 `DESIGN.md` → 先 [`frontend_aesthetic.md`](frontend_aesthetic.md)；有则切片读项目根 `DESIGN.md`。品牌/气质远程对标见 [`design_md.md`](design_md.md)。
 2. **题材锚定**：产品题材、受众、页面单一工作；视觉从题材语汇来，禁止「万能 SaaS 皮」。
-3. **短计划对齐 token**：4～6 色 + 1～2 字体族 + 间距阶梯；有设计系统跟 token。计划像默认稿 → 先改计划。
-4. **产品语义未冻** → `work_mode=DESIGN` 多问；视觉已写入 `DESIGN.md` 且仅实现 → `IMPLEMENT` 少问。
+3. **短计划对齐 token**：4～6 色 + 1～2 字体族 + 间距阶梯；有设计系统跟 token。计划像 AI 默认皮 → 先改计划。
+4. **产品语义未冻** → `work_mode=DESIGN` 审讯式多问；视觉已写入 `DESIGN.md` 且仅实现 → `IMPLEMENT` 少问。
 5. **品牌自测**：换掉 logo/产品名后是否仍有自己的性格？没有 → 太泛，重做方向。
 
 ---
@@ -43,7 +44,7 @@ python scripts/rule_fetch.py resolve --id vercel.react-rules --rule async-parall
 | 「Get Started / Learn More」万能 CTA；营销空话 | 具体动作与结果用语；句子大小写为主 |
 
 **目的测试**（anti-slop）：任何视觉手法先答「服务什么层级/识别/可读目标？」只有「看起来像 AI/很安全」→ 删或重做。  
-深化：`resolve --id antislop.core` / `anthropic.frontend-design`，用 `search-cache`，勿整篇灌进上下文。
+深化：本地不够时 `resolve --id anthropic.frontend-design` 或 `antislop.core`，用 `search-cache`，勿整篇灌进上下文。
 
 ---
 

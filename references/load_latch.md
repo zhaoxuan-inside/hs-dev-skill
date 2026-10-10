@@ -14,7 +14,11 @@ L0  写 change_size=S|M|L 与 work_mode=DESIGN|IMPLEMENT（见 right_sizing / co
 L1  路由：python scripts/skill_ref_index.py search --q <场景词> --limit 5
     或只读 references/_index.md 表格一行（二选一，勿两者都做）
 L2  打开命中的恰好 1 份 references/*.md（本会话已读过的不重读）
-    · 模糊 UI / 视觉方向 → 优先 `design_md.md`（或已有项目根 DESIGN.md）
+    · DESIGN 审讯对齐 / grilling → `grill_orchestration.md`
+    · 测试 / TDD / seam → `testing.md`
+    · 深模块 / 重构接口 → `deep_modules.md`
+    · 模糊 UI 默认审美 → `frontend_aesthetic.md`（项目已有 DESIGN.md 则切片读它）
+    · UI 品牌对标 / 落盘 DESIGN.md → `design_md.md`
     · UI 实现手艺 / 反 slop → `frontend_craft.md`
     · 架构/范式选型（规模·类型）→ `dev_paradigm.md`（先于 DDD）
     · 已选 DDD / 限界上下文 → `ddd_design.md`
@@ -41,7 +45,9 @@ L4  项目文档：doc_index_db search|slice → context_pack；禁止整树 hs_
 | 「把 references 全打开保险」 | Token 违规；只开 1 份 + 按需 rule_fetch |
 | 「远程规则库全拉下来」 | 只 resolve 命中 id，search 切片，禁止整包灌上下文 |
 | 「实现期也按设计轨狂问」 | work_mode=IMPLEMENT 走少问闸门 |
-| 「设计期少问省事」 | 模糊产品语义必须 DESIGN 多问或用户显式跳过 |
+| 「设计期少问省事」 | 模糊产品语义必须审讯式 DESIGN 或多问，或用户显式跳过 |
+| 「先写完再补测」 | 质量优先；IMPLEMENT 走 testing 红绿，禁止事后仪式测 |
+| 「审美先远程拉全文」 | 先 `frontend_aesthetic` 本地默认；不够再 rule_fetch ≤2 source |
 
 ---
 

@@ -1,13 +1,13 @@
 # hs-dev-skill: 产品开发 Skill
 
-> **文档驱动 + 变更分级（S/M/L）+ 六元组运行时 + Token 预算索引**
+> **质量优先 + 审讯式对齐 + 测试一等公民 + 深模块词汇 + 文档驱动 + S/M/L 分级**
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
-[![Spec Version](https://img.shields.io/badge/skill-v2.19-blue.svg)](SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v2.20-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS）。入口 [`SKILL.md`](SKILL.md) 保持薄装载；细则按场景索引打开。流程上先写 `change_size=S|M|L` 与 `work_mode=DESIGN|IMPLEMENT`（设计多问 / 实现少问），过装载门闩后再干活；领域规则本地高频 + `rule_fetch` 远程按需；配合产品冻结、SQLite 切片与 context_pack，平衡 Token 与反偷懒。
+`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS）。目标：**质量大于一切**——通过审讯式 DESIGN 对齐与分步正确（seam + 垂直 TDD），最大可能保证最终正确。入口 [`SKILL.md`](SKILL.md) 薄装载；细则按场景索引。先写 `change_size=S|M|L` 与 `work_mode`，过装载门闩后再干活；本地默认审美 + 深模块词汇 + 远程规则按需；产品冻结、SQLite 切片与 context_pack 平衡 Token 与反偷懒。
 
 ---
 
@@ -48,15 +48,15 @@ python scripts/skill_ref_index.py rebuild # Skill 详规场景索引
 
 ## 核心特性
 
-1. **变更分级（Right-Sizing）**：任意需求先写 `change_size=S|M|L`；S 快路径、M 补丁路径、L 满配。见 [right_sizing.md](references/right_sizing.md)。
-2. **设计多问 / 实现少问**：`work_mode=DESIGN|IMPLEMENT`；设计树澄清可跳过，实现期四条件才问。见 [confidence_decision.md](references/confidence_decision.md)。
-3. **装载门闩**：强制「分级 + 索引路由 + 1 份详规」，禁止跳过；也禁止整目录通读。见 [load_latch.md](references/load_latch.md)。
-4. **产品需求冻结（M/L）**：PRD 完整/正确/无冲突后才选型或满配详设。
-5. **Token 预算**：`skill_ref_index` + `doc_index_db` + `rule_fetch` 切片；禁止整树/远程规则包通读。见 [token_budget.md](references/token_budget.md)。
-6. **范式与架构指导**：先按规模/类型选范式 [dev_paradigm](references/dev_paradigm.md)（DDD 只是选项）；再按档打开 [ddd_design](references/ddd_design.md) / [backend_arch](references/backend_arch.md) / [frontend_arch](references/frontend_arch.md) + [design_md](references/design_md.md) + craft/API；远程书规则、wshobson、FSD、C4/ADR 等（见 [rule_library](references/rule_library.md)）。
-7. **全局学习与偏好**：`~/.hs-dev-skill/` + `global_index_db.py`。
-8. **六元组 + 任务三文件 + 迁移 V/U + Mock 契约隔离 + verify 门禁**。
-9. **默认本地 Commit；明确要求才 push**。
+1. **质量优先**：分步正确 + 测试一等公民（seam 确认 → 垂直 TDD）。见 [testing.md](references/testing.md) / [quality_gates.md](references/quality_gates.md)。
+2. **审讯式 DESIGN 对齐**：设计树前沿轮询（社区 grilling 心智），可跳过；实现少问。见 [grill_orchestration.md](references/grill_orchestration.md) / [confidence_decision.md](references/confidence_decision.md)。
+3. **变更分级（Right-Sizing）**：`change_size=S|M|L`；S 快路径、M 补丁、L 满配。见 [right_sizing.md](references/right_sizing.md)。
+4. **装载门闩**：分级 + 索引路由 + 恰好 1 份详规。见 [load_latch.md](references/load_latch.md)。
+5. **深模块词汇**：Module / Interface / Seam / Adapter / Depth / 删除测试。见 [deep_modules.md](references/deep_modules.md)。
+6. **本地默认审美 + 远程按需**：Anthropic 蒸馏在 [frontend_aesthetic.md](references/frontend_aesthetic.md)；品牌/气质/原文 → `rule_fetch` + [design_md.md](references/design_md.md) / craft。
+7. **产品冻结（M/L）+ Token 预算**：PRD 闭合后选型；索引切片禁止整树通读。
+8. **范式与架构**：[dev_paradigm](references/dev_paradigm.md) → deep_modules / ddd / backend / frontend / API；远程规则联邦见 [rule_library](references/rule_library.md)。
+9. **六元组 + 任务三文件 + Mock 隔离 + verify 门禁；默认本地 Commit**。
 
 ---
 
@@ -97,12 +97,16 @@ python scripts/verify_consistency.py --root .
 | [references/_index.md](references/_index.md) | 详规场景表（禁止整目录通读） |
 | [references/load_latch.md](references/load_latch.md) | **动手前装载门闩** |
 | [references/right_sizing.md](references/right_sizing.md) | 变更分级 + work_mode |
+| [references/grill_orchestration.md](references/grill_orchestration.md) | 审讯式 DESIGN 对齐 |
 | [references/confidence_decision.md](references/confidence_decision.md) | 设计多问 / 实现少问 |
+| [references/testing.md](references/testing.md) | 测试方法（一等公民） |
+| [references/deep_modules.md](references/deep_modules.md) | 深模块 / seam / Adapter |
 | [references/dev_paradigm.md](references/dev_paradigm.md) | 按规模/类型选开发范式（先于 DDD） |
 | [references/ddd_design.md](references/ddd_design.md) | DDD 子集（仅当范式选定含 DDD） |
 | [references/backend_arch.md](references/backend_arch.md) | 后端分层 / 微服务 / Saga |
 | [references/frontend_arch.md](references/frontend_arch.md) | 前端模块 / FSD / 与业务边界对齐 |
-| [references/design_md.md](references/design_md.md) | UI 视觉方向 / DESIGN.md |
+| [references/frontend_aesthetic.md](references/frontend_aesthetic.md) | UI 本地默认审美 |
+| [references/design_md.md](references/design_md.md) | DESIGN.md / 品牌对标 |
 | [references/frontend_craft.md](references/frontend_craft.md) / [api_engineering.md](references/api_engineering.md) | UI 手艺 / API 本地高频 |
 | [references/rule_library.md](references/rule_library.md) | 远程规则按需协议 |
 | [resources/rule_sources.yaml](resources/rule_sources.yaml) | 规则源目录 |

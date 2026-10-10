@@ -33,13 +33,27 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
     "load_latch.md": ["门闩", "装载", "反合理化", "latch", "跳过", "强制"],
     "right_sizing.md": ["分级", "S", "M", "L", "快路径", "小改动", "right-sizing", "change_size"],
     "token_budget.md": ["token", "预算", "context_pack", "装载", "SQLite"],
+    "grill_orchestration.md": [
+        "grill", "grilling", "审讯", "对齐", "澄清", "设计树", "多问", "DESIGN",
+    ],
+    "testing.md": [
+        "测试", "TDD", "seam", "质量", "单测", "红绿", "契约测", "test", "coverage",
+    ],
+    "deep_modules.md": [
+        "深模块", "deep", "module", "seam", "adapter", "删除测试", "深度",
+        "Ousterhout", "重构", "接口", "leverage", "locality",
+    ],
+    "frontend_aesthetic.md": [
+        "审美", "aesthetic", "Anthropic", "frontend-design", "默认审美",
+        "typography", "hero", "反模板", "AI皮",
+    ],
     "design_md.md": [
         "DESIGN.md", "设计", "视觉", "品牌", "design-md", "Stitch",
         "awesome-design-md", "对标", "token", "氛围", "Stripe", "Linear",
     ],
     "frontend_craft.md": [
         "前端", "UI", "组件", "页面", "a11y", "React", "样式",
-        "anti-slop", "动效", "motion", "审美", "hero", "无障碍",
+        "anti-slop", "动效", "motion", "hero", "无障碍", "手艺",
     ],
     "dev_paradigm.md": [
         "范式", "开发范式", "规模", "类型", "选型", "阶梯",
@@ -63,14 +77,17 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
         "anti-slop", "Lottie", "ui-craft", "web-interface", "DESIGN.md",
         "awesome-design-md", "wshobson", "Clean Architecture", "DDD", "FSD",
     ],
-    "confidence_decision.md": ["置信度", "询问", "闸门", "决策", "DESIGN", "IMPLEMENT", "设计多问", "实现少问"],
+    "confidence_decision.md": [
+        "置信度", "询问", "闸门", "决策", "DESIGN", "IMPLEMENT",
+        "设计多问", "实现少问", "审讯",
+    ],
     "learn_and_prefer.md": ["学习", "偏好", "GitHub", "对标", "标签"],
     "spec_driven_lifecycle.md": ["生命周期", "阶段", "门禁", "PRD", "冻结"],
     "six_tuple_runtime.md": ["六元组", "compensate", "fallback", "metrics", "recall"],
     "four_level_routing.md": ["四级索引", "JSONL", "路由"],
     "task_state_machine.md": ["任务", "状态机", "handoff"],
     "mock_contract_guide.md": ["Mock", "Profile", "契约测试"],
-    "quality_gates.md": ["门禁", "verify", "提交前"],
+    "quality_gates.md": ["门禁", "verify", "提交前", "覆盖率", "九级"],
     "cross_platform.md": ["跨平台", "Windows", "Linux", "macOS", "pathlib"],
     "spec_v2_4.md": ["规格", "百科", "争议"],
 }

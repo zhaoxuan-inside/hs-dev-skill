@@ -1,7 +1,7 @@
 # 后端框架设计清单（本地高频 · 按需加载）
 
 **何时读**：[`dev_paradigm.md`](dev_paradigm.md) 选定后端阶之后；依赖环；微服务拆分 / Saga；每会话最多一次。  
-**分工**：本文 = **后端分层与部署边界**；范式总表 → `dev_paradigm`；**DDD（仅 B4+）** → [`ddd_design.md`](ddd_design.md)；前端模块 → [`frontend_arch.md`](frontend_arch.md)；契约 → [`api_engineering.md`](api_engineering.md)；六元组 → [`six_tuple_runtime.md`](six_tuple_runtime.md)。
+**分工**：本文 = **后端分层与部署边界**；范式总表 → `dev_paradigm`；**深模块 / seam / Adapter** → [`deep_modules.md`](deep_modules.md)；**DDD（仅 B4+）** → [`ddd_design.md`](ddd_design.md)；前端模块 → [`frontend_arch.md`](frontend_arch.md)；契约 → [`api_engineering.md`](api_engineering.md)；六元组 → [`six_tuple_runtime.md`](six_tuple_runtime.md)。
 
 ```bash
 python scripts/rule_fetch.py search --q 架构
@@ -35,7 +35,8 @@ python scripts/rule_fetch.py resolve --id wshobson.saga-orchestration
 | 1. 变更档 | 跟 `change_size`：S 不新建架构文；M 只改触达边界；L 写完整架构 |
 | 2. 边界 | 先 `dev_paradigm` 定阶；B4+ 再 `ddd_design` 切 BC；否则按业务模块切；跨边界用 ACL/事件，禁止共享上帝模型 |
 | 3. 依赖方向 | **只向内**：Domain ← Application ← Adapters ← Frameworks；内层不知外层 |
-| 4. 外部封装 | 业务代码禁止直接 import 第三方 SDK/DB 驱动；经 infra Adapter（与本 Skill 红线一致） |
+| 4. 外部封装 | 业务代码禁止直接 import 第三方 SDK/DB 驱动；经 infra **Adapter** 落在明确 **seam**（见 `deep_modules`；真有 ≥2 实现再抽端口） |
+| 4b. 深度自检 | 用例/域模块做**删除测试**：删掉后复杂度是否散到 N 处调用方？浅透传则合并或加深 |
 | 5. 文档落盘 | L：`hs_dev_docs/_03_architecture_design/`；模板见 [`arch_design_template.md`](../resources/templates/architecture_design/arch_design_template.md) |
 
 模糊新技术栈：GitHub 高星对标 ≥2（框架官方样例 / 同域开源）再写 ADR。

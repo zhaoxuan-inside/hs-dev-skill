@@ -1,7 +1,7 @@
 # DESIGN.md 视觉方向协议（本地高频 · 按需加载）
 
-**何时读**：UI/落地页/品牌视觉方向未定或模糊；用户说「像 Stripe/Linear…」或「极简/编辑风…」；新建产品要落视觉身份；每会话最多一次。  
-**分工**：本文 = **何时写 / 怎么用 / 怎么对标**；手艺与反 slop → [`frontend_craft.md`](frontend_craft.md)；格式争议 → `rule_fetch`。
+**何时读**：要落盘/更新项目根 `DESIGN.md`；用户说「像 Stripe/Linear…」或「极简/编辑风…」；品牌/审美族对标；每会话最多一次。  
+**分工**：**默认审美纪律** → [`frontend_aesthetic.md`](frontend_aesthetic.md)（本地优先）；本文 = **何时写 DESIGN.md / 怎么对标远程品牌与气质**；手艺 → [`frontend_craft.md`](frontend_craft.md)。
 
 ```bash
 python scripts/rule_fetch.py search --q DESIGN.md
@@ -30,7 +30,7 @@ python scripts/rule_fetch.py resolve --id google.design-md-spec
 | `AGENTS.md` / 本 Skill | 编码 Agent | 怎么建、怎么改、门禁 |
 | **`DESIGN.md`（项目根）** | 设计向 Agent | **看起来与感觉如何**（色、字、组件、布局、禁忌） |
 
-无 `DESIGN.md` 时，Agent 只能靠默认审美 → 极易 AI 皮。有方向文件后，再叠 [`frontend_craft.md`](frontend_craft.md) 做手艺与诚实内容过滤。
+无 `DESIGN.md` 时，先遵守 [`frontend_aesthetic.md`](frontend_aesthetic.md) 本地默认，并尽快落盘本项目 `DESIGN.md`（模糊 UI / M/L 品牌向强制）。有方向文件后，再叠 [`frontend_craft.md`](frontend_craft.md)。更多设计需要 → `rule_fetch`（Anthropic 原文 / 品牌库 / 审美族），禁止跳过本地默认直接通读远程。
 
 ---
 
@@ -41,7 +41,7 @@ python scripts/rule_fetch.py resolve --id google.design-md-spec
 | 项目根已有 `DESIGN.md` | **必读**（或 `search-cache` 切片）；实现 UI 时以它为权威视觉契约 |
 | 用户点名品牌 / 「像 X」 | `voltagent.design-md --rule <slug>` → 改编进本项目 `DESIGN.md` |
 | 用户点名气质 / 「极简、编辑风、新粗野…」 | `bergside.design-skills --rule <slug>` → 改编；需要组件细则再拉 `bergside.design-skill-md` |
-| 模糊 UI、无品牌、无设计系统 | **品牌或审美族**选 ≥2 对标 → 记采纳/拒绝各 3 点 → 写出本项目 `DESIGN.md` 再编码 |
+| 模糊 UI、无品牌、无设计系统 | 先 `frontend_aesthetic` 两遍计划；可选品牌/审美族 ≥1～2 对标 → 写出本项目 `DESIGN.md` 再编码 |
 | 仅改交互/逻辑、视觉已冻 | 可不新写；仍遵守现有 `DESIGN.md` + `frontend_craft` |
 
 禁止：无方向文件却大改营销/品牌 UI；禁止把对标当模板整页复制（学 token 与原则，不抄 logo/专有文案/像素级布局）。

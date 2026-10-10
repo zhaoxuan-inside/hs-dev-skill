@@ -1,7 +1,7 @@
 # 开发范式选型（本地高频 · 指导设计）
 
 **何时读**：阶段 1～2 写架构前；新开产品/大改边界；团队规模或产品形态变化；每会话最多一次。  
-**分工**：本文 = **先选范式**；选中后再打开子集详规。DDD 只是复杂领域的一种选项，**禁止默认上 DDD**。
+**分工**：本文 = **先选范式**；模块接口与日常重构词汇 → [`deep_modules.md`](deep_modules.md)；选中后再打开子集详规。DDD 只是复杂领域的一种选项，**禁止默认上 DDD**。
 
 ```bash
 python scripts/rule_fetch.py search --q 范式
@@ -97,14 +97,17 @@ python scripts/rule_fetch.py resolve --id local.frontend.arch
 - [ ] 产品类型 + 规模 + 复杂度信号  
 - [ ] 后端阶（B0～B7）与前端阶（F0～F4）及「不升级」理由  
 - [ ] 模块/边界图（非 DDD 时用模块图即可；选了 DDD 再补 BC 图）  
-- [ ] 再按需打开：`ddd_design` / `backend_arch` / `frontend_arch` / `api_engineering`  
+- [ ] 关键模块的 **Interface / Seam / Depth** 一句（见 `deep_modules`）  
+- [ ] 再按需打开：`deep_modules` / `ddd_design` / `backend_arch` / `frontend_arch` / `api_engineering` / `testing`  
 
 ```text
 [类型+规模] → 选定 B阶/F阶 → 写 ADR 一行
+    → 接口与 seam 用深模块词汇 → deep_modules
     → 若含 DDD → ddd_design
     → 分层/部署 → backend_arch
     → 前端结构 → frontend_arch
     → 契约 → api_engineering
+    → 可测面 → testing
 ```
 
 ---
