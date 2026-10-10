@@ -33,9 +33,36 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
     "load_latch.md": ["门闩", "装载", "反合理化", "latch", "跳过", "强制"],
     "right_sizing.md": ["分级", "S", "M", "L", "快路径", "小改动", "right-sizing", "change_size"],
     "token_budget.md": ["token", "预算", "context_pack", "装载", "SQLite"],
-    "frontend_craft.md": ["前端", "UI", "组件", "页面", "a11y", "React", "样式"],
+    "design_md.md": [
+        "DESIGN.md", "设计", "视觉", "品牌", "design-md", "Stitch",
+        "awesome-design-md", "对标", "token", "氛围", "Stripe", "Linear",
+    ],
+    "frontend_craft.md": [
+        "前端", "UI", "组件", "页面", "a11y", "React", "样式",
+        "anti-slop", "动效", "motion", "审美", "hero", "无障碍",
+    ],
+    "dev_paradigm.md": [
+        "范式", "开发范式", "规模", "类型", "选型", "阶梯",
+        "事务脚本", "模块化单体", "CRUD", "B2B", "产品形态",
+    ],
+    "ddd_design.md": [
+        "DDD", "领域", "限界上下文", "聚合", "统一语言", "上下文映射",
+        "战略", "战术", "领域驱动", "bounded context", "aggregate",
+    ],
+    "frontend_arch.md": [
+        "前端架构", "FSD", "feature-sliced", "模块", "feature", "BFF",
+        "切片", "前端分层",
+    ],
+    "backend_arch.md": [
+        "后端", "架构", "分层", "hexagonal", "clean",
+        "微服务", "saga", "补偿", "ports", "adapter", "框架设计",
+    ],
     "api_engineering.md": ["API", "接口", "契约", "幂等", "Mock", "REST", "错误码"],
-    "rule_library.md": ["规则库", "rule_fetch", "远程规则", "Vercel", "Anthropic", "Addy"],
+    "rule_library.md": [
+        "规则库", "rule_fetch", "远程规则", "Vercel", "Anthropic", "Addy",
+        "anti-slop", "Lottie", "ui-craft", "web-interface", "DESIGN.md",
+        "awesome-design-md", "wshobson", "Clean Architecture", "DDD", "FSD",
+    ],
     "confidence_decision.md": ["置信度", "询问", "闸门", "决策", "DESIGN", "IMPLEMENT", "设计多问", "实现少问"],
     "learn_and_prefer.md": ["学习", "偏好", "GitHub", "对标", "标签"],
     "spec_driven_lifecycle.md": ["生命周期", "阶段", "门禁", "PRD", "冻结"],

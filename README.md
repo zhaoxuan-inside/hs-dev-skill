@@ -3,7 +3,7 @@
 > **文档驱动 + 变更分级（S/M/L）+ 六元组运行时 + Token 预算索引**
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
-[![Spec Version](https://img.shields.io/badge/skill-v2.13-blue.svg)](SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v2.19-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -53,7 +53,7 @@ python scripts/skill_ref_index.py rebuild # Skill 详规场景索引
 3. **装载门闩**：强制「分级 + 索引路由 + 1 份详规」，禁止跳过；也禁止整目录通读。见 [load_latch.md](references/load_latch.md)。
 4. **产品需求冻结（M/L）**：PRD 完整/正确/无冲突后才选型或满配详设。
 5. **Token 预算**：`skill_ref_index` + `doc_index_db` + `rule_fetch` 切片；禁止整树/远程规则包通读。见 [token_budget.md](references/token_budget.md)。
-6. **领域规则库**：本地 [frontend_craft](references/frontend_craft.md) / [api_engineering](references/api_engineering.md) 高频；远程按需 [rule_library](references/rule_library.md) + `resources/rule_sources.yaml`。
+6. **范式与架构指导**：先按规模/类型选范式 [dev_paradigm](references/dev_paradigm.md)（DDD 只是选项）；再按档打开 [ddd_design](references/ddd_design.md) / [backend_arch](references/backend_arch.md) / [frontend_arch](references/frontend_arch.md) + [design_md](references/design_md.md) + craft/API；远程书规则、wshobson、FSD、C4/ADR 等（见 [rule_library](references/rule_library.md)）。
 7. **全局学习与偏好**：`~/.hs-dev-skill/` + `global_index_db.py`。
 8. **六元组 + 任务三文件 + 迁移 V/U + Mock 契约隔离 + verify 门禁**。
 9. **默认本地 Commit；明确要求才 push**。
@@ -98,7 +98,12 @@ python scripts/verify_consistency.py --root .
 | [references/load_latch.md](references/load_latch.md) | **动手前装载门闩** |
 | [references/right_sizing.md](references/right_sizing.md) | 变更分级 + work_mode |
 | [references/confidence_decision.md](references/confidence_decision.md) | 设计多问 / 实现少问 |
-| [references/frontend_craft.md](references/frontend_craft.md) / [api_engineering.md](references/api_engineering.md) | UI / API 本地高频 |
+| [references/dev_paradigm.md](references/dev_paradigm.md) | 按规模/类型选开发范式（先于 DDD） |
+| [references/ddd_design.md](references/ddd_design.md) | DDD 子集（仅当范式选定含 DDD） |
+| [references/backend_arch.md](references/backend_arch.md) | 后端分层 / 微服务 / Saga |
+| [references/frontend_arch.md](references/frontend_arch.md) | 前端模块 / FSD / 与业务边界对齐 |
+| [references/design_md.md](references/design_md.md) | UI 视觉方向 / DESIGN.md |
+| [references/frontend_craft.md](references/frontend_craft.md) / [api_engineering.md](references/api_engineering.md) | UI 手艺 / API 本地高频 |
 | [references/rule_library.md](references/rule_library.md) | 远程规则按需协议 |
 | [resources/rule_sources.yaml](resources/rule_sources.yaml) | 规则源目录 |
 | [references/token_budget.md](references/token_budget.md) | 装载纪律 |

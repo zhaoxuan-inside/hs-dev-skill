@@ -10,7 +10,7 @@ sources:
   - id: local.frontend.core
     kind: local
     path: references/frontend_craft.md
-    tags: [UI, frontend, a11y, design, React]
+    tags: [UI, frontend, a11y, design, React, anti-slop, motion]
     when: 改 UI/组件/页面 — 本地高频必守（先于远程）
 
   - id: local.api.core
@@ -18,6 +18,30 @@ sources:
     path: references/api_engineering.md
     tags: [API, REST, 契约, 幂等, Mock, 错误码]
     when: 改 API/Mock/契约 — 本地高频必守（先于远程）
+
+  - id: local.dev.paradigm
+    kind: local
+    path: references/dev_paradigm.md
+    tags: [paradigm, 范式, 规模, 类型, architecture, 选型]
+    when: 阶段 1～2 按规模/类型选开发范式 — 先于 DDD/分层详规
+
+  - id: local.backend.arch
+    kind: local
+    path: references/backend_arch.md
+    tags: [backend, architecture, hexagonal, clean, 分层, saga]
+    when: 后端分层 / 微服务 / Saga — 本地高频（先 local.dev.paradigm）
+
+  - id: local.ddd.design
+    kind: local
+    path: references/ddd_design.md
+    tags: [DDD, domain, 限界上下文, 聚合, 统一语言, architecture]
+    when: 范式已选含 DDD 时的战略战术 — 非默认入口
+
+  - id: local.frontend.arch
+    kind: local
+    path: references/frontend_arch.md
+    tags: [frontend, architecture, FSD, feature, 模块]
+    when: 前端模块/FSD/与 BC 对齐 — 本地高频（视觉仍走 design_md）
 
   - id: vercel.react-rules
     kind: github_tree
@@ -53,10 +77,238 @@ sources:
     tags: [UI, components, state, a11y, forms]
     when: 组件状态机 / 表单 / a11y 深化
 
+  - id: vercel.web-interface
+    kind: github_raw
+    repo: vercel-labs/web-interface-guidelines
+    ref: main
+    file: command.md
+    tags: [a11y, web, guidelines, review, focus, forms]
+    when: Web 界面合规复审（100+ 条；按需 search-cache）
+
+  # 兼容旧 id：与 vercel.web-interface 同文件
   - id: vercel.web-guidelines
     kind: github_raw
-    repo: vercel-labs/agent-skills
+    repo: vercel-labs/web-interface-guidelines
     ref: main
-    file: skills/web-design-guidelines/SKILL.md
+    file: command.md
     tags: [a11y, web, guidelines, review]
-    when: Web 界面合规复审（按需）
+    when: 同 vercel.web-interface（旧 id 兼容）
+
+  - id: antislop.core
+    kind: github_raw
+    repo: miqdadbadjuber/anti-slop
+    ref: main
+    file: skills/antislop/SKILL.md
+    tags: [UI, anti-slop, filter, honesty, copy, delivery-gate]
+    when: 反 AI slop 过滤 / 假数据 / 交付门禁深挖 — 忽略安装向导与 during/after 询问
+
+  - id: antislop.ui
+    kind: github_raw
+    repo: miqdadbadjuber/anti-slop
+    ref: main
+    file: skills/antislop-ui/SKILL.md
+    tags: [UI, layout, color, decoration, motion]
+    when: 布局/装饰/动效目的性审查（先于或配合 antislop.core）
+
+  - id: lottie.motion-design
+    kind: github_raw
+    repo: LottieFiles/motion-design-skill
+    ref: main
+    file: skills/motion-design/SKILL.md
+    tags: [motion, animation, easing, choreography, micro-interaction]
+    when: 动效人格 / 时长曲线 / 多元素编排
+
+  - id: educlopez.ui-craft
+    kind: github_raw
+    repo: educlopez/ui-craft
+    ref: main
+    file: skills/ui-craft/SKILL.md
+    tags: [UI, craft, heuristics, design-system, polish]
+    when: 设计工程 / Top-12 细则 / 可打分复审 — 忽略其 /命令 与 MCP 专属流程，用 search-cache
+
+  - id: local.design.md
+    kind: local
+    path: references/design_md.md
+    tags: [DESIGN.md, design, brand, visual, Stitch]
+    when: UI 视觉方向 / 写或选用 DESIGN.md — 本地协议（先于品牌拉取）
+
+  - id: voltagent.design-md-catalog
+    kind: github_raw
+    repo: VoltAgent/awesome-design-md
+    ref: main
+    file: README.md
+    tags: [DESIGN.md, catalog, brands, awesome-design-md]
+    when: 浏览可用品牌 slug（Stripe/Linear/Vercel/…）
+
+  - id: voltagent.design-md
+    kind: github_tree
+    repo: VoltAgent/awesome-design-md
+    ref: main
+    base_path: design-md
+    file_template: "{rule}/DESIGN.md"
+    catalog_file: README.md
+    tags: [DESIGN.md, brand, visual, design-system, UI]
+    when: 按品牌拉 DESIGN.md — resolve --rule <slug>（学 token，不克隆品牌）
+    rule_examples: [stripe, vercel, linear.app, claude, cursor, notion, apple, spotify, supabase, figma]
+
+  - id: google.design-md-spec
+    kind: github_raw
+    repo: google-labs-code/design.md
+    ref: main
+    file: docs/spec.md
+    tags: [DESIGN.md, spec, tokens, Stitch, schema]
+    when: DESIGN.md 格式 / YAML token schema 争议
+
+  - id: google.design-md-philosophy
+    kind: github_raw
+    repo: google-labs-code/design.md
+    ref: main
+    file: PHILOSOPHY.md
+    tags: [DESIGN.md, prose, philosophy, intent]
+    when: 如何写有方向的 DESIGN.md 散文（具体参照 > 形容词）
+
+  - id: bergside.design-skills-catalog
+    kind: github_raw
+    repo: bergside/awesome-design-skills
+    ref: main
+    file: skills/index.json
+    tags: [DESIGN.md, aesthetic, style, catalog, TypeUI]
+    when: 浏览审美族 slug（minimal/editorial/glassmorphism/…）
+
+  - id: bergside.design-skills
+    kind: github_tree
+    repo: bergside/awesome-design-skills
+    ref: main
+    base_path: skills
+    file_template: "{rule}/DESIGN.md"
+    catalog_file: skills/index.json
+    tags: [DESIGN.md, aesthetic, style, visual, UI]
+    when: 按审美族拉 DESIGN.md — resolve --rule <slug>（学气质，改编进本项目；勿装 TypeUI CLI）
+    rule_examples: [minimal, editorial, corporate, premium, paper, sleek, glassmorphism, neobrutalism, mono]
+
+  - id: bergside.design-skill-md
+    kind: github_tree
+    repo: bergside/awesome-design-skills
+    ref: main
+    base_path: skills
+    file_template: "{rule}/SKILL.md"
+    tags: [SKILL.md, aesthetic, components, a11y]
+    when: 审美族 Agent 指令 SKILL.md（组件/门禁细则；先有本项目 DESIGN.md）
+    rule_examples: [minimal, editorial, premium, corporate]
+
+  - id: wshobson.architecture-patterns
+    kind: github_raw
+    repo: wshobson/agents
+    ref: main
+    file: plugins/backend-development/skills/architecture-patterns/SKILL.md
+    tags: [Clean, Hexagonal, DDD, backend, architecture, ports]
+    when: Clean / Hexagonal / DDD 深化（本地 backend_arch 不够时）
+
+  - id: wshobson.microservices-patterns
+    kind: github_raw
+    repo: wshobson/agents
+    ref: main
+    file: plugins/backend-development/skills/microservices-patterns/SKILL.md
+    tags: [microservices, resilience, saga, event-driven, backend]
+    when: 微服务拆分 / 通信 / 韧性模式
+
+  - id: wshobson.saga-orchestration
+    kind: github_raw
+    repo: wshobson/agents
+    ref: main
+    file: plugins/backend-development/skills/saga-orchestration/SKILL.md
+    tags: [saga, compensate, distributed, 六元组, orchestration]
+    when: 分布式事务 / Saga / 补偿编排（对齐六元组 compensate）
+
+  - id: wshobson.cqrs
+    kind: github_raw
+    repo: wshobson/agents
+    ref: main
+    file: plugins/backend-development/skills/cqrs-implementation/SKILL.md
+    tags: [CQRS, command, query, backend, architecture]
+    when: CQRS 读写分离（有明确读写负载差异时）
+
+  - id: clean-arch.skill
+    kind: github_raw
+    repo: omaromar9091/clean-architecture-skill
+    ref: main
+    file: SKILL.md
+    tags: [Clean Architecture, SOLID, layers, backend, over-engineering]
+    when: Clean Architecture 分档 / 禁令表 / 何时不做（防过度设计）
+
+  - id: wshobson.api-design-principles
+    kind: github_raw
+    repo: wshobson/agents
+    ref: main
+    file: plugins/backend-development/skills/api-design-principles/SKILL.md
+    tags: [API, REST, gRPC, backend, versioning]
+    when: 后端 API 设计原则深化（与 addy.api-design / local.api.core 互补）
+
+  - id: wshobson.event-store
+    kind: github_raw
+    repo: wshobson/agents
+    ref: main
+    file: plugins/backend-development/skills/event-store-design/SKILL.md
+    tags: [event-sourcing, event-store, backend, DDD]
+    when: 事件溯源 / Event Store（有明确审计/重建需求时）
+
+  - id: wshobson.architecture-refs
+    kind: github_tree
+    repo: wshobson/agents
+    ref: main
+    base_path: plugins/backend-development/skills/architecture-patterns/references
+    file_template: "{rule}.md"
+    tags: [DDD, Hexagonal, ACL, advanced, backend]
+    when: 架构模式深文 — resolve --rule advanced-patterns|details
+    rule_examples: [advanced-patterns, details]
+
+  - id: ciembor.architecture-books
+    kind: github_tree
+    repo: ciembor/agent-rules-books
+    ref: main
+    base_path: ""
+    file_template: "{rule}/{rule}.mini.md"
+    catalog_file: README.md
+    tags: [Clean Architecture, DDD, DDIA, books, backend]
+    when: 经典书提炼规则（mini 版）— resolve --rule clean-architecture|domain-driven-design|…
+    rule_examples: [clean-architecture, domain-driven-design, domain-driven-design-distilled, implementing-domain-driven-design, designing-data-intensive-applications, a-philosophy-of-software-design]
+
+  - id: muthub.c4designer
+    kind: github_raw
+    repo: muthub-ai/c4-skills
+    ref: main
+    file: c4designer/SKILL.md
+    tags: [C4, architecture, diagram, Mermaid, backend]
+    when: C4 上下文/容器/组件图（阶段 2 架构表达）
+
+  - id: muthub.adr-scribe
+    kind: github_raw
+    repo: muthub-ai/c4-skills
+    ref: main
+    file: adr-scribe/SKILL.md
+    tags: [ADR, decision, architecture, backend]
+    when: 写/复审 ADR（阶段 1；对齐本仓库 adr_template）
+
+  - id: fsd.skill
+    kind: github_raw
+    repo: feature-sliced/skills
+    ref: master
+    file: feature-sliced-design/SKILL.md
+    tags: [FSD, frontend, architecture, feature-sliced]
+    when: Feature-Sliced Design 细则（本地 frontend_arch T2 时）
+
+  - id: sairyss.dddh-readme
+    kind: github_raw
+    repo: Sairyss/domain-driven-hexagon
+    ref: master
+    file: README.md
+    tags: [DDD, hexagonal, backend, patterns]
+    when: DDD+六边形实践对照 — 仅 search-cache，禁止整读 100KB+ README
+
+  - id: kgrzybek.modular-monolith
+    kind: github_raw
+    repo: kgrzybek/modular-monolith-with-ddd
+    ref: master
+    file: README.md
+    tags: [DDD, modular-monolith, backend, architecture]
+    when: 模块化单体+DDD 实践对照 — 仅 search-cache，禁止整读

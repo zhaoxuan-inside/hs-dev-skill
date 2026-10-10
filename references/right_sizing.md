@@ -42,7 +42,7 @@
 | 轻量对齐 | 3～8 行：改什么 / 不改什么 / DoD；**不写**完整 PRD，除非触及产品语义（则升 M/L） |
 | 选型/架构/四要素 | **跳过**新建；禁止为 S 新建 ADR/架构文/四要素全套 |
 | 装载 | `doc_index_db search|slice` 只取**被改文件相关**设计切片入 pack（可极短） |
-| 实现 | 直接改代码；UI 则按需读 `frontend_craft.md`；不涉及 API 契约则不读 `api_engineering.md` |
+| 实现 | 直接改代码；UI 有 `DESIGN.md` 则跟它，手艺读 `frontend_craft.md`；视觉未定则先 `design_md.md`；不涉及 API 则不读 `api_engineering.md` |
 | 门禁 | 相关测试 + `verify_consistency`（若未动 docs/idx 可只跑测试）；有任务则归档 |
 | 询问闸门 | 默认 `IMPLEMENT` 少问；触及产品语义未决 → 升 M/L 并切 `DESIGN` |
 
@@ -55,14 +55,14 @@
 | 步骤 | 要求 |
 |------|------|
 | 阶段 0 | 短 PRD 或在既有 PRD 下追加「变更节」；冻结门禁缩为：**触达面的**完整/正确/无冲突 |
-| 阶段 1～2 | **跳过**除非换栈或动边界；否则引用既有 ADR/架构，只记「沿用」一行 |
+| 阶段 1～2 | **跳过**除非换栈或动边界；否则引用既有 ADR/架构，只记「沿用」一行；动范式/边界读 `dev_paradigm.md`；仅当范式含 DDD 再读 `ddd_design.md`；动分层读 `backend_arch`/`frontend_arch` |
 | 阶段 3 | **仅更新触达的** DB/API/六元组/调用链文档与 V/U；未触达维禁止重写 |
 | 阶段 4～6 | 同满配，但 context_pack 只物化触达切片 |
-| API/UI | 改契约读 `api_engineering.md`；改 UI 读 `frontend_craft.md`（各每会话最多一次） |
+| API/UI | 改契约读 `api_engineering.md`；改 UI：视觉→`design_md.md`/`DESIGN.md`，结构→`frontend_arch.md`，手艺→`frontend_craft.md`（各每会话最多一次） |
 
 ### L — 满配路径
 
-完整 `0 → 1 → 2 → 3 → 4 → 5 → 6`，见 [`spec_driven_lifecycle.md`](spec_driven_lifecycle.md)。模糊 UI/新技术仍先 GitHub 对标。
+完整 `0 → 1 → 2 → 3 → 4 → 5 → 6`，见 [`spec_driven_lifecycle.md`](spec_driven_lifecycle.md)。阶段 1～2 先[`dev_paradigm.md`](dev_paradigm.md)选范式；仅 DDD 档再读[`ddd_design.md`](ddd_design.md)；模糊 UI→[`design_md.md`](design_md.md)；后端分层→[`backend_arch.md`](backend_arch.md)；前端模块→[`frontend_arch.md`](frontend_arch.md)。
 
 ---
 

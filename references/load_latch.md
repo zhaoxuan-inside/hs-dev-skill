@@ -14,7 +14,14 @@ L0  写 change_size=S|M|L 与 work_mode=DESIGN|IMPLEMENT（见 right_sizing / co
 L1  路由：python scripts/skill_ref_index.py search --q <场景词> --limit 5
     或只读 references/_index.md 表格一行（二选一，勿两者都做）
 L2  打开命中的恰好 1 份 references/*.md（本会话已读过的不重读）
-L3  触达 UI/API 且本地 craft 不够用 → `rule_fetch` search/resolve（[`rule_library.md`](rule_library.md)），禁止预拉全部远程包
+    · 模糊 UI / 视觉方向 → 优先 `design_md.md`（或已有项目根 DESIGN.md）
+    · UI 实现手艺 / 反 slop → `frontend_craft.md`
+    · 架构/范式选型（规模·类型）→ `dev_paradigm.md`（先于 DDD）
+    · 已选 DDD / 限界上下文 → `ddd_design.md`
+    · 后端分层 / 微服务 / Saga → `backend_arch.md`
+    · 前端模块 / FSD → `frontend_arch.md`
+    · API 契约 → `api_engineering.md`
+L3  触达 UI/API/架构且本地不够用 → `rule_fetch`（书规则、FSD、wshobson、品牌 DESIGN.md…）；禁止预拉全部远程包
 L4  项目文档：doc_index_db search|slice → context_pack；禁止整树 hs_dev_docs
 ```
 

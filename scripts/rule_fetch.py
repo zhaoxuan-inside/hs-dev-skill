@@ -236,6 +236,7 @@ def search_catalog(catalog: Dict[str, Any], q: str, limit: int = 8) -> Dict[str,
                 " ".join(s.get("rule_examples") or []),
                 str(s.get("file") or ""),
                 str(s.get("base_path") or ""),
+                str(s.get("file_template") or ""),
             ]
         ).lower()
         score = 0
@@ -308,7 +309,13 @@ def resolve_source(
                 "hint": f"example: resolve --id {source_id} --rule {(examples[0] if examples else 'async-parallel')}",
             }
         rule_stem = rule[:-3] if rule.endswith(".md") else rule
-        file_path = f"{str(src.get('base_path') or '').rstrip('/')}/{rule_stem}.md"
+        # file_template 支持嵌套路径，如 "{rule}/DESIGN.md"（awesome-design-md）
+        template = str(src.get("file_template") or "{rule}.md").strip()
+        if "{rule}" not in template:
+            template = "{rule}.md"
+        rel = template.replace("{rule}", rule_stem).lstrip("/")
+        base = str(src.get("base_path") or "").rstrip("/")
+        file_path = f"{base}/{rel}" if base else rel
         body, meta = _cache_paths(cache_root, source_id, rule_stem)
         if not force and body.is_file() and _meta_fresh(meta, ttl):
             text = _read_text(body)

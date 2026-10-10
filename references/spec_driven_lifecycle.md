@@ -4,7 +4,7 @@
 **任意需求第一步**先做变更分级：见 **[right_sizing.md](right_sizing.md)**（S/M 缩短路径；未分级禁止按满配开工）。
 
 交互边界：**[confidence_decision.md](confidence_decision.md)**、**[learn_and_prefer.md](learn_and_prefer.md)**。  
-UI/API 详设与实现按需：**[frontend_craft.md](frontend_craft.md)**、**[api_engineering.md](api_engineering.md)**。
+架构/UI/API 详设与实现按需：**[dev_paradigm.md](dev_paradigm.md)**（先选型）、**[ddd_design.md](ddd_design.md)**（仅 DDD 档）、**[backend_arch.md](backend_arch.md)**、**[frontend_arch.md](frontend_arch.md)**、**[frontend_craft.md](frontend_craft.md)**、**[api_engineering.md](api_engineering.md)**。
 
 ```text
   [分级 S|M|L] -- right_sizing.md
@@ -96,31 +96,33 @@ UI/API 详设与实现按需：**[frontend_craft.md](frontend_craft.md)**、**[a
 
 ---
 
-## 阶段 2：领域建模与架构设计 (Domain Modeling & Architecture)
+## 阶段 2：范式落地与架构设计 (Paradigm & Architecture)
 
 ### 1. 核心目标
-建立 DDD 战略与战术模型，划分限界上下文（Bounded Context），确立分层架构与实体边界，统一定义项目术语词典。
+按规模/类型选定开发范式（后端 B 阶 / 前端 F 阶），再落模块边界与术语；**仅当范式含 DDD** 才做战略/战术领域模型。主详规：**[dev_paradigm.md](dev_paradigm.md)**；子集：**[ddd_design.md](ddd_design.md)** / **[backend_arch.md](backend_arch.md)** / **[frontend_arch.md](frontend_arch.md)**。
 
 ### 2. Agent 行为准则
-- 梳理核心领域对象（聚合根、实体、值对象、领域服务、仓储）；
-- 绘制分层架构图与模块依赖拓扑；
-- 维护 `_00_project/_02_project_word.dict.yaml`，统一全项目名词、实体、动词命名与禁止别名；
-- 标准分层与常规聚合拆分高置信自主推进；限界上下文切割等若同时满足询问闸门四条件则询问。
+- L2 优先读 `dev_paradigm.md`（本会话未读时）；按选定阶再读 `backend_arch` / `frontend_arch` /（若 B4+）`ddd_design`（各每会话最多一次）；
+- 非 DDD：模块图 + 依赖方向 + 词典即可；禁止硬套聚合/BC 仪式；
+- DDD 档：BC 图 + 上下文映射 + 聚合/VO/事件；前端 feature 与边界对齐（或显式 BFF）；
+- 依赖只向内；外部经 Adapter；模板见 `resources/templates/architecture_design/arch_design_template.md`；
+- 常规分层高置信自主推进；范式升级/BC 切割若触询问闸门四条件则询问；
+- 仍不够 → `rule_fetch`：按范式选 `ciembor.*` / `wshobson.*` / `fsd.skill` 等。
 
 ### 3. 产出文档
-- `hs_dev_docs/_03_architecture_design/_{platform}_architecture_design.md`
+- `hs_dev_docs/_03_architecture_design/_{platform}_architecture_design.md`（含范式阶 + 模块/BC 与前端对齐表）
 - `hs_dev_docs/_00_project/_02_project_word.dict.yaml`
 - 更新对应 `.idx`
 
 ### 4. 阶段门禁
-架构分层与实体边界清晰，术语词典完备；触发的询问项已关闭。
+范式阶与「不升级」理由已写；模块（或 BC）边界清晰；词典完备；前端模块对齐表已填（若有 UI）；触发的询问项已关闭。
 
 ---
 
 ## 阶段 3：详细规格设计四要素 (Detailed Spec Design)
 
 ### 1. 核心目标
-L：四维契约齐套后再编码。M：只更新触达维。S：跳过。接口细则见 `api_engineering.md`；UI 见 `frontend_craft.md`。
+L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范式见 `dev_paradigm.md`；DDD 档见 `ddd_design.md`；后端见 `backend_arch.md`；前端结构见 `frontend_arch.md`；接口见 `api_engineering.md`；UI 手艺/视觉见 `frontend_craft.md` / `design_md.md`。
 
 ### 2. 四维产出物
 1. **数据库设计与迁移 (DB Schema)**：

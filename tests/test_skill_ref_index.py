@@ -28,6 +28,11 @@ class TestSkillRefIndex(unittest.TestCase):
             "right_sizing.md",
             "api_engineering.md",
             "frontend_craft.md",
+            "design_md.md",
+            "dev_paradigm.md",
+            "ddd_design.md",
+            "frontend_arch.md",
+            "backend_arch.md",
             "token_budget.md",
         ):
             src = ref_src / name
@@ -54,6 +59,30 @@ class TestSkillRefIndex(unittest.TestCase):
 
         ui = db.search(q="UI", limit=8)
         self.assertTrue(any("frontend_craft" in h["path"] for h in ui["hits"]))
+
+        design = db.search(q="DESIGN.md", limit=8)
+        self.assertTrue(
+            any("design_md" in h["path"] for h in design["hits"]),
+            msg=json.dumps(design, ensure_ascii=False),
+        )
+
+        para = db.search(q="范式", limit=8)
+        self.assertTrue(
+            any("dev_paradigm" in h["path"] for h in para["hits"]),
+            msg=json.dumps(para, ensure_ascii=False),
+        )
+
+        ddd = db.search(q="DDD", limit=8)
+        self.assertTrue(
+            any("ddd_design" in h["path"] for h in ddd["hits"]),
+            msg=json.dumps(ddd, ensure_ascii=False),
+        )
+
+        fsd = db.search(q="FSD", limit=8)
+        self.assertTrue(
+            any("frontend_arch" in h["path"] for h in fsd["hits"]),
+            msg=json.dumps(fsd, ensure_ascii=False),
+        )
 
         size = db.search(tag="change_size", limit=5)
         self.assertTrue(any("right_sizing" in h["path"] for h in size["hits"]))
