@@ -7,6 +7,8 @@
 
 ## 1. 项目文件组织架构
 
+跨项目共享（不在仓库内）：`Path.home() / ".hs-dev-skill"`（Windows / Linux / macOS；`preferences.yaml`、`tech_learning/`），由 `scripts/init_hs_global.py` 初始化；协议见 `references/learn_and_prefer.md`，三端约定见 `references/cross_platform.md`。
+
 ```text
 /project_home_path/
 ├── {project_name}/
@@ -330,6 +332,12 @@ U{主}.{次}.{补丁}__{描述}.sql
 | spec | 设计文档、接口、方法、DB、调用链变更 |
 | migrate | 数据库迁移脚本变更 |
 | mock | Mock 服务、Mock 数据、测试集配置变更 |
+
+### 3.3 提交与推送边界（强制）
+
+- 常规流程：Agent 在门禁通过后执行**本地** `git commit`，**不主动**推送。
+- **仅当用户明确要求推送**（如「推送代码」「帮我 push」「push 到远程」）时，Agent 可代为执行 `git push`（含首次 `-u`）并回报结果。
+- 未获明确推送授权时，禁止 `git push` / 等价远程推送。
 
 ---
 

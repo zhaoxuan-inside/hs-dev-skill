@@ -32,6 +32,16 @@
 └───────────┘                    └───────────┘
 ```
 
+### BLOCKED 与置信度决策
+
+除依赖缺失外，**询问闸门触发时**（影响面广 + 项目特有 + 资料未提及 + 多选项置信接近，见 [`confidence_decision.md`](confidence_decision.md)）必须进入 `BLOCKED`：
+
+1. 在 task_detail / brief 中写明决策点、候选选项、自评置信与影响面；
+2. `python3 scripts/task_manager.py status --id {task_id} --set BLOCKED`；
+3. 用户答复后写入 PRD/ADR/设计/词典，再回到 `IN_PROGRESS`（或阶段 0–3 尚未建任务时，仅暂停跃迁、不落盘最终结论）。
+
+**禁止**：对大家通用的解决方案提问并为此 `BLOCKED`；**禁止**：在未满足询问闸门时用猜测填项目特有空白后继续推进。
+
 ---
 
 ## 2. 三文件强一致性约束

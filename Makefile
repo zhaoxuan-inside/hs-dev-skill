@@ -1,13 +1,21 @@
-.PHONY: test verify scan-dead-code init-docs help
+.PHONY: test verify scan-dead-code init-docs init-global paths help
 
-PYTHON ?= python3
+# 跨平台：Linux/macOS 默认 python3；Windows 可 make PYTHON="py -3" 或 PYTHON=python
+ifeq ($(OS),Windows_NT)
+  PYTHON ?= python
+else
+  PYTHON ?= python3
+endif
 
 help:
-	@echo "hs-dev-skill 常用开发命令:"
-	@echo "  make test           - 运行全量单元测试"
-	@echo "  make verify         - 执行提交前全量一致性与质量门禁自检"
-	@echo "  make scan-dead-code - 扫描死代码与未登记的孤儿方法"
-	@echo "  make init-docs      - 在当前目录初始化完整的 hs_dev_docs 骨架与索引"
+	@echo "hs-dev-skill commands (Windows / Linux / macOS):"
+	@echo "  make test           - run unit tests"
+	@echo "  make verify         - pre-commit consistency gates"
+	@echo "  make scan-dead-code - dead / orphan method scan"
+	@echo "  make init-docs      - init hs_dev_docs skeleton in cwd"
+	@echo "  make init-global    - init ~/.hs-dev-skill (cross-project)"
+	@echo "  make paths          - print resolved global paths for this OS"
+	@echo "  Override interpreter: make test PYTHON=python3   or   make test PYTHON=\"py -3\""
 
 test:
 	$(PYTHON) -m unittest discover -s tests -p "test_*.py"
@@ -21,3 +29,9 @@ scan-dead-code:
 
 init-docs:
 	$(PYTHON) scripts/init_hs_dev_docs.py --root .
+
+init-global:
+	$(PYTHON) scripts/init_hs_global.py
+
+paths:
+	$(PYTHON) scripts/hs_paths.py

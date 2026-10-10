@@ -23,4 +23,4 @@
 2. **三同步完整性**：业务逻辑修改已同步更新方法设计文档、DB 迁移脚本（V/U）及单元/契约测试。
 3. **索引完整性**：新增/重命名/删除的文件已同步更新对应的 `.idx` 索引文件。
 4. **三文件一致性**：`_00_task.idx`、`_01_task_brief/`、`_02_task_detail/` 任务状态与元数据完全吻合。
-5. **Git Commit 规范**：提交信息符合 `<type>(<scope>): <subject>` 及相关 Footer 规范。
+5. **Git Commit 规范**：提交信息符合 `<type>(<scope>): <subject>` 及相关 Footer 规范；默认仅本地 commit，**用户明确要求推送**时方可 `git push`。

@@ -147,6 +147,10 @@ def init_full_workspace(workspace_root: str):
         )
 
     print("[SUCCESS] Complete hs-dev-skill file tree and JSONL indices initialized successfully!")
+    print(
+        "[NOTE] Cross-project preferences & tech learning: Path.home()/.hs-dev-skill "
+        "(Windows/Linux/macOS) — run: python scripts/init_hs_global.py"
+    )
 
 
 def main():
