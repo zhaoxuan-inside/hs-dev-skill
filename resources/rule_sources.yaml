@@ -1,0 +1,62 @@
+# 领域规则源目录：本地高频 + 远程按需拉取
+# Agent：先 list/search，再 resolve 命中 id（可选 --rule）；禁止预拉全部远程包
+version: 1
+policy:
+  max_sources_per_task: 2
+  prefer_search_slice: true
+  cache_ttl_hours: 168
+
+sources:
+  - id: local.frontend.core
+    kind: local
+    path: references/frontend_craft.md
+    tags: [UI, frontend, a11y, design, React]
+    when: 改 UI/组件/页面 — 本地高频必守（先于远程）
+
+  - id: local.api.core
+    kind: local
+    path: references/api_engineering.md
+    tags: [API, REST, 契约, 幂等, Mock, 错误码]
+    when: 改 API/Mock/契约 — 本地高频必守（先于远程）
+
+  - id: vercel.react-rules
+    kind: github_tree
+    repo: vercel-labs/agent-skills
+    ref: main
+    base_path: skills/react-best-practices/rules
+    catalog_file: skills/react-best-practices/SKILL.md
+    tags: [React, Next, performance, async, bundle, rerender, server]
+    when: React/Next 性能细则 — resolve --rule <name> 拉单条，勿整读 AGENTS.md
+    rule_examples: [async-parallel, bundle-barrel-imports, server-cache-react, rerender-derived-state]
+
+  - id: anthropic.frontend-design
+    kind: github_raw
+    repo: anthropics/skills
+    ref: main
+    file: skills/frontend-design/SKILL.md
+    tags: [UI, design, aesthetic, typography, hero]
+    when: 审美方向 / 反模板皮深化（本地 craft 不够时）
+
+  - id: addy.api-design
+    kind: github_raw
+    repo: addyosmani/agent-skills
+    ref: main
+    file: skills/api-and-interface-design/SKILL.md
+    tags: [API, contract, idempotency, Hyrum, validation]
+    when: API 契约 / 边界 / 幂等深化（本地 craft 不够时）
+
+  - id: addy.frontend-ui
+    kind: github_raw
+    repo: addyosmani/agent-skills
+    ref: main
+    file: skills/frontend-ui-engineering/SKILL.md
+    tags: [UI, components, state, a11y, forms]
+    when: 组件状态机 / 表单 / a11y 深化
+
+  - id: vercel.web-guidelines
+    kind: github_raw
+    repo: vercel-labs/agent-skills
+    ref: main
+    file: skills/web-design-guidelines/SKILL.md
+    tags: [a11y, web, guidelines, review]
+    when: Web 界面合规复审（按需）

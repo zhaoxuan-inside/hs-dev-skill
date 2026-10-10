@@ -35,6 +35,9 @@ hs_dev_docs/_00_project/_18_doc_index/doc_index.sqlite*
 **/global_index.sqlite*
 .hs_cache/
 
+# Local skill comparison clones (not part of the skill)
+_compare_skills/
+
 # IDE & OS
 .DS_Store
 .idea/

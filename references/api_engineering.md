@@ -1,7 +1,14 @@
-# API 工程细则（按需加载）
+# API 工程细则（本地高频 · 按需加载）
 
 **何时读**：阶段 3 写/改接口与 Mock 契约，或阶段 5 实现对外/模块边界 API 时；每会话最多一次。  
-**来源压缩**：Addy `api-and-interface-design`（契约优先、错误语义、边界校验、幂等、Hyrum）。
+**分层**：本文 = **高频必守**；更深契约/幂等/Hyrum → [`rule_library.md`](rule_library.md) + `rule_fetch resolve --id addy.api-design`。
+
+```bash
+python scripts/rule_fetch.py search --q 幂等
+python scripts/rule_fetch.py resolve --id local.api.core
+python scripts/rule_fetch.py resolve --id addy.api-design
+python scripts/rule_fetch.py search-cache --q Idempotency
+```
 
 ---
 
@@ -12,6 +19,8 @@
 3. 列表必须分页（`page`/`pageSize` 或 cursor + `pagination` 元数据）。
 4. 扩展只加可选字段；禁止改类型/删字段而不走显式迁移/版本策略。
 5. 命名稳定：REST 用复数名词；布尔 `is/has/can`；枚举 `UPPER_SNAKE`。
+
+产品语义未冻（鉴权归属、计费字段等）→ `work_mode=DESIGN` 问清再写死公开契约。
 
 ---
 
@@ -56,7 +65,7 @@
 | 保留期 | TTL ≥ 最长重试链（含 DLQ 重放） |
 | 未知结果 | 超时 ≠ 失败；先记意图再调外部，崩溃可对账 |
 
-不可幂等的写操作必须在接口文档标明「不可安全重试」。
+不可幂等的写操作必须在接口文档标明「不可安全重试」。深化：`addy.api-design` + `search-cache --q idempoten`。
 
 ---
 
@@ -76,11 +85,4 @@
 | `_13_mock_contract/*.json` | 与成功/失败形状一致 |
 | 六元组 + 单测 | 校验失败、冲突、幂等重放、降级路径有覆盖 |
 
----
-
-## 7. 交付自检
-
-- [ ] 入出参类型齐全；错误格式全局一致
-- [ ] 列表可分页；破坏性变更有迁移说明
-- [ ] 写接口幂等策略已实现或已标明不可重试
-- [ ] Mock 与文档同形；边界有校验、内部无散落校验
+实现期命名/内部拆分细节：**少问**；公开契约与业务字段未决：**回切 DESIGN**。

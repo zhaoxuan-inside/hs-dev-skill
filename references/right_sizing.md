@@ -10,7 +10,7 @@
 
 ## 1. 分级判定（会话第一步，≤10 行落盘）
 
-在阶段 0 写 PRD 之前，先判定 `change_size`，写入任务 brief / context_pack 首行或 PRD 元数据：
+在阶段 0 写 PRD 之前，先判定 `change_size` 与 `work_mode`，写入任务 brief / context_pack 首行或 PRD 元数据：
 
 | 级别 | 判定（满足即取该级；冲突取更高） | 典型例子 |
 |------|----------------------------------|----------|
@@ -18,7 +18,14 @@
 | **M（补丁路径）** | 改已有功能行为或内部接口，但**不**新开限界上下文、不换技术栈、不新增表族 | 加可选字段、改校验规则、补一个端点、修补偿逻辑 |
 | **L（满配路径）** | 新功能/新域、换栈、新表或破坏性 API、架构边界变化、模糊 UI/新技术需对标 | 新支付域、换 ORM、公开 API 破坏性变更 |
 
-**不确定时取 M**（不要默认 L）。用户口头说「随便改一下」若触及契约/表结构 → 升为 M/L。
+**同时写 `work_mode`**（详见 [`confidence_decision.md`](confidence_decision.md)）：
+
+| `work_mode` | 默认何时 |
+|---|---|
+| **DESIGN** | M/L 冻结未过；需求模糊；写/改 PRD·ADR·架构·契约；不确定 |
+| **IMPLEMENT** | S 且 DoD 已清；或冻结已过、按已定设计编码/修测 |
+
+**不确定时**：`change_size=M`，`work_mode=DESIGN`（不要默认 L；不要默认少问）。用户口头说「随便改一下」若触及契约/表结构 → 升为 M/L。用户说「跳过澄清 / 直接做」→ 记假设后切 IMPLEMENT。
 
 ---
 
@@ -37,7 +44,7 @@
 | 装载 | `doc_index_db search|slice` 只取**被改文件相关**设计切片入 pack（可极短） |
 | 实现 | 直接改代码；UI 则按需读 `frontend_craft.md`；不涉及 API 契约则不读 `api_engineering.md` |
 | 门禁 | 相关测试 + `verify_consistency`（若未动 docs/idx 可只跑测试）；有任务则归档 |
-| 询问闸门 | 仍适用；S 默认高置信推进 |
+| 询问闸门 | 默认 `IMPLEMENT` 少问；触及产品语义未决 → 升 M/L 并切 `DESIGN` |
 
 ### M — 补丁路径
 
@@ -68,7 +75,8 @@
 
 ---
 
-## 4. 与置信度、Token 的关系
+## 4. 与置信度、门闩、Token 的关系
 
-- 分级本身**不询问**（工程编排）；仅当升降级取决于产品特有空白时走询问闸门。
-- Token：S 应明显少于 M，M 少于 L；若 S 会话仍加载 lifecycle 全文 + 多份 references，视为违规，改回本文件 + `token_budget.md` 挂载表。
+- 分级本身**不询问**（工程编排）；产品语义空白走 `DESIGN` 多问，不走「实现期四条件」偷懒跳过。
+- 动手前过 [`load_latch.md`](load_latch.md) L0～L2。
+- Token：S 应明显少于 M，M 少于 L；若 S 会话仍加载 lifecycle 全文 + 多份 references / 远程规则包，视为违规，改回本文件 + `token_budget.md` 挂载表。

@@ -1,4 +1,4 @@
-.PHONY: test verify scan-dead-code init-docs init-global paths index-rebuild index-search global-index-rebuild global-index-search skill-ref-rebuild skill-ref-search help
+.PHONY: test verify scan-dead-code init-docs init-global paths index-rebuild index-search global-index-rebuild global-index-search skill-ref-rebuild skill-ref-search rule-list rule-search rule-resolve help
 
 # 跨平台：Linux/macOS 默认 python3；Windows 可 make PYTHON="py -3" 或 PYTHON=python
 ifeq ($(OS),Windows_NT)
@@ -19,6 +19,9 @@ help:
 	@echo "  make index-search Q=\"keywords\" - search doc index"
 	@echo "  make skill-ref-rebuild - rebuild Skill references scenario index"
 	@echo "  make skill-ref-search Q=\"幂等\" - search Skill references"
+	@echo "  make rule-list        - list local+remote rule sources"
+	@echo "  make rule-search Q=\"React\" - search rule catalog"
+	@echo "  make rule-resolve ID=vercel.react-rules RULE=async-parallel"
 	@echo "  make global-index-rebuild - rebuild ~/.hs-dev-skill tag index"
 	@echo "  make global-index-search TAG=反向代理  or  Q=nginx"
 	@echo "  Override interpreter: make test PYTHON=python3   or   make test PYTHON=\"py -3\""
@@ -53,6 +56,15 @@ skill-ref-rebuild:
 
 skill-ref-search:
 	$(PYTHON) scripts/skill_ref_index.py search --q "$(Q)" --scenario "$(SCENARIO)" --limit 8
+
+rule-list:
+	$(PYTHON) scripts/rule_fetch.py list
+
+rule-search:
+	$(PYTHON) scripts/rule_fetch.py search --q "$(Q)" --limit 8
+
+rule-resolve:
+	$(PYTHON) scripts/rule_fetch.py resolve --id "$(ID)" --rule "$(RULE)"
 
 global-index-rebuild:
 	$(PYTHON) scripts/global_index_db.py rebuild

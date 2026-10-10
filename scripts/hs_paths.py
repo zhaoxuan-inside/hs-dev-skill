@@ -37,6 +37,11 @@ def tag_synonyms_path() -> Path:
     return global_root() / "tag_synonyms.yaml"
 
 
+def rule_cache_dir() -> Path:
+    """远程领域规则缓存（可重建；由 rule_fetch.py 写入）。"""
+    return global_root() / "rule_cache"
+
+
 def platform_id() -> str:
     """规范化平台标识：windows | linux | macos | other。"""
     if sys.platform.startswith("win"):

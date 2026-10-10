@@ -30,11 +30,13 @@ DB_FILE_NAME = "skill_ref.sqlite"
 # 文件名 → 场景关键词（补充 _index 与文首「何时读」）
 FILE_SCENARIOS: Dict[str, List[str]] = {
     "_index.md": ["index", "路由", "目录", "入口"],
+    "load_latch.md": ["门闩", "装载", "反合理化", "latch", "跳过", "强制"],
     "right_sizing.md": ["分级", "S", "M", "L", "快路径", "小改动", "right-sizing", "change_size"],
     "token_budget.md": ["token", "预算", "context_pack", "装载", "SQLite"],
     "frontend_craft.md": ["前端", "UI", "组件", "页面", "a11y", "React", "样式"],
     "api_engineering.md": ["API", "接口", "契约", "幂等", "Mock", "REST", "错误码"],
-    "confidence_decision.md": ["置信度", "询问", "闸门", "决策"],
+    "rule_library.md": ["规则库", "rule_fetch", "远程规则", "Vercel", "Anthropic", "Addy"],
+    "confidence_decision.md": ["置信度", "询问", "闸门", "决策", "DESIGN", "IMPLEMENT", "设计多问", "实现少问"],
     "learn_and_prefer.md": ["学习", "偏好", "GitHub", "对标", "标签"],
     "spec_driven_lifecycle.md": ["生命周期", "阶段", "门禁", "PRD", "冻结"],
     "six_tuple_runtime.md": ["六元组", "compensate", "fallback", "metrics", "recall"],

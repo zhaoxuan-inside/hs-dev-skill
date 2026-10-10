@@ -12,11 +12,13 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 
 | 场景 | 打开 |
 |------|------|
+| **动手前：装载门闩（反合理化 × Token）** | `load_latch.md` |
 | **任何需求第一步：变更分级 S/M/L** | `right_sizing.md` |
-| 询问是否该问用户 / 自主推进 | `confidence_decision.md` |
+| 设计多问 / 实现少问 / work_mode | `confidence_decision.md` |
 | 满配阶段细则 0～6 | `spec_driven_lifecycle.md`（可只读当前阶段节） |
-| UI/组件/页面实现或详设 | `frontend_craft.md` |
-| API/契约/Mock/幂等 | `api_engineering.md` |
+| UI 本地高频 | `frontend_craft.md` |
+| API 本地高频 | `api_engineering.md` |
+| 领域规则远程按需（Vercel/Anthropic/Addy） | `rule_library.md` |
 | 六元组签名与衍生方法 | `six_tuple_runtime.md` |
 | Token / SQLite / context_pack | `token_budget.md` |
 | 四级 JSONL 路由 | `four_level_routing.md` |
