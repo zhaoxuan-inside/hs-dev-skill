@@ -43,6 +43,9 @@ class ConsistencyVerifier:
         # 4. 检查 Mock 契约与 Profile 引用
         self._check_mock_profiles()
 
+        # 5. 文档索引库（SQLite）存在性与可查询性（跨平台缓存，非权威源）
+        self._check_doc_index_db()
+
         return self._print_results()
 
     def _check_indices(self):
@@ -107,6 +110,26 @@ class ConsistencyVerifier:
                     if d_status != status:
                         self.errors.append(f"[TASK MISMATCH] Task '{task_id}' status mismatch: .idx has '{status}', but detail has '{d_status}'")
 
+                # change_size：缺失仅 warning（兼容旧任务）
+                if not re.search(r"- \*\*(?:变更分级|change_size)\*\*：`([SML])`", d_content):
+                    self.warnings.append(
+                        f"[RIGHT-SIZING] Active task '{task_id}' missing change_size=S|M|L in detail "
+                        f"(set via task_manager create --change-size; see references/right_sizing.md)"
+                    )
+
+            # context_pack 同步检查 change_size
+            cp_path = (
+                self.docs_root
+                / "_08_dev_process/_09_task"
+                / f"_03_task_context_pack/_01_{task_id}/_00_context_pack.md"
+            )
+            if cp_path.exists():
+                cp_text = cp_path.read_text(encoding="utf-8")
+                if not re.search(r"- \*\*change_size\*\*：`([SML])`", cp_text):
+                    self.warnings.append(
+                        f"[RIGHT-SIZING] Active task '{task_id}' context_pack missing change_size=S|M|L"
+                    )
+
     def _check_database_migrations(self):
         """检查 DB 迁移 V/U 脚本原子配对与 SQL 规范"""
         print("  -> Checking Database Migrations (V/U Sync) and SQL Rules...")
@@ -147,6 +170,32 @@ class ConsistencyVerifier:
                     target = self.root / ref_path
                     if not target.exists():
                         self.warnings.append(f"[MOCK PROFILE WARNING] {pf.name} contract_ref not found on disk: {ref_path}")
+
+    def _check_doc_index_db(self):
+        """检查 SQLite 文档索引缓存；缺失则告警（不阻断，因可 rebuild）"""
+        print("  -> Checking Doc Index DB (SQLite cache)...")
+        db_file = self.docs_root / "_00_project" / "_18_doc_index" / "doc_index.sqlite"
+        idx_files = list(self.docs_root.rglob("*.idx"))
+        if not idx_files:
+            return
+        if not db_file.exists():
+            self.warnings.append(
+                "[DOC INDEX] Missing hs_dev_docs/_00_project/_18_doc_index/doc_index.sqlite — "
+                "run: python scripts/doc_index_db.py --root . rebuild"
+            )
+            return
+        try:
+            from doc_index_db import DocIndexDB
+
+            db = DocIndexDB(self.root)
+            st = db.stats()
+            db.close()
+            if st.get("docs", 0) <= 0:
+                self.warnings.append(
+                    "[DOC INDEX] SQLite index is empty — run: python scripts/doc_index_db.py --root . rebuild"
+                )
+        except Exception as ex:
+            self.warnings.append(f"[DOC INDEX] Unable to open SQLite cache: {ex}")
 
     def _print_results(self) -> bool:
         print("\n" + "=" * 60)

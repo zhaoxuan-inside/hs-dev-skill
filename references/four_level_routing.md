@@ -9,6 +9,8 @@
 
 渐进式四级索引路由（Four-Level Progressive Routing）通过分层索引树，使 Agent 在定位任何模块时只需读取少量索引行，按需精确注入。
 
+**工程加速（推荐）**：用跨平台 SQLite 查询缓存代替人工走树——`python scripts/doc_index_db.py --root . search --q ...` 直接返回 `path + summary`，再用 `slice` 取行段。JSONL `.idx` 仍是权威路由与 digest 源；SQLite 可随时 `rebuild`。详见 [`token_budget.md`](token_budget.md)。
+
 ---
 
 ## 2. 四级路由体系模型
@@ -66,7 +68,13 @@
 ```
 
 ### 3.4 四级：精确切片注入
-Agent 在读取第三级锁定到 `_01_order_create_design.md` 后，利用局部阅读工具（如 `view_file` 指定 StartLine/EndLine 或精准检索），仅将所需的签名、入参表和异常注入上下文，完成精确开发。
+Agent 在读取第三级锁定到 `_01_order_create_design.md` 后，利用局部阅读工具（指定 StartLine/EndLine）或：
+
+```bash
+python scripts/doc_index_db.py --root . slice --path hs_dev_docs/_05_interface_design/_01_order/_01_order_create_design.md --start 15 --end 45
+```
+
+仅将所需的签名、入参表和异常**物化**进 `_00_context_pack.md`，完成精确开发。禁止只写路径。
 
 ---
 
@@ -75,3 +83,4 @@ Agent 在读取第三级锁定到 `_01_order_create_design.md` 后，利用局�
 条目中的 `digest` 字段记录目标文件的 SHA-256（前 8 位）。
 * 当文档发生修改时，提交工具自动更新 `digest`。
 * 启动时校验引擎可快速比对 `digest`，立即感知哪些设计文档被外部篡改或发生漂移。
+* 批量变更后执行：`python scripts/doc_index_db.py --root . rebuild`，保持 SQLite 缓存与 `.idx` 对齐（三端同一命令）。

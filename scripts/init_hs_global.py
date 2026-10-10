@@ -47,6 +47,10 @@ def init_hs_global(*, sync_protocol: bool = True) -> Path:
     actions = [
         ensure_file_from_template(root / "README.md", templates / "README.md"),
         ensure_file_from_template(root / "preferences.yaml", templates / "preferences.yaml"),
+        ensure_file_from_template(
+            root / "tag_synonyms.yaml",
+            templates / "tag_synonyms.yaml",
+        ),
     ]
 
     if sync_protocol:
@@ -72,7 +76,28 @@ def init_hs_global(*, sync_protocol: bool = True) -> Path:
     print(f"    win pwsh:  {info['windows_pwsh']}")
     for line in actions:
         print(f"  - {line}")
+
+    # 重建全局标签索引（SQLite，三端标准库）
+    try:
+        from global_index_db import GlobalIndexDB
+
+        db = GlobalIndexDB(root)
+        try:
+            db_info = db.rebuild()
+        finally:
+            db.close()
+        print(
+            f"[*] Global index rebuilt: notes+prefs={db_info.get('inserted', 0)}, "
+            f"fts={db_info.get('fts')}, path={db_info.get('db_path')}"
+        )
+    except Exception as ex:
+        print(f"[WARN] Global index rebuild skipped: {ex}")
+
     print("[SUCCESS] Global preference & tech-learning area ready (Windows / Linux / macOS).")
+    print(
+        "[NOTE] Search: python scripts/global_index_db.py search --tag 反向代理"
+        "  (or --q nginx)"
+    )
     return root
 
 

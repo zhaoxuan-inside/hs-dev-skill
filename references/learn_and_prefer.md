@@ -2,7 +2,8 @@
 
 本协议与 [置信度决策](confidence_decision.md) 配套：通过**学新技术、记用户偏好、对标高星成熟方案**，提高自主决策置信度，**降低询问频率**并改善落地质量。
 
-适用于：新建项目、优化旧项目、引入新技术、UI/交互描述模糊、选型与架构分叉。
+适用于：新建项目、优化旧项目、引入新技术、UI/交互描述模糊、选型与架构分叉。  
+配合生命周期：**产品需求冻结前不做选型结论**；学习/对标用于抬高置信，不能替代未闭合的产品决策。
 
 ---
 
@@ -27,13 +28,29 @@
 ├── README.md
 ├── learn_and_prefer.md
 ├── preferences.yaml
+├── tag_synonyms.yaml          # 技术 → 特性标签同义词（可扩展）
+├── global_index.sqlite        # 可重建查询缓存（勿手改；默认不提交）
 └── tech_learning/
-    └── {tech_slug}_notes.md
+    └── {tech_slug}_notes.md   # 每条笔记含「标签」元数据
 ```
 
 - **首次使用 / 目录缺失**：`python scripts/init_hs_global.py`（Linux/macOS 可用 `python3`；Windows 可用 `py -3`）。
-- **Agent 每次决策前**：用 `Path.home()` 解析后的绝对路径读偏好、写学习笔记。
+- **Agent 每次决策前**：优先用全局索引检索，再打开命中文件——**禁止**整目录通读 `tech_learning/`。
 - 打印当前机路径：`python scripts/hs_paths.py`。
+
+### 0.1 全局标签索引（降 Token）
+
+| 项 | 约定 |
+|---|---|
+| CLI | `python scripts/global_index_db.py`（`--global-root` 可覆盖，默认 `Path.home()/.hs-dev-skill`） |
+| 重建 | `... rebuild`（写/改笔记或偏好后必须执行；`init_hs_global` 结束时自动 rebuild） |
+| 按标签搜 | `... search --tag 反向代理`（同义词展开，如命中 Nginx 笔记） |
+| 按关键词 | `... search --q nginx` 或 `--q 缓存` |
+| 列标签 | `... tags` |
+| 标签来源 | ① 笔记显式 `- **标签**：...` ② `tag_synonyms.yaml` 按 slug 展开 ③ 正文/标题特性词自动抽取 ④ 偏好项 `tags` |
+| 建议标签 | `... suggest-tags --path <note.md>`（写出前可预览） |
+
+**写笔记纪律**：每条学习笔记必须填写特性标签（例：Nginx → `后端`, `组件`, `反向代理`, `正向代理`, `WEB服务器`），使「用能力找技术」而不必先想准技术名。新概念可追加到 `tag_synonyms.yaml`。rebuild 时即使用户漏写标签，也会尝试从正文抽取同义词表中的特性词并展开。
 
 ---
 
@@ -76,6 +93,10 @@
 
 `~/.hs-dev-skill/tech_learning/{tech_slug}_notes.md`  
 模板：`resources/templates/hs_global/tech_learning_notes.md`
+
+落盘时**必须**填写 `- **标签**：...`（特性标签，非仅技术名）。  
+落盘后：`python scripts/global_index_db.py rebuild`。  
+决策检索：`python scripts/global_index_db.py search --tag <特性>` 或 `--q <技术名>`，只打开返回的 `abs_path`。
 
 学习完成后重估置信度；仍满足询问闸门四条件再问，否则自主推进。
 
@@ -148,9 +169,9 @@
 
 ## 5. 与置信度决策的衔接
 
-0. 读 `~/.hs-dev-skill/preferences.yaml`（命中则按偏好做，不询问）  
-1. 新技术或模糊 UI/技术 → §2 / §4，读写全局 `tech_learning/`  
+0. `python scripts/global_index_db.py search --tag/--q ...`（或等价打开命中项）；偏好命中则按偏好做，不询问  
+1. 新技术或模糊 UI/技术 → §2 / §4，读写全局 `tech_learning/`（先索引后切片，禁止整树读）  
 2. 重估置信度  
 3. 再套用询问闸门四条件  
 
-目标态：**跨项目复用偏好与学习成果，问得更少，依据更硬**。
+目标态：**跨项目复用偏好与学习成果，问得更少，依据更硬，检索更便宜**。

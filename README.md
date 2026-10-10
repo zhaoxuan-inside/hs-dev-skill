@@ -1,100 +1,100 @@
 # hs-dev-skill: 产品开发 Skill
 
-> **文档驱动开发（DDD） + 六元组标准化运行时 + Agent 上下文引擎**
+> **文档驱动 + 变更分级（S/M/L）+ 六元组运行时 + Token 预算索引**
 
-[![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](file:///home/hardstone/CodeSpace/GitHub/hs-dev-skill/tests/)
-[![Spec Version](https://img.shields.io/badge/spec-v2.8-blue.svg)](references/spec_v2_4.md)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
+[![Spec Version](https://img.shields.io/badge/skill-v2.12-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](file:///home/hardstone/CodeSpace/GitHub/hs-dev-skill/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-`hs-dev-skill` 是专为 AI Agent 和现代研发团队打造的标准化产品开发技能包，**可在 Windows / Linux / macOS 三端运行**。它建立了以文档为核心驱动力、以六元组为业务签名规范、以渐进式 JSONL 索引为检索底座的高可靠研发闭环；并以**置信度决策 + 偏好记忆 + GitHub 高星对标**约束交互——通用方案与用户偏好自主推进，模糊新技术/UI 先学成熟项目，仅在项目特有且选项难分高下时询问开发者。
-
----
-
-## 🌟 核心特性
-
-1. **置信度决策（Confidence-Gated Decision）**：
-   - 大家通用的解决方案不询问；仅当影响面广、项目特有、既有资料未提及、且多种选择置信接近时，才结构化询问并由开发者决策。详见 [confidence_decision.md](references/confidence_decision.md)。
-2. **技术学习与偏好记忆 + GitHub 高星对标（全局共享）**：
-   - 落盘于用户主目录 `~/.hs-dev-skill/`（偏好 `preferences.yaml`、笔记 `tech_learning/`），**所有项目共用**；模糊新技术/UI 优先检索 GitHub 高 Star 成熟方案。初始化：`python3 scripts/init_hs_global.py`。详见 [learn_and_prefer.md](references/learn_and_prefer.md)。
-3. **渐进式四级索引路由（Progressive JSONL Indexing）**：
-   - 杜绝全文盲目扫描，按 `根索引 -> 域索引 -> 模块索引 -> 精确切片` 精准注入上下文，极大节省 Token 预算。
-4. **六元组标准化架构（Six-Tuple Architecture）**：
-   - `exception method(input, output, context, isolate, metrics, recall)`
-   - 全面覆盖：业务主逻辑、Saga 事务补偿、异常熔断降级、可观测性度量、异步回调。
-5. **任务生命周期三文件强一致性（Triple-File Consistency）**：
-   - `_00_task.idx`（主索引）+ `_01_task_brief/`（15行紧凑滚动清单）+ `_02_task_detail/`（详细执行记录）原子同步与会话交接（Session Handoff）。
-6. **数据库设计与迁移原子同步（Atomic Migration Sync）**：
-   - 设计文档、前向迁移脚本（`V...sql`）与回滚脚本（`U...sql`）强制原子同步，杜绝 SQL 保留关键字冲突（如禁止直接使用 `desc`）。
-7. **Mock 契约与业务代码完全解耦**：
-   - 生产代码零污染，通过 Test Profile 灵活组合测试数据集、错误注入与延迟注入。
-8. **全自动化门禁自检工具链**：
-   - 内置 CLI 工具支持一键初始化、索引防漂移校验、三文件一致性比对与死代码扫描。
-9. **默认止于本地 Commit；明确要求才推送**：
-   - Agent 常规只做门禁 + 本地提交；**仅当用户明确说要推送**时才代为 `git push`。
+`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS）。入口 [`SKILL.md`](SKILL.md) 保持薄装载；细则按场景索引打开。流程上先判定 `change_size=S|M|L`，小改走快路径，新域走满配 0→6；配合置信度询问、产品冻结门禁、SQLite 切片与 context_pack，降低 Token 与返工。
 
 ---
 
-## 🚀 快速上手与常用命令
+## 安装（生态分发）
 
-### 1. 安装与依赖
-- 环境要求：`Python >= 3.8`
-- **支持平台**：Windows / Linux / macOS（详见 [cross_platform.md](references/cross_platform.md)）
-- 解释器：`python3`（Linux/macOS）、`python` 或 `py -3`（Windows）
+根目录即为单个 Skill（含 `SKILL.md` / `scripts/` / `references/`），可用官方 skills CLI：
 
-### 2. 快捷 Makefile 命令
 ```bash
-# 查看当前 OS 解析出的全局路径
-make paths
-# Windows 若默认 python 不对： make paths PYTHON="py -3"
+# 安装到当前项目（多 Agent 可选）
+npx skills add zhaoxuan-inside/hs-dev-skill
 
-make test
-make verify
-make scan-dead-code
-make init-docs
-make init-global
+# 全局安装
+npx skills add zhaoxuan-inside/hs-dev-skill -g
+
+# 仅浏览是否被发现
+npx skills add zhaoxuan-inside/hs-dev-skill --list
 ```
 
-无 make 时直接用下一节的 Python 命令即可。
+手动（任选其一）：
 
-### 3. CLI 工具直接调用
 ```bash
-# 打印全局路径（三端）
+git clone https://github.com/zhaoxuan-inside/hs-dev-skill.git
+# Cursor 用户技能目录示例：
+#   ln -s /path/to/hs-dev-skill ~/.cursor/skills/hs-dev-skill   # Linux/macOS
+#   mklink /J %USERPROFILE%\.cursor\skills\hs-dev-skill C:\path\to\hs-dev-skill  # Windows（管理员/开发者模式）
+```
+
+装后首次建议：
+
+```bash
+python scripts/init_hs_global.py          # 或 py -3 / python3
+python scripts/skill_ref_index.py rebuild # Skill 详规场景索引
+```
+
+依赖：`Python >= 3.8`（标准库 `sqlite3` + `pathlib`）。
+
+---
+
+## 核心特性
+
+1. **变更分级（Right-Sizing）**：任意需求先写 `change_size=S|M|L`；S 快路径、M 补丁路径、L 满配。见 [right_sizing.md](references/right_sizing.md)。
+2. **置信度决策**：通用方案不询问；仅特有分叉才问。见 [confidence_decision.md](references/confidence_decision.md)。
+3. **产品需求冻结（M/L）**：PRD 完整/正确/无冲突后才选型或满配详设。
+4. **Token 预算**：`skill_ref_index`（Skill 详规）+ `doc_index_db`（项目文档）+ 物化 context_pack；禁止整树通读。见 [token_budget.md](references/token_budget.md)、[_index.md](references/_index.md)。
+5. **前端 / API 按需细则**：[frontend_craft.md](references/frontend_craft.md)、[api_engineering.md](references/api_engineering.md)（触达才读）。
+6. **全局学习与偏好**：`~/.hs-dev-skill/` + `global_index_db.py`。
+7. **六元组 + 任务三文件 + 迁移 V/U + Mock 契约隔离 + verify 门禁**。
+8. **默认本地 Commit；明确要求才 push**。
+
+---
+
+## 快速命令
+
+```bash
+make paths          # 全局路径
+make test
+make verify
+make skill-ref-rebuild
+make skill-ref-search Q="幂等"
+make index-rebuild
+make init-docs
+make init-global
+# Windows: make test PYTHON="py -3"
+```
+
+```bash
 python scripts/hs_paths.py
-
-# 0. 初始化跨项目全局共享区（偏好 + 技术学习）
 python scripts/init_hs_global.py
-
-# 1. 初始化项目文档树与索引
-python scripts/init_hs_dev_docs.py --root .
-
-# 2. 创建新研发任务
-python scripts/task_manager.py create --id order_create --title "创建交易订单" --owner "agent" --priority "P0"
-
-# 3. 推进任务状态
-python scripts/task_manager.py status --id order_create --set IN_PROGRESS
-python scripts/task_manager.py status --id order_create --set VERIFYING
-python scripts/task_manager.py status --id order_create --set COMPLETED
-
-# 4. 校验全量一致性与门禁
+python scripts/skill_ref_index.py search --q "幂等" --limit 5
+python scripts/doc_index_db.py --root . search --q "订单 创建" --limit 8
+python scripts/task_manager.py create --id order_create --title "创建交易订单" --change-size L --priority P0
 python scripts/verify_consistency.py --root .
 ```
 
 ---
 
-## 📚 目录体系与文档指引
+## 目录指引
 
-- **[SKILL.md](file:///home/hardstone/CodeSpace/GitHub/hs-dev-skill/SKILL.md)**：Agent 核心技能定义与执行手册
-- **[references/](references/)**：
-  - [跨平台支持（Windows / Linux / macOS）](references/cross_platform.md)
-  - [置信度决策协议](references/confidence_decision.md)
-  - [技术学习、偏好记忆与 GitHub 对标](references/learn_and_prefer.md)
-  - [全生命周期驱动引擎指南](references/spec_driven_lifecycle.md)
-  - [规格定义书 v2.4 正式版](references/spec_v2_4.md)
-  - [六元组标准化运行时指南](references/six_tuple_runtime.md)
-  - [渐进式四级索引路由指南](references/four_level_routing.md)
-  - [任务状态机与生命周期指南](references/task_state_machine.md)
-  - [Mock 规范与契约测试指南](references/mock_contract_guide.md)
-  - [全层级质量门禁指南](references/quality_gates.md)
-- **[resources/templates/](file:///home/hardstone/CodeSpace/GitHub/hs-dev-skill/resources/templates/)**：设计文档、词典、迁移、Profile 预置脚手架模板
-- **[examples/](file:///home/hardstone/CodeSpace/GitHub/hs-dev-skill/examples/)**：[订单服务全流程参考用例](file:///home/hardstone/CodeSpace/GitHub/hs-dev-skill/examples/order_service/)
+| 路径 | 说明 |
+|------|------|
+| [SKILL.md](SKILL.md) | Agent 入口（薄）；铁律 + 路径图 + CLI |
+| [references/_index.md](references/_index.md) | 详规场景表（禁止整目录通读） |
+| [references/right_sizing.md](references/right_sizing.md) | **任意需求第一步** |
+| [references/frontend_craft.md](references/frontend_craft.md) / [api_engineering.md](references/api_engineering.md) | UI / API 按需 |
+| [references/token_budget.md](references/token_budget.md) | 装载纪律 |
+| [references/spec_driven_lifecycle.md](references/spec_driven_lifecycle.md) | L 满配阶段细则 |
+| [references/](references/) | 其余：置信度、六元组、任务机、Mock、门禁、跨平台、spec 百科 |
+| [scripts/](scripts/) | CLI（索引 / 任务 / 门禁 / 初始化） |
+| [resources/templates/](resources/templates/) | 文档与 Mock 脚手架 |
+| [examples/order_service/](examples/order_service/) | 订单服务参考用例 |

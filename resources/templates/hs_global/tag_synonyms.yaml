@@ -1,0 +1,85 @@
+# 技术/概念 → 检索标签（加速全局笔记与偏好搜索）
+# 落盘：Path.home()/.hs-dev-skill/tag_synonyms.yaml
+# Agent 写笔记时优先打这些标签；rebuild 时也会按 slug/标题自动展开
+
+version: 1
+synonyms:
+  nginx:
+    - nginx
+    - 后端
+    - 组件
+    - 反向代理
+    - 正向代理
+    - WEB服务器
+    - web服务器
+    - 负载均衡
+    - reverse-proxy
+    - forward-proxy
+    - load-balancer
+  redis:
+    - redis
+    - 缓存
+    - 后端
+    - 组件
+    - kv
+    - 消息队列
+  postgresql:
+    - postgresql
+    - postgres
+    - 数据库
+    - 后端
+    - rdbms
+    - sql
+  mysql:
+    - mysql
+    - 数据库
+    - 后端
+    - rdbms
+    - sql
+  sqlite:
+    - sqlite
+    - 数据库
+    - 嵌入式
+    - 本地存储
+  docker:
+    - docker
+    - 容器
+    - 运维
+    - devops
+    - 部署
+  kubernetes:
+    - kubernetes
+    - 容器编排
+    - k8s
+    - 运维
+    - devops
+  react:
+    - react
+    - 前端
+    - ui
+    - 组件
+    - spa
+  vue:
+    - vue
+    - 前端
+    - ui
+    - 组件
+    - spa
+  grpc:
+    - grpc
+    - rpc
+    - 后端
+    - 通信协议
+    - 微服务
+  kafka:
+    - kafka
+    - 消息队列
+    - 后端
+    - 事件驱动
+    - streaming
+  nginx_ingress:
+    - nginx
+    - ingress
+    - 反向代理
+    - kubernetes
+    - 网关

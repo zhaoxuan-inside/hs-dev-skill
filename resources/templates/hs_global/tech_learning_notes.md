@@ -5,6 +5,9 @@
 - **触发项目 / 任务**：
 - **状态**：learning | ready_to_use
 - **全局路径**：`~/.hs-dev-skill/tech_learning/{tech_slug}_notes.md`
+- **标签**：`{tag1}`, `{tag2}`, `{tag3}`
+  <!-- 必填：用特性标签代指技术，加速全局索引检索。例 Nginx → 后端, 组件, 反向代理, 正向代理, WEB服务器 -->
+  <!-- 写入/更新后执行：python scripts/global_index_db.py rebuild -->
 
 ## 1. 为何需要学
 

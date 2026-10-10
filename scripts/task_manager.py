@@ -5,19 +5,34 @@ task_manager.py
 支持任务创建、状态机流转、自动滚动分片、任务归档与会话交接。
 """
 
+from __future__ import annotations
+
 import os
 import sys
 import json
 import argparse
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
+
 from idx_manager import IdxManager
 
 VALID_STATUSES = ["DRAFT", "READY", "IN_PROGRESS", "BLOCKED", "VERIFYING", "COMPLETED", "ABORTED"]
+VALID_CHANGE_SIZES = ("S", "M", "L")
 
 
 def get_iso_timestamp():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def normalize_change_size(change_size: Optional[str]) -> str:
+    """Normalize to S|M|L; empty/None defaults to M (right_sizing: uncertain → M)."""
+    if change_size is None or str(change_size).strip() == "":
+        return "M"
+    size = str(change_size).strip().upper()
+    if size not in VALID_CHANGE_SIZES:
+        raise ValueError(f"Invalid change_size '{change_size}'. Allowed: {list(VALID_CHANGE_SIZES)}")
+    return size
 
 
 class TaskManager:
@@ -33,8 +48,18 @@ class TaskManager:
         self.task_idx_path = self.task_root / "_00_task.idx"
         self.archive_idx_path = self.task_root / "_00_task_archive.idx"
 
-    def create_task(self, task_id: str, title: str, owner: str = "agent", priority: str = "P1", goal: str = "", criteria: str = ""):
+    def create_task(
+        self,
+        task_id: str,
+        title: str,
+        owner: str = "agent",
+        priority: str = "P1",
+        goal: str = "",
+        criteria: str = "",
+        change_size: str = "M",
+    ):
         """创建新任务，原子更新 _00_task.idx、task_brief、task_detail 和 context_pack"""
+        change_size = normalize_change_size(change_size)
         self.task_root.mkdir(parents=True, exist_ok=True)
         self.brief_dir.mkdir(parents=True, exist_ok=True)
         self.detail_dir.mkdir(parents=True, exist_ok=True)
@@ -60,6 +85,7 @@ class TaskManager:
         detail_content = f"""# 任务详细设计与执行记录：{task_id}
 
 - **任务名称**：{title}
+- **变更分级**：`{change_size}`
 - **当前状态**：`{status}`
 - **优先级**：{priority}
 - **负责人**：{owner}
@@ -106,27 +132,48 @@ class TaskManager:
         cp_file = task_cp_folder / "_00_context_pack.md"
         cp_content = f"""# 上下文装载包 (Context Pack)：{task_id}
 
+- **change_size**：`{change_size}`
 - **任务 ID**：`{task_id}`
 - **生成时间**：`{now}`
 - **状态**：`{status}`
+- **装载纪律**：必须物化切片正文；禁止只写路径。
+- **查询**：`doc_index_db.py --root . search|slice`；Skill 详规用 `skill_ref_index.py search`（勿通读 references/）
 
 ---
 
-## 1. 需求与目标
+## 1. 需求与目标（物化）
 {goal or title}
 
+<!-- Agent：用 doc_index_db search/slice 粘贴 PRD/DoD 关键段落，勿只留链接；S 可仅 3～8 行 DoD -->
+
 ---
 
-## 2. 精确注入设计引用
-- 接口设计：`_05_interface_design/...`
-- 方法设计：`_06_method_design/...`
-- 数据库表：`_04_db_schema/...`
-- 契约参考：`hs_dev_docs/_00_project/_13_mock_contract/...`
+## 2. 数据模型切片（物化）
+<!-- 粘贴相关表字段/约束原文片段；并注明 path + line range；未触达写 N/A -->
+
+---
+
+## 3. 接口与六元组签名（物化）
+<!-- 粘贴方法签名、入参/出参、compensate/fallback；改 API 时读 api_engineering.md -->
+
+---
+
+## 4. 调用链与 Mock 契约（物化）
+<!-- 粘贴依赖方法清单与契约关键字段 -->
+
+---
+
+## 5. 查询轨迹（降 Token）
+- `doc_index_db` 命中 path 列表：
+- `skill_ref_index` 命中 path 列表：
+- 本会话已读 Skill references（禁止重复整读）：
 """
         cp_file.write_text(cp_content, encoding="utf-8")
 
         # 3. 追加任务简述 (Task Brief) 并处理滚动分片 (10个任务一个分片)
-        brief_ref = self._append_task_brief(task_id, title, status, priority, owner, goal, now)
+        brief_ref = self._append_task_brief(
+            task_id, title, status, priority, owner, goal, now, change_size
+        )
 
         # 4. 更新 _00_task.idx
         rel_detail_path = f"_02_task_detail/_01_{task_id}/_00_task_detail.md"
@@ -139,16 +186,27 @@ class TaskManager:
             auto_digest=True
         )
 
-        print(f"[SUCCESS] Created task '{task_id}' (Status: {status})")
+        print(f"[SUCCESS] Created task '{task_id}' (Status: {status}, change_size: {change_size})")
         return {
             "task_id": task_id,
             "status": status,
+            "change_size": change_size,
             "detail_path": str(detail_file),
             "brief_ref": brief_ref,
             "context_pack_path": str(cp_file)
         }
 
-    def _append_task_brief(self, task_id: str, title: str, status: str, priority: str, owner: str, goal: str, timestamp: str) -> str:
+    def _append_task_brief(
+        self,
+        task_id: str,
+        title: str,
+        status: str,
+        priority: str,
+        owner: str,
+        goal: str,
+        timestamp: str,
+        change_size: str = "M",
+    ) -> str:
         """追加任务简述（紧凑块不超过 15 行），自动滚动分片"""
         brief_files = sorted(self.brief_dir.glob("_*.md"))
         target_file = None
@@ -170,6 +228,7 @@ class TaskManager:
 
         brief_block = f"""### 任务简述：{task_id}
 - **标题**：{title}
+- **change_size**：`{change_size}`
 - **状态**：`{status}`
 - **优先级**：{priority}
 - **负责人**：{owner}
@@ -349,6 +408,13 @@ def main():
     p_create.add_argument("--priority", default="P1", help="Priority (P0/P1/P2)")
     p_create.add_argument("--goal", default="", help="Task main goal")
     p_create.add_argument("--criteria", default="", help="Acceptance criteria")
+    p_create.add_argument(
+        "--change-size",
+        dest="change_size",
+        default="M",
+        choices=list(VALID_CHANGE_SIZES),
+        help="Right-sizing grade S|M|L (default M)",
+    )
 
     # status
     p_status = subparsers.add_parser("status", help="Change task status")
@@ -365,7 +431,15 @@ def main():
     tm = TaskManager(args.root)
 
     if args.command == "create":
-        tm.create_task(args.id, args.title, args.owner, args.priority, args.goal, args.criteria)
+        tm.create_task(
+            args.id,
+            args.title,
+            args.owner,
+            args.priority,
+            args.goal,
+            args.criteria,
+            args.change_size,
+        )
     elif args.command == "status":
         tm.set_status(args.id, args.set, args.note)
     elif args.command == "handoff":

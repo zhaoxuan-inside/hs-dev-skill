@@ -28,6 +28,15 @@ def tech_learning_dir() -> Path:
     return global_root() / "tech_learning"
 
 
+def global_index_db_path() -> Path:
+    """全局偏好/学习笔记 SQLite 索引（可重建缓存）。"""
+    return global_root() / "global_index.sqlite"
+
+
+def tag_synonyms_path() -> Path:
+    return global_root() / "tag_synonyms.yaml"
+
+
 def platform_id() -> str:
     """规范化平台标识：windows | linux | macos | other。"""
     if sys.platform.startswith("win"):

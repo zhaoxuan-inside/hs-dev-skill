@@ -75,6 +75,7 @@ def init_full_workspace(workspace_root: str):
         "_08_dev_process/_09_task/_01_task_brief",
         "_08_dev_process/_09_task/_02_task_detail",
         "_08_dev_process/_09_task/_03_task_context_pack",
+        "_00_project/_18_doc_index",
     ]
     for d in doc_dirs:
         (docs_root / d).mkdir(parents=True, exist_ok=True)
@@ -146,10 +147,29 @@ def init_full_workspace(workspace_root: str):
             encoding="utf-8"
         )
 
+    # 5. 重建跨平台 SQLite 文档索引（FTS5 + LIKE，可重复执行）
+    try:
+        from doc_index_db import DocIndexDB
+
+        db = DocIndexDB(root)
+        try:
+            db_info = db.rebuild()
+        finally:
+            db.close()
+        print(
+            f"[*] Doc index DB rebuilt: {db_info.get('inserted', 0)} rows, "
+            f"fts={db_info.get('fts')}, path={db_info.get('db_path')}"
+        )
+    except Exception as ex:
+        print(f"[WARN] Doc index DB rebuild skipped: {ex}")
+
     print("[SUCCESS] Complete hs-dev-skill file tree and JSONL indices initialized successfully!")
     print(
         "[NOTE] Cross-project preferences & tech learning: Path.home()/.hs-dev-skill "
         "(Windows/Linux/macOS) — run: python scripts/init_hs_global.py"
+    )
+    print(
+        "[NOTE] Token-saving doc query: python scripts/doc_index_db.py --root . search --q <keywords>"
     )
 
 

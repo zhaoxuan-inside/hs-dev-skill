@@ -34,13 +34,19 @@
 
 ### BLOCKED 与置信度决策
 
-除依赖缺失外，**询问闸门触发时**（影响面广 + 项目特有 + 资料未提及 + 多选项置信接近，见 [`confidence_decision.md`](confidence_decision.md)）必须进入 `BLOCKED`：
+除依赖缺失外，以下情况必须进入 `BLOCKED`（或阶段 0–3 尚未建任务时等价暂停跃迁）：
 
-1. 在 task_detail / brief 中写明决策点、候选选项、自评置信与影响面；
-2. `python3 scripts/task_manager.py status --id {task_id} --set BLOCKED`；
-3. 用户答复后写入 PRD/ADR/设计/词典，再回到 `IN_PROGRESS`（或阶段 0–3 尚未建任务时，仅暂停跃迁、不落盘最终结论）。
+1. **询问闸门触发**（影响面广 + 项目特有 + 资料未提及 + 多选项置信接近，见 [`confidence_decision.md`](confidence_decision.md)）；
+2. **产品需求冻结门禁未过**（PRD 不完整、不正确或存在未裁决冲突，见 [`spec_driven_lifecycle.md`](spec_driven_lifecycle.md)）——此时禁止进入选型及后续阶段。
 
-**禁止**：对大家通用的解决方案提问并为此 `BLOCKED`；**禁止**：在未满足询问闸门时用猜测填项目特有空白后继续推进。
+处理步骤：
+
+1. 在 task_detail / brief（或阶段 0 产出）中写明决策点、候选选项、自评置信与影响面；
+2. 已有任务时：`python3 scripts/task_manager.py status --id {task_id} --set BLOCKED`；
+3. 用户答复后写入 PRD/ADR/设计/词典（产品项须先满足冻结门禁），再回到 `IN_PROGRESS` 或恢复阶段跃迁；
+4. **解除阻塞后必须立即继续推进**，沿阶段链做到本需求 `COMPLETED`（阶段 6），禁止无确认事项时停工等待「请继续」。
+
+**禁止**：对大家通用的解决方案提问并为此 `BLOCKED`；**禁止**：在未满足询问闸门时用猜测填项目特有空白后继续推进；**禁止**：产品需求未冻结即进入阶段 1+。
 
 ---
 

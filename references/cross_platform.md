@@ -69,10 +69,14 @@ python scripts/<name>.py ...
 | 动作 | Linux / macOS | Windows (PowerShell) |
 |---|---|---|
 | 初始化全局区 | `python3 scripts/init_hs_global.py` | `py -3 scripts/init_hs_global.py` |
+| 重建全局标签索引 | `python3 scripts/global_index_db.py rebuild` | `py -3 scripts/global_index_db.py rebuild` |
+| 按特性标签搜笔记 | `python3 scripts/global_index_db.py search --tag 反向代理` | `py -3 scripts/global_index_db.py search --tag 反向代理` |
 | 初始化项目文档 | `python3 scripts/init_hs_dev_docs.py --root .` | `py -3 scripts/init_hs_dev_docs.py --root .` |
+| 重建文档索引库 | `python3 scripts/doc_index_db.py --root . rebuild` | `py -3 scripts/doc_index_db.py --root . rebuild` |
+| 检索文档（降 Token） | `python3 scripts/doc_index_db.py --root . search --q kw` | `py -3 scripts/doc_index_db.py --root . search --q kw` |
 | 跑测试 | `make test` 或 `python3 -m unittest discover -s tests -p "test_*.py"` | `py -3 -m unittest discover -s tests -p "test_*.py"` |
 | 一致性门禁 | `python3 scripts/verify_consistency.py --root .` | `py -3 scripts/verify_consistency.py --root .` |
-| Make（若已装） | `make init-global` | `make init-global`（需 make；或直接跑上一行 Python） |
+| Make（若已装） | `make init-global` / `make index-rebuild` | 同上（需 make；或直接跑 Python） |
 
 ---
 
@@ -87,9 +91,25 @@ python scripts/<name>.py ...
 
 ---
 
-## 6. 验收清单（Skill 可移植性）
+## 6. 文档索引库（SQLite）三端约定
+
+| 项 | 约定 |
+|---|---|
+| 引擎 | 标准库 `sqlite3`（勿依赖仅 Linux 的扩展二进制） |
+| FTS | 优先 FTS5；不可用或中文查询时 `LIKE` 回退，保证三端可搜 |
+| 路径 | `Path(workspace) / "hs_dev_docs/_00_project/_18_doc_index/doc_index.sqlite"` |
+| 输出 | CLI 打印 JSON；内部 path 使用 POSIX 相对路径（`as_posix()`），避免 `\` 污染提示词 |
+| 编码 | UTF-8；Windows 控制台经 `hs_paths.ensure_utf8_stdout()` 尽量不乱码 |
+
+语义向量扩展（可选）必须同样走 `pathlib` + 可重建缓存，且不能阻断无 GPU/无网络环境的 FTS/LIKE 主路径。
+
+---
+
+## 7. 验收清单（Skill 可移植性）
 
 - [ ] `init_hs_global.py` 在 Win/Linux/macOS 均能创建全局目录  
 - [ ] `preferences.yaml` / `tech_learning/` 路径仅通过 `Path.home()` 解析  
+- [ ] `doc_index_db.py rebuild/search/slice` 在三端可用（仅标准库）  
+- [ ] `global_index_db.py rebuild/search --tag` 在三端可用（索引 `Path.home()/.hs-dev-skill`）  
 - [ ] 无 GNU make 时，全部门禁仍可通过 `python`/`python3`/`py -3` 执行  
 - [ ] 文档同时给出 Unix 与 Windows 示例，或使用「`python` + 启动器说明」统一写法  

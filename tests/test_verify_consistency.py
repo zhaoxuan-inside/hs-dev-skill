@@ -11,7 +11,7 @@ from verify_consistency import ConsistencyVerifier
 
 class TestVerifyConsistency(unittest.TestCase):
     def setUp(self):
-        self.temp_dir = tempfile.TemporaryDirectory()
+        self.temp_dir = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
         self.root = Path(self.temp_dir.name)
         init_full_workspace(str(self.root))
         self.verifier = ConsistencyVerifier(str(self.root))

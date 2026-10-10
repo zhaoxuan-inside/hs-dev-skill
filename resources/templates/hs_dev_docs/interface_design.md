@@ -1,10 +1,14 @@
 # 接口设计文档：{interface_name}
 
+> 细则见 Skill 内 `references/api_engineering.md`（错误语义、边界校验、幂等、兼容）。
+
 ## 1. 接口元数据
 - **接口名称**：`{interface_name}`
 - **接口协议**：RESTful JSON / gRPC / WebSocket
 - **端点路径 / 方法**：`POST /api/v1/{module}/{resource}`
 - **鉴权与隔离**：Bearer Token + Tenant Header
+- **幂等**：是 / 否（否须标明不可安全重试）；键来源与保留期：
+- **分页**：列表是否支持（page/pageSize 或 cursor）
 
 ---
 

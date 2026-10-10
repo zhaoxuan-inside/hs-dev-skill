@@ -1,4 +1,4 @@
-.PHONY: test verify scan-dead-code init-docs init-global paths help
+.PHONY: test verify scan-dead-code init-docs init-global paths index-rebuild index-search global-index-rebuild global-index-search skill-ref-rebuild skill-ref-search help
 
 # 跨平台：Linux/macOS 默认 python3；Windows 可 make PYTHON="py -3" 或 PYTHON=python
 ifeq ($(OS),Windows_NT)
@@ -15,6 +15,12 @@ help:
 	@echo "  make init-docs      - init hs_dev_docs skeleton in cwd"
 	@echo "  make init-global    - init ~/.hs-dev-skill (cross-project)"
 	@echo "  make paths          - print resolved global paths for this OS"
+	@echo "  make index-rebuild  - rebuild SQLite doc index (token-saving query cache)"
+	@echo "  make index-search Q=\"keywords\" - search doc index"
+	@echo "  make skill-ref-rebuild - rebuild Skill references scenario index"
+	@echo "  make skill-ref-search Q=\"幂等\" - search Skill references"
+	@echo "  make global-index-rebuild - rebuild ~/.hs-dev-skill tag index"
+	@echo "  make global-index-search TAG=反向代理  or  Q=nginx"
 	@echo "  Override interpreter: make test PYTHON=python3   or   make test PYTHON=\"py -3\""
 
 test:
@@ -35,3 +41,21 @@ init-global:
 
 paths:
 	$(PYTHON) scripts/hs_paths.py
+
+index-rebuild:
+	$(PYTHON) scripts/doc_index_db.py --root . rebuild
+
+index-search:
+	$(PYTHON) scripts/doc_index_db.py --root . search --q "$(Q)" --limit 8
+
+skill-ref-rebuild:
+	$(PYTHON) scripts/skill_ref_index.py rebuild
+
+skill-ref-search:
+	$(PYTHON) scripts/skill_ref_index.py search --q "$(Q)" --scenario "$(SCENARIO)" --limit 8
+
+global-index-rebuild:
+	$(PYTHON) scripts/global_index_db.py rebuild
+
+global-index-search:
+	$(PYTHON) scripts/global_index_db.py search --q "$(Q)" --tag "$(TAG)" --limit 8
