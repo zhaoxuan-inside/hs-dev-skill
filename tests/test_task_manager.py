@@ -47,13 +47,25 @@ class TestTaskManager(unittest.TestCase):
             msg=verifier.warnings,
         )
 
-        # 3. 流转状态为 IN_PROGRESS
+        # 3. 合法迁移：READY → IN_PROGRESS → VERIFYING → COMPLETED
         self.tm.set_status("order_create_test", "IN_PROGRESS")
         self.assertTrue(verifier.check_all())
-
-        # 4. 流转为 COMPLETED (自动触发归档)
+        self.tm.set_status("order_create_test", "VERIFYING")
         self.tm.set_status("order_create_test", "COMPLETED")
         self.assertTrue(verifier.check_all())
+
+        plan = self.root / "hs_dev_docs/_08_dev_process/_01_plan_log/order_create_test_plan.md"
+        self.assertTrue(plan.exists())
+
+    def test_illegal_transition_rejected(self):
+        self.tm.create_task("t_illegal", "非法迁移", change_size="S")
+        with self.assertRaises(ValueError):
+            self.tm.set_status("t_illegal", "COMPLETED")
+        # 日常禁止 force 跳步以外：force 仅用于终态重开
+        self.tm.set_status("t_illegal", "IN_PROGRESS")
+        self.tm.set_status("t_illegal", "VERIFYING")
+        self.tm.set_status("t_illegal", "COMPLETED")
+        self.tm.set_status("t_illegal", "IN_PROGRESS", force=True)
 
     def test_create_defaults_change_size_m(self):
         res = self.tm.create_task("task_size_default", "默认分级")

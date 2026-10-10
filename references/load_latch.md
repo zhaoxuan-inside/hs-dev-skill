@@ -11,10 +11,13 @@
 
 ```text
 L0  写 change_size=S|M|L 与 work_mode=DESIGN|IMPLEMENT（见 right_sizing / confidence_decision）
+    · 语义为「继续/继续任务/接着做/resume」→ 先记 work_mode 沿用 plan，勿当新需求
 L1  路由：python scripts/skill_ref_index.py search --q <场景词> --limit 5
     或只读 references/_index.md 表格一行（二选一，勿两者都做）
 L2  打开命中的恰好 1 份 references/*.md（本会话已读过的不重读）
+    · 继续 / 续做 / 回退 → `process_continuity.md`（并跑 process_log resume-scan）
     · DESIGN 审讯对齐 / grilling → `grill_orchestration.md`
+    · 原型 / 线框 / 无图布局 → `product_prototype.md`
     · 测试 / TDD / seam → `testing.md`
     · 深模块 / 重构接口 → `deep_modules.md`
     · 模糊 UI 默认审美 → `frontend_aesthetic.md`（项目已有 DESIGN.md 则切片读它）
@@ -25,6 +28,7 @@ L2  打开命中的恰好 1 份 references/*.md（本会话已读过的不重读
     · 后端分层 / 微服务 / Saga → `backend_arch.md`
     · 前端模块 / FSD → `frontend_arch.md`
     · API 契约 → `api_engineering.md`
+    · 任务状态迁移 → `task_state_machine.md`
 L3  触达 UI/API/架构且本地不够用 → `rule_fetch`（书规则、FSD、wshobson、品牌 DESIGN.md…）；禁止预拉全部远程包
 L4  项目文档：doc_index_db search|slice → context_pack；禁止整树 hs_dev_docs
 ```
@@ -45,7 +49,9 @@ L4  项目文档：doc_index_db search|slice → context_pack；禁止整树 hs_
 | 「把 references 全打开保险」 | Token 违规；只开 1 份 + 按需 rule_fetch |
 | 「远程规则库全拉下来」 | 只 resolve 命中 id，search 切片，禁止整包灌上下文 |
 | 「实现期也按设计轨狂问」 | work_mode=IMPLEMENT 走少问闸门 |
-| 「设计期少问省事」 | 模糊产品语义必须审讯式 DESIGN 或多问，或用户显式跳过 |
+| 「设计期少问省事」 | 模糊产品语义必须审讯式 DESIGN；跳过须过 confidence §1.5 |
+| 「继续=当新需求重开」 | 续做走 process_continuity + plan/change |
+| 「回退只能 git」 | 走 change_log 快照 rollback |
 | 「先写完再补测」 | 质量优先；IMPLEMENT 走 testing 红绿，禁止事后仪式测 |
 | 「审美先远程拉全文」 | 先 `frontend_aesthetic` 本地默认；不够再 rule_fetch ≤2 source |
 

@@ -15,7 +15,10 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | **动手前：装载门闩（反合理化 × Token）** | `load_latch.md` |
 | **任何需求第一步：变更分级 S/M/L** | `right_sizing.md` |
 | **审讯式 DESIGN 对齐 / grilling** | `grill_orchestration.md` |
-| 设计多问 / 实现少问 / work_mode | `confidence_decision.md` |
+| 设计多问 / 实现少问 / 跳过收紧 / work_mode | `confidence_decision.md` |
+| **继续任务 / plan_log / change_log / 非 git 回退** | `process_continuity.md` |
+| **产品原型 / Mermaid 线框（无位图）** | `product_prototype.md` |
+| 任务状态合法迁移 | `task_state_machine.md` |
 | **测试方法（一等公民）/ TDD / seam** | `testing.md` |
 | 提交前门禁 / 九级测试分层 | `quality_gates.md` |
 | **深模块 / seam / Adapter / 删除测试** | `deep_modules.md` |
@@ -32,7 +35,6 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | 六元组签名与衍生方法 | `six_tuple_runtime.md` |
 | Token / SQLite / context_pack | `token_budget.md` |
 | 四级 JSONL 路由 | `four_level_routing.md` |
-| 任务状态机 | `task_state_machine.md` |
 | Mock Profile | `mock_contract_guide.md` |
 | 学习笔记 / 偏好 / GitHub 对标 | `learn_and_prefer.md` |
 | Win/Linux/macOS 路径与解释器 | `cross_platform.md` |

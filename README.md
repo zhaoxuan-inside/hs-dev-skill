@@ -3,11 +3,11 @@
 > **质量优先 + 审讯式对齐 + 测试一等公民 + 深模块词汇 + 文档驱动 + S/M/L 分级**
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
-[![Spec Version](https://img.shields.io/badge/skill-v2.20-blue.svg)](SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v2.21-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS）。目标：**质量大于一切**——通过审讯式 DESIGN 对齐与分步正确（seam + 垂直 TDD），最大可能保证最终正确。入口 [`SKILL.md`](SKILL.md) 薄装载；细则按场景索引。先写 `change_size=S|M|L` 与 `work_mode`，过装载门闩后再干活；本地默认审美 + 深模块词汇 + 远程规则按需；产品冻结、SQLite 切片与 context_pack 平衡 Token 与反偷懒。
+`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS），**替代已废弃的 `hs-project-skill`**。目标：**质量大于一切**——审讯式 DESIGN（跳过收紧）、原型必产（无图用 Mermaid）、分步正确（seam + 垂直 TDD）。续做靠 `plan_log`/`change_log`（语义「继续」）；回退靠快照而非 git。入口 [`SKILL.md`](SKILL.md)；先写 `change_size`+`work_mode`，过装载门闩后再干活。
 
 ---
 
@@ -25,6 +25,8 @@ npx skills add zhaoxuan-inside/hs-dev-skill -g
 # 仅浏览是否被发现
 npx skills add zhaoxuan-inside/hs-dev-skill --list
 ```
+
+若本机仍装着已废弃的 `hs-project-skill`，从 Agent 技能目录删掉（`~/.cursor/skills/hs-project-skill`、`~/.agents/skills/hs-project-skill`），改装本仓库 `hs-dev-skill`。
 
 手动（任选其一）：
 
@@ -49,14 +51,16 @@ python scripts/skill_ref_index.py rebuild # Skill 详规场景索引
 ## 核心特性
 
 1. **质量优先**：分步正确 + 测试一等公民（seam 确认 → 垂直 TDD）。见 [testing.md](references/testing.md) / [quality_gates.md](references/quality_gates.md)。
-2. **审讯式 DESIGN 对齐**：设计树前沿轮询（社区 grilling 心智），可跳过；实现少问。见 [grill_orchestration.md](references/grill_orchestration.md) / [confidence_decision.md](references/confidence_decision.md)。
-3. **变更分级（Right-Sizing）**：`change_size=S|M|L`；S 快路径、M 补丁、L 满配。见 [right_sizing.md](references/right_sizing.md)。
-4. **装载门闩**：分级 + 索引路由 + 恰好 1 份详规。见 [load_latch.md](references/load_latch.md)。
-5. **深模块词汇**：Module / Interface / Seam / Adapter / Depth / 删除测试。见 [deep_modules.md](references/deep_modules.md)。
-6. **本地默认审美 + 远程按需**：Anthropic 蒸馏在 [frontend_aesthetic.md](references/frontend_aesthetic.md)；品牌/气质/原文 → `rule_fetch` + [design_md.md](references/design_md.md) / craft。
-7. **产品冻结（M/L）+ Token 预算**：PRD 闭合后选型；索引切片禁止整树通读。
-8. **范式与架构**：[dev_paradigm](references/dev_paradigm.md) → deep_modules / ddd / backend / frontend / API；远程规则联邦见 [rule_library](references/rule_library.md)。
-9. **六元组 + 任务三文件 + Mock 隔离 + verify 门禁；默认本地 Commit**。
+2. **审讯式 DESIGN 对齐**：设计树前沿轮询；跳过澄清收紧（不可逆/契约等禁止跳过）。见 [grill_orchestration.md](references/grill_orchestration.md) / [confidence_decision.md](references/confidence_decision.md)。
+3. **商业计划可选；有 UI 则原型必产**（无位图 → Mermaid）。见 [product_prototype.md](references/product_prototype.md)。
+4. **变更分级（Right-Sizing）**：`change_size=S|M|L`。见 [right_sizing.md](references/right_sizing.md)。
+5. **装载门闩**：分级 + 索引路由 + 恰好 1 份详规。见 [load_latch.md](references/load_latch.md)。
+6. **续做 / 非 git 回退**：`plan_log` + `change_log` + 快照；语义「继续」。见 [process_continuity.md](references/process_continuity.md)。
+7. **深模块词汇**：Module / Interface / Seam / Adapter / Depth / 删除测试。见 [deep_modules.md](references/deep_modules.md)。
+8. **本地默认审美 + 远程按需**：见 [frontend_aesthetic.md](references/frontend_aesthetic.md) / [design_md.md](references/design_md.md)。
+9. **产品冻结（M/L）+ Token 预算**：PRD（+原型）闭合后选型；索引切片禁止整树通读。
+10. **范式与架构**：[dev_paradigm](references/dev_paradigm.md) → deep_modules / ddd / backend / frontend / API。
+11. **六元组 + 合法状态机 + Mock + verify；默认本地 Commit**。
 
 ---
 
@@ -84,6 +88,8 @@ python scripts/skill_ref_index.py search --q "幂等" --limit 5
 python scripts/rule_fetch.py resolve --id local.frontend.core
 python scripts/doc_index_db.py --root . search --q "订单 创建" --limit 8
 python scripts/task_manager.py create --id order_create --title "创建交易订单" --change-size L --priority P0
+python scripts/process_log.py resume-scan --root .
+python scripts/process_log.py checkpoint --id order_create --step S2 --summary "改支付主路径" --paths backend/payment_service.py
 python scripts/verify_consistency.py --root .
 ```
 
@@ -98,7 +104,10 @@ python scripts/verify_consistency.py --root .
 | [references/load_latch.md](references/load_latch.md) | **动手前装载门闩** |
 | [references/right_sizing.md](references/right_sizing.md) | 变更分级 + work_mode |
 | [references/grill_orchestration.md](references/grill_orchestration.md) | 审讯式 DESIGN 对齐 |
-| [references/confidence_decision.md](references/confidence_decision.md) | 设计多问 / 实现少问 |
+| [references/confidence_decision.md](references/confidence_decision.md) | 设计多问 / 实现少问 / 跳过收紧 |
+| [references/product_prototype.md](references/product_prototype.md) | 原型必产（Mermaid OK） |
+| [references/process_continuity.md](references/process_continuity.md) | plan/change 续做与非 git 回退 |
+| [references/task_state_machine.md](references/task_state_machine.md) | 合法状态迁移 |
 | [references/testing.md](references/testing.md) | 测试方法（一等公民） |
 | [references/deep_modules.md](references/deep_modules.md) | 深模块 / seam / Adapter |
 | [references/dev_paradigm.md](references/dev_paradigm.md) | 按规模/类型选开发范式（先于 DDD） |

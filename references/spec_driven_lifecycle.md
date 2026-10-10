@@ -41,7 +41,9 @@
 
 ### 2. Agent 行为准则
 - **第一步是分级**（`right_sizing.md`），再进入本阶段的对齐深度。
-- **审讯式对齐**：`work_mode=DESIGN` 时走 [`grill_orchestration.md`](grill_orchestration.md) / [`confidence_decision.md`](confidence_decision.md)；可跳过但须记假设。
+- **审讯式对齐**：`work_mode=DESIGN` 时走 [`grill_orchestration.md`](grill_orchestration.md) / [`confidence_decision.md`](confidence_decision.md)；跳过受 §1.5 收紧。
+- **商业计划可选**：存在 `_01_business_plan/` 则纳入冲突扫描；缺失不阻断、不追讨。
+- **原型必有（有 UI）**：用户未提供则 Agent 生成；不能出图 → Mermaid/线框（[`product_prototype.md`](product_prototype.md)）。纯 API/批处理在 PRD 写「无 UI，豁免原型」。
 - S：数行 DoD/影响面即可，不强制完整 PRD；DoD 须可写成测试断言。
 - M/L：正式需求对齐；再选型/详设/编码。
 - 对齐维度（用作完整性检查清单；产品缺口优先闭合）：
@@ -50,24 +52,28 @@
   3. **异常与边缘用例**：网络超时、数据重复、并发冲突、权限越界时如何处理？（通用重试/幂等可高置信自定）
   4. **性能与规模预期**：预估 QPS、数据量级、时延要求？（无特有约束时可按常规默认并注明假设）
   5. **验收标准 (DoD)**：满足哪些具体断言才算任务完成？（须可映射到 [`testing.md`](testing.md) 的 seam）
-- **冲突扫描**：对照会话、既有 PRD/ADR/词典、代码与全局偏好，消除互相矛盾的目标、边界、优先级与验收口径。
+  6. **布局原型（有 UI）**：主路径 + 至少一屏区域划分可展示
+- **冲突扫描**：对照会话、可选商业计划、原型、既有 PRD/ADR/词典、代码与全局偏好，消除矛盾。
 - 用户只给一句话且核心场景/DoD 资料中不存在时，必须询问并闭合后再冻结；工程通用假设可写入 PRD「自主假设」节，**不得**用假设填补会影响选型/架构的产品空白。
 
 ### 3. 产出文档
+- （可选）`hs_dev_docs/_01_product_design/_01_business_plan/…`
 - `hs_dev_docs/_01_product_design/_02_product_design/{feature_name}_prd.md`
+- （有 UI）`hs_dev_docs/_01_product_design/_03_product_figma/{feature_name}_prototype.md`
 - 更新 `_01_product_design/_00_product_design.idx`
 
 ### 4. 产品需求冻结门禁（进入阶段 1 的硬前提）
 
-三项**全部**满足方可进入阶段 1；任一项不满足则停在阶段 0（询问或补齐），开发者确认后更新 PRD 再检：
+下列条件**全部**满足方可进入阶段 1；任一项不满足则停在阶段 0（询问或补齐），开发者确认后更新 PRD/原型再检：
 
 | 条件 | 含义 |
 |---|---|
 | **完整** | 场景/角色、正向流与 I/O 边界、影响架构的约束、可验证 DoD 均已写清；会影响选型或架构的产品空白已闭合（资料 / 偏好 / 对标 / 开发者确认） |
 | **正确** | 与用户已表态、既有资料及全局偏好一致；高置信工程假设仅限通用惯例，且不改写业务语义 |
-| **无冲突** | PRD 内部及与既有资料之间无未裁决矛盾 |
+| **无冲突** | PRD 内部及与既有资料（含可选商业计划、原型）之间无未裁决矛盾 |
+| **原型齐套** | 有 UI：原型文档存在且主路径+布局可读；无 UI：PRD 已声明豁免 |
 
-通过后**立即**进入阶段 1，不得空等。不强制对整份 PRD 做「全文请确认」——冻结依据是上述三项客观门禁，而非仪式性签字。
+通过后**立即**进入阶段 1，不得空等。不强制对整份 PRD 做「全文请确认」——冻结依据是上述客观门禁，而非仪式性签字。
 
 ---
 
@@ -151,8 +157,9 @@ L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范�
 
 ### 2. Agent 行为准则
 - 运行 `python scripts/task_manager.py create --id {task_id} --title "{task_title}"`（Linux/macOS 可用 `python3`；Windows 可用 `py -3`）；
-- 自动生成 `_02_task_detail/`、`_01_task_brief/`（15行紧凑滚动清单）与 `_03_task_context_pack/`；
+- 自动生成 `_02_task_detail/`、`_01_task_brief/`、`_03_task_context_pack/` 与 `_01_plan_log/{task_id}_plan.md`；
 - 优先 `python scripts/doc_index_db.py --root . search|slice` 定位阶段 0~3 切片，将**原文**写入 `_00_context_pack.md`（禁止只写路径）；控制 Token 预算。
+- 改代码/设计文件前：`python scripts/process_log.py checkpoint --id {task_id} --step … --summary "…" --paths …`（见 [`process_continuity.md`](process_continuity.md)）。
 
 ---
 

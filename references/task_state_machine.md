@@ -1,74 +1,85 @@
 # 任务生命周期与状态机规范指南
 
-## 1. 任务状态机定义
+**何时读**：建任务、改状态、回退重开、续做涉及任务态；每会话最多一次。  
+**续做/回退账本** → [`process_continuity.md`](process_continuity.md)。
 
-在 `hs-dev-skill` 中，所有研发动作必须绑定到明确的任务状态机上，确保过程可溯源、可恢复、可中断：
+---
+
+## 1. 状态机与合法迁移
 
 ```text
-    ┌──────────┐
-    │  DRAFT   │ (草稿状态)
-    └────┬─────┘
-         │ 任务初审通过
-         ▼
-    ┌──────────┐
-    │  READY   │ (就绪状态)
-    └────┬─────┘
-         │ Agent 加载上下文并开始执行
-         ▼
- ┌───────────────┐  遇到阻断/依赖缺失   ┌───────────┐
- │  IN_PROGRESS  │ ─────────────────► │  BLOCKED  │
- └───┬───────▲───┘ ◄───────────────── └───────────┘
-     │       │          解除阻塞
-     │ 开发三同步完成，发起验证
-     ▼       │
- ┌───────────┴───┐
- │   VERIFYING   │ (门禁与测试执行)
- └───┬───────────┘
-     │ 测试全部通过
-     ├─────────────────────────────────┐
-     ▼                                 ▼
-┌───────────┐                    ┌───────────┐
-│ COMPLETED │ (归档主索引)        │  ABORTED  │ (废弃归档)
-└───────────┘                    └───────────┘
+DRAFT ──► READY ──► IN_PROGRESS ⇄ BLOCKED
+                      │     ▲
+                      ▼     │（门禁失败）
+                   VERIFYING
+                    │     │
+                    ▼     ▼
+               COMPLETED  ABORTED
 ```
+
+| 从 \ 到 | 合法下一态 |
+|---------|------------|
+| DRAFT | READY, ABORTED |
+| READY | IN_PROGRESS, ABORTED, DRAFT |
+| IN_PROGRESS | BLOCKED, VERIFYING, ABORTED, READY |
+| BLOCKED | IN_PROGRESS, ABORTED |
+| VERIFYING | COMPLETED, IN_PROGRESS, ABORTED |
+| COMPLETED | ∅（终态） |
+| ABORTED | ∅（终态） |
+
+CLI 强制校验：
+
+```bash
+python scripts/task_manager.py status --id {id} --set VERIFYING
+# 非法迁移会失败。仅 process_log 回退后重开可用：
+python scripts/task_manager.py status --id {id} --set IN_PROGRESS --force
+```
+
+**禁止**：`READY → COMPLETED` 等跳步；用 `--force` 绕过日常推进。
 
 ### BLOCKED 与置信度决策
 
-除依赖缺失外，以下情况必须进入 `BLOCKED`（或阶段 0–3 尚未建任务时等价暂停跃迁）：
+除依赖缺失外，以下必须 `BLOCKED`（或阶段 0–3 未建任务时等价暂停）：
 
-1. **询问闸门触发**（影响面广 + 项目特有 + 资料未提及 + 多选项置信接近，见 [`confidence_decision.md`](confidence_decision.md)）；
-2. **产品需求冻结门禁未过**（PRD 不完整、不正确或存在未裁决冲突，见 [`spec_driven_lifecycle.md`](spec_driven_lifecycle.md)）——此时禁止进入选型及后续阶段。
+1. **询问闸门触发**（见 [`confidence_decision.md`](confidence_decision.md)）；
+2. **产品冻结未过**（见 [`spec_driven_lifecycle.md`](spec_driven_lifecycle.md)）；
+3. **有 UI 却无原型齐套**（见 [`product_prototype.md`](product_prototype.md)）。
 
-处理步骤：
-
-1. 在 task_detail / brief（或阶段 0 产出）中写明决策点、候选选项、自评置信与影响面；
-2. 已有任务时：`python3 scripts/task_manager.py status --id {task_id} --set BLOCKED`；
-3. 用户答复后写入 PRD/ADR/设计/词典（产品项须先满足冻结门禁），再回到 `IN_PROGRESS` 或恢复阶段跃迁；
-4. **解除阻塞后必须立即继续推进**，沿阶段链做到本需求 `COMPLETED`（阶段 6），禁止无确认事项时停工等待「请继续」。
-
-**禁止**：对大家通用的解决方案提问并为此 `BLOCKED`；**禁止**：在未满足询问闸门时用猜测填项目特有空白后继续推进；**禁止**：产品需求未冻结即进入阶段 1+。
+解除后**立即继续**至路径终点，禁止无确认事项时空等「请继续」。
 
 ---
 
-## 2. 三文件强一致性约束
+## 2. 三文件强一致性 + plan_log
 
-任何任务的创建、流转、完成，必须原子同步以下三处：
+创建/流转/完成须同步：
 
-1. **`_00_task.idx`（主索引文件）**：
-   - 记录所有处于非终态（`READY`、`IN_PROGRESS`、`BLOCKED`、`VERIFYING`）的任务。
-   - 包含字段：`task_id`、`title`、`status`、`priority`、`brief_ref`、`detail_ref`、`context_pack_ref`、`owner`、`updated_at`。
-2. **`_01_task_brief/`（任务滚动简述）**：
-   - 每个任务简述采用紧凑 Markdown 块，**不超过 15 行**。
-   - 单文件最多承载 10 个任务，满 10 个自动滚卷生成 `_02_task_brief_002.md`。
-3. **`_02_task_detail/`（任务详细设计与日志）**：
-   - 每个任务独立目录：`_01_{task_name}/_00_task_detail.md`。
-   - 包含背景、上下文包引用、执行步骤、验证记录与修改文件列表。
+1. `_00_task.idx`
+2. `_01_task_brief/`
+3. `_02_task_detail/`
+
+并维护过程最小集（见 [`process_continuity.md`](process_continuity.md)）：
+
+4. `_01_plan_log/{task_id}_plan.md`（`create` 时自动 ensure）
+5. `_02_change_log/{task_id}_changes.jsonl`（改文件前 checkpoint）
 
 ---
 
-## 3. 会话中断与恢复机制（Session Handoff）
+## 3. 续做入口（语义，非 handoff）
 
-当 Agent 遇到会话 token 限制、用户主动切断或长耗时等待时：
-1. 立即触发生成 `_08_dev_process/_05_session_handoff/handoff_{task_id}_{timestamp}.md`；
-2. 记录当前任务 ID、执行断点、已修改文件、遗留待办和下一轮会话的恢复 Prompt。
-3. 下一轮会话启动时，Agent 优先检查 `_05_session_handoff/`，实现无缝断点续传。
+用户说「继续 / 继续任务 / 接着做 / resume」等 →：
+
+1. `python scripts/process_log.py resume-scan --root .`
+2. 按 plan_log 断点 + change_log 续做  
+
+handoff 仅为可选补充；**不以 handoff 为续做真理源**。
+
+---
+
+## 4. 回退（非 git）
+
+```bash
+python scripts/process_log.py rollback --id {task_id} --to {checkpoint_id}
+python scripts/task_manager.py status --id {task_id} --set IN_PROGRESS --force   # 若已 COMPLETED
+```
+
+按快照恢复文件；git 可选附赠，不是引擎。

@@ -67,7 +67,7 @@ def init_full_workspace(workspace_root: str):
         "_08_dev_process/_01_plan_log",
         "_08_dev_process/_02_change_log",
         "_08_dev_process/_03_verify_log",
-        "_08_dev_process/_04_error_recovery",
+        "_08_dev_process/_04_error_recovery/snapshots",
         "_08_dev_process/_05_session_handoff",
         "_08_dev_process/_06_todo",
         "_08_dev_process/_07_iteration_debt_log",

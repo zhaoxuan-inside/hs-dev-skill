@@ -20,6 +20,17 @@ from idx_manager import IdxManager
 VALID_STATUSES = ["DRAFT", "READY", "IN_PROGRESS", "BLOCKED", "VERIFYING", "COMPLETED", "ABORTED"]
 VALID_CHANGE_SIZES = ("S", "M", "L")
 
+# 合法迁移（终态默认不可迁出；回退用 force=True 或 status --force）
+ALLOWED_TRANSITIONS = {
+    "DRAFT": frozenset({"READY", "ABORTED"}),
+    "READY": frozenset({"IN_PROGRESS", "ABORTED", "DRAFT"}),
+    "IN_PROGRESS": frozenset({"BLOCKED", "VERIFYING", "ABORTED", "READY"}),
+    "BLOCKED": frozenset({"IN_PROGRESS", "ABORTED"}),
+    "VERIFYING": frozenset({"COMPLETED", "IN_PROGRESS", "ABORTED"}),
+    "COMPLETED": frozenset(),
+    "ABORTED": frozenset(),
+}
+
 
 def get_iso_timestamp():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -186,6 +197,27 @@ class TaskManager:
             auto_digest=True
         )
 
+        # 5. 同步创建 plan_log（续做/回退真理源之一）
+        try:
+            from process_log import ensure_plan
+
+            ensure_plan(
+                self.root,
+                task_id,
+                title=title,
+                change_size=change_size,
+                work_mode="IMPLEMENT" if change_size == "S" else "DESIGN",
+                stage="4" if change_size != "S" else "S",
+                steps=[
+                    ("S1", "对齐/装载上下文"),
+                    ("S2", "实现可验证增量"),
+                    ("S3", "测试与门禁"),
+                    ("S4", "归档与本地 Commit"),
+                ],
+            )
+        except Exception as e:
+            print(f"[WARN] plan_log ensure failed: {e}")
+
         print(f"[SUCCESS] Created task '{task_id}' (Status: {status}, change_size: {change_size})")
         return {
             "task_id": task_id,
@@ -250,8 +282,14 @@ class TaskManager:
 
         return f"_01_task_brief/{target_file.name}"
 
-    def set_status(self, task_id: str, new_status: str, note: str = ""):
-        """流转任务状态并原子同步三文件"""
+    def set_status(
+        self,
+        task_id: str,
+        new_status: str,
+        note: str = "",
+        force: bool = False,
+    ):
+        """流转任务状态并原子同步三文件；默认校验合法迁移。"""
         if new_status not in VALID_STATUSES:
             raise ValueError(f"Invalid status '{new_status}'. Allowed: {VALID_STATUSES}")
 
@@ -265,11 +303,32 @@ class TaskManager:
                 break
 
         if not found:
-            raise ValueError(f"Active task '{task_id}' not found in _00_task.idx")
+            # 允许 force 从归档拉回（非 git 回退后重开）
+            if force and new_status in ("IN_PROGRESS", "READY"):
+                self._unarchive_task(task_id, new_status)
+                mgr = IdxManager(str(self.task_idx_path))
+                for entry in mgr.entries:
+                    if entry.get("id") == task_id:
+                        found = True
+                        target_entry = entry
+                        break
+            if not found:
+                raise ValueError(f"Active task '{task_id}' not found in _00_task.idx")
+
+        old_status = target_entry.get("status") or "READY"
+        allowed = ALLOWED_TRANSITIONS.get(old_status, frozenset())
+        if not force and new_status != old_status and new_status not in allowed:
+            raise ValueError(
+                f"Illegal transition {old_status} → {new_status}. "
+                f"Allowed from {old_status}: {sorted(allowed) or '∅ (terminal)'}. "
+                f"Use --force only for process_log rollback reopen."
+            )
 
         now = get_iso_timestamp()
         target_entry["status"] = new_status
         target_entry["updated_at"] = now
+        if note:
+            target_entry["last_note"] = note
 
         # 1. 更新 task_detail
         detail_path = self.task_root / target_entry["path"]
@@ -325,7 +384,11 @@ class TaskManager:
         if new_status in ["COMPLETED", "ABORTED"]:
             self._archive_task(task_id, new_status)
 
-        print(f"[SUCCESS] Task '{task_id}' status transitioned to '{new_status}'")
+        print(
+            f"[SUCCESS] Task '{task_id}' status transitioned "
+            f"{old_status} → '{new_status}'"
+            + (" (force)" if force else "")
+        )
 
     def _archive_task(self, task_id: str, final_status: str):
         """将完成或废弃的任务归档移入 _00_task_archive.idx"""
@@ -351,6 +414,28 @@ class TaskManager:
         arch_mgr.entries.append(target_entry)
         arch_mgr.save()
         print(f"[ARCHIVE] Task '{task_id}' archived into _00_task_archive.idx")
+
+    def _unarchive_task(self, task_id: str, new_status: str):
+        """从归档移回活跃索引（仅 force / 回退重开）。"""
+        arch_mgr = IdxManager(str(self.archive_idx_path))
+        target = None
+        for entry in list(arch_mgr.entries):
+            if entry.get("id") == task_id:
+                target = entry
+                break
+        if not target:
+            raise ValueError(f"Task '{task_id}' not found in active or archive idx")
+        arch_mgr.entries = [e for e in arch_mgr.entries if e.get("id") != task_id]
+        arch_mgr.save()
+
+        mgr = IdxManager(str(self.task_idx_path))
+        if not mgr.metadata:
+            mgr.init_idx("task_active", "_09_task")
+        target["status"] = new_status
+        target["updated_at"] = get_iso_timestamp()
+        mgr.entries.append(target)
+        mgr.save()
+        print(f"[UNARCHIVE] Task '{task_id}' restored to active as {new_status}")
 
     def create_session_handoff(self, task_id: str, checkpoint_desc: str, completed_steps: list, remaining_steps: list) -> str:
         """生成会话交接记录，保障断点续传"""
@@ -385,9 +470,10 @@ class TaskManager:
 
 ## 4. 恢复提示词 (Resume Prompt)
 ```text
-请继续执行任务 [{task_id}]。
-当前断点：{checkpoint_desc}。
-请阅读 hs_dev_docs/_08_dev_process/_09_task/_02_task_detail/_01_{task_id}/_00_task_detail.md 并在当前断点基础上继续推进。
+请继续执行任务 [{task_id}]（语义续做，勿当新需求）。
+先运行：python scripts/process_log.py resume-scan --root .
+按该任务 plan_log 断点 + change_log 推进；handoff 仅作补充。
+当前断点备注：{checkpoint_desc}。
 ```
 """
         handoff_file.write_text(content, encoding="utf-8")
@@ -421,11 +507,26 @@ def main():
     p_status.add_argument("--id", required=True, help="Task ID")
     p_status.add_argument("--set", required=True, choices=VALID_STATUSES, help="New status")
     p_status.add_argument("--note", default="", help="Transition note")
+    p_status.add_argument(
+        "--force",
+        action="store_true",
+        help="Bypass transition table (process_log rollback reopen only)",
+    )
 
     # handoff
     p_handoff = subparsers.add_parser("handoff", help="Create a session handoff")
     p_handoff.add_argument("--id", required=True, help="Task ID")
     p_handoff.add_argument("--checkpoint", required=True, help="Checkpoint description")
+    p_handoff.add_argument(
+        "--completed",
+        default="",
+        help="Comma-separated completed steps",
+    )
+    p_handoff.add_argument(
+        "--remaining",
+        default="",
+        help="Comma-separated remaining steps",
+    )
 
     args = parser.parse_args()
     tm = TaskManager(args.root)
@@ -441,9 +542,11 @@ def main():
             args.change_size,
         )
     elif args.command == "status":
-        tm.set_status(args.id, args.set, args.note)
+        tm.set_status(args.id, args.set, args.note, force=args.force)
     elif args.command == "handoff":
-        tm.create_session_handoff(args.id, args.checkpoint, [], [])
+        completed = [x.strip() for x in args.completed.split(",") if x.strip()]
+        remaining = [x.strip() for x in args.remaining.split(",") if x.strip()]
+        tm.create_session_handoff(args.id, args.checkpoint, completed, remaining)
 
 
 if __name__ == "__main__":

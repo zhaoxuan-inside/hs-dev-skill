@@ -34,6 +34,9 @@ class TestSkillRefIndex(unittest.TestCase):
             "frontend_arch.md",
             "backend_arch.md",
             "token_budget.md",
+            "process_continuity.md",
+            "product_prototype.md",
+            "confidence_decision.md",
         ):
             src = ref_src / name
             if src.is_file():
@@ -84,8 +87,27 @@ class TestSkillRefIndex(unittest.TestCase):
             msg=json.dumps(fsd, ensure_ascii=False),
         )
 
-        size = db.search(tag="change_size", limit=5)
-        self.assertTrue(any("right_sizing" in h["path"] for h in size["hits"]))
+        size = db.search(q="right-sizing", limit=8)
+        self.assertTrue(
+            any("right_sizing" in h["path"] for h in size["hits"]),
+            msg=json.dumps(size, ensure_ascii=False),
+        )
+
+        resume = db.search(q="继续任务", limit=8)
+        self.assertTrue(
+            any("process_continuity" in h["path"] for h in resume["hits"]),
+            msg=json.dumps(resume, ensure_ascii=False),
+        )
+        proto = db.search(q="原型", limit=8)
+        self.assertTrue(
+            any("product_prototype" in h["path"] for h in proto["hits"]),
+            msg=json.dumps(proto, ensure_ascii=False),
+        )
+        skip = db.search(q="跳过澄清", limit=8)
+        self.assertTrue(
+            any("confidence_decision" in h["path"] for h in skip["hits"]),
+            msg=json.dumps(skip, ensure_ascii=False),
+        )
 
         stats = db.stats()
         self.assertGreaterEqual(stats["count"], 4)

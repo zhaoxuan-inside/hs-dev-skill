@@ -15,7 +15,7 @@
 |----------|----------|
 | grill / grilling | DESIGN 轨设计树澄清（§1） |
 | grill-with-docs | 澄清时同步 PRD / 词典 / ADR 假设 |
-| 用户可跳过 | 「跳过澄清 / 直接做」→ 记假设后切 IMPLEMENT |
+| 跳过澄清（收紧） | 仅可跳过「可逆 + 不影响选型/契约」的工程偏好；见 confidence_decision §1.5 |
 | 实现对齐后再 TDD | 冻结后 `work_mode=IMPLEMENT` + [`testing.md`](testing.md) |
 
 ---
@@ -26,8 +26,8 @@
 2. **事实自查、决策问人**：代码/文档/工具能答的禁止问。  
 3. **只问前沿**：前置未定的节点不提前问；每轮 2～5 题。  
 4. **带推荐**：每题给推荐，让「好/yes」可落地。  
-5. **可跳过**：用户显式跳过 → 一行重大假设 → 进入 IMPLEMENT（S）或迷你冻结（M/L）。  
-6. **闭合才切模式**：核心场景 / DoD / 影响架构的约束齐且无冲突 → 宣布冻结 → `IMPLEMENT`。
+5. **跳过收紧**：用户说「跳过澄清」时，对照 [`confidence_decision.md`](confidence_decision.md) §1.5；命中禁止清单 → 拒绝跳过并继续审讯或 `BLOCKED`。  
+6. **闭合才切模式**：核心场景 / DoD / 影响架构的约束齐且无冲突 → 宣布冻结 → `IMPLEMENT`。有 UI → 原型齐套（[`product_prototype.md`](product_prototype.md)）。
 
 ---
 
@@ -53,7 +53,9 @@ G4  前沿空且冻结条件满足 → work_mode=IMPLEMENT；否则继续 G2
 - 权限、计费、归属、审计等业务特有规则  
 - 对外契约与持久化是否牵动多端/迁移  
 - 模块 seam：测什么界面、谁拥有不变量（见 [`deep_modules.md`](deep_modules.md)）  
-- 模糊 UI：题材与受众先定，再方向取舍（见 [`frontend_aesthetic.md`](frontend_aesthetic.md)）
+- 模糊 UI：题材与受众先定，再方向取舍（见 [`frontend_aesthetic.md`](frontend_aesthetic.md)）  
+- 有 UI：原型布局（用户提供或 Agent 生成 Mermaid 线框，见 [`product_prototype.md`](product_prototype.md)）  
+- 商业计划：有则对照；无则跳过，不入阻断前沿  
 
 ---
 
@@ -64,6 +66,8 @@ G4  前沿空且冻结条件满足 → work_mode=IMPLEMENT；否则继续 G2
 | 一上来写实现再「顺便问」 | 先 G1～G3 |
 | 问卷灌水（通用 REST/命名） | 自决；只问产品特有 |
 | 用「行业常识」填产品空白后强行冻结 | 入前沿或记假设并标风险 |
+| 用户一说跳过就冻结算选型 | 先过 §1.5 禁止清单 |
+| 无原型（有 UI）进编码 | 生成 Mermaid 线框后再冻结 |
 | IMPLEMENT 里继续审讯式狂问 | 回切 DESIGN 或走四条件闸门 |
 
 实现期暴露产品空白 → **回切 DESIGN** 再跑一轮迷你审讯，禁止静默猜业务。

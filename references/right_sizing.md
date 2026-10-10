@@ -25,7 +25,7 @@
 | **DESIGN** | M/L 冻结未过；需求模糊；写/改 PRD·ADR·架构·契约；不确定 |
 | **IMPLEMENT** | S 且 DoD 已清；或冻结已过、按已定设计编码/修测 |
 
-**不确定时**：`change_size=M`，`work_mode=DESIGN`（不要默认 L；不要默认少问）。用户口头说「随便改一下」若触及契约/表结构 → 升为 M/L。用户说「跳过澄清 / 直接做」→ 记假设后切 IMPLEMENT。
+**不确定时**：`change_size=M`，`work_mode=DESIGN`（不要默认 L；不要默认少问）。用户口头说「随便改一下」若触及契约/表结构 → 升为 M/L。用户说「跳过澄清 / 直接做」→ 按 [`confidence_decision.md`](confidence_decision.md) §1.5 收紧处理（禁止项不可跳过）。
 
 ---
 
