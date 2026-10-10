@@ -36,5 +36,6 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | Token / SQLite / context_pack | `token_budget.md` |
 | 四级 JSONL 路由 | `four_level_routing.md` |
 | Mock Profile | `mock_contract_guide.md` |
+| **版本号控制与单源防漂移 / SemVer / 发布 Tag** | `version_control.md` |
 | 学习笔记 / 偏好 / GitHub 对标 | `learn_and_prefer.md` |
 | Win/Linux/macOS 路径与解释器 | `cross_platform.md` |

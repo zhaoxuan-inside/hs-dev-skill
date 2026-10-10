@@ -3,7 +3,7 @@
 > **质量优先 + 审讯式对齐 + 测试一等公民 + 深模块词汇 + 文档驱动 + S/M/L 分级**
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
-[![Spec Version](https://img.shields.io/badge/skill-v2.21-blue.svg)](SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v2.22-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -61,6 +61,7 @@ python scripts/skill_ref_index.py rebuild # Skill 详规场景索引
 9. **产品冻结（M/L）+ Token 预算**：PRD（+原型）闭合后选型；索引切片禁止整树通读。
 10. **范式与架构**：[dev_paradigm](references/dev_paradigm.md) → deep_modules / ddd / backend / frontend / API。
 11. **六元组 + 合法状态机 + Mock + verify；默认本地 Commit**。
+12. **版本号双轨控制与防漂移**：遵循 SemVer；Skill 自身三处强一致；交付 S/M/L 映射 PATCH/MINOR/MAJOR；API 与 DB 迁移版本防破坏。见 [version_control.md](references/version_control.md)。
 
 ---
 
@@ -108,6 +109,7 @@ python scripts/verify_consistency.py --root .
 | [references/product_prototype.md](references/product_prototype.md) | 原型必产（Mermaid OK） |
 | [references/process_continuity.md](references/process_continuity.md) | plan/change 续做与非 git 回退 |
 | [references/task_state_machine.md](references/task_state_machine.md) | 合法状态迁移 |
+| [references/version_control.md](references/version_control.md) | 双轨版本号控制与单源防漂移 / SemVer / 发布 Tag |
 | [references/testing.md](references/testing.md) | 测试方法（一等公民） |
 | [references/deep_modules.md](references/deep_modules.md) | 深模块 / seam / Adapter |
 | [references/dev_paradigm.md](references/dev_paradigm.md) | 按规模/类型选开发范式（先于 DDD） |

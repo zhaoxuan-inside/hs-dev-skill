@@ -27,9 +27,16 @@ class ConsistencyVerifier:
         self.warnings.clear()
 
         if not self.docs_root.exists():
-            self.errors.append("hs_dev_docs directory does not exist! Please run init_hs_dev_docs.py first.")
-            self._print_results()
-            return False
+            if (self.root / "demo_project" / "hs_dev_docs").exists():
+                self.docs_root = self.root / "demo_project" / "hs_dev_docs"
+                self.mock_root = self.root / "demo_project" / "mock"
+            else:
+                self.errors.append("hs_dev_docs directory does not exist! Please run init_hs_dev_docs.py first.")
+                self._print_results()
+                return False
+
+        # 0. 检查 Skill 自身三处版本号单源一致性（当处于 Skill 根目录时）
+        self._check_skill_version()
 
         # 1. 检查全量 .idx 索引文件
         self._check_indices()
@@ -47,6 +54,44 @@ class ConsistencyVerifier:
         self._check_doc_index_db()
 
         return self._print_results()
+
+    def _check_skill_version(self):
+        """检查 Skill 自身三处版本号单源一致性（仅在包含 SKILL.md 的 Skill 根目录触发）"""
+        skill_file = self.root / "SKILL.md"
+        readme_file = self.root / "README.md"
+        if not skill_file.exists():
+            return
+
+        print("  -> Checking Skill Package Version Consistency...")
+        skill_text = skill_file.read_text(encoding="utf-8")
+
+        m_meta = re.search(r'metadata:\s*\n(?:\s+.*\n)*?\s+version:\s*["\']?([^"\']+)["\']?', skill_text)
+        meta_ver = m_meta.group(1).strip() if m_meta else None
+
+        m_body = re.search(r'版本：v?([0-9\.]+)', skill_text)
+        body_ver = m_body.group(1).strip() if m_body else None
+
+        if not meta_ver:
+            self.errors.append("[SKILL VERSION ERROR] SKILL.md missing metadata.version in frontmatter")
+        if not body_ver:
+            self.errors.append("[SKILL VERSION ERROR] SKILL.md missing '版本：v...' in body")
+
+        if meta_ver and body_ver and meta_ver != body_ver:
+            self.errors.append(
+                f"[SKILL VERSION MISMATCH] SKILL.md metadata.version '{meta_ver}' "
+                f"does not match body version '{body_ver}'"
+            )
+
+        if readme_file.exists():
+            readme_text = readme_file.read_text(encoding="utf-8")
+            m_readme = re.search(r'badge/skill-v?([0-9\.]+)-blue', readme_text)
+            if m_readme:
+                readme_ver = m_readme.group(1).strip()
+                if meta_ver and readme_ver != meta_ver:
+                    self.errors.append(
+                        f"[SKILL VERSION MISMATCH] README.md badge version '{readme_ver}' "
+                        f"does not match SKILL.md version '{meta_ver}'"
+                    )
 
     def _check_indices(self):
         """遍历并校验所有 .idx 文件"""
@@ -144,6 +189,8 @@ class ConsistencyVerifier:
                 if match:
                     ver_desc = match.group(1)
                     v_versions[ver_desc] = vf
+                else:
+                    self.errors.append(f"[DB MIGRATION FORMAT ERROR] {vf.name} does not match V<version>__<description>.sql format")
 
             for ver_desc, vf in v_versions.items():
                 expected_u = m_dir / f"U{ver_desc}.sql"

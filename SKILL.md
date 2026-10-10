@@ -13,13 +13,13 @@ license: MIT
 compatibility: Requires Python >= 3.8 (stdlib sqlite3; Win/Linux/macOS)
 metadata:
   author: hardstone
-  version: "2.21"
+  version: "2.22"
 ---
 
 # 产品开发 Skill (hs-dev-skill)
 
-版本：v2.21  
-核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动 + 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 深模块词汇 + 本地默认审美 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；默认本地 Commit**  
+版本：v2.22  
+核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动 + 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 深模块词汇 + 本地默认审美 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
 **替代**：原 `hs-project-skill` 已废弃，统一用本 Skill。
 
 **装载门闩（反合理化 × Token）**：动手前必须完成 [`load_latch.md`](references/load_latch.md) L0～L2（分级 + 索引路由 + **恰好 1 份**详规）。禁止「跳过 Skill 先干」；也禁止整目录通读。场景有 ≥1% 可能适用 → **必须跑** `skill_ref_index search`（或读 `_index` 一行），命中再打开。
@@ -46,6 +46,7 @@ metadata:
 15. **三端**：`pathlib` + `python3`/`python`/`py -3`（[`cross_platform.md`](references/cross_platform.md)）。
 16. **Token**：门闩 + `doc_index_db` / `skill_ref_index` / `rule_fetch` → 切片 → context_pack；禁止整树/`spec_v2_4`/远程规则包开局通读（[`token_budget.md`](references/token_budget.md)）。
 17. **默认 Commit；明确要求才 push**。
+18. **版本号双轨控制与防漂移**：遵循 SemVer（`vX.Y.Z`）；Skill 自身三处元数据（metadata/正文/README）强一致；项目交付 S/M/L 映射 PATCH/MINOR/MAJOR；API/DB 严格按版本演进（[`version_control.md`](references/version_control.md)）。
 
 ---
 
@@ -94,6 +95,6 @@ metadata:
 - [`learn_and_prefer.md`](references/learn_and_prefer.md) · [`spec_driven_lifecycle.md`](references/spec_driven_lifecycle.md)
 - [`six_tuple_runtime.md`](references/six_tuple_runtime.md) · [`four_level_routing.md`](references/four_level_routing.md)
 - [`task_state_machine.md`](references/task_state_machine.md) · [`mock_contract_guide.md`](references/mock_contract_guide.md)
-- [`cross_platform.md`](references/cross_platform.md)
+- [`version_control.md`](references/version_control.md)（双轨版本号控制 / SemVer / 发布 Tag） · [`cross_platform.md`](references/cross_platform.md)
 - [`spec_v2_4.md`](references/spec_v2_4.md)（争议按节；禁止开局通读）
 - [`resources/rule_sources.yaml`](resources/rule_sources.yaml) · [`resources/templates/`](resources/templates/) · [`examples/order_service/`](examples/order_service/)

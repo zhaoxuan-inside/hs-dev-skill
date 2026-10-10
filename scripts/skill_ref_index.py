@@ -96,6 +96,10 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
     "task_state_machine.md": ["任务", "状态机", "handoff", "迁移", "ABORTED"],
     "mock_contract_guide.md": ["Mock", "Profile", "契约测试"],
     "quality_gates.md": ["门禁", "verify", "提交前", "覆盖率", "九级"],
+    "version_control.md": [
+        "版本", "版本号", "version", "semver", "发布", "release", "tag", "升级",
+        "防漂移", "单源", "变更分级", "补丁", "major", "minor", "patch",
+    ],
     "cross_platform.md": ["跨平台", "Windows", "Linux", "macOS", "pathlib"],
     "spec_v2_4.md": ["规格", "百科", "争议"],
 }
