@@ -17,7 +17,8 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | **审讯式 DESIGN 对齐 / grilling** | `grill_orchestration.md` |
 | 设计多问 / 实现少问 / 跳过收紧 / work_mode | `confidence_decision.md` |
 | **继续任务 / plan_log / change_log / 非 git 回退** | `process_continuity.md` |
-| **产品原型 / Mermaid 线框（无位图）** | `product_prototype.md` |
+| **产品设计规范（设计语言 + 产品功能）** | `product_design.md` |
+| **产品原型 / 多态线框（无位图）** | `product_prototype.md` |
 | 任务状态合法迁移 | `task_state_machine.md` |
 | **测试方法（一等公民）/ TDD / seam** | `testing.md` |
 | 提交前门禁 / 九级测试分层 | `quality_gates.md` |

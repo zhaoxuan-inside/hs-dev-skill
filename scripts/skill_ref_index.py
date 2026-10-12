@@ -85,9 +85,13 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
         "继续", "续做", "继续任务", "resume", "plan_log", "change_log",
         "回退", "rollback", "checkpoint", "中断", "过程日志",
     ],
+    "product_design.md": [
+        "产品设计", "设计语言", "产品功能", "PRD", "功能规格", "design tokens",
+        "UI规范", "功能架构", "用户旅程", "四态", "产品设计规范", "tokens",
+    ],
     "product_prototype.md": [
         "原型", "线框", "mermaid", "figma", "布局", "prototype",
-        "商业计划", "无图",
+        "商业计划", "无图", "多态",
     ],
     "learn_and_prefer.md": ["学习", "偏好", "GitHub", "对标", "标签"],
     "spec_driven_lifecycle.md": ["生命周期", "阶段", "门禁", "PRD", "冻结", "原型"],

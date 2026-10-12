@@ -34,32 +34,35 @@
 
 ---
 
-## 阶段 0：需求对齐与澄清 (Requirement Alignment)
+## 阶段 0：产品设计与需求冻结 (Product Design & Alignment)
 
 ### 1. 核心目标
-产出可冻结的产品需求（M/L）或轻量对齐记录（S），作为后续路径的产品真理源；杜绝带着产品空白选型，同时避免对通用做法逢项必问。
+全面强化专业产品设计能力，产出可冻结的专业级产品设计方案，作为后续研发路径的权威真理源。
+**产出边界铁律（绝对纯净原则）**：产品设计的产出**只需要且必须**包含两大部分：
+1. **产品的设计语言 (Product Design Language)**（详见 [`product_design.md`](product_design.md)）；
+2. **产品的功能 (Product Features & Functionality)**（详见 [`product_design.md`](product_design.md)）。
+
+> [!IMPORTANT]
+> **严禁底层技术细节反向侵入产品设计**：
+> 严禁在阶段 0 的 PRD 或原型文档中提前塞入底层技术选型（如 MySQL vs PG）、物理数据库 DDL、接口代码实现签名、分布式 Saga 补偿、代码单元测试覆盖率指标等工程实现细节！这些是阶段 1（选型）至阶段 3（四要素详设）的职责。产品设计阶段只对产品的设计语言与功能规格负责。
 
 ### 2. Agent 行为准则
-- **第一步是分级**（`right_sizing.md`），再进入本阶段的对齐深度。
+- **第一步是分级**（[`right_sizing.md`](right_sizing.md)），再进入本阶段的设计与对齐深度。
+- **产品设计指南驱动**：深度遵循 [`product_design.md`](product_design.md)，从产品定位到交互全状态进行专业设计。
 - **审讯式对齐**：`work_mode=DESIGN` 时走 [`grill_orchestration.md`](grill_orchestration.md) / [`confidence_decision.md`](confidence_decision.md)；跳过受 §1.5 收紧。
 - **商业计划可选**：存在 `_01_business_plan/` 则纳入冲突扫描；缺失不阻断、不追讨。
-- **原型必有（有 UI）**：用户未提供则 Agent 生成；不能出图 → Mermaid/线框（[`product_prototype.md`](product_prototype.md)）。纯 API/批处理在 PRD 写「无 UI，豁免原型」。
-- S：数行 DoD/影响面即可，不强制完整 PRD；DoD 须可写成测试断言。
-- M/L：正式需求对齐；再选型/详设/编码。
-- 对齐维度（用作完整性检查清单；产品缺口优先闭合）：
-  1. **业务场景与目标**：核心业务流程是什么？谁是使用者？解决什么核心痛点？
-  2. **输入与输出边界**：用户输入什么？预期产出什么？
-  3. **异常与边缘用例**：网络超时、数据重复、并发冲突、权限越界时如何处理？（通用重试/幂等可高置信自定）
-  4. **性能与规模预期**：预估 QPS、数据量级、时延要求？（无特有约束时可按常规默认并注明假设）
-  5. **验收标准 (DoD)**：满足哪些具体断言才算任务完成？（须可映射到 [`testing.md`](testing.md) 的 seam）
-  6. **布局原型（有 UI）**：主路径 + 至少一屏区域划分可展示
-- **冲突扫描**：对照会话、可选商业计划、原型、既有 PRD/ADR/词典、代码与全局偏好，消除矛盾。
-- 用户只给一句话且核心场景/DoD 资料中不存在时，必须询问并闭合后再冻结；工程通用假设可写入 PRD「自主假设」节，**不得**用假设填补会影响选型/架构的产品空白。
+- **设计语言与原型必有（有 UI）**：用户未提供则 Agent 生成；不能出图 → Mermaid 结构化多态线框 + Design Tokens 规范（[`product_prototype.md`](product_prototype.md) / [`product_design.md`](product_design.md)）。纯 API/批处理在 PRD 写「无 UI，豁免原型与设计语言」。
+- S：数行 DoD/影响面即可，不强制完整 PRD；DoD 须从用户与产品功能视角可断言。
+- M/L：正式完成产品设计（设计语言 + 功能规格书）；再选型/详设/编码。
+- **产品设计对齐与规划双支柱**：
+  1. **支柱一：产品设计语言 (Design Language)**：具象对标参照物与视觉调性、Design Tokens（色/字/空/圆角/阴影）、核心组件六态规范（Default/Hover/Active/Loading/Disabled/Error）、交互微动效与设计禁忌（Do's & Don'ts）。
+  2. **支柱二：产品功能规格 (Features & Functionality)**：产品价值与用户画像、功能架构全景树、用户端到端核心旅程、详细功能规格矩阵（输入/触发/业务规则/输出/边界异常）、界面信息架构与页面四态（Empty/Loading/Populated/Error）、产品验收标准 (DoD)。
+- **冲突扫描**：对照会话、可选商业计划、原型、既有 PRD/词典、代码与全局偏好，消除矛盾。
 
 ### 3. 产出文档
 - （可选）`hs_dev_docs/_01_product_design/_01_business_plan/…`
-- `hs_dev_docs/_01_product_design/_02_product_design/{feature_name}_prd.md`
-- （有 UI）`hs_dev_docs/_01_product_design/_03_product_figma/{feature_name}_prototype.md`
+- `hs_dev_docs/_01_product_design/_02_product_design/{feature_name}_prd.md`（产品功能规格书，专注功能架构、旅程、规格矩阵与功能 DoD）
+- （有 UI）`hs_dev_docs/_01_product_design/_03_product_figma/{feature_name}_prototype.md`（产品设计语言与多态界面原型，包含 Tokens、组件状态与四态线框，并同步项目根 `DESIGN.md`）
 - 更新 `_01_product_design/_00_product_design.idx`
 
 ### 4. 产品需求冻结门禁（进入阶段 1 的硬前提）
@@ -68,12 +71,14 @@
 
 | 条件 | 含义 |
 |---|---|
-| **完整** | 场景/角色、正向流与 I/O 边界、影响架构的约束、可验证 DoD 均已写清；会影响选型或架构的产品空白已闭合（资料 / 偏好 / 对标 / 开发者确认） |
-| **正确** | 与用户已表态、既有资料及全局偏好一致；高置信工程假设仅限通用惯例，且不改写业务语义 |
-| **无冲突** | PRD 内部及与既有资料（含可选商业计划、原型）之间无未裁决矛盾 |
-| **原型齐套** | 有 UI：原型文档存在且主路径+布局可读；无 UI：PRD 已声明豁免 |
+| **设计语言完备** | 有 UI 时：具象调性定位清晰、Design Tokens（色/字/空/圆角/阴影）完整、核心组件六态定义完备； |
+| **产品功能完备** | 功能架构树、用户端到端旅程、详细功能规格矩阵（输入/规则/输出/边界）清晰；页面覆盖四态（空/加载/正常/错误）；产品 DoD 从功能交互视角清晰可测； |
+| **纯净无技术侵入** | 严格杜绝在阶段 0 文档中提前塞入底层技术选型、物理表 DDL、RPC 接口签名、Saga 补偿、代码单测覆盖率等研发实现细节； |
+| **无冲突一致性** | PRD 内部及与设计语言、原型、既有资料（含可选商业计划）之间无未裁决矛盾； |
+| **原型齐套** | 有 UI：原型与设计语言文档存在且四态可读；无 UI：PRD 已声明豁免； |
 
 通过后**立即**进入阶段 1，不得空等。不强制对整份 PRD 做「全文请确认」——冻结依据是上述客观门禁，而非仪式性签字。
+
 
 ---
 
