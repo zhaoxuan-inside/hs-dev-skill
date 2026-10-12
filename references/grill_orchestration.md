@@ -55,6 +55,7 @@ G4  前沿空且冻结条件满足 → work_mode=IMPLEMENT；否则继续 G2
 - 模块 seam：测什么界面、谁拥有不变量（见 [`deep_modules.md`](deep_modules.md)）  
 - 模糊 UI：题材与受众先定，再方向取舍（见 [`frontend_aesthetic.md`](frontend_aesthetic.md)）  
 - 有 UI：原型布局（用户提供或 Agent 生成 Mermaid 线框，见 [`product_prototype.md`](product_prototype.md)）  
+- **MVP 裁剪与分阶段实施边界**：Must-have 核心假设 vs Phase 2/3 延期清单（见 [`product_roadmap.md`](product_roadmap.md)）  
 - 商业计划：有则对照；无则跳过，不入阻断前沿  
 
 ---

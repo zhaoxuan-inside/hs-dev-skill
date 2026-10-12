@@ -93,6 +93,10 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
         "原型", "线框", "mermaid", "figma", "布局", "prototype",
         "商业计划", "无图", "多态",
     ],
+    "product_roadmap.md": [
+        "MVP", "分阶段规划", "分阶段实施", "产品开发分阶段规划书", "roadmap",
+        "规划书", "功能裁剪", "MoSCoW", "人机交互", "演进路线", "里程碑",
+    ],
     "learn_and_prefer.md": ["学习", "偏好", "GitHub", "对标", "标签"],
     "spec_driven_lifecycle.md": ["生命周期", "阶段", "门禁", "PRD", "冻结", "原型"],
     "six_tuple_runtime.md": ["六元组", "compensate", "fallback", "metrics", "recall"],

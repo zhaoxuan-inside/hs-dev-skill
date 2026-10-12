@@ -51,6 +51,30 @@ class TestProductDesignCapability(unittest.TestCase):
         paths = [h["path"] for h in hits["hits"]]
         self.assertTrue(any("product_design.md" in p for p in paths))
 
+    def test_product_roadmap_guide_and_template_exist(self):
+        guide = self.root / "references" / "product_roadmap.md"
+        self.assertTrue(guide.exists(), "references/product_roadmap.md must exist")
+        content = guide.read_text(encoding="utf-8")
+        self.assertIn("人机交互", content)
+        self.assertIn("MVP", content)
+        self.assertIn("MoSCoW", content)
+        self.assertIn("产品开发分阶段规划书", content)
+
+        tpl = self.root / "resources" / "templates" / "product_design" / "phased_roadmap_template.md"
+        self.assertTrue(tpl.exists(), "phased_roadmap_template.md must exist")
+        tpl_content = tpl.read_text(encoding="utf-8")
+        self.assertIn("人机交互对齐备忘录", tpl_content)
+        self.assertIn("全量功能池 MoSCoW 分级与分期矩阵", tpl_content)
+        self.assertIn("阶段一：MVP", tpl_content)
+
+    def test_skill_ref_index_finds_product_roadmap(self):
+        idx = SkillRefIndex(self.root)
+        hits = idx.search("分阶段规划", limit=5)
+        self.assertTrue(hits["ok"])
+        paths = [h["path"] for h in hits["hits"]]
+        self.assertTrue(any("product_roadmap.md" in p for p in paths))
+
 
 if __name__ == "__main__":
     unittest.main()
+

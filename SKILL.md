@@ -13,13 +13,13 @@ license: MIT
 compatibility: Requires Python >= 3.8 (stdlib sqlite3; Win/Linux/macOS)
 metadata:
   author: hardstone
-  version: "2.23"
+  version: "2.24"
 ---
 
 # 产品开发 Skill (hs-dev-skill)
 
-版本：v2.23  
-核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动 + 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（纯净双支柱：设计语言与产品功能）+ 深模块词汇 + 本地默认审美 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
+版本：v2.24  
+核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动 + 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（纯净双支柱：设计语言与产品功能）+ MVP 分阶段规划（人机交互对齐）+ 深模块词汇 + 本地默认审美 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
 **替代**：原 `hs-project-skill` 已废弃，统一用本 Skill。
 
 **装载门闩（反合理化 × Token）**：动手前必须完成 [`load_latch.md`](references/load_latch.md) L0～L2（分级 + 索引路由 + **恰好 1 份**详规）。禁止「跳过 Skill 先干」；也禁止整目录通读。场景有 ≥1% 可能适用 → **必须跑** `skill_ref_index search`（或读 `_index` 一行），命中再打开。
@@ -34,7 +34,7 @@ metadata:
 3. **持续推进**：除 DESIGN 前沿等待 / 实现期询问闸门 /（M/L）冻结未过 / `BLOCKED` 外禁止空转；确认后立刻继续至路径终点（测试绿+门禁+归档+本地 Commit）。
 4. **审讯式对齐后再编码**：`DESIGN` 走 [`grill_orchestration.md`](references/grill_orchestration.md)；**跳过澄清收紧**（不可逆/计费权限/对外契约/持久化/影响选型的产品空白 → 禁止跳过，见 confidence_decision）。S 数行 DoD；M/L 阶段 0。
 5. **产品设计强化（纯净双支柱：设计语言与功能）**：专业级产品设计能力（[`product_design.md`](references/product_design.md)）；阶段 0 产出**只需且必须包含产品的设计语言和产品的功能**；严禁底层技术细节（选型/DB/Saga/单测指标）反向侵入产品文档。商业计划可选；原型必有（有 UI 时 Agent 必生成 Tokens 规范与四态线框，见 [`product_prototype.md`](references/product_prototype.md)）。
-6. **产品冻结（M/L）**：设计语言（Tokens/组件六态）与产品功能（架构树/旅程/详细规格/四态布局/产品DoD）完备、无冲突、无技术杂音；S 不写完整 PRD。
+6. **MVP 裁剪与分阶段实施（人机交互对齐）**：产品设计完成后，**必须进行 MVP 裁剪与分阶段实施规划**（[`product_roadmap.md`](references/product_roadmap.md)），严禁一次性全量研发；通过人机交互对齐确认核心假设、MoSCoW 优先级与裁剪边界，产出《产品开发分阶段规划书》；阶段 0 冻结后，阶段 1～6 研发严格收敛于当前阶段（MVP）功能边界。S 不写完整规划书。
 7. **按路径设计**：L 须 1→2→3；M 只改触达 DB/API/六元组/调用链；S 禁止空 ADR/空四要素。**先按规模/类型选范式**→[`dev_paradigm.md`](references/dev_paradigm.md)（DDD 只是选项之一，禁止默认上）；模块接口用深模块词汇→[`deep_modules.md`](references/deep_modules.md)；仅当范式含 DDD→[`ddd_design.md`](references/ddd_design.md)；后端分层→[`backend_arch.md`](references/backend_arch.md)；前端模块→[`frontend_arch.md`](references/frontend_arch.md)；UI 默认审美→[`frontend_aesthetic.md`](references/frontend_aesthetic.md)；项目身份→[`design_md.md`](references/design_md.md)+根目录 `DESIGN.md`；UI 手艺→[`frontend_craft.md`](references/frontend_craft.md)；API→[`api_engineering.md`](references/api_engineering.md)；不够再用 [`rule_library.md`](references/rule_library.md) / `rule_fetch`。
 8. **路径内单向门禁**：L=`0→1→2→3→4→5→6`；M/S 按 right_sizing。
 9. **设计多问 / 实现少问**：`DESIGN` = 审讯式澄清（跳过受 §4 收紧）；`IMPLEMENT` 仅四条件闸门才问（[`confidence_decision.md`](references/confidence_decision.md)）。实现中暴露产品空白 → 回切 DESIGN。
@@ -60,7 +60,7 @@ metadata:
   └─ L: 0→1→2→3→4→5→6（细则见 spec_driven_lifecycle.md）
 ```
 
-**L 满配**：0 产品设计（设计语言+功能规格）/冻结 → 1 选型 ADR → 2 架构（深模块词汇）→ 3 四要素（API/UI：aesthetic→DESIGN.md→craft / rule_fetch）→ 4 任务+pack+seam → 5 三同步+垂直 TDD → 6 测试绿+门禁+归档+Commit。
+**L 满配**：0 产品设计（设计语言+功能规格）+ MVP分阶段规划/冻结 → 1 选型 ADR（按当前阶段范围）→ 2 架构（深模块词汇）→ 3 四要素（API/UI：aesthetic→DESIGN.md→craft / rule_fetch）→ 4 任务+pack+seam → 5 三同步+垂直 TDD → 6 测试绿+门禁+归档+Commit。
 
 **跃迁**：未分级/未过门闩禁止开工；L 的 0→1 须冻结门禁；M/S 禁止为空跑造空文档；`BLOCKED`→落盘→继续至终点。
 
@@ -88,7 +88,7 @@ metadata:
 
 - [`_index.md`](references/_index.md) · [`load_latch.md`](references/load_latch.md) · [`right_sizing.md`](references/right_sizing.md) · [`token_budget.md`](references/token_budget.md)
 - [`grill_orchestration.md`](references/grill_orchestration.md) · [`confidence_decision.md`](references/confidence_decision.md)（审讯式 DESIGN / IMPLEMENT 少问；跳过收紧）
-- [`product_design.md`](references/product_design.md)（设计语言与产品功能双支柱 · 产出纯净铁律）· [`product_prototype.md`](references/product_prototype.md) · [`process_continuity.md`](references/process_continuity.md)（原型必产；plan/change 续做与回退）
+- [`product_design.md`](references/product_design.md)（设计语言与产品功能双支柱 · 产出纯净铁律）· [`product_roadmap.md`](references/product_roadmap.md)（MVP 裁剪与分阶段实施 · 人机交互对齐）· [`product_prototype.md`](references/product_prototype.md) · [`process_continuity.md`](references/process_continuity.md)
 - [`testing.md`](references/testing.md) · [`quality_gates.md`](references/quality_gates.md) · [`deep_modules.md`](references/deep_modules.md)
 - [`dev_paradigm.md`](references/dev_paradigm.md) · [`ddd_design.md`](references/ddd_design.md) · [`backend_arch.md`](references/backend_arch.md) · [`frontend_arch.md`](references/frontend_arch.md)
 - [`frontend_aesthetic.md`](references/frontend_aesthetic.md) · [`design_md.md`](references/design_md.md) · [`frontend_craft.md`](references/frontend_craft.md) · [`api_engineering.md`](references/api_engineering.md) · [`rule_library.md`](references/rule_library.md)

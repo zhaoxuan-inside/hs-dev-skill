@@ -58,6 +58,7 @@ def init_full_workspace(workspace_root: str):
         "_01_product_design/_01_business_plan",
         "_01_product_design/_02_product_design",
         "_01_product_design/_03_product_figma",
+        "_01_product_design/_04_phased_roadmap",
         "_02_tech_select",
         "_03_architecture_design",
         "_04_db_schema",

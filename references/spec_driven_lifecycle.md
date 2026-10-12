@@ -34,50 +34,57 @@
 
 ---
 
-## 阶段 0：产品设计与需求冻结 (Product Design & Alignment)
+## 阶段 0：产品设计与分阶段规划冻结 (Product Design & Phased Roadmap)
 
 ### 1. 核心目标
-全面强化专业产品设计能力，产出可冻结的专业级产品设计方案，作为后续研发路径的权威真理源。
+全面强化专业产品设计能力，并通过**MVP 裁剪与分阶段实施规划**，杜绝一次性全量研发 (Big Bang)，产出可冻结的专业级产品设计方案与分阶段规划书，作为后续研发路径的权威真理源。
 **产出边界铁律（绝对纯净原则）**：产品设计的产出**只需要且必须**包含两大部分：
 1. **产品的设计语言 (Product Design Language)**（详见 [`product_design.md`](product_design.md)）；
 2. **产品的功能 (Product Features & Functionality)**（详见 [`product_design.md`](product_design.md)）。
 
 > [!IMPORTANT]
 > **严禁底层技术细节反向侵入产品设计**：
-> 严禁在阶段 0 的 PRD 或原型文档中提前塞入底层技术选型（如 MySQL vs PG）、物理数据库 DDL、接口代码实现签名、分布式 Saga 补偿、代码单元测试覆盖率指标等工程实现细节！这些是阶段 1（选型）至阶段 3（四要素详设）的职责。产品设计阶段只对产品的设计语言与功能规格负责。
+> 严禁在阶段 0 的 PRD、原型或规划文档中提前塞入底层技术选型（如 MySQL vs PG）、物理数据库 DDL、接口代码实现签名、分布式 Saga 补偿、代码单元测试覆盖率指标等工程实现细节！这些是阶段 1（选型）至阶段 3（四要素详设）的职责。产品设计阶段只对产品的设计语言与功能规格负责。
 
-### 2. Agent 行为准则
-- **第一步是分级**（[`right_sizing.md`](right_sizing.md)），再进入本阶段的设计与对齐深度。
-- **产品设计指南驱动**：深度遵循 [`product_design.md`](product_design.md)，从产品定位到交互全状态进行专业设计。
-- **审讯式对齐**：`work_mode=DESIGN` 时走 [`grill_orchestration.md`](grill_orchestration.md) / [`confidence_decision.md`](confidence_decision.md)；跳过受 §1.5 收紧。
-- **商业计划可选**：存在 `_01_business_plan/` 则纳入冲突扫描；缺失不阻断、不追讨。
-- **设计语言与原型必有（有 UI）**：用户未提供则 Agent 生成；不能出图 → Mermaid 结构化多态线框 + Design Tokens 规范（[`product_prototype.md`](product_prototype.md) / [`product_design.md`](product_design.md)）。纯 API/批处理在 PRD 写「无 UI，豁免原型与设计语言」。
-- S：数行 DoD/影响面即可，不强制完整 PRD；DoD 须从用户与产品功能视角可断言。
-- M/L：正式完成产品设计（设计语言 + 功能规格书）；再选型/详设/编码。
-- **产品设计对齐与规划双支柱**：
-  1. **支柱一：产品设计语言 (Design Language)**：具象对标参照物与视觉调性、Design Tokens（色/字/空/圆角/阴影）、核心组件六态规范（Default/Hover/Active/Loading/Disabled/Error）、交互微动效与设计禁忌（Do's & Don'ts）。
-  2. **支柱二：产品功能规格 (Features & Functionality)**：产品价值与用户画像、功能架构全景树、用户端到端核心旅程、详细功能规格矩阵（输入/触发/业务规则/输出/边界异常）、界面信息架构与页面四态（Empty/Loading/Populated/Error）、产品验收标准 (DoD)。
-- **冲突扫描**：对照会话、可选商业计划、原型、既有 PRD/词典、代码与全局偏好，消除矛盾。
+### 2. 阶段执行双步法 (0A 产品设计 → 0B MVP 分阶段规划)
+
+#### 阶段 0A：全量产品设计 (Product Design)
+- **设计指南驱动**：深度遵循 [`product_design.md`](product_design.md)，从产品定位到交互全状态进行专业设计；
+- **支柱一：产品设计语言 (Design Language)**：具象对标参照物与视觉调性、Design Tokens（色/字/空/圆角/阴影）、核心组件六态规范（Default/Hover/Active/Loading/Disabled/Error）、交互微动效与设计禁忌（Do's & Don'ts）；
+- **支柱二：产品功能规格 (Features & Functionality)**：产品价值与用户画像、功能架构全景树、用户端到端核心旅程、详细功能规格矩阵（输入/触发/业务规则/输出/边界异常）、界面信息架构与页面四态（Empty/Loading/Populated/Error）、产品验收标准 (DoD)；
+- **商业计划可选；原型必产**：无位图则 Mermaid 结构化多态线框（[`product_prototype.md`](product_prototype.md)）。
+
+#### 阶段 0B：MVP 裁剪与分阶段实施规划 (Phased Roadmap & MVP)
+- **规划指南驱动**：遵循 [`product_roadmap.md`](product_roadmap.md)，严禁直接对全量功能进行大包大揽式开发；
+- **强制人机交互对齐机制 (Human-in-the-Loop Alignment)**：Agent 主动发起针对性问询，向人类决策者提问并确认：
+  1. *Q1 核心假设*：MVP 最关键要验证的核心闭环是什么？
+  2. *Q2 范围裁剪与 MoSCoW 分级*：哪些功能列入 MVP (Must-have)？哪些明确暂缓至 Phase 2/3 (Won't-have in MVP)？
+  3. *Q3 交付里程碑与验收标准*：MVP 的验收断言与交付形态？
+- **编制分阶段规划书**：形成各阶段功能映射表、阶段依赖路线图与准出条件。
 
 ### 3. 产出文档
 - （可选）`hs_dev_docs/_01_product_design/_01_business_plan/…`
 - `hs_dev_docs/_01_product_design/_02_product_design/{feature_name}_prd.md`（产品功能规格书，专注功能架构、旅程、规格矩阵与功能 DoD）
 - （有 UI）`hs_dev_docs/_01_product_design/_03_product_figma/{feature_name}_prototype.md`（产品设计语言与多态界面原型，包含 Tokens、组件状态与四态线框，并同步项目根 `DESIGN.md`）
+- `hs_dev_docs/_01_product_design/_04_phased_roadmap/{feature_name}_phased_plan.md`（《产品开发分阶段规划书》，包含 MVP 范围、人机交互对齐记录、MoSCoW 分级矩阵与路线图）
 - 更新 `_01_product_design/_00_product_design.idx`
 
-### 4. 产品需求冻结门禁（进入阶段 1 的硬前提）
+### 4. 阶段 0 冻结门禁（进入阶段 1 的硬前提）
 
-下列条件**全部**满足方可进入阶段 1；任一项不满足则停在阶段 0（询问或补齐），开发者确认后更新 PRD/原型再检：
+下列条件**全部**满足方可进入阶段 1；任一项不满足则停在阶段 0（询问或补齐），开发者确认后更新文档再检：
 
 | 条件 | 含义 |
 |---|---|
 | **设计语言完备** | 有 UI 时：具象调性定位清晰、Design Tokens（色/字/空/圆角/阴影）完整、核心组件六态定义完备； |
 | **产品功能完备** | 功能架构树、用户端到端旅程、详细功能规格矩阵（输入/规则/输出/边界）清晰；页面覆盖四态（空/加载/正常/错误）；产品 DoD 从功能交互视角清晰可测； |
+| **分阶段规划齐套** | 完成人机交互对齐，`_04_phased_roadmap/` 存在《产品开发分阶段规划书》，MVP 与演进阶段边界明确； |
 | **纯净无技术侵入** | 严格杜绝在阶段 0 文档中提前塞入底层技术选型、物理表 DDL、RPC 接口签名、Saga 补偿、代码单测覆盖率等研发实现细节； |
-| **无冲突一致性** | PRD 内部及与设计语言、原型、既有资料（含可选商业计划）之间无未裁决矛盾； |
+| **无冲突一致性** | PRD 内部及与设计语言、原型、分阶段规划书、既有资料（含可选商业计划）之间无未裁决矛盾； |
 | **原型齐套** | 有 UI：原型与设计语言文档存在且四态可读；无 UI：PRD 已声明豁免； |
 
-通过后**立即**进入阶段 1，不得空等。不强制对整份 PRD 做「全文请确认」——冻结依据是上述客观门禁，而非仪式性签字。
+通过后**立即**进入阶段 1。  
+> [!IMPORTANT]
+> **研发范围收敛铁律**：后续阶段 1（选型）至阶段 6（交付）**严格收敛于当前阶段（Phase 1 MVP）所定义的功能边界**，坚决不为远期特性超前开发。
 
 
 ---

@@ -3,7 +3,7 @@
 > **质量优先 + 审讯式对齐 + 测试一等公民 + 深模块词汇 + 文档驱动 + S/M/L 分级**
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
-[![Spec Version](https://img.shields.io/badge/skill-v2.23-blue.svg)](SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v2.24-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -52,7 +52,7 @@ python scripts/skill_ref_index.py rebuild # Skill 详规场景索引
 
 1. **质量优先**：分步正确 + 测试一等公民（seam 确认 → 垂直 TDD）。见 [testing.md](references/testing.md) / [quality_gates.md](references/quality_gates.md)。
 2. **审讯式 DESIGN 对齐**：设计树前沿轮询；跳过澄清收紧（不可逆/契约等禁止跳过）。见 [grill_orchestration.md](references/grill_orchestration.md) / [confidence_decision.md](references/confidence_decision.md)。
-3. **产品设计强化与纯净双支柱**：专业产品设计能力，产出专注**设计语言**与**产品功能**；严禁底层实现细节反向侵入。原型必产（Tokens + 四态线框）。见 [product_design.md](references/product_design.md) / [product_prototype.md](references/product_prototype.md)。
+3. **产品设计强化与 MVP 分阶段规划**：纯净双支柱（设计语言 + 产品功能），严禁底层实现细节反向侵入；通过强制人机交互对齐完成 MVP 裁剪与优先级排序，产出《产品开发分阶段规划书》。见 [product_design.md](references/product_design.md) / [product_roadmap.md](references/product_roadmap.md) / [product_prototype.md](references/product_prototype.md)。
 4. **变更分级（Right-Sizing）**：`change_size=S|M|L`。见 [right_sizing.md](references/right_sizing.md)。
 5. **装载门闩**：分级 + 索引路由 + 恰好 1 份详规。见 [load_latch.md](references/load_latch.md)。
 6. **续做 / 非 git 回退**：`plan_log` + `change_log` + 快照；语义「继续」。见 [process_continuity.md](references/process_continuity.md)。
@@ -106,6 +106,7 @@ python scripts/verify_consistency.py --root .
 | [references/right_sizing.md](references/right_sizing.md) | 变更分级 + work_mode |
 | [references/grill_orchestration.md](references/grill_orchestration.md) | 审讯式 DESIGN 对齐 |
 | [references/product_design.md](references/product_design.md) | **产品设计规范（设计语言 + 产品功能双支柱 · 产出纯净铁律）** |
+| [references/product_roadmap.md](references/product_roadmap.md) | **产品分阶段规划与 MVP 裁剪（人机交互对齐驱动）** |
 | [references/product_prototype.md](references/product_prototype.md) | 原型必产（Tokens + 四态线框） |
 | [references/process_continuity.md](references/process_continuity.md) | plan/change 续做与非 git 回退 |
 | [references/task_state_machine.md](references/task_state_machine.md) | 合法状态迁移 |
