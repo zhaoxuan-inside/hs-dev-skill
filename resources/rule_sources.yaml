@@ -34,8 +34,66 @@ sources:
   - id: local.grill
     kind: local
     path: references/grill_orchestration.md
-    tags: [grill, DESIGN, 审讯, 对齐, 澄清]
-    when: DESIGN 审讯式对齐
+    tags: [grill, DESIGN, 审讯, 对齐, 澄清, office-hours, trade-offs]
+    when: DESIGN 审讯式对齐与产品方案博弈
+
+  - id: local.product.design
+    kind: local
+    path: references/product_design.md
+    tags: [产品设计, 设计语言, 产品功能, PRD, JTBD, Gherkin, 渐进式披露, FTUE, Aha Moment]
+    when: 阶段 0 产品探索、设计语言、UX 四定律与产品功能规格 — 本地高频必守
+
+  - id: local.product.prototype
+    kind: local
+    path: references/product_prototype.md
+    tags: [原型, 线框, ASCII, Mermaid, 四态, prototype, wireframe, UX]
+    when: 阶段 0 双轨高表现力原型（Mermaid 拓扑 + ASCII 比例线框 + 页面四态）
+
+  - id: local.product.roadmap
+    kind: local
+    path: references/product_roadmap.md
+    tags: [MVP, 分阶段规划, MoSCoW, 路线图, roadmap, 人机交互]
+    when: 阶段 0 MVP 裁剪与《产品开发分阶段规划书》
+
+  - id: gstack.office-hours
+    kind: github_raw
+    repo: garrytan/gstack
+    ref: main
+    file: office-hours/SKILL.md
+    tags: [product, discovery, JTBD, status-quo, wedge, office-hours, YC, 痛点, 产品探索]
+    when: 产品探索深化 — 痛点真伪、现状替代方案 (Status Quo) 与最窄切入点追问
+
+  - id: gstack.plan-ceo-review
+    kind: github_raw
+    repo: garrytan/gstack
+    ref: main
+    file: plan-ceo-review/SKILL.md
+    tags: [product, strategy, 10-star, scope, MVP, Aha-Moment, 产品策略, 评审]
+    when: 产品策略与 10 星体验评审（Scope Expansion 惊喜体验 vs Scope Reduction 砍伪需求）
+
+  - id: gstack.plan-design-review
+    kind: github_raw
+    repo: garrytan/gstack
+    ref: main
+    file: plan-design-review/SKILL.md
+    tags: [UX, UI, design-review, hierarchy, empty-state, interaction, 设计评审, 体验走查]
+    when: 交互与设计体验深度评审（信息架构、空状态、交互边缘路径评分）
+
+  - id: deanpeters.pm-prd
+    kind: github_raw
+    repo: deanpeters/Product-Manager-Skills
+    ref: main
+    file: skills/prd-development/SKILL.md
+    tags: [PRD, JTBD, Gherkin, user-stories, product-manager, 需求规格, 验收标准]
+    when: 结构化 PRD、JTBD 问题界定与 Gherkin Given-When-Then 验收标准深化
+
+  - id: uipro.ux-design
+    kind: github_raw
+    repo: nextlevelbuilder/ui-ux-pro-max-skill
+    ref: main
+    file: .claude/skills/ui-ux-pro-max/SKILL.md
+    tags: [UX, UI, usability, Fitts, Hick, progressive-disclosure, palette, 行业UX, 可用性]
+    when: 行业 UX 布局范式、可用性心理学法则与色彩排版配对深化
 
   - id: local.api.core
     kind: local

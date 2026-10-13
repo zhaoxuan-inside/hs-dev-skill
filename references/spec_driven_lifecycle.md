@@ -48,47 +48,48 @@
 
 ### 2. 阶段执行双步法 (0A 产品设计 → 0B MVP 分阶段规划)
 
-#### 阶段 0A：全量产品设计 (Product Design)
-- **设计指南驱动**：深度遵循 [`product_design.md`](product_design.md)，从产品定位到交互全状态进行专业设计；
-- **支柱一：产品设计语言 (Design Language)**：具象对标参照物与视觉调性、Design Tokens（色/字/空/圆角/阴影）、核心组件六态规范（Default/Hover/Active/Loading/Disabled/Error）、交互微动效与设计禁忌（Do's & Don'ts）；
-- **支柱二：产品功能规格 (Features & Functionality)**：产品价值与用户画像、功能架构全景树、用户端到端核心旅程、详细功能规格矩阵（输入/触发/业务规则/输出/边界异常）、界面信息架构与页面四态（Empty/Loading/Populated/Error）、产品验收标准 (DoD)；
-- **商业计划可选；原型必产**：无位图则 Mermaid 结构化多态线框（[`product_prototype.md`](product_prototype.md)）。
+#### 阶段 0A：产品探索与全量产品设计 (Product Discovery & Design)
+- **设计指南驱动**：深度遵循 [`product_design.md`](product_design.md)，拒绝机械填表，先完成**产品探索五步推演**（Status Quo 现状痛点、JTBD 用户雇佣任务、Aha Moment 惊喜时刻、FTUE 首分钟冷启动体验、2～3 种交互形态方案 Trade-offs 比选）；
+- **支柱一：产品设计语言 (Design Language)**：具象对标参照物与视觉调性、Design Tokens（色/字/空/圆角/阴影）、**UX 认知心理学四定律**（渐进式披露、F/Z 型视觉扫视层级、费茨与希克定律、真实微文案规范）、核心组件六态规范（Default/Hover/Active/Loading/Disabled/Error）、交互微动效与设计禁忌（Do's & Don'ts）；
+- **支柱二：产品功能规格 (Features & Functionality)**：产品价值与 JTBD、交互方案比选、功能架构全景树、端到端核心旅程（含 FTUE 冷启动分支）、详细功能规格矩阵（区分首屏高频项与渐进式披露折叠项）、**双轨多态原型（Mermaid 拓扑 + ASCII 空间比例线框，覆盖 Empty/Loading/Populated/Error 四态）**、**Gherkin (`Given/When/Then`) 行为级产品验收标准 (DoD)**；
+- **商业计划可选；双轨原型必产**：无位图则采用 **Mermaid 拓扑 + ASCII 比例线框**（[`product_prototype.md`](product_prototype.md)）。
 
 #### 阶段 0B：MVP 裁剪与分阶段实施规划 (Phased Roadmap & MVP)
 - **规划指南驱动**：遵循 [`product_roadmap.md`](product_roadmap.md)，严禁直接对全量功能进行大包大揽式开发；
 - **强制人机交互对齐机制 (Human-in-the-Loop Alignment)**：Agent 主动发起针对性问询，向人类决策者提问并确认：
-  1. *Q1 核心假设*：MVP 最关键要验证的核心闭环是什么？
+  1. *Q1 核心假设*：MVP 最关键要验证的核心闭环与 Aha Moment 是什么？
   2. *Q2 范围裁剪与 MoSCoW 分级*：哪些功能列入 MVP (Must-have)？哪些明确暂缓至 Phase 2/3 (Won't-have in MVP)？
-  3. *Q3 交付里程碑与验收标准*：MVP 的验收断言与交付形态？
+  3. *Q3 交付里程碑与验收标准*：MVP 的 Gherkin 验收断言与交付形态？
 - **编制分阶段规划书**：形成各阶段功能映射表、阶段依赖路线图与准出条件。
 
 #### 阶段 0C：MVP 详细功能设计、整体交互逻辑与规模评估 (Detailed Interaction & Scale Assessment)
 > [!IMPORTANT]
 > **先交互与功能，后技术选型**：
 > 绝对不能在没有明确详细功能与交互逻辑前空泛搞技术选型！必须先有 0C 的详细设计与规模评估，阶段 1 的技术栈匹配与选型论证才有据可依。
-- **详细功能规格详述**：所有输入项与约束规则、前置触发条件、业务分支矩阵、边界极端异常处理；
-- **整体交互逻辑网络**：页面路由流转拓扑（Mermaid）、组件交互层级（视图/抽屉/弹窗/浮层）、异步与状态迁移（防抖锁定/乐观渲染/错误自愈）；
+- **详细功能规格详述**：所有输入项与约束规则（含首屏披露与高级折叠层级）、前置触发条件、业务分支矩阵、边界极端异常处理；
+- **整体交互逻辑网络**：页面路由流转拓扑（Mermaid）、组件交互层级（视图/抽屉/弹窗/浮层）、未保存脏数据退出拦截、异步与状态迁移（防抖锁定/乐观渲染/草稿保护与错误自愈）；
 - **规模与复杂度客观评估 (Scale Assessment)**：量化评估交互复杂度（轻/中/高）、数据规则规模（简/中/复）、通信实时性要求，明确项目工程量级，为阶段 1 技术选型提供精准约束输入。
 
 ### 3. 产出文档
 - （可选）`hs_dev_docs/_01_product_design/_01_business_plan/…`
-- `hs_dev_docs/_01_product_design/_02_product_design/{feature_name}_prd.md`（产品功能规格书，含详细规格矩阵、交互逻辑流与规模评估）
-- （有 UI）`hs_dev_docs/_01_product_design/_03_product_figma/{feature_name}_prototype.md`（产品设计语言与多态界面原型，包含 Tokens、组件状态与四态线框，并同步项目根 `DESIGN.md`）
+- `hs_dev_docs/_01_product_design/_02_product_design/{feature_name}_prd.md`（产品功能规格书，含产品洞察 JTBD/FTUE、方案比选、详细规格矩阵、交互逻辑流、Gherkin DoD 与规模评估）
+- （有 UI）`hs_dev_docs/_01_product_design/_03_product_figma/{feature_name}_prototype.md`（产品设计语言与双轨多态原型，包含 Tokens、UX 四定律、组件六态与 Mermaid + ASCII 四态线框，并同步项目根 `DESIGN.md`）
 - `hs_dev_docs/_01_product_design/_04_phased_roadmap/{feature_name}_phased_plan.md`（《产品开发分阶段规划书》，包含 MVP 范围、人机交互对齐记录、MoSCoW 分级矩阵与路线图）
 - 更新 `_01_product_design/_00_product_design.idx`
 
 ### 4. 阶段 0 冻结门禁（进入阶段 1 的硬前提）
 
-下列条件**全部**满足方可进入阶段 1；任一项不满足则停在阶段 0（询问或补齐），开发者确认后更新文档再检：
+下列条件**全部**满足（且通过 `product_design.md` §5.1 的 **10 维产品与体验自审标尺**）方可进入阶段 1；任一项不满足则停在阶段 0（询问或补齐），开发者确认后更新文档再检：
 
 | 条件 | 含义 |
 |---|---|
-| **设计语言完备** | 有 UI 时：具象调性定位清晰、Design Tokens（色/字/空/圆角/阴影）完整、核心组件六态定义完备； |
-| **功能与交互完备** | 功能架构树、用户端到端旅程、详细功能规格矩阵清晰；页面导航拓扑与组件层级交互明确；页面覆盖四态（空/加载/正常/错误）；产品 DoD 从功能交互视角清晰可测； |
+| **产品探索与方案比选完备** | 明确定义了 Status Quo（现状痛点）、JTBD、Aha Moment、FTUE 冷启动引导及 ≥2 种核心交互形态的 Trade-offs 比选； |
+| **设计语言与 UX 定律完备** | 有 UI 时：具象调性定位清晰、Design Tokens 完整、落实 UX 认知四定律（渐进式披露/视觉层级/费茨希克/真实微文案）、核心组件六态定义完备； |
+| **功能与双轨交互完备** | 功能架构树、端到端旅程（含 FTUE）、详细规格矩阵清晰；双轨原型（Mermaid 拓扑 + ASCII 比例线框）覆盖页面四态（空/加载/正常/错误）；产品 DoD 采用 **Gherkin (`Given/When/Then`)** 从用户交互视角清晰可测； |
 | **分阶段规划与规模评估就绪** | 完成人机交互对齐，`_04_phased_roadmap/` 存在《产品开发分阶段规划书》，MVP 与演进阶段边界明确，完成客观规模评估； |
 | **纯净无技术侵入** | 严格杜绝在阶段 0 文档中提前塞入底层技术选型、物理表 DDL、RPC 接口签名、Saga 补偿、代码单测覆盖率等研发实现细节； |
 | **无冲突一致性** | PRD 内部及与设计语言、原型、分阶段规划书、既有资料（含可选商业计划）之间无未裁决矛盾； |
-| **原型齐套** | 有 UI：原型与设计语言文档存在且四态可读；无 UI：PRD 已声明豁免； |
+| **原型齐套** | 有 UI：原型与设计语言文档存在且 Mermaid + ASCII 四态可读；无 UI：PRD 已声明豁免； |
 
 通过后**立即**进入阶段 1。  
 > [!IMPORTANT]

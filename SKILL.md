@@ -13,13 +13,13 @@ license: MIT
 compatibility: Requires Python >= 3.8 (stdlib sqlite3; Win/Linux/macOS)
 metadata:
   author: hardstone
-  version: "2.24"
+  version: "2.25"
 ---
 
 # 产品开发 Skill (hs-dev-skill)
 
-版本：v2.24  
-核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动 + 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（纯净双支柱：设计语言与产品功能）+ MVP 分阶段规划（人机交互对齐）+ 深模块词汇 + 本地默认审美 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
+版本：v2.25  
+核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动 + 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（产品探索五步推演 + 纯净双支柱：设计语言与 UX 四定律 + 产品功能与双轨原型/Gherkin DoD）+ MVP 分阶段规划（人机交互对齐）+ 深模块词汇 + 本地默认审美 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
 **替代**：原 `hs-project-skill` 已废弃，统一用本 Skill。
 
 **装载门闩（反合理化 × Token）**：动手前必须完成 [`load_latch.md`](references/load_latch.md) L0～L2（分级 + 索引路由 + **恰好 1 份**详规）。禁止「跳过 Skill 先干」；也禁止整目录通读。场景有 ≥1% 可能适用 → **必须跑** `skill_ref_index search`（或读 `_index` 一行），命中再打开。
@@ -32,8 +32,8 @@ metadata:
 1. **先分级 + 定模式**：写 `change_size=S|M|L` 与 `work_mode=DESIGN|IMPLEMENT`（[`right_sizing.md`](references/right_sizing.md) / [`confidence_decision.md`](references/confidence_decision.md)）。禁止未分级按满配 0→6。不确定：`change_size=M`，`work_mode=DESIGN`。
 2. **装载门闩**：未过 L0～L2 禁止探代码开工或写 PRD 正文（[`load_latch.md`](references/load_latch.md)）。语义为「继续/继续任务」时 L2 优先 [`process_continuity.md`](references/process_continuity.md)。
 3. **持续推进**：除 DESIGN 前沿等待 / 实现期询问闸门 /（M/L）冻结未过 / `BLOCKED` 外禁止空转；确认后立刻继续至路径终点（测试绿+门禁+归档+本地 Commit）。
-4. **审讯式对齐后再编码**：`DESIGN` 走 [`grill_orchestration.md`](references/grill_orchestration.md)；**跳过澄清收紧**（不可逆/计费权限/对外契约/持久化/影响选型的产品空白 → 禁止跳过，见 confidence_decision）。S 数行 DoD；M/L 阶段 0。
-5. **产品设计强化（纯净双支柱：设计语言与功能）**：专业级产品设计能力（[`product_design.md`](references/product_design.md)）；阶段 0 产出**只需且必须包含产品的设计语言和产品的功能**；严禁底层技术细节（选型/DB/Saga/单测指标）反向侵入产品文档。商业计划可选；原型必有（有 UI 时 Agent 必生成 Tokens 规范与四态线框，见 [`product_prototype.md`](references/product_prototype.md)）。
+4. **审讯式对齐与方案比选后再编码**：`DESIGN` 走 [`grill_orchestration.md`](references/grill_orchestration.md)（融合 `gstack /office-hours` 痛点拷问与 `superpowers` 多方案 Trade-offs 博弈）；**跳过澄清收紧**（不可逆/计费权限/对外契约/持久化/影响选型的产品空白 → 禁止跳过，见 confidence_decision）。S 数行 DoD；M/L 阶段 0。
+5. **产品设计强化（产品探索 + 纯净双支柱：设计语言与功能）**：专业级产品与 UX 设计能力（[`product_design.md`](references/product_design.md)）；先完成 Status Quo / JTBD / Aha Moment / FTUE / 交互方案比选，再落盘**产品的设计语言（Tokens + UX 四定律：渐进式披露/视觉动线/费茨希克/真实微文案）**和**产品的功能（含 Gherkin `Given/When/Then` DoD）**；严禁底层技术细节（选型/DB/Saga/单测指标）反向侵入产品文档。商业计划可选；双轨原型必有（有 UI 时必产 **Mermaid 拓扑 + ASCII 空间比例四态线框**，见 [`product_prototype.md`](references/product_prototype.md)）。
 6. **MVP 裁剪与详细功能交互（人机对齐驱动）**：产品设计完成后，**必须进行 MVP 裁剪与分阶段实施规划**（[`product_roadmap.md`](references/product_roadmap.md)）；通过人机交互对齐产出《产品开发分阶段规划书》；锁定 MVP 范围后，**必须先输出详细功能设计与整体交互逻辑**（[`product_design.md`](references/product_design.md)），据此**客观评估工程规模**后，方可进入阶段 1 技术选型（**先交互与功能，后技术选型**）。S 不写完整规划书。
 7. **按路径设计**：L 须 1→2→3；M 只改触达 DB/API/六元组/调用链；S 禁止空 ADR/空四要素。**先按规模/类型选范式**→[`dev_paradigm.md`](references/dev_paradigm.md)（DDD 只是选项之一，禁止默认上）；模块接口用深模块词汇→[`deep_modules.md`](references/deep_modules.md)；仅当范式含 DDD→[`ddd_design.md`](references/ddd_design.md)；后端分层→[`backend_arch.md`](references/backend_arch.md)；前端模块→[`frontend_arch.md`](references/frontend_arch.md)；UI 默认审美→[`frontend_aesthetic.md`](references/frontend_aesthetic.md)；项目身份→[`design_md.md`](references/design_md.md)+根目录 `DESIGN.md`；UI 手艺→[`frontend_craft.md`](references/frontend_craft.md)；API→[`api_engineering.md`](references/api_engineering.md)；不够再用 [`rule_library.md`](references/rule_library.md) / `rule_fetch`。
 8. **路径内单向门禁**：L=`0→1→2→3→4→5→6`；M/S 按 right_sizing。

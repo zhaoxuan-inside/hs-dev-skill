@@ -3,11 +3,11 @@
 > **质量优先 + 审讯式对齐 + 测试一等公民 + 深模块词汇 + 文档驱动 + S/M/L 分级**
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
-[![Spec Version](https://img.shields.io/badge/skill-v2.24-blue.svg)](SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v2.25-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS），**替代已废弃的 `hs-project-skill`**。目标：**质量大于一切**——审讯式 DESIGN（跳过收紧）、原型必产（无图用 Mermaid）、分步正确（seam + 垂直 TDD）。续做靠 `plan_log`/`change_log`（语义「继续」）；回退靠快照而非 git。入口 [`SKILL.md`](SKILL.md)；先写 `change_size`+`work_mode`，过装载门闩后再干活。
+`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS），**替代已废弃的 `hs-project-skill`**。目标：**质量大于一切**——审讯式 DESIGN（跳过收紧）、双轨原型必产（Mermaid 拓扑 + ASCII 比例线框）、分步正确（seam + 垂直 TDD）。续做靠 `plan_log`/`change_log`（语义「继续」）；回退靠快照而非 git。入口 [`SKILL.md`](SKILL.md)；先写 `change_size`+`work_mode`，过装载门闩后再干活。
 
 ---
 
@@ -51,8 +51,8 @@ python scripts/skill_ref_index.py rebuild # Skill 详规场景索引
 ## 核心特性
 
 1. **质量优先**：分步正确 + 测试一等公民（seam 确认 → 垂直 TDD）。见 [testing.md](references/testing.md) / [quality_gates.md](references/quality_gates.md)。
-2. **审讯式 DESIGN 对齐**：设计树前沿轮询；跳过澄清收紧（不可逆/契约等禁止跳过）。见 [grill_orchestration.md](references/grill_orchestration.md) / [confidence_decision.md](references/confidence_decision.md)。
-3. **产品设计强化与 MVP 分阶段规划**：纯净双支柱（设计语言 + 产品功能），严禁底层实现细节反向侵入；通过强制人机交互对齐完成 MVP 裁剪与优先级排序，产出《产品开发分阶段规划书》。见 [product_design.md](references/product_design.md) / [product_roadmap.md](references/product_roadmap.md) / [product_prototype.md](references/product_prototype.md)。
+2. **审讯式 DESIGN 对齐与方案博弈**：设计树前沿轮询 + 产品探索拷问（`gstack /office-hours`）+ 交互方案 Trade-offs 比选；跳过澄清收紧。见 [grill_orchestration.md](references/grill_orchestration.md) / [confidence_decision.md](references/confidence_decision.md)。
+3. **产品设计深度强化与 MVP 分阶段规划**：先产品探索五步推演（Status Quo / JTBD / Aha Moment / FTUE / 方案比选），再落盘纯净双支柱（**设计语言**：Tokens + UX 认知四定律；**产品功能**：双轨 Mermaid+ASCII 四态原型 + Gherkin `Given/When/Then` DoD + 10 维自审标尺），严禁底层实现细节反向侵入；通过强制人机交互对齐产出《产品开发分阶段规划书》。见 [product_design.md](references/product_design.md) / [product_roadmap.md](references/product_roadmap.md) / [product_prototype.md](references/product_prototype.md)。
 4. **变更分级（Right-Sizing）**：`change_size=S|M|L`。见 [right_sizing.md](references/right_sizing.md)。
 5. **装载门闩**：分级 + 索引路由 + 恰好 1 份详规。见 [load_latch.md](references/load_latch.md)。
 6. **续做 / 非 git 回退**：`plan_log` + `change_log` + 快照；语义「继续」。见 [process_continuity.md](references/process_continuity.md)。

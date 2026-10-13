@@ -5,6 +5,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from skill_ref_index import SkillRefIndex
+from rule_fetch import load_catalog, search_catalog
 
 
 class TestProductDesignCapability(unittest.TestCase):
@@ -15,19 +16,35 @@ class TestProductDesignCapability(unittest.TestCase):
         guide = self.root / "references" / "product_design.md"
         self.assertTrue(guide.exists(), "references/product_design.md must exist")
         content = guide.read_text(encoding="utf-8")
+        # 双支柱与纯净铁律
         self.assertIn("产品的设计语言", content)
         self.assertIn("产品的功能", content)
         self.assertIn("Design Tokens", content)
         self.assertIn("绝对纯净原则", content)
+        # 产品探索五步推演与 UX 四定律、Gherkin DoD、10 维自审标尺
+        self.assertIn("Status Quo", content)
+        self.assertIn("JTBD", content)
+        self.assertIn("Aha Moment", content)
+        self.assertIn("FTUE", content)
+        self.assertIn("渐进式披露", content)
+        self.assertIn("Gherkin", content)
+        self.assertIn("Given", content)
+        self.assertIn("10 维自审标尺", content)
 
     def test_prd_template_is_pure_and_professional(self):
         prd_tpl = self.root / "resources" / "templates" / "product_design" / "prd_template.md"
         self.assertTrue(prd_tpl.exists(), "prd_template.md must exist")
         content = prd_tpl.read_text(encoding="utf-8")
-        # 必须包含产品功能与业务规格
+        # 必须包含产品洞察、方案比选、功能架构、旅程与 Gherkin DoD
+        self.assertIn("JTBD", content)
+        self.assertIn("Status Quo", content)
+        self.assertIn("FTUE", content)
+        self.assertIn("核心产品/交互形态方案比选", content)
         self.assertIn("功能架构全景", content)
         self.assertIn("端到端用户核心旅程", content)
         self.assertIn("详细功能规格与业务规则矩阵", content)
+        self.assertIn("Gherkin", content)
+        self.assertIn("Given", content)
         # 严禁混入底层工程细节
         self.assertNotIn("Saga 模式", content)
         self.assertNotIn("单测覆盖率 ≥ 85%", content)
@@ -38,18 +55,31 @@ class TestProductDesignCapability(unittest.TestCase):
         self.assertTrue(proto_tpl.exists(), "prototype_template.md must exist")
         content = proto_tpl.read_text(encoding="utf-8")
         self.assertIn("Design Tokens 规范定义", content)
+        self.assertIn("UX 认知心理学与可用性四定律", content)
+        self.assertIn("渐进式披露", content)
         self.assertIn("核心组件全状态矩阵", content)
+        self.assertIn("ASCII", content)
         self.assertIn("正常数据态", content)
         self.assertIn("空白引导态", content)
         self.assertIn("数据加载态", content)
         self.assertIn("异常错误态", content)
 
-    def test_skill_ref_index_finds_product_design(self):
+    def test_skill_ref_index_finds_product_design_and_new_keywords(self):
         idx = SkillRefIndex(self.root)
-        hits = idx.search("设计语言", limit=5)
-        self.assertTrue(hits["ok"])
-        paths = [h["path"] for h in hits["hits"]]
-        self.assertTrue(any("product_design.md" in p for p in paths))
+        idx.rebuild()
+        for kw, target in [
+            ("设计语言", "product_design.md"),
+            ("JTBD", "product_design.md"),
+            ("渐进式披露", "product_design.md"),
+            ("ASCII线框", "product_prototype.md"),
+        ]:
+            hits = idx.search(kw, limit=5)
+            self.assertTrue(hits["ok"])
+            paths = [h["path"] for h in hits["hits"]]
+            self.assertTrue(
+                any(target in p for p in paths),
+                f"Expected {target} when searching '{kw}', got {paths}",
+            )
 
     def test_product_roadmap_guide_and_template_exist(self):
         guide = self.root / "references" / "product_roadmap.md"
@@ -74,7 +104,23 @@ class TestProductDesignCapability(unittest.TestCase):
         paths = [h["path"] for h in hits["hits"]]
         self.assertTrue(any("product_roadmap.md" in p for p in paths))
 
+    def test_rule_sources_include_product_and_ux_skills(self):
+        catalog = load_catalog(self.root)
+        ids = {s["id"] for s in catalog.get("sources", [])}
+        self.assertIn("local.product.design", ids)
+        self.assertIn("local.product.prototype", ids)
+        self.assertIn("local.product.roadmap", ids)
+        self.assertIn("gstack.office-hours", ids)
+        self.assertIn("gstack.plan-ceo-review", ids)
+        self.assertIn("gstack.plan-design-review", ids)
+        self.assertIn("deanpeters.pm-prd", ids)
+        self.assertIn("uipro.ux-design", ids)
+
+        res = search_catalog(catalog, "JTBD", limit=5)
+        self.assertTrue(res["ok"])
+        hit_ids = [h["id"] for h in res["hits"]]
+        self.assertTrue(any(i in hit_ids for i in ("local.product.design", "gstack.office-hours", "deanpeters.pm-prd")))
+
 
 if __name__ == "__main__":
     unittest.main()
-

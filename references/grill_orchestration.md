@@ -1,33 +1,32 @@
-# 审讯式编排（Grill）— 设计对齐纪律
+# 审讯式编排（Grill）— 设计对齐与产品探索纪律
 
 **何时读**：`work_mode=DESIGN`；需求/验收/边界模糊；用户说「对齐一下 / 帮我问清楚」；每会话最多一次。  
-**分工**：本文 = **审讯式是什么 + 怎么跑**；闸门与少问 → [`confidence_decision.md`](confidence_decision.md)；分级 → [`right_sizing.md`](right_sizing.md)。
+**分工**：本文 = **审讯式是什么 + 怎么跑产品探索与方案比选**；闸门与少问 → [`confidence_decision.md`](confidence_decision.md)；产品设计双支柱 → [`product_design.md`](product_design.md)；分级 → [`right_sizing.md`](right_sizing.md)。
 
 ---
 
 ## 0. 是什么（融入本 Skill 的含义）
 
-**审讯式编排**（社区口语 *grilling*，如 mattpocock `grill-me`）：Agent **不先写代码**，而是像严厉产品经理一样，按**设计树前沿**轮询用户，把未决产品语义逼成可冻结结论；通用工程问题自查自决，不问人。
+**审讯式编排**（融合 `mattpocock/grill-me`、`garrytan/gstack` 的 `/office-hours` 与 `obra/superpowers` 的 `brainstorming`）：Agent **不先写代码、也不盲目填表出文档**，而是像硅谷顶尖产品合伙人一样，按**设计树前沿**向用户发问、提供多方案权衡（Trade-offs），把模糊想法逼成有灵魂、可验证、可冻结的产品与工程结论；通用工程细节则自查自决，不拿废话烦人。
 
-**社区心智**：爆款 Skill 教 Agent「先对齐再动手」——用户主动 `/grill`，或 Agent 在 DESIGN 期自动进入同一套路。本 Skill **不另装第三方**，把同一心智写进 DESIGN 轨：多问 = 审讯式；IMPLEMENT = 少问闸门。
-
-| 社区说法 | 本 Skill |
-|----------|----------|
-| grill / grilling | DESIGN 轨设计树澄清（§1） |
-| grill-with-docs | 澄清时同步 PRD / 词典 / ADR 假设 |
-| 跳过澄清（收紧） | 仅可跳过「可逆 + 不影响选型/契约」的工程偏好；见 confidence_decision §1.5 |
+| 社区标杆模式 | 本 Skill 融合实现 |
+|---|---|
+| `grill-me`（设计树前沿追问） | DESIGN 轨设计树澄清（§1～§3），只问未决前沿，每题必带推荐 |
+| `gstack /office-hours`（痛点与现状拷问） | 产品探索四必探：Status Quo（现状怎么凑合）、JTBD、Aha Moment 与冷启动 FTUE（§3.1） |
+| `superpowers brainstorming`（多方案博弈） | 核心产品/交互形态存在多种解法时，抛出 **2～3 个差异化方案 + Trade-offs 对比** 供用户拍板（§2.1） |
+| 跳过澄清（收紧） | 仅可跳过「可逆 + 不影响选型/契约」的工程偏好；见 [`confidence_decision.md`](confidence_decision.md) §1.5 |
 | 实现对齐后再 TDD | 冻结后 `work_mode=IMPLEMENT` + [`testing.md`](testing.md) |
 
 ---
 
 ## 1. 强制原则
 
-1. **质量优先于速度**：未闭合的产品语义禁止假装冻结；分步问清 = 分步正确。  
-2. **事实自查、决策问人**：代码/文档/工具能答的禁止问。  
-3. **只问前沿**：前置未定的节点不提前问；每轮 2～5 题。  
-4. **带推荐**：每题给推荐，让「好/yes」可落地。  
+1. **质量优先于速度**：未闭合的产品价值与核心交互禁止假装冻结；分步问清 = 分步正确。  
+2. **事实自查、决策问人**：代码/文档/工具能答的禁止问；只问产品价值取舍、业务边界与体验偏好。  
+3. **只问前沿**：前置未定的节点不提前问；每轮 2～5 题，严禁一次性倾倒十几道题的审问长卷。  
+4. **带推荐 + 给方案权衡**：是非/边界题给明确推荐；产品形态/交互模式题给出 **2～3 个备选方案及优劣权衡（Trade-offs）**，让用户回「选 A / 好」即可高质落地。  
 5. **跳过收紧**：用户说「跳过澄清」时，对照 [`confidence_decision.md`](confidence_decision.md) §1.5；命中禁止清单 → 拒绝跳过并继续审讯或 `BLOCKED`。  
-6. **闭合才切模式**：核心场景 / DoD / 影响架构的约束齐且无冲突 → 宣布冻结 → `IMPLEMENT`。有 UI → 原型齐套（[`product_prototype.md`](product_prototype.md)）。
+6. **闭合才切模式**：产品洞察（JTBD/Aha Moment）/ 核心场景 / Gherkin DoD / 影响架构的约束齐且无冲突 → 宣布冻结 → `IMPLEMENT`。有 UI → 双轨原型齐套（[`product_prototype.md`](product_prototype.md)）。
 
 ---
 
@@ -35,11 +34,17 @@
 
 ```text
 G0  已过 load_latch L0～L2；本详规可作 L2
-G1  列出设计树领地（见 confidence_decision §1.3），标「已定 / 前沿 / 未就绪」
-G2  对前沿出题（格式同 confidence_decision §1.2）
-G3  答复 → 补丁更新 PRD/词典/ADR 假设；重算前沿
-G4  前沿空且冻结条件满足 → work_mode=IMPLEMENT；否则继续 G2
+G1  列出设计树领地（见 §3 与 confidence_decision §1.3），标「已定 / 前沿 / 未就绪」
+G2  对前沿出题（含产品探索追问 + 2～3 种交互方案 Trade-offs 比选）
+G3  答复 → 补丁更新 PRD / 原型 / 分阶段规划 / ADR 假设；重算前沿
+G4  前沿空且阶段 0 冻结条件满足 → work_mode=IMPLEMENT；否则继续 G2
 ```
+
+### 2.1 多方案博弈提问法（Approaches & Trade-offs）
+当涉及**核心界面布局、主交互流程或产品切入形态**时，禁止直接按单一刻板印象写死，应在问题中呈现 **2～3 个具象方案**：
+- **方案 A（推荐）**：描述交互形态 + 优势（如上下文不断裂、直达 Aha Moment 快）+ 代价；
+- **方案 B（备选）**：描述交互形态 + 优势（如单步认知负荷低）+ 代价（如步骤长、频繁跳转）；
+- **推荐结论**：明确给出推荐哪一个及理由，请用户确认或微调。
 
 **S**：轻量审讯（DoD + 影响面 1～3 题）即可；勿空跑完整 PRD。  
 **M/L**：触及产品语义则审讯至冻结门禁；可与阶段 0 合并，禁止「先选型再问需求」。
@@ -48,27 +53,34 @@ G4  前沿空且冻结条件满足 → work_mode=IMPLEMENT；否则继续 G2
 
 ## 3. 领地速查（缺则入前沿）
 
-- 是什么 / 为谁 / 成功与失败长什么样（含反目标）  
-- 核心场景与 DoD；非目标  
-- 权限、计费、归属、审计等业务特有规则  
-- 对外契约与持久化是否牵动多端/迁移  
-- 模块 seam：测什么界面、谁拥有不变量（见 [`deep_modules.md`](deep_modules.md)）  
-- 模糊 UI：题材与受众先定，再方向取舍（见 [`frontend_aesthetic.md`](frontend_aesthetic.md)）  
-- 有 UI：原型布局（用户提供或 Agent 生成 Mermaid 线框，见 [`product_prototype.md`](product_prototype.md)）  
-- **MVP 裁剪与分阶段实施边界**：Must-have 核心假设 vs Phase 2/3 延期清单（见 [`product_roadmap.md`](product_roadmap.md)）  
-- 商业计划：有则对照；无则跳过，不入阻断前沿  
+### 3.1 产品探索与体验核心领地（借鉴 `gstack` & `pm-skills`）
+- **现状痛点与替代方案 (Status Quo)**：用户现在怎么凑合解决？最痛的摩擦点是什么？
+- **用户雇佣任务 (JTBD) 与非目标 (Non-Goals)**：`When [情境], I want to [动作], so I can [价值]`；本期明确不做什么？
+- **惊喜时刻 (Aha Moment) 与冷启动 (FTUE)**：用户首次进入空白系统，前 30 秒怎么零门槛感知核心价值？
+- **核心交互方案权衡 (Approaches & Trade-offs)**：主工作区采用哪种交互范式（如主从抽屉 vs 分步向导 vs 画布看板）？
+- **视觉调性与具体参照**：对标什么具象参照物或品牌气质？信息密度是 `Compact`、`Balanced` 还是 `Airy`？（见 [`product_design.md`](product_design.md) / [`design_md.md`](design_md.md)）
+- **双轨多态原型与渐进式披露**：首屏保留哪 20% 高频动作？哪些收进抽屉/折叠区？Empty / Loading / Populated / Error 四态如何表现？（见 [`product_prototype.md`](product_prototype.md)）
+- **MVP 裁剪与分阶段实施边界**：Must-have 核心验证闭环 vs Phase 2/3 延期清单（见 [`product_roadmap.md`](product_roadmap.md)）
+
+### 3.2 业务规则与工程边界领地
+- **Gherkin 验收标准 (`Given/When/Then`)**：主成功流、校验拦截流与异常恢复流的可观测断言；
+- **业务特有规则**：权限、计费、配额、归属、状态机与审计约束；
+- **对外契约与持久化**：是否牵动多端兼容或数据迁移；
+- **模块 seam**：测什么界面、谁拥有不变量（见 [`deep_modules.md`](deep_modules.md)）；
+- **商业计划**：有则对照；无则跳过，不入阻断前沿。
 
 ---
 
 ## 4. 反模式
 
 | 禁止 | 改为 |
-|------|------|
-| 一上来写实现再「顺便问」 | 先 G1～G3 |
-| 问卷灌水（通用 REST/命名） | 自决；只问产品特有 |
-| 用「行业常识」填产品空白后强行冻结 | 入前沿或记假设并标风险 |
-| 用户一说跳过就冻结算选型 | 先过 §1.5 禁止清单 |
-| 无原型（有 UI）进编码 | 生成 Mermaid 线框后再冻结 |
+|---|---|
+| 一上来写代码或直接套模板默写几百行空洞 PRD | 先走 G1～G3 问清痛点、JTBD 与交互方案权衡 |
+| 只问冷冰冰的字段名，不问用户怎么用、首次进入看到什么 | 追问 Status Quo、Aha Moment 与冷启动 FTUE 体验 |
+| 交互形态只有唯一默认解，不给对比 | 给出 2～3 种产品/交互方案及 Trade-offs 推荐 |
+| 问卷灌水（问通用 REST 规范/常规命名） | 工程通识自决；只问产品价值与业务特有决策 |
+| 用户一说跳过就冻结算选型 | 先过 `confidence_decision.md` §1.5 禁止清单 |
+| 无双轨原型（有 UI）进编码 | 生成 Mermaid 拓扑 + ASCII 比例线框后再冻结 |
 | IMPLEMENT 里继续审讯式狂问 | 回切 DESIGN 或走四条件闸门 |
 
 实现期暴露产品空白 → **回切 DESIGN** 再跑一轮迷你审讯，禁止静默猜业务。

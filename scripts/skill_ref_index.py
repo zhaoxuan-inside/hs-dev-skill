@@ -35,6 +35,7 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
     "token_budget.md": ["token", "预算", "context_pack", "装载", "SQLite"],
     "grill_orchestration.md": [
         "grill", "grilling", "审讯", "对齐", "澄清", "设计树", "多问", "DESIGN",
+        "office-hours", "方案比选", "trade-offs",
     ],
     "testing.md": [
         "测试", "TDD", "seam", "质量", "单测", "红绿", "契约测", "test", "coverage",
@@ -76,6 +77,7 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
         "规则库", "rule_fetch", "远程规则", "Vercel", "Anthropic", "Addy",
         "anti-slop", "Lottie", "ui-craft", "web-interface", "DESIGN.md",
         "awesome-design-md", "wshobson", "Clean Architecture", "DDD", "FSD",
+        "gstack", "pm-skills", "ui-ux-pro-max",
     ],
     "confidence_decision.md": [
         "置信度", "询问", "闸门", "决策", "DESIGN", "IMPLEMENT",
@@ -88,10 +90,12 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
     "product_design.md": [
         "产品设计", "设计语言", "产品功能", "PRD", "功能规格", "design tokens",
         "UI规范", "功能架构", "用户旅程", "四态", "产品设计规范", "tokens",
+        "JTBD", "Gherkin", "渐进式披露", "微文案", "冷启动", "FTUE", "Aha Moment",
+        "Status Quo", "痛点", "产品探索", "体验评审",
     ],
     "product_prototype.md": [
         "原型", "线框", "mermaid", "figma", "布局", "prototype",
-        "商业计划", "无图", "多态",
+        "商业计划", "无图", "多态", "ASCII", "ASCII线框", "双轨原型", "wireframe",
     ],
     "product_roadmap.md": [
         "MVP", "分阶段规划", "分阶段实施", "产品开发分阶段规划书", "roadmap",
