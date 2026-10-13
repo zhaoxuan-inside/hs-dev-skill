@@ -83,10 +83,26 @@ class TestProductDesignCapability(unittest.TestCase):
         self.assertTrue(proto_guide.exists())
         content = proto_guide.read_text(encoding="utf-8")
         self.assertIn("Desktop / Mobile / Web", content)
-        self.assertIn("UI 关键物理参数内联标注", content)
+        self.assertIn("UI 物理参数内联标注", content)
         self.assertIn("开发者可视化确认机制", content)
         self.assertIn("开发者可视化确认签收单", content)
         self.assertIn("tabular-nums", content)
+        self.assertIn("prototype.html", content)
+        self.assertIn("三位一体原型表达", content)
+
+
+    def test_standalone_html_prototype_template_exists(self):
+        html_tpl = self.root / "resources" / "templates" / "product_design" / "prototype_html_template.html"
+        self.assertTrue(html_tpl.exists(), "prototype_html_template.html must exist")
+        html_content = html_tpl.read_text(encoding="utf-8")
+        self.assertIn("Tailwind CSS", html_content)
+        self.assertIn("setViewport", html_content)
+        self.assertIn("setState", html_content)
+        self.assertIn("view-normal", html_content)
+        self.assertIn("view-empty", html_content)
+        self.assertIn("view-loading", html_content)
+        self.assertIn("view-error", html_content)
+
 
 
     def test_two_layer_decoupled_taste_architecture(self):

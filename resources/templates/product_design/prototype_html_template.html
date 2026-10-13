@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>产品原型与多端可视化预览：{feature_name}</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              primary: '#1A1C1E',
+              secondary: '#6C7278',
+              accent: '#B8422E', // 唯一主 CTA
+              canvas: '#F7F5F2',
+              surface: '#FFFFFF',
+              success: '#1B873F',
+              warning: '#C47D00',
+              error: '#D9383A',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .tabular { font-variant-numeric: tabular-nums; }
+    /* 模拟骨架脉冲动画 */
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .skeleton-pulse { animation: pulse-subtle 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  </style>
+</head>
+<body class="h-full bg-slate-900 text-slate-100 font-sans antialiased flex flex-col overflow-hidden">
+
+  <!-- 顶部开发者工作台工具栏：多端视口切换与状态切换 -->
+  <header class="bg-slate-950 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between shrink-0 select-none">
+    <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-2">
+        <span class="w-3 h-3 rounded-full bg-brand-accent inline-block"></span>
+        <span class="font-bold text-sm text-slate-200">Prototype Viewer</span>
+        <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">FEAT: {feature_name}</span>
+      </div>
+      <div class="h-4 w-px bg-slate-800"></div>
+      <!-- 视口模式切换 -->
+      <div class="flex items-center bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-xs">
+        <button id="btn-desktop" onclick="setViewport('desktop')" class="px-2.5 py-1 rounded-md font-medium transition-all bg-slate-800 text-white shadow-sm flex items-center space-x-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+          <span>桌面/Web (1440px)</span>
+        </button>
+        <button id="btn-tablet" onclick="setViewport('tablet')" class="px-2.5 py-1 rounded-md font-medium transition-all text-slate-400 hover:text-slate-200 flex items-center space-x-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+          <span>平板 (768px)</span>
+        </button>
+        <button id="btn-mobile" onclick="setViewport('mobile')" class="px-2.5 py-1 rounded-md font-medium transition-all text-slate-400 hover:text-slate-200 flex items-center space-x-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+          <span>移动端 (390px)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 页面四态切换 -->
+    <div class="flex items-center space-x-3 text-xs">
+      <span class="text-slate-400 font-medium">四态呈现：</span>
+      <div class="flex items-center bg-slate-900 p-0.5 rounded-lg border border-slate-800">
+        <button id="state-normal" onclick="setState('normal')" class="px-2.5 py-1 rounded-md transition-all bg-emerald-600/20 text-emerald-300 font-medium">正常数据态 (Populated)</button>
+        <button id="state-empty" onclick="setState('empty')" class="px-2.5 py-1 rounded-md transition-all text-slate-400 hover:text-slate-200 font-medium">空白引导态 (FTUE)</button>
+        <button id="state-loading" onclick="setState('loading')" class="px-2.5 py-1 rounded-md transition-all text-slate-400 hover:text-slate-200 font-medium">加载骨架态 (Loading)</button>
+        <button id="state-error" onclick="setState('error')" class="px-2.5 py-1 rounded-md transition-all text-slate-400 hover:text-slate-200 font-medium">异常错误态 (Error)</button>
+      </div>
+
+      <!-- 标注标尺开关 -->
+      <button id="btn-spec-toggle" onclick="toggleSpecOverlay()" class="px-2.5 py-1 rounded-md border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center space-x-1">
+        <span>📐 标尺标注</span>
+        <span id="spec-status" class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 原型容器画布视口 (居中舞台) -->
+  <main class="flex-1 bg-slate-950/60 p-4 sm:p-6 flex items-center justify-center overflow-auto relative">
+    
+    <!-- 模拟设备外壳 -->
+    <div id="device-wrapper" class="w-full max-w-[1440px] h-[860px] bg-brand-canvas text-brand-primary rounded-xl shadow-2xl border border-slate-800 flex flex-col overflow-hidden transition-all duration-300 relative">
+
+      <!-- ================= 视图 A: 正常数据态 (Populated State) ================= -->
+      <div id="view-normal" class="h-full flex flex-col overflow-hidden">
+        <!-- 桌面端顶栏 (56px) -->
+        <header class="h-14 bg-brand-surface border-b border-gray-200 px-6 flex items-center justify-between shrink-0 relative">
+          <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2 font-bold text-base tracking-tight text-brand-primary">
+              <span class="w-6 h-6 rounded bg-brand-primary text-white flex items-center justify-center text-xs">P</span>
+              <span>{系统名称}</span>
+            </div>
+            <div class="hidden sm:flex items-center text-xs text-gray-500 bg-gray-100 rounded-md px-2.5 py-1.5 w-64 border border-gray-200">
+              <span class="mr-2">🔍</span>
+              <span class="flex-1">全局搜索订单、客户...</span>
+              <kbd class="font-mono bg-white px-1.5 py-0.5 rounded border border-gray-300 text-[10px]">⌘K</kbd>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3 text-xs">
+            <span class="relative cursor-pointer p-1 text-gray-500 hover:text-gray-900">🔔</span>
+            <div class="flex items-center space-x-2 pl-2 border-l border-gray-200">
+              <div class="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center font-medium text-gray-700">张</div>
+              <span class="font-medium text-gray-800 hidden md:inline">张运营</span>
+            </div>
+          </div>
+          <!-- 悬浮标注提示 -->
+          <div class="spec-label absolute top-2 left-64 bg-amber-500/90 text-white text-[10px] px-1.5 py-0.5 rounded font-mono pointer-events-none shadow">Height: 56px | Padding: 24px</div>
+        </header>
+
+        <!-- 主体结构：左侧导航 + 主工作台 -->
+        <div class="flex-1 flex overflow-hidden">
+          <!-- 侧边导航 (220px) -->
+          <aside id="app-sidebar" class="w-56 bg-brand-surface border-r border-gray-200 p-4 flex flex-col justify-between shrink-0 transition-all">
+            <div class="space-y-1">
+              <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-2 py-1">核心业务</div>
+              <a href="#" class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50">
+                <span>▸</span><span>工作台概览</span>
+              </a>
+              <a href="#" class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold bg-gray-100 text-brand-primary">
+                <span>●</span><span>{核心模块}</span>
+                <span class="ml-auto bg-gray-200 text-gray-700 px-1.5 py-0.2 rounded-full text-[10px] tabular">24</span>
+              </a>
+              <a href="#" class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50">
+                <span>▸</span><span>流转审批</span>
+                <span class="ml-auto bg-amber-100 text-amber-700 px-1.5 py-0.2 rounded-full text-[10px] tabular">3</span>
+              </a>
+              <a href="#" class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50">
+                <span>▸</span><span>统计分析</span>
+              </a>
+            </div>
+            <div class="text-[11px] text-gray-400 border-t border-gray-100 pt-3 px-2">v2.28 System Spec</div>
+          </aside>
+
+          <!-- 中央主工作画布 -->
+          <section class="flex-1 flex flex-col p-6 overflow-hidden">
+            <!-- 头部操作区 (H1 + 唯一主 CTA) -->
+            <div class="flex items-center justify-between pb-5 border-b border-gray-200/80 shrink-0">
+              <div>
+                <h1 class="text-xl sm:text-2xl font-semibold text-brand-primary tracking-tight">{模块主标题}</h1>
+                <p class="text-xs text-brand-secondary mt-1">共 24 项待处理记录，首屏渐进式披露展示核心字段与操作</p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button class="bg-brand-surface border border-gray-300 text-brand-primary text-xs font-medium h-9 px-3 rounded-md hover:bg-gray-50 transition-all">导出报表</button>
+                <button class="bg-brand-accent text-white text-xs font-medium h-9 px-4 rounded-md hover:brightness-105 active:scale-95 transition-all shadow-sm inline-flex items-center space-x-1.5 select-none">
+                  <span>+</span><span>新建{业务对象}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 筛选与渐进式披露栏 -->
+            <div class="py-4 flex flex-wrap items-center justify-between gap-3 shrink-0">
+              <div class="flex items-center space-x-2 text-xs">
+                <span class="px-2.5 py-1 rounded bg-brand-primary text-white font-medium cursor-pointer">全部 (24)</span>
+                <span class="px-2.5 py-1 rounded bg-gray-200/70 text-gray-700 hover:bg-gray-200 font-medium cursor-pointer">待审核 (6)</span>
+                <span class="px-2.5 py-1 rounded bg-gray-200/70 text-gray-700 hover:bg-gray-200 font-medium cursor-pointer">履约中 (18)</span>
+              </div>
+              <div class="flex items-center space-x-2 text-xs text-brand-secondary">
+                <button class="flex items-center space-x-1 hover:text-brand-primary">
+                  <span>高级筛选</span><span>▾</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 核心数据主表 -->
+            <div class="flex-1 bg-brand-surface rounded-lg border border-gray-200 shadow-sm overflow-auto relative">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase font-semibold">
+                  <tr>
+                    <th class="py-3 px-4">业务编号</th>
+                    <th class="py-3 px-4">对象主体 / 客户</th>
+                    <th class="py-3 px-4 text-right">金额指标 (¥)</th>
+                    <th class="py-3 px-4 text-center">流转状态</th>
+                    <th class="py-3 px-4">更新时间</th>
+                    <th class="py-3 px-4 text-right">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 font-normal">
+                  <tr class="hover:bg-gray-50/80 transition-colors cursor-pointer" onclick="toggleDrawer(true)">
+                    <td class="py-3.5 px-4 font-mono font-medium text-brand-primary">#ORD-202610-01</td>
+                    <td class="py-3.5 px-4 font-medium text-gray-900">星海未来科技有限公司</td>
+                    <td class="py-3.5 px-4 text-right font-mono tabular font-semibold text-gray-900">128,000.00</td>
+                    <td class="py-3.5 px-4 text-center">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">● 待审核</span>
+                    </td>
+                    <td class="py-3.5 px-4 text-gray-500 font-mono text-[11px]">2026-10-13 15:20</td>
+                    <td class="py-3.5 px-4 text-right space-x-2">
+                      <span class="text-brand-accent font-medium hover:underline">审核</span>
+                      <span class="text-gray-400">|</span>
+                      <span class="text-gray-600 hover:underline">详情</span>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50/80 transition-colors cursor-pointer" onclick="toggleDrawer(true)">
+                    <td class="py-3.5 px-4 font-mono font-medium text-brand-primary">#ORD-202610-02</td>
+                    <td class="py-3.5 px-4 font-medium text-gray-900">远航全球物流供应链</td>
+                    <td class="py-3.5 px-4 text-right font-mono tabular font-semibold text-gray-900">45,200.00</td>
+                    <td class="py-3.5 px-4 text-center">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">○ 履约中</span>
+                    </td>
+                    <td class="py-3.5 px-4 text-gray-500 font-mono text-[11px]">2026-10-13 14:10</td>
+                    <td class="py-3.5 px-4 text-right space-x-2">
+                      <span class="text-gray-600 hover:underline">详情</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 分页条 -->
+            <div class="pt-3 flex items-center justify-between text-xs text-gray-500 shrink-0">
+              <span class="tabular">显示第 1-20 条 / 共 24 条记录</span>
+              <div class="flex items-center space-x-1">
+                <button class="px-2.5 py-1 border border-gray-200 rounded bg-white text-gray-400 cursor-not-allowed">上一页</button>
+                <button class="px-2.5 py-1 border border-gray-200 rounded bg-white text-gray-700 hover:bg-gray-50">下一页</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 右侧抽屉 (Drawer: 420px, 默认隐藏) -->
+          <div id="inspector-drawer" class="w-96 bg-brand-surface border-l border-gray-200 p-5 flex flex-col justify-between shrink-0 shadow-lg hidden">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+                <h3 class="font-semibold text-sm text-gray-900">订单详情抽屉</h3>
+                <button onclick="toggleDrawer(false)" class="text-gray-400 hover:text-gray-600 text-base">✕</button>
+              </div>
+              <div class="mt-4 space-y-3 text-xs">
+                <div><span class="text-gray-400">客户名称:</span> <span class="font-medium text-gray-800">星海未来科技</span></div>
+                <div><span class="text-gray-400">总金额:</span> <span class="font-mono font-semibold tabular text-brand-primary">¥128,000.00</span></div>
+                <div><span class="text-gray-400">风控评分:</span> <span class="text-emerald-600 font-semibold">98.5 (通过)</span></div>
+              </div>
+            </div>
+            <div class="pt-4 border-t border-gray-100 flex justify-end space-x-2">
+              <button onclick="toggleDrawer(false)" class="px-3 py-1.5 border border-gray-300 rounded text-xs text-gray-600">关闭</button>
+              <button class="px-3 py-1.5 bg-brand-accent text-white rounded text-xs font-medium">批准通过</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 视图 B: 空白引导态 (Empty State) ================= -->
+      <div id="view-empty" class="h-full flex flex-col items-center justify-center p-8 text-center hidden">
+        <div class="w-16 h-16 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center text-3xl mb-4 shadow-inner">📭</div>
+        <h2 class="text-lg font-semibold text-brand-primary">还没有创建任何{业务对象}</h2>
+        <p class="text-xs text-brand-secondary mt-1.5 max-w-sm">创建首条业务对象后可在此实时追踪流转、审批与数据对账，或先载入示例数据体验完整闭环流程。</p>
+        <div class="mt-6 flex items-center space-x-3">
+          <button class="bg-brand-accent text-white text-xs font-medium h-9 px-4 rounded-md shadow hover:brightness-105 active:scale-95 transition-all">
+            + 立即创建首个{对象}
+          </button>
+          <button class="bg-brand-surface border border-gray-300 text-brand-primary text-xs font-medium h-9 px-3 rounded-md hover:bg-gray-50">
+            载入示例数据
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= 视图 C: 加载骨架态 (Loading State) ================= -->
+      <div id="view-loading" class="h-full p-6 flex flex-col space-y-4 hidden">
+        <div class="flex justify-between items-center pb-4 border-b border-gray-200/60">
+          <div class="h-7 w-48 bg-gray-200 rounded skeleton-pulse"></div>
+          <div class="h-9 w-28 bg-gray-200 rounded skeleton-pulse"></div>
+        </div>
+        <div class="h-8 w-64 bg-gray-100 rounded skeleton-pulse"></div>
+        <div class="flex-1 bg-white rounded-lg border border-gray-200 p-4 space-y-3">
+          <div class="h-10 bg-gray-100 rounded skeleton-pulse"></div>
+          <div class="h-12 bg-gray-50 rounded skeleton-pulse"></div>
+          <div class="h-12 bg-gray-50 rounded skeleton-pulse"></div>
+          <div class="h-12 bg-gray-50 rounded skeleton-pulse"></div>
+        </div>
+      </div>
+
+      <!-- ================= 视图 D: 异常错误态 (Error State) ================= -->
+      <div id="view-error" class="h-full flex flex-col items-center justify-center p-8 text-center hidden">
+        <div class="w-14 h-14 rounded-full bg-red-50 text-brand-error flex items-center justify-center text-2xl mb-3 border border-red-200">⚠️</div>
+        <h2 class="text-base font-semibold text-brand-error">数据加载超时，网络连接似乎不稳定</h2>
+        <p class="text-xs text-brand-secondary mt-1 max-w-sm">您的已填筛选参数已安全保留，请检查网络后点击下方按钮重试。</p>
+        <button class="mt-5 bg-brand-surface border border-gray-300 text-brand-primary text-xs font-medium h-9 px-4 rounded-md hover:bg-gray-50 shadow-sm inline-flex items-center space-x-1.5">
+          <span>↻</span><span>重新加载数据</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // 视口切换逻辑
+    function setViewport(mode) {
+      const dev = document.getElementById('device-wrapper');
+      const side = document.getElementById('app-sidebar');
+      const btnD = document.getElementById('btn-desktop');
+      const btnT = document.getElementById('btn-tablet');
+      const btnM = document.getElementById('btn-mobile');
+      [btnD, btnT, btnM].forEach(b => {
+        b.className = b.className.replace('bg-slate-800 text-white shadow-sm', 'text-slate-400 hover:text-slate-200');
+      });
+
+      if (mode === 'desktop') {
+        btnD.className = btnD.className.replace('text-slate-400 hover:text-slate-200', 'bg-slate-800 text-white shadow-sm');
+        dev.style.maxWidth = '1440px';
+        dev.style.height = '860px';
+        if (side) side.style.display = 'flex';
+      } else if (mode === 'tablet') {
+        btnT.className = btnT.className.replace('text-slate-400 hover:text-slate-200', 'bg-slate-800 text-white shadow-sm');
+        dev.style.maxWidth = '768px';
+        dev.style.height = '800px';
+        if (side) side.style.display = 'none'; // 平板自动收起侧边栏
+      } else if (mode === 'mobile') {
+        btnM.className = btnM.className.replace('text-slate-400 hover:text-slate-200', 'bg-slate-800 text-white shadow-sm');
+        dev.style.maxWidth = '390px';
+        dev.style.height = '800px';
+        if (side) side.style.display = 'none'; // 移动端隐藏侧栏转单列
+      }
+    }
+
+    // 状态切换逻辑
+    function setState(state) {
+      ['normal', 'empty', 'loading', 'error'].forEach(s => {
+        const v = document.getElementById(`view-${s}`);
+        const btn = document.getElementById(`state-${s}`);
+        if (v) v.classList.add('hidden');
+        if (btn) btn.className = 'px-2.5 py-1 rounded-md transition-all text-slate-400 hover:text-slate-200 font-medium';
+      });
+      const activeView = document.getElementById(`view-${state}`);
+      const activeBtn = document.getElementById(`state-${state}`);
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeBtn) activeBtn.className = 'px-2.5 py-1 rounded-md transition-all bg-emerald-600/20 text-emerald-300 font-medium';
+    }
+
+    // 抽屉展开
+    function toggleDrawer(open) {
+      const d = document.getElementById('inspector-drawer');
+      if (d) {
+        if (open) d.classList.remove('hidden');
+        else d.classList.add('hidden');
+      }
+    }
+
+    // 标注浮层开关
+    let showSpecs = true;
+    function toggleSpecOverlay() {
+      showSpecs = !showSpecs;
+      const labels = document.querySelectorAll('.spec-label');
+      const dot = document.getElementById('spec-status');
+      labels.forEach(l => l.style.display = showSpecs ? 'block' : 'none');
+      if (dot) dot.className = `w-1.5 h-1.5 rounded-full inline-block ${showSpecs ? 'bg-emerald-400' : 'bg-slate-500'}`;
+    }
+  </script>
+</body>
+</html>

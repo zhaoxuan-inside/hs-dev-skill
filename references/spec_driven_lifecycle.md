@@ -84,11 +84,12 @@
 - **整体交互逻辑网络**：页面路由流转拓扑（Mermaid）、组件交互层级（视图/抽屉/弹窗/浮层）、未保存脏数据退出拦截、异步与状态迁移（防抖锁定/乐观渲染/草稿保护与错误自愈）；
 - **规模与复杂度客观评估 (Scale Assessment)**：量化评估交互复杂度（轻/中/高）、数据规则规模（简/中/复）、通信实时性要求，明确项目工程量级，为阶段 1 技术选型提供精准约束输入。
 
-### 3. 产出文档（一源双视图）
+### 3. 产出文档（一源双视图 + 可交互 HTML 预览）
 - （可选）`hs_dev_docs/_01_product_design/_01_business_plan/…`
 - `hs_dev_docs/_01_product_design/_02_product_design/{feature_name}_prd.md`（【视图一：面向人】产品功能设计书，含痛点 JTBD/FTUE、方案比选、详细规格矩阵、交互逻辑流、Gherkin DoD 与规模评估）
 - `hs_dev_docs/_01_product_design/_02_product_design/{feature_name}_vibe_spec.md`（【视图二：面向 VibeCoding】机器执行契约，含 Tokens、组件树 DOM 骨架、状态机、字段约束字典、Gherkin 可测用例与机器硬护栏）
-- （有 UI）`hs_dev_docs/_01_product_design/_03_product_figma/{feature_name}_prototype.md`（【视图一补全：面向人】产品设计语言与双轨多态原型，包含 Tokens、UX 四定律、组件六态与 Mermaid + ASCII 四态线框，并同步项目根 `DESIGN.md`）
+- （有 UI）`hs_dev_docs/_01_product_design/_03_product_figma/{feature_name}_prototype.md`（【视图一规约：面向人】产品设计语言与双轨多态原型，包含 Tokens、UX 四定律、组件六态与 Mermaid + ASCII 四态线框，并同步项目根 `DESIGN.md`）
+- （有 UI）`hs_dev_docs/_01_product_design/_03_product_figma/{feature_name}_prototype.html`（【视图一高保真：面向开发者可视化核准】单文件可交互 HTML 预览，内联 Tailwind CDN + 多端 1440/768/390px 视口切换 + 四态无死角仿真）
 - `hs_dev_docs/_01_product_design/_04_phased_roadmap/{feature_name}_phased_plan.md`（《产品开发分阶段规划书》，包含 MVP 范围、人机交互对齐记录、MoSCoW 分级矩阵与路线图）
 - 更新 `_01_product_design/_00_product_design.idx`
 
@@ -104,8 +105,9 @@
 | **功能与双轨交互完备** | 功能架构树、端到端旅程（含 FTUE）、详细规格矩阵清晰；双轨原型（Mermaid 拓扑 + ASCII 比例线框）覆盖页面四态（空/加载/正常/错误）；产品 DoD 采用 **Gherkin (`Given/When/Then`)** 从用户交互视角清晰可测； |
 | **分阶段规划与规模评估就绪** | 完成人机交互对齐，`_04_phased_roadmap/` 存在《产品开发分阶段规划书》，MVP 与演进阶段边界明确，完成客观规模评估； |
 | **纯净无技术侵入** | 严格杜绝在阶段 0 文档中提前塞入底层技术选型、物理表 DDL、RPC 接口签名、Saga 补偿、代码单测覆盖率等研发实现细节； |
-| **原型齐套与 UI 标注** | 有 UI：存在 `{feature}_prototype.md`，提供多端（Web/桌面/移动）Mermaid 拓扑与内联 UI 参数标注（布局/字阶/间距/Tokens）的 ASCII 比例四态线框；无 UI：PRD 已声明豁免； |
-| **开发者可视化确认签收** | 有 UI：原型文档末尾包含开发者核准勾选的《开发者可视化确认签收单》，6 大检查点均通过且签署 Sign-off，无技术实现阻断缺陷； |
+| **多端原型与 HTML 齐套** | 有 UI：存在 `{feature}_prototype.md`（Mermaid + ASCII 标注）与可交互 `{feature}_prototype.html`（多端仿真 + 四态直读）；无 UI：PRD 已声明豁免； |
+| **开发者可视化确认签收** | 有 UI：开发者基于 HTML 原型与规约完成 6 大检查点审阅并签署《开发者可视化确认签收单》(APPROVED)，无技术实现阻断缺陷； |
+
 
 通过后**立即**进入阶段 1。  
 
