@@ -30,6 +30,9 @@ class TestProductDesignCapability(unittest.TestCase):
         self.assertIn("Gherkin", content)
         self.assertIn("Given", content)
         self.assertIn("10 维自审标尺", content)
+        # 一源双视图架构
+        self.assertIn("一源双视图", content)
+        self.assertIn("vibe_spec.md", content)
 
     def test_prd_template_is_pure_and_professional(self):
         prd_tpl = self.root / "resources" / "templates" / "product_design" / "prd_template.md"
@@ -63,6 +66,41 @@ class TestProductDesignCapability(unittest.TestCase):
         self.assertIn("空白引导态", content)
         self.assertIn("数据加载态", content)
         self.assertIn("异常错误态", content)
+
+    def test_vibe_spec_template_exists_and_is_machine_actionable(self):
+        vibe_tpl = self.root / "resources" / "templates" / "product_design" / "vibe_spec_template.md"
+        self.assertTrue(vibe_tpl.exists(), "vibe_spec_template.md must exist")
+        content = vibe_tpl.read_text(encoding="utf-8")
+        self.assertIn("design_tokens:", content)
+        self.assertIn("component_tree:", content)
+        self.assertIn("state_machine:", content)
+        self.assertIn("field_constraints:", content)
+        self.assertIn("executable_tests_gherkin:", content)
+        self.assertIn("hard_guardrails:", content)
+
+    def test_top_contract_slice_in_tech_select_and_adr_templates(self):
+        tech_tpl = self.root / "resources" / "templates" / "tech_select" / "tech_select_template.md"
+        self.assertTrue(tech_tpl.exists())
+        tech_content = tech_tpl.read_text(encoding="utf-8")
+        self.assertIn("[VIBE_CONTRACT]", tech_content)
+        self.assertIn("[HUMAN_RATIONALE]", tech_content)
+
+        adr_tpl = self.root / "resources" / "templates" / "hs_dev_docs" / "adr_template.md"
+        self.assertTrue(adr_tpl.exists())
+        adr_content = adr_tpl.read_text(encoding="utf-8")
+        self.assertIn("[VIBE_CONTRACT]", adr_content)
+        self.assertIn("[HUMAN_RATIONALE]", adr_content)
+
+        arch_tpl = self.root / "resources" / "templates" / "architecture_design" / "arch_design_template.md"
+        self.assertTrue(arch_tpl.exists())
+        arch_content = arch_tpl.read_text(encoding="utf-8")
+        self.assertIn("[VIBE_CONTRACT]", arch_content)
+
+        cp_tpl = self.root / "resources" / "templates" / "hs_dev_docs" / "context_pack_template.md"
+        self.assertTrue(cp_tpl.exists())
+        cp_content = cp_tpl.read_text(encoding="utf-8")
+        self.assertIn("vibe_spec.md", cp_content)
+        self.assertIn("[VIBE_CONTRACT]", cp_content)
 
     def test_skill_ref_index_finds_product_design_and_new_keywords(self):
         idx = SkillRefIndex(self.root)

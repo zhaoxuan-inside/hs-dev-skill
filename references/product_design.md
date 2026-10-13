@@ -224,23 +224,27 @@ flowchart LR
 
 ---
 
-## 3. 产出文档结构与落盘约定
+## 3. 产出文档结构与“单一真实源 · 双重视图”落地约定
 
-在项目文档库中，阶段 0 的设计与规划产出统一落盘至 `hs_dev_docs/_01_product_design/`，结构严密：
+为了兼顾**人类团队的审美与决策共识**，同时**杜绝向 VibeCoding 工具灌输散文导致 Token 爆炸与 AI 幻觉**，阶段 0 产出统一落盘至 `hs_dev_docs/_01_product_design/`，执行**一源双视图**：
 
 ```text
 hs_dev_docs/_01_product_design/
 ├── _00_product_design.idx                 # 索引文件
 ├── _01_business_plan/                     # （可选）商业计划
-├── _02_product_design/                    # 核心产品功能规格书
-│   └── {feature_name}_prd.md              # 纯净产品功能：JTBD、方案比选、架构树、旅程、规格矩阵、Gherkin DoD、规模评估
+├── _02_product_design/                    # 核心产品设计与执行契约
+│   ├── {feature_name}_prd.md              # 【视图一：面向人】产品功能设计书（痛点/JTBD/方案比选/规格矩阵/规模评估）
+│   └── {feature_name}_vibe_spec.md        # 【视图二：面向 VibeCoding】机器执行契约（Tokens/组件树/状态机/Gherkin DoD）
 ├── _03_product_figma/                     # 产品设计语言与双轨多态原型
-│   └── {feature_name}_prototype.md        # 设计语言 Tokens、UX 四定律、组件六态、Mermaid + ASCII 四态线框
+│   └── {feature_name}_prototype.md        # 【视图一补全：面向人】设计语言规范 + Mermaid 拓扑 + ASCII 空间比例四态线框
 └── _04_phased_roadmap/                    # 产品开发分阶段规划书（MVP 演进）
     └── {feature_name}_phased_plan.md      # MVP 假设、人机交互对齐记录、MoSCoW 分级矩阵与路线图
 ```
 
-同时，在项目根目录生成或更新 **`DESIGN.md`**，作为全局视觉与交互设计语言的单一真实源。
+### 3.1 视图分工与下游消费法则
+1. **人类评审视图 (Human PDD)**：`{feature}_prd.md` + `{feature}_prototype.md`（合称《产品设计书》），供人类评审、决策、共识与审美验收；
+2. **机器执行视图 (Vibe Spec)**：`{feature}_vibe_spec.md`（模板见 `resources/templates/product_design/vibe_spec_template.md`），专供下游阶段 4 打包进 `task_context_pack` 与阶段 5 VibeCoding 消费。**AI 写代码和测试时只读此文件，节省 60%+ Token 且执行零偏差**！
+3. **全局视觉单一源**：项目根目录同步生成或更新 **`DESIGN.md`**，作为全局视觉 Design Tokens 的权威基础。
 
 ---
 

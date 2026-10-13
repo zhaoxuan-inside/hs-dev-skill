@@ -9,7 +9,32 @@
 
 ---
 
-## 0. 范式选型（必填）
+## [VIBE_CONTRACT] 架构执行契约 (Machine-Actionable Architecture)
+<!-- 
+  【专供 VibeCoding / AI 编码切片读取（行 10～40）】
+  说明：本区块记录锁定的范式阶梯、模块根路径映射与硬性依赖禁令。
+  AI 编码切片直接读取本区块，作为代码组织与 import 依赖的绝对红线！
+-->
+```yaml
+architecture_contract:
+  domain_name: "{name}"
+  paradigm:
+    backend_tier: "{B0～B7，如 B1 事务脚本 / B2 模块化单体 / B4 Hexagonal / B5 DDD}"
+    frontend_tier: "{F0～F4，如 F1 组件化 / F2 Feature模块 / F3 FSD}"
+  module_path_map:
+    core_logic: "backend/{module}/domain"
+    application_services: "backend/{module}/app"
+    infrastructure_adapters: "backend/{module}/infra"
+    api_entrypoints: "backend/{module}/interfaces"
+
+dependency_rules:
+  - "RULE: 依赖方向严禁向外倒流！domain 层严禁 import infra 或 interfaces"
+  - "RULE: 模块间通信严禁私自跨库直连，必须通过显式 API 或 Seam Adapter"
+```
+
+---
+
+## 0. 范式选型与权衡 (Human Rationale)
 
 | 项 | 值 |
 |----|-----|
