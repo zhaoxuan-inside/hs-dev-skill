@@ -13,13 +13,13 @@ license: MIT
 compatibility: Requires Python >= 3.8 (stdlib sqlite3; Win/Linux/macOS)
 metadata:
   author: hardstone
-  version: "2.29"
+  version: "2.30"
 ---
 
 # 产品开发 Skill (hs-dev-skill)
 
-版本：v2.29  
-核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动 + 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构选型置顶契约切片（[VIBE_CONTRACT] 隔离废案）+ MVP 分阶段规划 + 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
+版本：v2.30  
+核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动 + 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构选型置顶契约切片（[VIBE_CONTRACT] 隔离废案）+ MVP 激进裁剪决策（CEO 砍半法则 · 团队胃口时间箱 · Day 1 垂直曳光弹切片）+ 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
 **替代**：原 `hs-project-skill` 已废弃，统一用本 Skill。
 
 **装载门闩（反合理化 × Token）**：动手前必须完成 [`load_latch.md`](references/load_latch.md) L0～L2（分级 + 索引路由 + **恰好 1 份**详规）。禁止「跳过 Skill 先干」；也禁止整目录通读。场景有 ≥1% 可能适用 → **必须跑** `skill_ref_index search`（或读 `_index` 一行），命中再打开。
@@ -39,7 +39,12 @@ metadata:
    - **多端字符与 UI 标注**：在 Markdown 原型中提供 Mermaid 空间拓扑与 ASCII 比例线框，内联标注**布局网格、字体字阶（含 tabular-nums）、间距步进与 Tokens**；
    - **开发者可视化确认签收**：进入技术选型与编码前，开发者必须基于 HTML 预览与字符规约完成 6 项可视化检查并签署 Sign-off (APPROVED)，杜绝盲目编码；
    - **微观特性设计与双视图**：声明 `Inherits: /DESIGN.md`，输出面向人类《产品设计书》（PRD + 原型）与面向 VibeCoding《机器执行契约》（`vibe_spec.md`：Tokens 映射/DOM 骨架/状态机/Gherkin DoD/硬护栏）；严禁技术细节反向侵入。
-6. **MVP 裁剪与详细功能交互（人机对齐驱动）**：产品设计完成后，**必须进行 MVP 裁剪与分阶段实施规划**（[`product_roadmap.md`](references/product_roadmap.md)）；通过人机交互对齐产出《产品开发分阶段规划书》；锁定 MVP 范围后，**必须先输出详细功能设计与整体交互逻辑**（[`product_design.md`](references/product_design.md)），据此**客观评估工程规模**后，方可进入阶段 1 技术选型（**先交互与功能，后技术选型**）。S 不写完整规划书。
+6. **MVP 激进裁剪与开发计划抉择（CEO 法则 · 团队胃口 · 垂直切片）**：产品设计完成后，**必须进行 MVP 决策与分阶段实施规划**（[`product_roadmap.md`](references/product_roadmap.md)）；
+   - **CEO 砍半法则 (The Radical Cut)**：强迫单一核心假设，Agent 主动发起砍掉 50% 辅助范围的提案，严守 **No Admin in MVP**；
+   - **团队胃口 (Appetite)**：定界时间箱，执行断路器原则（砍功能保上线，绝不延期）；
+   - **垂直曳光弹 (Tracer Bullet)**：规划 Day 1 贯通 UI+API+DB 的端到端首日冒烟切片，严禁水平脱节分层施工；
+   - **详细功能与规模评估先决**：锁定 MVP 范围后，**必须先输出详细功能设计与整体交互逻辑**（[`product_design.md`](references/product_design.md)），据此**客观评估工程规模**后，方可进入阶段 1 技术选型（**先交互与功能，后技术选型**）。S 不写完整规划书。
+
 
 
 

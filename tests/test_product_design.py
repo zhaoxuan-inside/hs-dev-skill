@@ -190,6 +190,10 @@ class TestProductDesignCapability(unittest.TestCase):
         self.assertIn("MVP", content)
         self.assertIn("MoSCoW", content)
         self.assertIn("产品开发分阶段规划书", content)
+        self.assertIn("砍半法则", content)
+        self.assertIn("No Admin in MVP", content)
+        self.assertIn("Appetite", content)
+        self.assertIn("Tracer Bullet", content)
 
         tpl = self.root / "resources" / "templates" / "product_design" / "phased_roadmap_template.md"
         self.assertTrue(tpl.exists(), "phased_roadmap_template.md must exist")
@@ -197,6 +201,10 @@ class TestProductDesignCapability(unittest.TestCase):
         self.assertIn("人机交互对齐备忘录", tpl_content)
         self.assertIn("全量功能池 MoSCoW 分级与分期矩阵", tpl_content)
         self.assertIn("阶段一：MVP", tpl_content)
+        self.assertIn("Appetite", tpl_content)
+        self.assertIn("CEO 砍半提案", tpl_content)
+        self.assertIn("垂直曳光弹切片", tpl_content)
+
 
     def test_skill_ref_index_finds_product_roadmap(self):
         idx = SkillRefIndex(self.root)

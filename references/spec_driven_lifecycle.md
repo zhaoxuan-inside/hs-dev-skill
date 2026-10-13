@@ -67,14 +67,16 @@
   - **【视图二：面向 VibeCoding】** `{feature}_vibe_spec.md`：高信息密度 YAML 契约（继承 `/DESIGN.md`、Tokens 代码映射、DOM 骨架、状态机、字段规则、硬护栏），供 AI 编码无噪音直读；
 - **商业计划可选；双轨原型必产**：无位图则采用 **Mermaid 拓扑 + ASCII 比例线框**（[`product_prototype.md`](product_prototype.md)）。
 
-#### 阶段 0B：MVP 裁剪与分阶段实施规划 (Phased Roadmap & MVP)
+#### 阶段 0B：MVP 决策与分阶段实施规划 (Phased Roadmap & MVP Decision)
 
-- **规划指南驱动**：遵循 [`product_roadmap.md`](product_roadmap.md)，严禁直接对全量功能进行大包大揽式开发；
-- **强制人机交互对齐机制 (Human-in-the-Loop Alignment)**：Agent 主动发起针对性问询，向人类决策者提问并确认：
-  1. *Q1 核心假设*：MVP 最关键要验证的核心闭环与 Aha Moment 是什么？
-  2. *Q2 范围裁剪与 MoSCoW 分级*：哪些功能列入 MVP (Must-have)？哪些明确暂缓至 Phase 2/3 (Won't-have in MVP)？
-  3. *Q3 交付里程碑与验收标准*：MVP 的 Gherkin 验收断言与交付形态？
+- **规划指南驱动**：深度遵循 [`product_roadmap.md`](product_roadmap.md)，严禁直接对全量功能进行大包大揽式开发；
+- **强制人机交互对齐机制 (Human-in-the-Loop Alignment & CEO Cut)**：Agent 主动发起针对性问询，向人类决策者提问并确认：
+  1. *Q1 单一核心假设 (Single Risky Assumption)*：MVP 最关键要验证的核心闭环与痛点是什么？
+  2. *Q2 CEO 视角激进砍半提案 (The Radical Cut)*：Agent 主动提案砍掉 50% 次级特性（高级筛选/批量导出/站内通知/权限管理），严格落实 **No Admin in MVP**；
+  3. *Q3 团队胃口与时间箱 (Appetite & Circuit Breaker)*：本次 MVP 设定的胃口周期（1~3天/1~2周），触发断路器坚决砍功能保上线；
+  4. *Q4 Day 1 垂直曳光弹切片与验收 (Tracer Bullet & DoD)*：端到端纵向贯通 UI+API+DB 的首日冒烟切片与 Gherkin 验收断言；
 - **编制分阶段规划书**：形成各阶段功能映射表、阶段依赖路线图与准出条件。
+
 
 #### 阶段 0C：MVP 详细功能设计、整体交互逻辑与规模评估 (Detailed Interaction & Scale Assessment)
 > [!IMPORTANT]
