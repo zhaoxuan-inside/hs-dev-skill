@@ -3,12 +3,14 @@
 # Target Feature: {feature_name}
 # Source PRD: _02_product_design/{feature_name}_prd.md
 # Source Prototype: _03_product_figma/{feature_name}_prototype.md
+# Macro Taste Charter: Inherits /DESIGN.md (全局设计隐喻、基准调色盘与 Anti-Slop 守则)
 # 读写约定：专供 VibeCoding / AI 编码工具快速消费；高信息密度、零叙事废话、可直接映射代码与测试。
 # ==============================================================================
 
 meta:
   feature_id: "{FEAT-XXX}"
   feature_name: "{feature_name}"
+  inherits_design_md: "/DESIGN.md"
   density: "compact | balanced | airy"
   max_container_width: "1440px"
   primary_anchor_cta: "{具象主按钮，如：+ 创建采购订单}"

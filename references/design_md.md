@@ -23,14 +23,15 @@ python scripts/rule_fetch.py resolve --id google.design-md-spec
 
 ---
 
-## 1. 两份文件，两种职责
+## 1. 宏观品味宪章与微观特性的两层解耦
 
-| 文件 | 谁读 | 定义什么 |
-|------|------|----------|
-| `AGENTS.md` / 本 Skill | 编码 Agent | 怎么建、怎么改、门禁 |
-| **`DESIGN.md`（项目根）** | 设计向 Agent | **看起来与感觉如何**（色、字、组件、布局、禁忌） |
+| 文件 | 谁读 | 级别与生命周期 | 定义什么 |
+|------|------|----------------|----------|
+| **`DESIGN.md`（项目根）** | 设计向 Agent / 全局常驻 | **项目级 · 宏观品味宪章**（极度稳定） | **全站看起来与感觉如何**（具象参照物、隐喻、全站 Design Tokens、Anti-Slop 护栏、10 星体验） |
+| `{feature}_prd.md` / `prototype.md` | 产品/前端 Agent | **特性级 · 微观施工图**（高频迭代） | **特定任务的交互与契约**（JTBD、首屏渐进披露、ASCII 线框、字段约束、Gherkin DoD，**声明 Inherits: /DESIGN.md**） |
+| `AGENTS.md` / 本 Skill | 编码 Agent | 工具链与工程门禁 | 怎么建、怎么改、状态机、测试门禁与 Git 规范 |
 
-无 `DESIGN.md` 时，先遵守 [`frontend_aesthetic.md`](frontend_aesthetic.md) 本地默认，并尽快落盘本项目 `DESIGN.md`（模糊 UI / M/L 品牌向强制）。有方向文件后，再叠 [`frontend_craft.md`](frontend_craft.md)。更多设计需要 → `rule_fetch`（Anthropic 原文 / 品牌库 / 审美族），禁止跳过本地默认直接通读远程。
+**继承铁律**：无 `DESIGN.md` 时，先遵守 [`frontend_aesthetic.md`](frontend_aesthetic.md) 本地默认，并在阶段 0A 尽快落盘本项目根目录 `DESIGN.md`。后续所有特性的 PRD 与原型必须**显式声明继承根目录 `DESIGN.md`**，**严禁在具体特性中各自重新发明色彩、字体族或设计哲学**，彻底杜绝多特性品味漂移！有方向文件后，再叠 [`frontend_craft.md`](frontend_craft.md)。更多设计需要 → `rule_fetch`（Anthropic 原文 / 品牌库 / 审美族），禁止跳过本地默认直接通读远程。
 
 ---
 

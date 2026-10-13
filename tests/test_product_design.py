@@ -67,6 +67,30 @@ class TestProductDesignCapability(unittest.TestCase):
         self.assertIn("数据加载态", content)
         self.assertIn("异常错误态", content)
 
+    def test_two_layer_decoupled_taste_architecture(self):
+        # 1. 验证 references/product_design.md 与 references/design_md.md 具备解耦定义
+        prod_design = (self.root / "references" / "product_design.md").read_text(encoding="utf-8")
+        self.assertIn("两层解耦", prod_design)
+        self.assertIn("第一层：宏观品味宪章", prod_design)
+        self.assertIn("第二层：微观特性施工图", prod_design)
+        self.assertIn("Inherits: /DESIGN.md", prod_design)
+
+        design_md_ref = (self.root / "references" / "design_md.md").read_text(encoding="utf-8")
+        self.assertIn("宏观品味宪章", design_md_ref)
+        self.assertIn("Anti-Slop", design_md_ref)
+        self.assertIn("Inherits: /DESIGN.md", design_md_ref)
+
+        # 2. 验证 PRD、原型与 VibeSpec 模板均显式声明继承 /DESIGN.md
+        prd_tpl = (self.root / "resources" / "templates" / "product_design" / "prd_template.md").read_text(encoding="utf-8")
+        self.assertIn("Inherits: /DESIGN.md", prd_tpl)
+
+        proto_tpl = (self.root / "resources" / "templates" / "product_design" / "prototype_template.md").read_text(encoding="utf-8")
+        self.assertIn("Inherits: /DESIGN.md", proto_tpl)
+
+        vibe_tpl = (self.root / "resources" / "templates" / "product_design" / "vibe_spec_template.md").read_text(encoding="utf-8")
+        self.assertIn("inherits_design_md: \"/DESIGN.md\"", vibe_tpl)
+
+
     def test_vibe_spec_template_exists_and_is_machine_actionable(self):
         vibe_tpl = self.root / "resources" / "templates" / "product_design" / "vibe_spec_template.md"
         self.assertTrue(vibe_tpl.exists(), "vibe_spec_template.md must exist")
@@ -77,6 +101,7 @@ class TestProductDesignCapability(unittest.TestCase):
         self.assertIn("field_constraints:", content)
         self.assertIn("executable_tests_gherkin:", content)
         self.assertIn("hard_guardrails:", content)
+
 
     def test_top_contract_slice_in_tech_select_and_adr_templates(self):
         tech_tpl = self.root / "resources" / "templates" / "tech_select" / "tech_select_template.md"
