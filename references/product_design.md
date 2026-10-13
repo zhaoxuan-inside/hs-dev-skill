@@ -132,12 +132,14 @@
 ### 2.4 端到端用户核心旅程 (Core User Journeys)
 梳理端到端核心旅程，强制覆盖**首次冷启动 FTUE 分支**、**常规主成功流**与**校验拦截原位恢复分支**。
 
-### 2.5 界面信息架构与双轨多态原型 (Dual-Track Prototypes)
-在原型设计中（详见 [`product_prototype.md`](product_prototype.md)），采用**「Mermaid 流转拓扑 + ASCII 空间比例线框图」双轨表达**，覆盖页面四态：
+### 2.5 界面信息架构与双轨多态原型 (Dual-Track Multi-Platform Prototypes)
+在原型设计中（详见 [`product_prototype.md`](product_prototype.md)），明确目标平台（**桌面端 Desktop / 移动端 Mobile / Web 端 Responsive**），采用**「Mermaid 空间拓扑 + ASCII 空间比例线框图」双轨表达**，并内联标注**布局网格、字体字阶、间距步进与 Tokens**：
 - **空白引导态 (Empty State / FTUE)**：引导插画、原因说明及「+ 创建首条记录 / 载入示例」主 CTA；
 - **加载骨架态 (Loading State)**：1:1 比例脉冲骨架屏，消灭布局抖动 (CLS = 0)；
-- **正常数据态 (Populated State)**：真实空间排布、主视觉锚点（★ 主 CTA）与折叠筛选；
-- **异常错误态 (Error State)**：人话原因说明、保留用户已填草稿及原位「重新加载 / 重试」按钮。
+- **正常数据态 (Populated State)**：真实空间排布、主视觉锚点（★ 主 CTA）、内联字阶标注（如 H1 24px/Body 14px/`tabular-nums`）与折叠筛选；
+- **异常错误态 (Error State)**：人话原因说明、保留用户已填草稿及原位「重新加载 / 重试」按钮；
+- **开发者可视化确认签收 (Developer Sign-off)**：在原型末尾完成 6 项可视化检查（容器尺寸/字阶/间距/平台特性/四态/可映射性）并签字核准，作为阶段 0 冻结与流转的硬性门禁。
+
 
 ### 2.6 详细功能规格矩阵 (Detailed Feature Specifications)
 明确输入要素、触发前置条件、业务分支矩阵、默认值与边界极端异常。

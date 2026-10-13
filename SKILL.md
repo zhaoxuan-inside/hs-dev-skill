@@ -13,13 +13,13 @@ license: MIT
 compatibility: Requires Python >= 3.8 (stdlib sqlite3; Win/Linux/macOS)
 metadata:
   author: hardstone
-  version: "2.27"
+  version: "2.28"
 ---
 
 # 产品开发 Skill (hs-dev-skill)
 
-版本：v2.27  
-核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动 + 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（两层解耦品味架构：项目根 DESIGN.md 宏观品味宪章 + 特性级双视图契约继承 / 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构选型置顶契约切片（[VIBE_CONTRACT] 隔离废案）+ MVP 分阶段规划 + 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
+版本：v2.28  
+核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动 + 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（多端可视化原型与内联 UI 标注 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构选型置顶契约切片（[VIBE_CONTRACT] 隔离废案）+ MVP 分阶段规划 + 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
 **替代**：原 `hs-project-skill` 已废弃，统一用本 Skill。
 
 **装载门闩（反合理化 × Token）**：动手前必须完成 [`load_latch.md`](references/load_latch.md) L0～L2（分级 + 索引路由 + **恰好 1 份**详规）。禁止「跳过 Skill 先干」；也禁止整目录通读。场景有 ≥1% 可能适用 → **必须跑** `skill_ref_index search`（或读 `_index` 一行），命中再打开。
@@ -33,10 +33,13 @@ metadata:
 2. **装载门闩**：未过 L0～L2 禁止探代码开工或写 PRD 正文（[`load_latch.md`](references/load_latch.md)）。语义为「继续/继续任务」时 L2 优先 [`process_continuity.md`](references/process_continuity.md)。
 3. **持续推进**：除 DESIGN 前沿等待 / 实现期询问闸门 /（M/L）冻结未过 / `BLOCKED` 外禁止空转；确认后立刻继续至路径终点（测试绿+门禁+归档+本地 Commit）。
 4. **审讯式对齐与方案比选后再编码**：`DESIGN` 走 [`grill_orchestration.md`](references/grill_orchestration.md)（融合 `gstack /office-hours` 痛点拷问与 `superpowers` 多方案 Trade-offs 博弈）；**跳过澄清收紧**（不可逆/计费权限/对外契约/持久化/影响选型的产品空白 → 禁止跳过，见 confidence_decision）。S 数行 DoD；M/L 阶段 0。
-5. **两层解耦产品设计与一源双视图**：专业级产品与 UX 设计能力（[`product_design.md`](references/product_design.md)）；
+5. **多端可视化原型与内联 UI 标注（开发者确认签收门禁）**：专业级产品与 UX 设计能力（[`product_design.md`](references/product_design.md) / [`product_prototype.md`](references/product_prototype.md)）；
    - **宏观品味宪章**：项目根目录 `DESIGN.md`（[`design_md.md`](references/design_md.md)）作为永久记忆，确立具象物理隐喻、Design Tokens、Anti-Slop 审美红线与 10 星标准；
-   - **微观特性设计**：显式声明 `Inherits: /DESIGN.md`，先推演产品探索五步（Status Quo / JTBD / Aha Moment / FTUE / 方案比选），再输出**面向人类的《产品设计书》**（`{feature}_prd.md` + `{feature}_prototype.md` 双轨线框）与**面向 VibeCoding 的《机器执行契约》**（`{feature}_vibe_spec.md`：Tokens 映射/DOM 骨架/状态机/Gherkin DoD/硬护栏）；严禁底层技术细节反向侵入产品文档。下游写代码时优先装载 Vibe Spec，防 Token 爆炸与叙事幻觉。
+   - **多端与 UI 标注**：针对 Web、移动端、桌面端分别绘制 Mermaid 空间拓扑与 ASCII 比例线框，必须内联标注**布局网格、字体字阶（含 tabular-nums）、间距步进与 Tokens**，覆盖四态（Populated/Empty/Loading/Error）；
+   - **开发者可视化确认签收**：进入技术选型与编码前，开发者必须对照原型线框完成 6 项可视化检查并签署 Sign-off，杜绝盲目编码；
+   - **微观特性设计与双视图**：声明 `Inherits: /DESIGN.md`，输出面向人类《产品设计书》（PRD + 原型）与面向 VibeCoding《机器执行契约》（`vibe_spec.md`：Tokens 映射/DOM 骨架/状态机/Gherkin DoD/硬护栏）；严禁技术细节反向侵入。
 6. **MVP 裁剪与详细功能交互（人机对齐驱动）**：产品设计完成后，**必须进行 MVP 裁剪与分阶段实施规划**（[`product_roadmap.md`](references/product_roadmap.md)）；通过人机交互对齐产出《产品开发分阶段规划书》；锁定 MVP 范围后，**必须先输出详细功能设计与整体交互逻辑**（[`product_design.md`](references/product_design.md)），据此**客观评估工程规模**后，方可进入阶段 1 技术选型（**先交互与功能，后技术选型**）。S 不写完整规划书。
+
 
 7. **按路径设计与顶置契约切片**：L 须 1→2→3；选型（阶段 1）与架构（阶段 2）强制在**文档顶部 1～35 行置顶 `[VIBE_CONTRACT]` 机器执行契约**，隔离下半部人类论证与落选废案；阶段 3（DB/API/六元组）保持**天然人机同构不拆分**；阶段 4 `task_context_pack` 编译装配 Vibe Spec + `[VIBE_CONTRACT]` 置顶切片。范式选型见 [`dev_paradigm.md`](references/dev_paradigm.md)；深模块见 [`deep_modules.md`](references/deep_modules.md)；UI 默认审美见 [`frontend_aesthetic.md`](references/frontend_aesthetic.md)；UI 手艺见 [`frontend_craft.md`](references/frontend_craft.md)；API 见 [`api_engineering.md`](references/api_engineering.md)。
 8. **路径内单向门禁**：L=`0→1→2→3→4→5→6`；M/S 按 right_sizing。

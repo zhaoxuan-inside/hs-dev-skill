@@ -66,6 +66,28 @@ class TestProductDesignCapability(unittest.TestCase):
         self.assertIn("空白引导态", content)
         self.assertIn("数据加载态", content)
         self.assertIn("异常错误态", content)
+        # 多端适配、UI Spec 标注与开发者可视化确认签收
+        self.assertIn("多端适用声明", content)
+        self.assertIn("Web 端", content)
+        self.assertIn("移动端", content)
+        self.assertIn("桌面端", content)
+        self.assertIn("UI Spec:", content)
+        self.assertIn("tabular", content)
+        self.assertIn("开发者可视化确认签收单", content)
+        self.assertIn("多端容器与布局架构", content)
+        self.assertIn("字体与字阶层级", content)
+        self.assertIn("核准通过 (APPROVED)", content)
+
+    def test_prototype_guide_has_multi_platform_and_developer_sign_off_gate(self):
+        proto_guide = self.root / "references" / "product_prototype.md"
+        self.assertTrue(proto_guide.exists())
+        content = proto_guide.read_text(encoding="utf-8")
+        self.assertIn("Desktop / Mobile / Web", content)
+        self.assertIn("UI 关键物理参数内联标注", content)
+        self.assertIn("开发者可视化确认机制", content)
+        self.assertIn("开发者可视化确认签收单", content)
+        self.assertIn("tabular-nums", content)
+
 
     def test_two_layer_decoupled_taste_architecture(self):
         # 1. 验证 references/product_design.md 与 references/design_md.md 具备解耦定义
