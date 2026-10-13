@@ -53,6 +53,9 @@ class ConsistencyVerifier:
         # 5. 文档索引库（SQLite）存在性与可查询性（跨平台缓存，非权威源）
         self._check_doc_index_db()
 
+        # 6. 检查多端工程架构卫生与打包产物输出隔离 (Output & Workspace Hygiene)
+        self._check_workspace_hygiene()
+
         return self._print_results()
 
     def _check_skill_version(self):
@@ -243,6 +246,28 @@ class ConsistencyVerifier:
                 )
         except Exception as ex:
             self.warnings.append(f"[DOC INDEX] Unable to open SQLite cache: {ex}")
+
+    def _check_workspace_hygiene(self):
+        """检查工程多端目录卫生：散落二进制产物、配置隔离与 output 规约"""
+        print("  -> Checking Workspace Hygiene & Output Directory Isolation...")
+        # 1. 检查是否存在直接散落在根目录的安装包或二进制产物 (未收敛至 output/)
+        stray_extensions = [".apk", ".aab", ".ipa", ".dmg", ".exe", ".AppImage"]
+        for ext in stray_extensions:
+            for stray in self.root.glob(f"*{ext}"):
+                self.errors.append(
+                    f"[ARTIFACT ERROR] Stray binary '{stray.name}' found at workspace root! "
+                    f"Must be relocated into output/<platform> directory."
+                )
+
+        # 2. 检查敏感环境变量与配置隔离 (.env 存在但无 .env.example)
+        dot_env = self.root / ".env"
+        dot_env_example = self.root / "config" / ".env.example"
+        if not dot_env_example.exists():
+            dot_env_example = self.root / ".env.example"
+        if dot_env.exists() and not dot_env_example.exists():
+            self.warnings.append(
+                "[CONFIG WARNING] Local .env exists but missing .env.example template in config/ or root!"
+            )
 
     def _print_results(self) -> bool:
         print("\n" + "=" * 60)

@@ -30,4 +30,15 @@
 3. **索引完整性**：新增/重命名/删除的文件已同步更新对应的 `.idx` 索引文件。
 4. **三文件一致性**：`_00_task.idx`、`_01_task_brief/`、`_02_task_detail/` 任务状态与元数据完全吻合。
 5. **专项体验与性能合规**：满足 WCAG a11y 关键对比度与键盘访问；无突出的 LCP 阻塞与内存泄漏隐患。
-6. **Git Commit 规范**：提交信息符合 `<type>(<scope>): <subject>` 及相关 Footer 规范；默认仅本地 commit，**用户明确要求推送**时方可 `git push`。
+6. **多端产物收敛与环境安全**：打包产物必须通过脚手架配置重定向至 `output/<client>` 对应子目录，工作区根目录下严禁散落二进制安装包；移动端发布包强制配对混淆符号表（Mapping/dSYM）；敏感 `.env` 绝不上库，具备 `config/.env.example` 声明契约。
+7. **Git Commit 规范**：提交信息符合 `<type>(<scope>): <subject>` 及相关 Footer 规范；默认仅本地 commit，**用户明确要求推送**时方可 `git push`。
+
+---
+
+## 3. 多端代码与产出目录控制门禁（Workspace & Output Isolation Gate）
+
+在执行提交、打包或发布前，必须确保各端代码与打包产物符合物理隔离标准：
+- **应用代码收敛**：各端代码存放于 `apps/<client_name>/`，跨端共享库与类型存放于 `packages/`；
+- **产出收敛铁律**：Web、桌面端（Desktop）、移动端（Mobile）所有打包产物（`.html`/`.js`, `.exe`/`.dmg`, `.apk`/`.ipa`）**必须通过构建配置强制重定向至根目录 `output/` 对应子目录**，严禁在子应用内堆积散落产物；
+- **符号表齐套门禁**：移动端 Android `mapping.txt` 与 iOS `dSYM.zip` 必须与安装包成对输出归档至 `output/app_mobile/`，缺失符号表禁止发版；
+- **配置与密钥安全**：环境配置收敛于 `config/`，敏感密钥绝不上库，必须提供 `config/.env.example` 声明变量契约。

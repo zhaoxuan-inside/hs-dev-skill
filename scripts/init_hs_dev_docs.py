@@ -19,10 +19,12 @@ def init_full_workspace(workspace_root: str):
 
     print(f"[*] Initializing hs-dev workspace at: {root}")
 
-    # 1. 基础项目层级目录
+    # 1. 基础项目层级目录 (多端架构与产出收敛规划)
     base_dirs = [
+        "apps", "packages", "deploy", "assets",
         "backend", "frontend", "linux", "mac", "windows", "android", "ios",
-        "output", "logs", "config", "scripts",
+        "output/web_desktop", "output/app_desktop", "output/app_mobile/android",
+        "output/app_mobile/ios", "output/server", "logs", "config", "scripts",
         "test/_00_e2e", "test/_01_method_test", "test/_02_integration_test",
         "test/_03_contract_test", "test/_04_regression_test", "test/_05_performance_test",
         "test/_06_security_test", "test/_07_compatibility_test", "test/_08_test_data",
@@ -36,6 +38,11 @@ def init_full_workspace(workspace_root: str):
     ]
     for d in base_dirs:
         (root / d).mkdir(parents=True, exist_ok=True)
+
+    # 默认创建环境配置模板
+    env_example = root / "config" / ".env.example"
+    if not env_example.exists():
+        env_example.write_text("# Global Environment Variables Template\n# PORT=8080\n# DATABASE_URL=\n", encoding="utf-8")
 
     # 2. hs_dev_docs 目录层级
     doc_dirs = [

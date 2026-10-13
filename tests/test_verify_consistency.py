@@ -82,6 +82,17 @@ class TestVerifyConsistency(unittest.TestCase):
         self.assertFalse(self.verifier.check_all())
         self.assertTrue(any("[DB MIGRATION FORMAT ERROR]" in e for e in self.verifier.errors))
 
+    def test_detect_stray_artifacts(self):
+        # 模拟在项目根目录下散落未收敛的安装包
+        stray_apk = self.root / "app-release.apk"
+        stray_apk.write_bytes(b"dummy apk content")
+        self.assertFalse(self.verifier.check_all())
+        self.assertTrue(any("[ARTIFACT ERROR]" in e for e in self.verifier.errors))
+
+        # 移除散落安装包后恢复通过
+        stray_apk.unlink()
+        self.assertTrue(self.verifier.check_all())
+
 
 if __name__ == "__main__":
     unittest.main()
