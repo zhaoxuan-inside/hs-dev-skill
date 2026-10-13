@@ -3,11 +3,11 @@
 > **质量优先 + 审讯式对齐 + 测试一等公民 + 深模块词汇 + 文档驱动 + S/M/L 分级**
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
-[![Spec Version](https://img.shields.io/badge/skill-v2.30-blue.svg)](SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v2.31-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS），**替代已废弃的 `hs-project-skill`**。目标：**质量大于一切**——审讯式 DESIGN（跳过收紧）、一源双视图（人类产品设计书 + VibeCoding 执行契约）、双轨原型必产（Mermaid 拓扑 + ASCII 比例线框）、选型架构顶置契约切片（隔离废案）、分步正确（seam + 垂直 TDD）。续做靠 `plan_log`/`change_log`（语义「继续」）；回退靠快照而非 git。入口 [`SKILL.md`](SKILL.md)；先写 `change_size`+`work_mode`，过装载门闩后再干活。
+`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS），**替代已废弃的 `hs-project-skill`**。目标：**质量大于一切**——审讯式 DESIGN（跳过收紧）、一源双视图（人类产品设计书 + VibeCoding 执行契约）、双轨原型必产（Mermaid 拓扑 + ASCII 比例线框）、垂直领域能力融合（OpenPencil / Generative UI 原型、Modern Web Guidance 规范、Chrome DevTools 运行时/a11y/CWV 门禁）、选型架构顶置契约切片（隔离废案）、分步正确（seam + 垂直 TDD）。续做靠 `plan_log`/`change_log`（语义「继续」）；回退靠快照而非 git。入口 [`SKILL.md`](SKILL.md)；先写 `change_size`+`work_mode`，过装载门闩后再干活。
 
 ---
 

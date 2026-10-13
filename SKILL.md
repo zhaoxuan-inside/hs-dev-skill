@@ -13,13 +13,13 @@ license: MIT
 compatibility: Requires Python >= 3.8 (stdlib sqlite3; Win/Linux/macOS)
 metadata:
   author: hardstone
-  version: "2.30"
+  version: "2.31"
 ---
 
 # 产品开发 Skill (hs-dev-skill)
 
-版本：v2.30  
-核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动 + 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构选型置顶契约切片（[VIBE_CONTRACT] 隔离废案）+ MVP 激进裁剪决策（CEO 砍半法则 · 团队胃口时间箱 · Day 1 垂直曳光弹切片）+ 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
+版本：v2.31  
+核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动 + 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构选型置顶契约切片（[VIBE_CONTRACT] 隔离废案）+ MVP 激进裁剪决策（CEO 砍半法则 · 团队胃口时间箱 · Day 1 垂直曳光弹切片）+ 垂直领域能力融合（OpenPencil 矢量规约 · Generative UI 动态交互仿真 · Modern Web Guidance 现代合规 · Chrome DevTools 运行态/CWV/a11y 质量门禁 · 专用 SDK 防腐 Adapter）+ 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
 **替代**：原 `hs-project-skill` 已废弃，统一用本 Skill。
 
 **装载门闩（反合理化 × Token）**：动手前必须完成 [`load_latch.md`](references/load_latch.md) L0～L2（分级 + 索引路由 + **恰好 1 份**详规）。禁止「跳过 Skill 先干」；也禁止整目录通读。场景有 ≥1% 可能适用 → **必须跑** `skill_ref_index search`（或读 `_index` 一行），命中再打开。
@@ -36,7 +36,7 @@ metadata:
 5. **单文件 HTML 可交互原型与多端可视化确认（开发者签收门禁）**：专业级产品与 UX 设计能力（[`product_design.md`](references/product_design.md) / [`product_prototype.md`](references/product_prototype.md)）；
    - **宏观品味宪章**：项目根目录 `DESIGN.md`（[`design_md.md`](references/design_md.md)）作为永久记忆，确立具象物理隐喻、Design Tokens、Anti-Slop 审美红线与 10 星标准；
    - **可交互 HTML 原型真理源**：有前端界面时，必须配套生成零依赖单文件 `{feature}_prototype.html`（内联 Tailwind CDN + 多端 1440/768/390px 视口切换 + 正常/空态/骨架/报错四态仿真），供开发者双击浏览器直读预览；
-   - **多端字符与 UI 标注**：在 Markdown 原型中提供 Mermaid 空间拓扑与 ASCII 比例线框，内联标注**布局网格、字体字阶（含 tabular-nums）、间距步进与 Tokens**；
+   - **多端字符与 UI 标注**：在 Markdown 原型中提供 Mermaid 空间拓扑与 ASCII 比例线框，融合 **OpenPencil PenNode 矢量层级** 与 **Generative UI 动态交互仿真**，内联标注**布局网格、字体字阶（含 tabular-nums）、间距步进与 Tokens**；
    - **开发者可视化确认签收**：进入技术选型与编码前，开发者必须基于 HTML 预览与字符规约完成 6 项可视化检查并签署 Sign-off (APPROVED)，杜绝盲目编码；
    - **微观特性设计与双视图**：声明 `Inherits: /DESIGN.md`，输出面向人类《产品设计书》（PRD + 原型）与面向 VibeCoding《机器执行契约》（`vibe_spec.md`：Tokens 映射/DOM 骨架/状态机/Gherkin DoD/硬护栏）；严禁技术细节反向侵入。
 6. **MVP 激进裁剪与开发计划抉择（CEO 法则 · 团队胃口 · 垂直切片）**：产品设计完成后，**必须进行 MVP 决策与分阶段实施规划**（[`product_roadmap.md`](references/product_roadmap.md)）；
@@ -48,12 +48,12 @@ metadata:
 
 
 
-7. **按路径设计与顶置契约切片**：L 须 1→2→3；选型（阶段 1）与架构（阶段 2）强制在**文档顶部 1～35 行置顶 `[VIBE_CONTRACT]` 机器执行契约**，隔离下半部人类论证与落选废案；阶段 3（DB/API/六元组）保持**天然人机同构不拆分**；阶段 4 `task_context_pack` 编译装配 Vibe Spec + `[VIBE_CONTRACT]` 置顶切片。范式选型见 [`dev_paradigm.md`](references/dev_paradigm.md)；深模块见 [`deep_modules.md`](references/deep_modules.md)；UI 默认审美见 [`frontend_aesthetic.md`](references/frontend_aesthetic.md)；UI 手艺见 [`frontend_craft.md`](references/frontend_craft.md)；API 见 [`api_engineering.md`](references/api_engineering.md)。
+7. **按路径设计与顶置契约切片**：L 须 1→2→3；选型（阶段 1）与架构（阶段 2）强制在**文档顶部 1～35 行置顶 `[VIBE_CONTRACT]` 机器执行契约**，隔离下半部人类论证与落选废案；涉及垂直领域 SDK（如 Gemini 大模型 API/Live、Android、Chrome 扩展 MV3）时必须建立防腐层（Adapter）；阶段 3（DB/API/六元组）保持**天然人机同构不拆分**；阶段 4 `task_context_pack` 编译装配 Vibe Spec + `[VIBE_CONTRACT]` 置顶切片。范式选型见 [`dev_paradigm.md`](references/dev_paradigm.md)；深模块见 [`deep_modules.md`](references/deep_modules.md)；UI 默认审美见 [`frontend_aesthetic.md`](references/frontend_aesthetic.md)；UI 手艺见 [`frontend_craft.md`](references/frontend_craft.md)（融合 Modern Web Guidance 铁律）；API 见 [`api_engineering.md`](references/api_engineering.md)。
 8. **路径内单向门禁**：L=`0→1→2→3→4→5→6`；M/S 按 right_sizing。
 9. **设计多问 / 实现少问**：`DESIGN` = 审讯式澄清（跳过受 §4 收紧）；`IMPLEMENT` 仅四条件闸门才问（[`confidence_decision.md`](references/confidence_decision.md)）。实现中暴露产品空白 → 回切 DESIGN。
 10. **续做 = plan_log + change_log**：语义「继续」→ `process_log.py resume-scan`；**回退不依赖 git** → `process_log.py rollback`（[`process_continuity.md`](references/process_continuity.md)）。
 11. **状态机合法迁移**：禁止跳步；终态重开仅回退 `--force`（[`task_state_machine.md`](references/task_state_machine.md)）。
-12. **实现必测**：确认 seam → 垂直切片红绿重构（[`testing.md`](references/testing.md)）；阶段 6 / 提交前测试必须绿。改文件前先 `process_log.py checkpoint`。
+12. **实现必测与运行态干净**：确认 seam → 垂直切片红绿重构（[`testing.md`](references/testing.md)）；阶段 6 / 提交前测试必须绿；前端集成 Chrome DevTools CDP 自动化排查、WCAG a11y 审计与 LCP/内存泄漏诊断门禁。改文件前先 `process_log.py checkpoint`。
 13. **学习/偏好**：`~/.hs-dev-skill/`；`global_index_db.py search`，禁止整目录通读。
 14. **模糊新技术/UI/架构**：GitHub 高星对标 ≥2；范式见 `dev_paradigm`；深模块见 `deep_modules`；前端结构见 `frontend_arch`；后端见 `backend_arch`；复杂域才读 `ddd_design`（远程按需）。
 15. **三端**：`pathlib` + `python3`/`python`/`py -3`（[`cross_platform.md`](references/cross_platform.md)）。

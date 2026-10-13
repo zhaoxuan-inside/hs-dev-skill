@@ -60,16 +60,24 @@ python scripts/rule_fetch.py resolve --id vercel.react-rules --rule async-parall
 
 ---
 
-## 4. 可访问、响应式与 Web 合规（底线）
+## 4. 可访问、现代 Web 标准与合规（底线 · 融合 Modern Web Guidance）
 
-- 对比度：正文 ≥ 4.5:1；大字 ≥ 3:1；不单靠颜色传达状态。
-- 键盘可走完主路径；可见 `:focus-visible`（禁止无替代的 `outline: none`）；尊重 `prefers-reduced-motion`。
-- 移动优先；关键断点自测约 320 / 768 / 1024；触控目标舒适（约 ≥44px）；注意 `safe-area`。
-- 表单：可见 label、`autocomplete`/正确 `type`；错误贴字段；提交后焦点首错；勿禁粘贴。
-- 图片给宽高防 CLS；首屏外 `loading="lazy"`；长列表考虑虚拟化。
-- 排版细节：加载文案用 `…`；数字列 `tabular-nums`；标题可 `text-wrap: balance`。
+- **现代 UI 与原生组件（反陈旧 Hack）**：
+  - 弹窗与浮层必须使用原生 `<dialog>` 或 **Popover API**（自动处理顶层渲染 Top-layer、焦点陷阱 Focus Trap 与 Light Dismiss，禁止手写易漏焦点缺陷的 `z-index: 9999` div 遮罩）；
+  - 响应式组件优先使用 **Container Queries (`@container`)** 实现内聚容器查询，而非粗暴监听全局窗口视口断点；
+  - 巧用 CSS **`:has()`** 关系伪类与 `:user-valid` / `:user-invalid` 状态，替代大量冗余 JS DOM 监听。
+- **视图过渡与流畅动效**：单页/跨页切换优先采用 **View Transitions API**（平滑布局变形，告别突兀闪烁）；滚动视差/渐入优先使用 CSS **Scroll-driven animations** 或 `IntersectionObserver`，严禁挂载昂贵的 `window.onscroll` 阻断主线程。
+- **资源与渲染性能（CWV 优化）**：
+  - 首屏核心图片标注 **`fetchpriority="high"`** 与明确 `width`/`height`（严格防范 LCP 迟滞与 CLS 布局抖动）；首屏外强制 `loading="lazy"` + `decoding="async"`；
+  - 接口请求与大数据渲染优先结合 **Streams API** 与轻量 Web Worker，大列表强制虚拟滚动。
+- **可访问性（a11y）底线**：
+  - 对比度：正文 ≥ 4.5:1；大字 ≥ 3:1；不单靠颜色传达状态；
+  - 键盘可走完主路径；可见 `:focus-visible`（禁止无替代的 `outline: none`）；尊重 `prefers-reduced-motion`；
+  - 移动优先；关键断点自测约 320 / 768 / 1024；触控目标舒适（约 ≥44px）；注意 `safe-area`；
+  - 表单：可见 label、`autocomplete`/正确 `type`；错误贴字段；提交后焦点首错；勿禁粘贴；
+  - 排版细节：加载文案用 `…`；数字列 `tabular-nums`；标题可 `text-wrap: balance`。
 
-合规复审：`resolve --id vercel.web-interface`。
+合规复审：`resolve --id vercel.web-interface` · 遵循 Modern Web Guidance 最新标准。
 
 ---
 

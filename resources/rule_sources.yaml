@@ -16,20 +16,20 @@ sources:
   - id: local.frontend.core
     kind: local
     path: references/frontend_craft.md
-    tags: [UI, frontend, a11y, design, React, anti-slop, motion]
-    when: 改 UI/组件/页面手艺 — 本地高频（先 aesthetic / DESIGN.md）
+    tags: [UI, frontend, a11y, design, React, anti-slop, motion, modern-web-guidance]
+    when: 改 UI/组件/页面手艺与现代 Web 规范（融合 Modern Web Guidance）— 本地高频（先 aesthetic / DESIGN.md）
 
   - id: local.testing
     kind: local
     path: references/testing.md
-    tags: [test, TDD, seam, quality, 测试, 质量]
-    when: 实现/门禁 — 测试方法一等公民
+    tags: [test, TDD, seam, quality, 测试, 质量, devtools, chrome-devtools, a11y, memory-leak, lcp]
+    when: 实现/门禁 — 测试方法一等公民与运行态 DevTools/CWV 审计
 
   - id: local.deep.modules
     kind: local
     path: references/deep_modules.md
-    tags: [module, seam, adapter, depth, architecture, 深模块, 重构]
-    when: 模块接口 / 可测性 / 日常重构对话
+    tags: [module, seam, adapter, depth, architecture, 深模块, 重构, SDK防腐]
+    when: 模块接口 / 可测性 / 外部 SDK 防腐 Adapter / 日常重构对话
 
   - id: local.grill
     kind: local
@@ -46,8 +46,8 @@ sources:
   - id: local.product.prototype
     kind: local
     path: references/product_prototype.md
-    tags: [原型, 线框, ASCII, Mermaid, 四态, prototype, wireframe, UX]
-    when: 阶段 0 双轨高表现力原型（Mermaid 拓扑 + ASCII 比例线框 + 页面四态）
+    tags: [原型, 线框, ASCII, Mermaid, 四态, prototype, wireframe, UX, openpencil, generative-ui]
+    when: 阶段 0 双轨高表现力原型（Mermaid 拓扑 + ASCII 比例线框 + OpenPencil / Generative UI 页面四态）
 
   - id: local.product.roadmap
     kind: local

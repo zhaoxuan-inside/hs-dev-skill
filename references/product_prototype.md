@@ -18,19 +18,19 @@
 4. **用户未提供 → Agent 生成**；不得空着进选型/编码。  
 5. **三位一体原型表达（字符拓扑 + 物理标注 + 可交互 HTML 预览）**：
    - **轨 1（Mermaid 空间与交互拓扑）**：清晰表达页面壳层划分、多端布局容器（Web 栅格 / 桌面多窗格 / 移动端纵向流）、抽屉/弹窗唤起路径与导航跳转；
-   - **轨 2（ASCII 空间比例线框图）**：以字符网格精准还原首屏视觉层级（Primary/Secondary/Tertiary）、按钮具体文案、表格列与留白比例，内联物理参数标注（字阶/间距/Tokens）；
-   - **轨 3（单文件可交互 HTML 预览 · 开发者可视化确认真理源）**：
+   - **轨 2（ASCII 空间比例线框图 · 融合 OpenPencil PenNode 语义）**：以字符网格精准还原首屏视觉层级（Primary/Secondary/Tertiary）、按钮具体文案、表格列与留白比例，内联物理参数标注（字阶/间距/Tokens）；针对专业设计交付场景，兼容 **OpenPencil PenNode Schema** 规范（Frame / Text / Component 语义层级与矢量坐标约束），支持批量设计 DSL 表达；
+   - **轨 3（单文件可交互 HTML 预览 · 融合 Generative UI 动态仿真）**：
      - **落盘路径**：`hs_dev_docs/_01_product_design/_03_product_figma/{feature}_prototype.html`（基于 `prototype_html_template.html` 生成）；
      - **极简独立**：零外部构建依赖，内联 Tailwind CDN + Google Fonts + 品牌 Tokens；
      - **多端视口仿真**：顶部自带 1440px 桌面端 / 768px 平板 / 390px 移动端单键切换；
-     - **页面四态切换**：一键切换正常数据态 (Populated)、空白引导态 (FTUE)、加载骨架态 (Loading)、异常错误态 (Error)；
+     - **动态交互与页面四态**：融合 Generative UI 交互组件规范，一键切换正常数据态 (Populated)、空白引导态 (FTUE)、加载骨架态 (Loading)、异常错误态 (Error)，支持表单与微动效的实时交互走查；
      - **真机/浏览器直读**：开发者直接在浏览器双击打开或本地预览，所见即所得进行可视化核准。
 6. **开发者可视化确认机制 (Developer Visual Confirmation Gate)**：进入阶段 1 选型与代码开发前，开发者必须基于 HTML 预览与字符/Mermaid 线框完成可视化确认签收（Visual Sign-off），杜绝盲目编码与返工。
 7. **S**：无 UI 语义变更可不写原型；一旦改布局/主路径 → 升 M 并补原型。
 
 落盘：
-- 文档规约：`hs_dev_docs/_01_product_design/_03_product_figma/{feature}_prototype.md`（含 Tokens、Mermaid、ASCII 标注、签收单）
-- 可视化原型：`hs_dev_docs/_01_product_design/_03_product_figma/{feature}_prototype.html`（可交互多端四态 HTML 预览）
+- 文档规约：`hs_dev_docs/_01_product_design/_03_product_figma/{feature}_prototype.md`（含 Tokens、Mermaid、ASCII 标注、OpenPencil 节点映射、签收单）
+- 可视化原型：`hs_dev_docs/_01_product_design/_03_product_figma/{feature}_prototype.html`（可交互多端四态 HTML 预览，内嵌 Generative UI 交互部件）
 
 
 ---

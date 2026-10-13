@@ -5,18 +5,18 @@
 
 **质量铁律**：测试未绿禁止 Commit；分步红绿通过才算该切片完成。
 
-## 1. 九级质量保障分层
+## 1. 九级质量保障分层（融合 DevTools / a11y / 性能审计）
 
 | 目录分层 | 测试类型 | 门禁与覆盖率要求 |
 |---|---|---|
-| `test/_00_e2e` | 端到端全链路冒烟测试 | 主流程用例 100% 通过；致命异常链路 100% 覆盖 |
+| `test/_00_e2e` | 端到端全链路冒烟与运行态测试 | 主流程用例 100% 通过；致命异常链路 100% 覆盖；**集成 Chrome DevTools CDP 自动化**：真实/无头浏览器 Console 错误与未捕获 Promise 异常 100% 清零，关键网络请求 0 挂起 |
 | `test/_01_method_test` | 方法级单元测试 | 核心业务逻辑分支覆盖率 ≥ 85%；降级（Fallback）与补偿（Compensate）逻辑 100% 覆盖 |
 | `test/_02_integration_test` | 数据库/中间件/RPC 联调测试 | 事务原子性、分布式补偿生效、超时熔断与重试正常生效 |
 | `test/_03_contract_test` | 多端/服务契约测试 | 接口请求与响应字段必须与 `_13_mock_contract/` 中的 Schema 严格一致 |
 | `test/_04_regression_test` | 历史缺陷回归测试 | 历史已知缺陷库中的所有用例持续 100% 通过 |
-| `test/_05_performance_test` | 性能基准测试 | 核心接口响应耗时 P99、吞吐量（QPS）不得发生明显劣化 |
+| `test/_05_performance_test` | 性能基准与 CWV 指标测试 | 核心接口响应耗时 P99、QPS 无劣化；**集成 LCP/内存泄漏诊断**：LCP ≤ 2.5s（关键资源预加载）、前端 SPA 路由切换与长任务下**无游离 DOM 与事件监听内存泄漏**（Heap Snapshot 稳定） |
 | `test/_06_security_test` | 安全合规扫描 | SQL/NoSQL 注入、XSS、垂直/水平越权、敏感字段日志脱敏校验 |
-| `test/_07_compatibility_test`| 多端/多系统兼容测试 | 覆盖目标 OS、不同语言运行时与浏览器引擎矩阵 |
+| `test/_07_compatibility_test`| 多端兼容与无障碍（a11y）测试 | 覆盖目标 OS、不同语言运行时与浏览器引擎矩阵；**集成 a11y 审计**：WCAG 2.1 AA 对比度 ≥ 4.5:1、ARIA 属性合法性、键盘导航全路径闭环 |
 | `test/_08_test_data` | 测试数据集管理 | 数据脱敏合规，具备自动化初始化与重入清理机制 |
 
 ---
@@ -24,9 +24,10 @@
 ## 2. 提交前门禁自检（Pre-Commit Checklist）
 
 在执行 Git 提交或合并前，必须通过以下自检项：
-0. **测试全绿**：`make test`（或项目等价命令）PASS；触达 seam 的自动化测已存在（见 [`testing.md`](testing.md) §4）。
+0. **测试全绿与运行时干净**：`make test`（或项目等价命令）PASS；触达 seam 的自动化测已存在；**前端页面无未捕获 Console 报错与网络死锁**（Chrome DevTools 审计通过）。
 1. **死代码与孤儿方法扫描**：所有新增或修改的方法均在 `_07_call_chain` 中有合法引用路径，或具备白名单注解。
 2. **三同步完整性**：业务逻辑修改已同步更新方法设计文档、DB 迁移脚本（V/U）及单元/契约测试。
 3. **索引完整性**：新增/重命名/删除的文件已同步更新对应的 `.idx` 索引文件。
 4. **三文件一致性**：`_00_task.idx`、`_01_task_brief/`、`_02_task_detail/` 任务状态与元数据完全吻合。
-5. **Git Commit 规范**：提交信息符合 `<type>(<scope>): <subject>` 及相关 Footer 规范；默认仅本地 commit，**用户明确要求推送**时方可 `git push`。
+5. **专项体验与性能合规**：满足 WCAG a11y 关键对比度与键盘访问；无突出的 LCP 阻塞与内存泄漏隐患。
+6. **Git Commit 规范**：提交信息符合 `<type>(<scope>): <subject>` 及相关 Footer 规范；默认仅本地 commit，**用户明确要求推送**时方可 `git push`。

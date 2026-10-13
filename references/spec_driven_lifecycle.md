@@ -61,7 +61,7 @@
 
 #### 阶段 0A：微观特性探索与双视图设计 (Feature Discovery & Dual Views)
 - **设计指南驱动**：深度遵循 [`product_design.md`](product_design.md)，显式声明 `Inherits: /DESIGN.md`，先完成**产品探索五步推演**（Status Quo 现状痛点、JTBD 用户雇佣任务、Aha Moment 惊喜时刻、FTUE 首分钟冷启动体验、2～3 种交互形态方案 Trade-offs 比选）；
-- **支柱一：特性级交互流与原型 (Interaction & Prototyping)**：承袭全局 Tokens，落实 **UX 认知心理学四定律**（渐进式披露、视觉扫视层级、费茨与希克定律、真实微文案规范）、核心组件六态规范、**双轨多态原型（Mermaid 拓扑 + ASCII 空间比例线框，覆盖 Empty/Loading/Populated/Error 四态）**；
+- **支柱一：特性级交互流与原型 (Interaction & Prototyping)**：承袭全局 Tokens，落实 **UX 认知心理学四定律**（渐进式披露、视觉扫视层级、费茨与希克定律、真实微文案规范）、核心组件六态规范、**双轨多态原型（Mermaid 拓扑 + ASCII 空间比例线框，覆盖 Empty/Loading/Populated/Error 四态，融合 OpenPencil PenNode 矢量层级与 Generative UI 动态部件仿真）**；
 - **支柱二：特性功能规格与双视图 (Features & Dual Views)**：
   - **【视图一：面向人】** `{feature}_prd.md`：痛点叙事、方案论证、业务规则矩阵、端到端旅程、Gherkin (`Given/When/Then`) 验收断言；
   - **【视图二：面向 VibeCoding】** `{feature}_vibe_spec.md`：高信息密度 YAML 契约（继承 `/DESIGN.md`、Tokens 代码映射、DOM 骨架、状态机、字段规则、硬护栏），供 AI 编码无噪音直读；
@@ -133,6 +133,7 @@
 - 从性能、开发成本、可维护性、团队技术栈契合度等维度打分评估（含置信度）；
 - 推荐首选方案并阐述理由；**与现有栈一致或大家通用的最优解直接选定并在顶部写入 `[VIBE_CONTRACT]` 与对应 ADR**；
 - 选型结论必须可追溯到已冻结 PRD 的约束与 DoD；
+- 涉及垂直领域 SDK 或外部平台依赖（如大模型 API/Live 流式、Android 原生、浏览器扩展 MV3）时，必须评估防腐层（Adapter）与版本适配方案，禁止外部不可控依赖直连业务核心；
 - 仅当影响面广、项目特有、资料与全局偏好未提及且顶部分数接近时，结构化询问开发者；答复后更新全局偏好账本；
 - 若选型暴露产品语义未决：**回退阶段 0**，闭合后再继续。
 
@@ -173,7 +174,7 @@
 ## 阶段 3：详细规格设计四要素 (Detailed Spec Design)
 
 ### 1. 核心目标
-L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范式见 `dev_paradigm.md`；DDD 档见 `ddd_design.md`；后端见 `backend_arch.md`；前端结构见 `frontend_arch.md`；接口见 `api_engineering.md`；UI 手艺/视觉见 `frontend_craft.md` / `design_md.md`。
+L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范式见 `dev_paradigm.md`；DDD 档见 `ddd_design.md`；后端见 `backend_arch.md`；前端结构见 `frontend_arch.md`；接口见 `api_engineering.md`；UI 手艺/视觉见 `frontend_craft.md` / `design_md.md`（**强制遵循 Modern Web Guidance 最新标准**：原生 Dialog/Popover、Container Queries、CSS `:has()`、Fetch Priority 与流式传输规范）。
 **人机同构原则**：阶段 3 产出的 SQL DDL、接口 Schema、六元组签名和调用链时序图本身即为高度精确的工程语言，**保持单文件天然人机同构，绝不额外拆分**。
 
 ### 2. 四维产出物
@@ -228,7 +229,7 @@ L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范�
 执行严格的提交前质量门禁自检，保障零死代码、零破坏性迁移、零索引漂移。
 
 ### 2. 自检动作
-1. **运行全量测试**：`make test` 确保 100% PASS。
+1. **运行全量测试与运行态走查**：`make test` 确保 100% PASS；前端工程结合 Chrome DevTools CDP 自动化排查，确保无未捕获 Console 报错与网络死锁，满足 WCAG a11y 对比度与 LCP/内存泄漏安全线。
 2. **运行一致性门禁检查**：`python3 scripts/verify_consistency.py --root .`。
 3. **运行死代码与孤儿方法扫描**：`python3 scripts/dead_code_scanner.py --root .`。
 4. **流转任务状态并归档**：`python3 scripts/task_manager.py status --id {task_id} --set COMPLETED`（自动归档至 `_00_task_archive.idx`）。
