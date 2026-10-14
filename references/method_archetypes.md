@@ -148,3 +148,6 @@ flowchart TD
    - 当需求为“调整折算规则”时，AI 查阅 `_06_method_design` 仅加载 `calc.ts`（L20-L45），**无需加载包含几百行 Tailwind 类名的 React 组件**，Token 节约 90%。
 3. **0 DOM 依赖的高速单测**：
    - 核心业务纯函数（`ALGO` / `TRANSFORM` / `STATE` / `GUARD`）脱离浏览器 DOM 与 JSDOM 运行，`vitest run` 0.2 秒反馈，形成即时红绿闭环。
+
+### 前端方法文档模板标准：
+前端方法设计文档模板见 [`resources/templates/hs_dev_docs/frontend_method_design.md`](../resources/templates/hs_dev_docs/frontend_method_design.md)。前端核心方法必须落盘到 `hs_dev_docs/_06_method_design/_02_{feature}/_01_{method_name}_design.md`，明确标记 `0 DOM 依赖` 测试环境与具体行号范围。

@@ -185,10 +185,10 @@ L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范�
 2. **接口契约设计 (Interface Design)**：
    - 接口文档：`_05_interface_design/_01_{model}/_01_{api}_design.md`（错误码、分页、幂等）；
    - Mock 契约：`_00_project/_13_mock_contract/{contract_name}.json`。
-3. **六元组方法设计与契约画像 (Method Archetypes & Six-Tuple Design)**：
-   - 方法设计：`_06_method_design/_01_{model}/_01_{method}_design.md`（遵循 [`method_archetypes.md`](method_archetypes.md) 规范）；
-   - 包含：六元组主方法、`_compensate`、`_fallback`、`_metrics`、`_recall`；
-   - 登记：**代码物理定位（行号与行数）、7 大方法类型（TRANSFORM/ALGO/GUARD/STATE/ORCHESTRATE/ADAPTER/PRESENT）、敏感度及理由、副作用及具体表现、精准跑测命令、以本方法为中心的局部依赖图与三段式历史修改记录**。
+3. **六元组与前端方法设计契约画像 (Method Archetypes & Contract Design)**：
+   - 后端方法设计：`_06_method_design/_01_{model}/_01_{method}_design.md`（六元组主方法、`_compensate`、`_fallback`、`_metrics`、`_recall`，模板见 `method_design.md`）；
+   - 前端方法设计：`_06_method_design/_02_{feature}/_01_{method}_design.md`（纯计算 ALGO、转换 TRANSFORM、策略 GUARD、状态 STATE、Hook 编排 ORCHESTRATE、适配 ADAPTER，模板见 `frontend_method_design.md`）；
+   - 登记标准：**代码物理定位（行号与行数）、7 大方法类型、敏感度及理由、副作用及具体表现、0 DOM 依赖/精准跑测命令、以本方法为中心的局部依赖图与三段式历史修改记录**（遵循 [`method_archetypes.md`](method_archetypes.md) 规范）。
 4. **调用链拓扑分析 (Call Chain)**：
    - `_07_call_chain/_01_{source}/_01_{source}_call_chain.md`。
 
