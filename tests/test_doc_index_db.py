@@ -43,9 +43,15 @@ class TestDocIndexDB(unittest.TestCase):
 
     def test_db_path_under_docs_index(self):
         p = db_path_for_root(self.root)
-        self.assertTrue(str(p).replace("\\", "/").endswith(
-            "hs_dev_docs/_00_project/_18_doc_index/doc_index.sqlite"
-        ))
+        self.assertTrue(
+            any(
+                str(p).replace("\\", "/").endswith(suffix)
+                for suffix in [
+                    "hs_dev_docs/_00_project_foundation/_05_doc_index/doc_index.sqlite",
+                    "hs_dev_docs/_00_project/_18_doc_index/doc_index.sqlite",
+                ]
+            )
+        )
 
     def test_rebuild_search_slice_cross_platform_paths(self):
         db = DocIndexDB(self.root)

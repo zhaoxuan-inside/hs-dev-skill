@@ -23,7 +23,8 @@ from hs_paths import ensure_utf8_stdout
 from idx_manager import IdxManager, calculate_digest
 
 # 相对仓库根：权威文档树下的可重建缓存（勿手改）
-DB_REL_DIR = Path("hs_dev_docs") / "_00_project" / "_18_doc_index"
+DB_REL_DIR = Path("hs_dev_docs") / "_00_project_foundation" / "_05_doc_index"
+DB_LEGACY_REL_DIR = Path("hs_dev_docs") / "_00_project" / "_18_doc_index"
 DB_FILE_NAME = "doc_index.sqlite"
 SUMMARY_MAX = 480
 BODY_MAX = 12000
@@ -32,7 +33,13 @@ SLICE_MAX_LINES = 80
 
 
 def db_path_for_root(workspace_root: Path) -> Path:
-    return (workspace_root / DB_REL_DIR / DB_FILE_NAME).resolve()
+    p_new = workspace_root / DB_REL_DIR / DB_FILE_NAME
+    p_old = workspace_root / DB_LEGACY_REL_DIR / DB_FILE_NAME
+    if p_new.parent.exists():
+        return p_new.resolve()
+    if p_old.parent.exists():
+        return p_old.resolve()
+    return p_new.resolve()
 
 
 def _posix_rel(path: Path, root: Path) -> str:
@@ -457,30 +464,48 @@ class DocIndexDB:
             if p.is_file():
                 yield p
 
-        # 扫描 _06_method_design 下所有可能未在 .idx 中登记的方法设计文档
-        method_dir = self.docs_root / "_06_method_design"
-        if method_dir.exists():
-            for p in sorted(method_dir.rglob("*.md")):
-                if p.is_file():
-                    yield p
+        # 扫描方法设计目录（兼容新旧结构）
+        for method_dir in [
+            self.docs_root / "_04_engineering_contract" / "_04_method_design",
+            self.docs_root / "_06_method_design",
+        ]:
+            if method_dir.exists():
+                for p in sorted(method_dir.rglob("*.md")):
+                    if p.is_file():
+                        yield p
 
     def _model_from_path(self, rel_posix: str) -> str:
         parts = rel_posix.split("/")
         for p in parts:
             if re.match(r"^_\d+_.+", p) and p not in {
+                "_00_project_foundation",
+                "_01_product_vision",
+                "_02_feature_spec",
+                "_03_architecture_design",
+                "_04_engineering_contract",
+                "_05_task_orchestration",
+                "_06_dev_process",
                 "_00_project",
                 "_01_product_design",
                 "_02_tech_select",
-                "_03_architecture_design",
                 "_04_db_schema",
                 "_05_interface_design",
                 "_06_method_design",
                 "_07_call_chain",
                 "_08_dev_process",
+                "_01_db_schema",
+                "_02_interface_design",
+                "_03_mock_contract",
+                "_04_method_design",
+                "_05_call_chain",
             }:
                 # _01_payment -> payment
                 m = re.match(r"^_\d+_(.+)$", p)
-                if m and m.group(1) not in {"product_design", "task_brief", "task_detail", "task_context_pack"}:
+                if m and m.group(1) not in {
+                    "product_design", "task_brief", "task_detail", "task_context_pack",
+                    "design_charter", "phased_roadmap", "human_prd", "vibe_spec",
+                    "system_architecture", "plan_log", "change_log", "verify_log"
+                }:
                     return m.group(1)
         return ""
 

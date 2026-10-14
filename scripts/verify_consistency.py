@@ -117,13 +117,18 @@ class ConsistencyVerifier:
     def _check_task_consistency(self):
         """检查 _00_task.idx、task_brief 与 task_detail 三文件一致性"""
         print("  -> Checking Task Triple-File Consistency...")
-        task_idx_file = self.docs_root / "_08_dev_process/_09_task/_00_task.idx"
+        task_root_dir = self.docs_root / "_05_task_orchestration"
+        task_idx_file = task_root_dir / "_00_task.idx"
+        if not task_idx_file.exists():
+            task_root_dir = self.docs_root / "_08_dev_process/_09_task"
+            task_idx_file = task_root_dir / "_00_task.idx"
+
         if not task_idx_file.exists():
             return
 
         mgr = IdxManager(str(task_idx_file))
-        brief_dir = self.docs_root / "_08_dev_process/_09_task/_01_task_brief"
-        detail_dir = self.docs_root / "_08_dev_process/_09_task/_02_task_detail"
+        brief_dir = task_root_dir / "_01_task_brief"
+        detail_dir = task_root_dir / "_02_task_detail"
 
         # 聚合所有 task_brief 内容
         brief_contents = ""
@@ -151,7 +156,7 @@ class ConsistencyVerifier:
 
             # 2. 检查 task_detail
             rel_path = entry.get("path")
-            target_detail = self.docs_root / "_08_dev_process/_09_task" / rel_path
+            target_detail = task_root_dir / rel_path
             if not target_detail.exists():
                 self.errors.append(f"[TASK CONSISTENCY] Task '{task_id}' detail file missing: {rel_path}")
             else:
@@ -171,10 +176,14 @@ class ConsistencyVerifier:
 
             # context_pack 同步检查 change_size
             cp_path = (
-                self.docs_root
-                / "_08_dev_process/_09_task"
+                task_root_dir
                 / f"_03_task_context_pack/_01_{task_id}/_00_context_pack.md"
             )
+            if not cp_path.exists():
+                cp_path = (
+                    task_root_dir
+                    / f"_03_task_context_pack/{task_id}_context_pack.md"
+                )
             if cp_path.exists():
                 cp_text = cp_path.read_text(encoding="utf-8")
                 if not re.search(r"- \*\*change_size\*\*：`([SML])`", cp_text):
@@ -230,14 +239,15 @@ class ConsistencyVerifier:
     def _check_doc_index_db(self):
         """检查 SQLite 文档索引缓存；缺失则告警（不阻断，因可 rebuild）"""
         print("  -> Checking Doc Index DB (SQLite cache)...")
-        db_file = self.docs_root / "_00_project" / "_18_doc_index" / "doc_index.sqlite"
+        db_file = self.docs_root / "_00_project_foundation" / "_05_doc_index" / "doc_index.sqlite"
+        if not db_file.exists():
+            db_file = self.docs_root / "_00_project" / "_18_doc_index" / "doc_index.sqlite"
         idx_files = list(self.docs_root.rglob("*.idx"))
         if not idx_files:
             return
         if not db_file.exists():
             self.warnings.append(
-                "[DOC INDEX] Missing hs_dev_docs/_00_project/_18_doc_index/doc_index.sqlite — "
-                "run: python scripts/doc_index_db.py --root . rebuild"
+                "[DOC INDEX] Missing doc_index.sqlite — run: python scripts/doc_index_db.py --root . rebuild"
             )
             return
         try:
@@ -286,10 +296,12 @@ class ConsistencyVerifier:
         4. 事件命名动词原形漂移与时间戳混淆（如使用 order.update 或将 updated_at 命名为事件）。
         """
         print("  -> Checking Project Word Dictionary & Terminology Consistency...")
-        dict_file = self.docs_root / "_00_project" / "_02_project_word.dict.yaml"
+        dict_file = self.docs_root / "_00_project_foundation" / "_02_dictionary" / "_02_project_word.dict.yaml"
+        if not dict_file.exists():
+            dict_file = self.docs_root / "_00_project" / "_02_project_word.dict.yaml"
         if not dict_file.exists():
             self.warnings.append(
-                "[TERMINOLOGY WARNING] Missing hs_dev_docs/_00_project/_02_project_word.dict.yaml. "
+                "[TERMINOLOGY WARNING] Missing project word dictionary (_02_project_word.dict.yaml). "
                 "Ubiquitous language dictionary is strongly recommended."
             )
             return
@@ -365,6 +377,9 @@ class ConsistencyVerifier:
         # 扫描关键工程目录：DB 迁移、接口设计、方法设计、后端与前端源码
         if forbidden_map:
             scan_dirs = [
+                self.docs_root / "_04_engineering_contract" / "_01_db_schema",
+                self.docs_root / "_04_engineering_contract" / "_02_interface_design",
+                self.docs_root / "_04_engineering_contract" / "_04_method_design",
                 self.docs_root / "_04_db_schema",
                 self.docs_root / "_05_interface_design",
                 self.docs_root / "_06_method_design",

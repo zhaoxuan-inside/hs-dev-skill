@@ -50,11 +50,20 @@ class TaskManager:
     def __init__(self, workspace_root: str):
         self.root = Path(workspace_root).resolve()
         self.docs_root = self.root / "hs_dev_docs"
-        self.task_root = self.docs_root / "_08_dev_process/_09_task"
-        self.brief_dir = self.task_root / "_01_task_brief"
-        self.detail_dir = self.task_root / "_02_task_detail"
-        self.context_pack_dir = self.task_root / "_03_task_context_pack"
-        self.handoff_dir = self.docs_root / "_08_dev_process/_05_session_handoff"
+        if (self.docs_root / "_05_task_orchestration").exists() or not (self.docs_root / "_08_dev_process/_09_task").exists():
+            self.task_root = self.docs_root / "_05_task_orchestration"
+            self.brief_dir = self.task_root / "_01_task_brief"
+            self.detail_dir = self.task_root / "_02_task_detail"
+            self.context_pack_dir = self.task_root / "_03_task_context_pack"
+            self.archive_dir = self.task_root / "_04_task_archive"
+            self.handoff_dir = self.docs_root / "_06_dev_process/_06_session_handoff"
+        else:
+            self.task_root = self.docs_root / "_08_dev_process/_09_task"
+            self.brief_dir = self.task_root / "_01_task_brief"
+            self.detail_dir = self.task_root / "_02_task_detail"
+            self.context_pack_dir = self.task_root / "_03_task_context_pack"
+            self.archive_dir = self.task_root / "_04_task_archive"
+            self.handoff_dir = self.docs_root / "_08_dev_process/_05_session_handoff"
 
         self.task_idx_path = self.task_root / "_00_task.idx"
         self.archive_idx_path = self.task_root / "_00_task_archive.idx"
@@ -78,7 +87,7 @@ class TaskManager:
 
         mgr = IdxManager(str(self.task_idx_path))
         if not mgr.metadata:
-            mgr.init_idx("task_active", "_09_task")
+            mgr.init_idx("task_active", self.task_root.name)
 
         # 检查是否已存在
         for entry in mgr.entries:
@@ -408,7 +417,7 @@ class TaskManager:
         # 写入归档索引
         arch_mgr = IdxManager(str(self.archive_idx_path))
         if not arch_mgr.metadata:
-            arch_mgr.init_idx("task_archive", "_09_task")
+            arch_mgr.init_idx("task_archive", self.task_root.name)
 
         target_entry["status"] = final_status
         arch_mgr.entries.append(target_entry)
@@ -430,7 +439,7 @@ class TaskManager:
 
         mgr = IdxManager(str(self.task_idx_path))
         if not mgr.metadata:
-            mgr.init_idx("task_active", "_09_task")
+            mgr.init_idx("task_active", self.task_root.name)
         target["status"] = new_status
         target["updated_at"] = get_iso_timestamp()
         mgr.entries.append(target)

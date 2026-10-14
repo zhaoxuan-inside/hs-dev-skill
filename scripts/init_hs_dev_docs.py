@@ -44,47 +44,50 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
     if not env_example.exists():
         env_example.write_text("# Global Environment Variables Template\n# PORT=8080\n# DATABASE_URL=\n", encoding="utf-8")
 
-    # 2. hs_dev_docs 目录层级
+    # 2. hs_dev_docs 目录层级（一级功能 + 二级子功能严格按 _01_ 序号组织）
     doc_dirs = [
-        "_00_project/_01_dev_rule",
-        "_00_project/_03_code_map",
-        "_00_project/_04_context_pack_template",
-        "_00_project/_05_decision_record",
-        "_00_project/_06_known_issue",
-        "_00_project/_07_tech_debt",
-        "_00_project/_08_dev_command",
-        "_00_project/_09_dev_env",
-        "_00_project/_10_prompt_template",
-        "_00_project/_11_example_lib",
-        "_00_project/_12_test_strategy",
-        "_00_project/_13_mock_contract",
-        "_00_project/_14_observability_rule",
-        "_00_project/_15_security_rule",
-        "_00_project/_16_data_consistency_rule",
-        "_00_project/_17_git_commit_rule",
-        "_01_product_design/_01_business_plan",
-        "_01_product_design/_02_product_design",
-        "_01_product_design/_03_product_figma",
-        "_01_product_design/_04_phased_roadmap",
-        "_02_tech_select",
-        "_03_architecture_design",
+        # _00_project_foundation (基座)
+        "_00_project_foundation/_01_dev_rule",
+        "_00_project_foundation/_02_dictionary",
+        "_00_project_foundation/_03_decision_record",
+        "_00_project_foundation/_04_code_map",
+        "_00_project_foundation/_05_doc_index",
+
+        # _01_product_vision (功能一：愿景与定界)
+        "_01_product_vision/_01_design_charter",
+        "_01_product_vision/_02_phased_roadmap",
+        "_01_product_vision/_03_business_plan",
+
+        # _02_feature_spec (功能二：特性规格与原型契约)
+        "_02_feature_spec/_01_human_prd",
+        "_02_feature_spec/_02_vibe_spec",
+        "_02_feature_spec/_03_prototype_html",
+        "_02_feature_spec/_04_prototype_wireframe",
+
+        # _03_architecture_design (功能三：技术架构与蓝图)
+        "_03_architecture_design/_01_system_architecture",
         "_03_architecture_design/_02_pattern_clusters",
-        "_04_db_schema",
-        "_05_interface_design",
-        "_06_method_design",
-        "_07_call_chain",
-        "_08_dev_process/_01_plan_log",
-        "_08_dev_process/_02_change_log",
-        "_08_dev_process/_03_verify_log",
-        "_08_dev_process/_04_error_recovery/snapshots",
-        "_08_dev_process/_05_session_handoff",
-        "_08_dev_process/_06_todo",
-        "_08_dev_process/_07_iteration_debt_log",
-        "_08_dev_process/_08_next_step",
-        "_08_dev_process/_09_task/_01_task_brief",
-        "_08_dev_process/_09_task/_02_task_detail",
-        "_08_dev_process/_09_task/_03_task_context_pack",
-        "_00_project/_18_doc_index",
+        "_03_architecture_design/_03_adapter_spec",
+
+        # _04_engineering_contract (功能四：工程四要素详细契约)
+        "_04_engineering_contract/_01_db_schema",
+        "_04_engineering_contract/_02_interface_design",
+        "_04_engineering_contract/_03_mock_contract",
+        "_04_engineering_contract/_04_method_design",
+        "_04_engineering_contract/_05_call_chain",
+
+        # _05_task_orchestration (功能五：任务编排与上下文装载)
+        "_05_task_orchestration/_01_task_brief",
+        "_05_task_orchestration/_02_task_detail",
+        "_05_task_orchestration/_03_task_context_pack",
+        "_05_task_orchestration/_04_task_archive",
+
+        # _06_dev_process (功能六：开发过程与治理记录)
+        "_06_dev_process/_01_plan_log",
+        "_06_dev_process/_02_change_log",
+        "_06_dev_process/_03_verify_log",
+        "_06_dev_process/_04_error_recovery/snapshots",
+        "_06_dev_process/_05_tech_debt",
     ]
     for d in doc_dirs:
         (docs_root / d).mkdir(parents=True, exist_ok=True)
@@ -96,50 +99,57 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
     root_idx = docs_root / "_00_hs_dev_docs.idx"
     r_mgr = IdxManager(str(root_idx))
     r_mgr.init_idx("root", "hs_dev_docs")
-    r_mgr.add_entry("domain_project", "项目基础配置与规范域", "_00_project/_00_project.idx", auto_digest=False)
-    r_mgr.add_entry("domain_product", "产品需求与规划域", "_01_product_design/_00_product_design.idx", auto_digest=False)
-    r_mgr.add_entry("domain_tech", "技术选型域", "_02_tech_select/_00_tech_select.idx", auto_digest=False)
-    r_mgr.add_entry("domain_arch", "架构设计域", "_03_architecture_design/_00_architecture_design.idx", auto_digest=False)
-    r_mgr.add_entry("domain_db", "数据库与迁移域", "_04_db_schema/_00_db_schema.idx", auto_digest=False)
-    r_mgr.add_entry("domain_interface", "接口设计域", "_05_interface_design/_00_interface_design.idx", auto_digest=False)
-    r_mgr.add_entry("domain_method", "方法设计域", "_06_method_design/_00_method_design.idx", auto_digest=False)
-    r_mgr.add_entry("domain_call_chain", "调用链分析域", "_07_call_chain/_00_call_chain.idx", auto_digest=False)
-    r_mgr.add_entry("domain_process", "开发过程与任务域", "_08_dev_process/_00_dev_process.idx", auto_digest=False)
+    r_mgr.add_entry("domain_foundation", "项目基座与全局规范", "_00_project_foundation/_00_project_foundation.idx", auto_digest=False)
+    r_mgr.add_entry("domain_vision", "产品愿景与分阶段定界", "_01_product_vision/_00_product_vision.idx", auto_digest=False)
+    r_mgr.add_entry("domain_feature_spec", "特性详细规格与原型契约", "_02_feature_spec/_00_feature_spec.idx", auto_digest=False)
+    r_mgr.add_entry("domain_architecture", "系统架构设计与模式集群", "_03_architecture_design/_00_architecture_design.idx", auto_digest=False)
+    r_mgr.add_entry("domain_contract", "工程四要素详细契约", "_04_engineering_contract/_00_engineering_contract.idx", auto_digest=False)
+    r_mgr.add_entry("domain_task", "任务编排与极速装配", "_05_task_orchestration/_00_task_orchestration.idx", auto_digest=False)
+    r_mgr.add_entry("domain_process", "开发过程与治理审计", "_06_dev_process/_00_dev_process.idx", auto_digest=False)
 
-    # 各功能域索引
+    # 各一级功能域索引
     domains = [
-        ("_00_project/_00_project.idx", "project", "_00_project"),
-        ("_01_product_design/_00_product_design.idx", "product_design", "_01_product_design"),
-        ("_02_tech_select/_00_tech_select.idx", "tech_select", "_02_tech_select"),
+        ("_00_project_foundation/_00_project_foundation.idx", "project_foundation", "_00_project_foundation"),
+        ("_01_product_vision/_00_product_vision.idx", "product_vision", "_01_product_vision"),
+        ("_02_feature_spec/_00_feature_spec.idx", "feature_spec", "_02_feature_spec"),
         ("_03_architecture_design/_00_architecture_design.idx", "architecture_design", "_03_architecture_design"),
-        ("_04_db_schema/_00_db_schema.idx", "db_schema", "_04_db_schema"),
-        ("_05_interface_design/_00_interface_design.idx", "interface_design", "_05_interface_design"),
-        ("_06_method_design/_00_method_design.idx", "method_design", "_06_method_design"),
-        ("_07_call_chain/_00_call_chain.idx", "call_chain", "_07_call_chain"),
-        ("_08_dev_process/_00_dev_process.idx", "dev_process", "_08_dev_process"),
+        ("_04_engineering_contract/_00_engineering_contract.idx", "engineering_contract", "_04_engineering_contract"),
+        ("_05_task_orchestration/_00_task_orchestration.idx", "task_orchestration", "_05_task_orchestration"),
+        ("_06_dev_process/_00_dev_process.idx", "dev_process", "_06_dev_process"),
     ]
     for rel_idx, cat, r_name in domains:
         mgr = IdxManager(str(docs_root / rel_idx))
         mgr.init_idx(cat, r_name)
 
-    # 任务体系索引
-    task_idx = docs_root / "_08_dev_process/_09_task/_00_task.idx"
+    # 二级子域索引（工程契约四要素）
+    sub_contract_domains = [
+        ("_04_engineering_contract/_01_db_schema/_00_db_schema.idx", "db_schema", "_01_db_schema"),
+        ("_04_engineering_contract/_02_interface_design/_00_interface_design.idx", "interface_design", "_02_interface_design"),
+        ("_04_engineering_contract/_04_method_design/_00_method_design.idx", "method_design", "_04_method_design"),
+        ("_04_engineering_contract/_05_call_chain/_00_call_chain.idx", "call_chain", "_05_call_chain"),
+    ]
+    for rel_idx, cat, r_name in sub_contract_domains:
+        mgr = IdxManager(str(docs_root / rel_idx))
+        mgr.init_idx(cat, r_name)
+
+    # 任务体系索引（位于 _05_task_orchestration）
+    task_idx = docs_root / "_05_task_orchestration/_00_task.idx"
     t_mgr = IdxManager(str(task_idx))
-    t_mgr.init_idx("task_active", "_09_task")
+    t_mgr.init_idx("task_active", "_05_task_orchestration")
 
-    task_archive_idx = docs_root / "_08_dev_process/_09_task/_00_task_archive.idx"
+    task_archive_idx = docs_root / "_05_task_orchestration/_00_task_archive.idx"
     ta_mgr = IdxManager(str(task_archive_idx))
-    ta_mgr.init_idx("task_archive", "_09_task")
+    ta_mgr.init_idx("task_archive", "_05_task_orchestration")
 
-    task_brief_idx = docs_root / "_08_dev_process/_09_task/_01_task_brief/_00_task_brief.idx"
+    task_brief_idx = docs_root / "_05_task_orchestration/_01_task_brief/_00_task_brief.idx"
     tb_mgr = IdxManager(str(task_brief_idx))
     tb_mgr.init_idx("task_brief", "_01_task_brief")
 
-    task_detail_idx = docs_root / "_08_dev_process/_09_task/_02_task_detail/_00_task_detail.idx"
+    task_detail_idx = docs_root / "_05_task_orchestration/_02_task_detail/_00_task_detail.idx"
     td_mgr = IdxManager(str(task_detail_idx))
     td_mgr.init_idx("task_detail", "_02_task_detail")
 
-    task_cp_idx = docs_root / "_08_dev_process/_09_task/_03_task_context_pack/_00_context_pack.idx"
+    task_cp_idx = docs_root / "_05_task_orchestration/_03_task_context_pack/_00_context_pack.idx"
     tcp_mgr = IdxManager(str(task_cp_idx))
     tcp_mgr.init_idx("task_context_pack", "_03_task_context_pack")
 
@@ -148,8 +158,8 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
     m_mgr = IdxManager(str(mock_idx))
     m_mgr.init_idx("mock_root", "mock")
 
-    # 4. 生成统一术语词典模板
-    dict_file = docs_root / "_00_project/_02_project_word.dict.yaml"
+    # 4. 生成统一术语词典模板（置于 _00_project_foundation/_02_dictionary）
+    dict_file = docs_root / "_00_project_foundation/_02_dictionary/_02_project_word.dict.yaml"
     if not dict_file.exists():
         tmpl_file = Path(__file__).resolve().parent.parent / "resources" / "templates" / "project_word.dict.yaml"
         if tmpl_file.exists():
@@ -162,7 +172,7 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
 
     # 4.1 若为已有项目反向重建 (from_existing)，探测技术栈并写入基线 ADR
     if from_existing:
-        adr_file = docs_root / "_00_project/_05_decision_record/ADR_001_tech_baseline.md"
+        adr_file = docs_root / "_00_project_foundation/_03_decision_record/ADR_001_tech_baseline.md"
         if not adr_file.exists():
             detected_stacks = []
             if (root / "package.json").exists():

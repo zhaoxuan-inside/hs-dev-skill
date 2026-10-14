@@ -87,13 +87,15 @@
 - **规模与复杂度客观评估 (Scale Assessment)**：量化评估交互复杂度（轻/中/高）、数据规则规模（简/中/复）、通信实时性要求，明确项目工程量级，为阶段 1 技术选型提供精准约束输入。
 
 ### 3. 产出文档（一源双视图 + 可交互 HTML 预览）
-- （可选）`hs_dev_docs/_01_product_design/_01_business_plan/…`
-- `hs_dev_docs/_01_product_design/_02_product_design/{feature_name}_prd.md`（【视图一：面向人】产品功能设计书，含痛点 JTBD/FTUE、方案比选、详细规格矩阵、交互逻辑流、Gherkin DoD 与规模评估）
-- `hs_dev_docs/_01_product_design/_02_product_design/{feature_name}_vibe_spec.md`（【视图二：面向 VibeCoding】机器执行契约，含 Tokens、组件树 DOM 骨架、状态机、字段约束字典、Gherkin 可测用例与机器硬护栏）
-- （有 UI）`hs_dev_docs/_01_product_design/_03_product_figma/{feature_name}_prototype.md`（【视图一规约：面向人】产品设计语言与双轨多态原型，包含 Tokens、UX 四定律、组件六态与 Mermaid + ASCII 四态线框，并同步项目根 `DESIGN.md`）
-- （有 UI）`hs_dev_docs/_01_product_design/_03_product_figma/{feature_name}_prototype.html`（【视图一高保真：面向开发者可视化核准】单文件可交互 HTML 预览，内联 Tailwind CDN + 多端 1440/768/390px 视口切换 + 四态无死角仿真）
-- `hs_dev_docs/_01_product_design/_04_phased_roadmap/{feature_name}_phased_plan.md`（《产品开发分阶段规划书》，包含 MVP 范围、人机交互对齐记录、MoSCoW 分级矩阵与路线图）
-- 更新 `_01_product_design/_00_product_design.idx`
+- （可选）`hs_dev_docs/_01_product_vision/_03_business_plan/…`
+- `hs_dev_docs/_01_product_vision/_01_design_charter/DESIGN.md`（项目根目录 `DESIGN.md` 归档）
+- `hs_dev_docs/_01_product_vision/_02_phased_roadmap/{feature_name}_phased_plan.md`（《产品开发分阶段规划书》，包含 MVP 范围、人机交互对齐记录、MoSCoW 分级矩阵与路线图）
+- `hs_dev_docs/_02_feature_spec/_01_human_prd/{feature_name}_prd.md`（【视图一：面向人】产品功能设计书，含痛点 JTBD/FTUE、方案比选、详细规格矩阵、交互逻辑流、Gherkin DoD 与规模评估）
+- `hs_dev_docs/_02_feature_spec/_02_vibe_spec/{feature_name}_vibe_spec.md`（【视图二：面向 VibeCoding】机器执行契约，含 Tokens、组件树 DOM 骨架、状态机、字段约束字典、Gherkin 可测用例与机器硬护栏）
+- `hs_dev_docs/_02_feature_spec/_03_prototype_html/{feature_name}_prototype.html`（【视图一高保真：面向开发者可视化核准】单文件可交互 HTML 预览，内联 Tailwind CDN + 多端 1440/768/390px 视口切换 + 四态无死角仿真）
+- `hs_dev_docs/_02_feature_spec/_04_prototype_wireframe/{feature_name}_prototype.md`（双轨多态线框与拓扑）
+- `hs_dev_docs/_00_project_foundation/_02_dictionary/_02_project_word.dict.yaml`（统一术语词典）
+- 更新 `_01_product_vision/_00_product_vision.idx` 与 `_02_feature_spec/_00_feature_spec.idx`
 
 ### 4. 阶段 0 冻结门禁（进入阶段 1 的硬前提）
 
@@ -104,10 +106,10 @@
 | **一源双视图齐套** | 存在面向人类的 `{feature}_prd.md`（+原型）与面向机器的 `{feature}_vibe_spec.md`，两者由同一设计数据提纯，无语义冲突； |
 | **产品探索与方案比选完备** | 明确定义了 Status Quo（现状痛点）、JTBD、Aha Moment、FTUE 冷启动引导及 ≥2 种核心交互形态的 Trade-offs 比选； |
 | **设计语言与 UX 定律完备** | 有 UI 时：具象调性定位清晰、Design Tokens 完整、落实 UX 认知四定律（渐进式披露/视觉层级/费茨希克/真实微文案）、核心组件六态定义完备； |
-| **功能与双轨交互完备** | 功能架构树、端到端旅程（含 FTUE）、详细规格矩阵清晰；双轨原型（Mermaid 拓扑 + ASCII 比例线框）覆盖页面四态（空/加载/正常/错误）；产品 DoD 采用 **Gherkin (`Given/When/Then`)** 从用户交互视角清晰可测； |
-| **分阶段规划与规模评估就绪** | 完成人机交互对齐，`_04_phased_roadmap/` 存在《产品开发分阶段规划书》，MVP 与演进阶段边界明确，完成客观规模评估； |
+| **功能与双轨交互完备** | 功能架构树、端到端旅程（含 FTUE）、详细规格矩阵清晰；双轨原型覆盖页面四态（空/加载/正常/错误）；产品 DoD 采用 **Gherkin (`Given/When/Then`)** 从用户交互视角清晰可测； |
+| **分阶段规划与规模评估就绪** | 完成人机交互对齐，`_02_phased_roadmap/` 存在《产品开发分阶段规划书》，MVP 与演进阶段边界明确，完成客观规模评估； |
 | **纯净无技术侵入** | 严格杜绝在阶段 0 文档中提前塞入底层技术选型、物理表 DDL、RPC 接口签名、Saga 补偿、代码单测覆盖率等研发实现细节； |
-| **多端原型与 HTML 齐套** | 有 UI：存在 `{feature}_prototype.md`（Mermaid + ASCII 标注）与可交互 `{feature}_prototype.html`（多端仿真 + 四态直读）；无 UI：PRD 已声明豁免； |
+| **多端原型与 HTML 齐套** | 有 UI：存在字符拓扑标注与可交互 HTML 原型（多端仿真 + 四态直读）；无 UI：PRD 已声明豁免； |
 | **开发者可视化确认签收** | 有 UI：开发者基于 HTML 原型与规约完成 6 大检查点审阅并签署《开发者可视化确认签收单》(APPROVED)，无技术实现阻断缺陷； |
 
 
@@ -138,8 +140,8 @@
 - 若选型暴露产品语义未决：**回退阶段 0**，闭合后再继续。
 
 ### 3. 产出文档
-- `hs_dev_docs/_02_tech_select/_{platform}_tech_select.md`（含顶部 `[VIBE_CONTRACT]` 契约块）
-- `hs_dev_docs/_00_project/_05_decision_record/ADR_{xxx}.md`（含顶部 `[VIBE_CONTRACT]` 契约块）
+- `hs_dev_docs/_03_architecture_design/_01_system_architecture/_{platform}_tech_select.md`（含顶部 `[VIBE_CONTRACT]` 契约块）
+- `hs_dev_docs/_00_project_foundation/_03_decision_record/ADR_{xxx}.md`（含顶部 `[VIBE_CONTRACT]` 契约块）
 - 必要时：`~/.hs-dev-skill/tech_learning/{tech}_notes.md`、更新 `~/.hs-dev-skill/preferences.yaml`
 - 更新对应 `.idx`
 
@@ -162,8 +164,9 @@
 - 仍不够 → `rule_fetch`：按范式选 `ciembor.*` / `wshobson.*` / `fsd.skill` 等。
 
 ### 3. 产出文档
-- `hs_dev_docs/_03_architecture_design/_{platform}_architecture_design.md`（含顶部 `[VIBE_CONTRACT]` 契约块 + 范式阶 + 模块/BC 与前端对齐表）
-- `hs_dev_docs/_00_project/_02_project_word.dict.yaml`
+- `hs_dev_docs/_03_architecture_design/_01_system_architecture/_{platform}_architecture_design.md`（含顶部 `[VIBE_CONTRACT]` 契约块 + 范式阶 + 模块/BC 与前端对齐表）
+- `hs_dev_docs/_03_architecture_design/_02_pattern_clusters/`（GoF 23 种设计模式协同集群档案）
+- `hs_dev_docs/_03_architecture_design/_03_adapter_spec/`（防腐层规约）
 - 更新对应 `.idx`
 
 ### 4. 阶段门禁
@@ -179,18 +182,18 @@ L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范�
 
 ### 2. 四维产出物
 1. **数据库设计与迁移 (DB Schema)**：
-   - 表结构设计：`_04_db_schema/_01_{model}/_01_{table}_design.md`（强制字段：`id`, `created_at`, `updated_at`, `description`, `is_del`, `version`，**严禁使用 SQL 关键字 `desc`**）；
+   - 表结构设计：`_04_engineering_contract/_01_db_schema/_01_{model}/_01_{table}_design.md`（强制字段：`id`, `created_at`, `updated_at`, `description`, `is_del`, `version`，**严禁使用 SQL 关键字 `desc`**）；
    - 前向脚本：`migrations/V1.0.0__init_{table}.sql`；
    - 回滚脚本：`migrations/U1.0.0__init_{table}.sql`（V/U 强制原子配对）。
 2. **接口契约设计 (Interface Design)**：
-   - 接口文档：`_05_interface_design/_01_{model}/_01_{api}_design.md`（错误码、分页、幂等）；
-   - Mock 契约：`_00_project/_13_mock_contract/{contract_name}.json`。
+   - 接口文档：`_04_engineering_contract/_02_interface_design/_01_{model}/_01_{api}_design.md`（错误码、分页、幂等）；
+   - Mock 契约：`_04_engineering_contract/_03_mock_contract/{contract_name}.json` 与 `mock/_06_test_profile/`。
 3. **六元组与前端方法设计契约画像 (Method Archetypes & Contract Design)**：
-   - 后端方法设计：`_06_method_design/_01_{model}/_01_{method}_design.md`（六元组主方法、`_compensate`、`_fallback`、`_metrics`、`_recall`，模板见 `method_design.md`）；
-   - 前端方法设计：`_06_method_design/_02_{feature}/_01_{method}_design.md`（纯计算 ALGO、转换 TRANSFORM、策略 GUARD、状态 STATE、Hook 编排 ORCHESTRATE、适配 ADAPTER，模板见 `frontend_method_design.md`）；
-   - 登记标准：**代码物理定位（行号与行数）、7 大方法类型、敏感度及理由、副作用及具体表现、0 DOM 依赖/精准跑测命令、以本方法为中心的局部依赖图与三段式历史修改记录**（遵循 [`method_archetypes.md`](method_archetypes.md) 规范）。
+   - 后端方法设计：`_04_engineering_contract/_04_method_design/_01_{model}/_01_{method}_design.md`（六元组主方法、`_compensate`、`_fallback`、`_metrics`、`_recall`，模板见 `method_design.md`）；
+   - 前端方法设计：`_04_engineering_contract/_04_method_design/_02_{feature}/_01_{method}_design.md`（纯计算 ALGO、转换 TRANSFORM、策略 GUARD、状态 STATE、Hook 编排 ORCHESTRATE、适配 ADAPTER，模板见 `frontend_method_design.md`）；
+   - 登记标准：**代码物理定位（实现后自动回填）、7 大方法类型、敏感度及理由、副作用及具体表现、0 DOM 依赖/精准跑测命令、以本方法为中心的局部依赖图与三段式历史修改记录**（遵循 [`method_archetypes.md`](method_archetypes.md) 规范）。
 4. **调用链拓扑分析 (Call Chain)**：
-   - `_07_call_chain/_01_{source}/_01_{source}_call_chain.md`。
+   - `_04_engineering_contract/_05_call_chain/_01_{source}/_01_{source}_call_chain.md`。
 
 ### 3. 阶段门禁
 路径要求的设计与 V/U（若触达 DB）及 `.idx` 齐套。骨架不询问；契约语义/业务字段/不可逆补偿若触询问闸门须先关闭。
@@ -200,7 +203,7 @@ L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范�
 ## 阶段 4：任务拆解与上下文装载 (Task Breakdown & Context Assembly)
 
 ### 1. 核心目标
-将经过评审的详细设计拆解为独立、原子、可验证的工程任务项，通过渐进式四级路由 / SQLite 检索，将各阶段的**机器执行契约切片**物化装配进 `_03_task_context_pack/{task_id}_context_pack.md`，充当面向 VibeCoding 的极速装载包。
+将经过评审的详细设计拆解为独立、原子、可验证的工程任务项，通过渐进式四级路由 / SQLite 检索，将各阶段的**机器执行契约切片**物化装配进 `_05_task_orchestration/_03_task_context_pack/{task_id}_context_pack.md`，充当面向 VibeCoding 的极速装载包。
 
 ### 2. Context Pack 机器装配法则 (VibeCoding Assembly Rules)
 1. **产品与 UI 契约**：优先装入阶段 0 的 **`{feature}_vibe_spec.md` 机器契约切片**（Design Tokens、组件树 DOM 骨架、状态机、Gherkin DoD），严禁整篇灌入人类版故事与讨论；

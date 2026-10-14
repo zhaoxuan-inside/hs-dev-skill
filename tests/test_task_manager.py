@@ -54,7 +54,9 @@ class TestTaskManager(unittest.TestCase):
         self.tm.set_status("order_create_test", "COMPLETED")
         self.assertTrue(verifier.check_all())
 
-        plan = self.root / "hs_dev_docs/_08_dev_process/_01_plan_log/order_create_test_plan.md"
+        plan = self.root / "hs_dev_docs/_06_dev_process/_01_plan_log/order_create_test_plan.md"
+        if not plan.exists():
+            plan = self.root / "hs_dev_docs/_08_dev_process/_01_plan_log/order_create_test_plan.md"
         self.assertTrue(plan.exists())
 
     def test_illegal_transition_rejected(self):
@@ -70,7 +72,9 @@ class TestTaskManager(unittest.TestCase):
     def test_create_defaults_change_size_m(self):
         res = self.tm.create_task("task_size_default", "默认分级")
         self.assertEqual(res["change_size"], "M")
-        brief_dir = self.root / "hs_dev_docs/_08_dev_process/_09_task/_01_task_brief"
+        brief_dir = self.root / "hs_dev_docs/_05_task_orchestration/_01_task_brief"
+        if not brief_dir.exists():
+            brief_dir = self.root / "hs_dev_docs/_08_dev_process/_09_task/_01_task_brief"
         brief_text = "\n".join(p.read_text(encoding="utf-8") for p in brief_dir.glob("*.md"))
         self.assertIn("**change_size**：`M`", brief_text)
 
@@ -87,7 +91,9 @@ class TestTaskManager(unittest.TestCase):
         # 模拟「旧任务缺分级」时内容已改过：同步 digest，门禁应仅 warning 不 fail
         from idx_manager import IdxManager
 
-        idx_path = self.root / "hs_dev_docs/_08_dev_process/_09_task/_00_task.idx"
+        idx_path = self.root / "hs_dev_docs/_05_task_orchestration/_00_task.idx"
+        if not idx_path.exists():
+            idx_path = self.root / "hs_dev_docs/_08_dev_process/_09_task/_00_task.idx"
         IdxManager(str(idx_path)).update_digest()
         verifier = ConsistencyVerifier(str(self.root))
         self.assertTrue(verifier.check_all())

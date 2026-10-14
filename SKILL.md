@@ -11,13 +11,13 @@ license: MIT
 compatibility: Requires Python >= 3.8 (stdlib sqlite3; Win/Linux/macOS)
 metadata:
   author: hardstone
-  version: "2.39"
+  version: "2.40"
 ---
 
 # 产品开发 Skill (hs-dev-skill)
 
-版本：v2.39  
-核心定位：**全场景意图路由（BUILD 从零构建 · REVERSE 存量反向重建 · FIX 系统化调试 · REFACTOR 行为等价重构 · EXPLORE 只读代码理解 · RESUME 任务续做）+ 质量优先（分步正确 + 测试一等公民 · 测试零报错硬阻断交付 · 静态检测零告警零错误 · 数据驱动测试 DDT 与双轨制 E2E 规约 · 多语言编码规范与 Linter 门禁矩阵 · 全局统一术语与防歧义词典 Ubiquitous Language / 词态矩阵 Command/Event/Attribute / Search-Before-Name / 零裸字符串 Zero Magic Strings）+ 文档驱动（方法类型七分类 · 属性契约七维画像 · patternCluster 单向指针局部切片防破坏 · 物理行号定位 · 精准测试分级矩阵 · 局部依赖拓扑 · 三段式修改原理 · 抗方法爆炸门禁与写前意图检索选型 `doc_index_db method-search`）+ 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构与模式设计（[VIBE_CONTRACT] 顶置切片 · GoF 23 种设计模式选型决策树 · 模式协同集群档案 · VibeCoding 防破坏三铁律）+ MVP 激进裁剪决策（CEO 砍半法则 · 团队胃口时间箱 · Day 1 垂直曳光弹切片）+ 垂直领域能力融合（OpenPencil 矢量规约 · Generative UI 动态交互仿真 · Modern Web Guidance 现代合规 · Chrome DevTools 运行态/CWV/a11y 质量门禁 · 专用 SDK 防腐 Adapter）+ 多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）+ 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
+版本：v2.40  
+核心定位：**全场景意图路由（BUILD 从零构建 · REVERSE 存量反向重建 · FIX 系统化调试 · REFACTOR 行为等价重构 · EXPLORE 只读代码理解 · RESUME 任务续做）+ 质量优先（分步正确 + 测试一等公民 · 测试零报错硬阻断交付 · 静态检测零告警零错误 · 数据驱动测试 DDT 与双轨制 E2E 规约 · 多语言编码规范与 Linter 门禁矩阵 · 全局统一术语与防歧义词典 Ubiquitous Language / 词态矩阵 Command/Event/Attribute / Search-Before-Name / 零裸字符串 Zero Magic Strings）+ 核心功能两级目录规约（一级功能 _01_ ~ _06_ + 二级子功能原子拆分，严格遵循 _01_xxx 顺序命名规则，彻底消除深层嵌套，实现 Domain+Category 二元高信噪比精准检索与极速切片装配）+ 文档驱动（方法类型七分类 · 属性契约七维画像 · patternCluster 单向指针局部切片防破坏 · 物理行号实现后自动回填 · 精准测试分级矩阵 · 局部依赖拓扑 · 三段式修改原理 · 抗方法爆炸门禁与写前意图检索选型 `doc_index_db method-search`）+ 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构与模式设计（[VIBE_CONTRACT] 顶置切片 · GoF 23 种设计模式选型决策树 · 模式协同集群档案 · VibeCoding 防破坏三铁律）+ MVP 激进裁剪决策（CEO 砍半法则 · 团队胃口时间箱 · Day 1 垂直曳光弹切片）+ 垂直领域能力融合（OpenPencil 矢量规约 · Generative UI 动态交互仿真 · Modern Web Guidance 现代合规 · Chrome DevTools 运行态/CWV/a11y 质量门禁 · 专用 SDK 防腐 Adapter）+ 多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）+ 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
 **替代**：原 `hs-project-skill` 已废弃，统一用本 Skill。
 
 **装载门闩（反合理化 × Token）**：动手前必须完成 [`load_latch.md`](references/load_latch.md) L0～L2（分级 + 索引路由 + **恰好 1 份**详规）。禁止「跳过 Skill 先干」；也禁止整目录通读。场景有 ≥1% 可能适用 → **必须跑** `skill_ref_index search`（或读 `_index` 一行），命中再打开。

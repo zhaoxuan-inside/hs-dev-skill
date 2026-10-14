@@ -18,14 +18,14 @@
 ```text
 [Level 1: 根索引]  hs_dev_docs/_00_hs_dev_docs.idx
          │
-         ├───► [Level 2: 域索引]  _05_interface_design/_00_interface_design.idx
+         ├───► [Level 2: 一级功能索引]  _04_engineering_contract/_00_engineering_contract.idx
          │             │
-         │             └───► [Level 3: 模块索引]  _05_interface_design/_01_order/_00_order_interface_design.idx
+         │             └───► [Level 3: 二级子功能索引]  _02_interface_design/_00_interface_design.idx
          │                           │
-         │                           └───► [Level 4: 精确切片]  _01_order_create_design.md (Line 15-45)
+         │                           └───► [Level 4: 精确切片]  _01_order/_01_order_create_design.md (Line 15-45)
          │
-         ├───► [Level 2: 域索引]  _04_db_schema/_00_db_schema.idx
-         └───► [Level 2: 域索引]  _08_dev_process/_00_dev_process.idx
+         ├───► [Level 2: 一级功能索引]  _02_feature_spec/_00_feature_spec.idx
+         └───► [Level 2: 一级功能索引]  _05_task_orchestration/_00_task_orchestration.idx
 ```
 
 ---
@@ -33,29 +33,28 @@
 ## 3. 各级索引规范
 
 ### 3.1 一级：全局根索引 (`hs_dev_docs/_00_hs_dev_docs.idx`)
-* **定位**：整个文档体系的单一入口，枚举所有业务功能域。
+* **定位**：整个文档体系的单一入口，枚举所有核心功能域。
 * **格式**：
 ```jsonl
 {"version":"1.0","category":"root","root":"hs_dev_docs"}
-{"id":"domain_project","title":"项目基础配置与规范域","path":"_00_project/_00_project.idx","status":"active"}
-{"id":"domain_product","title":"产品需求与规划域","path":"_01_product_design/_00_product_design.idx","status":"active"}
-{"id":"domain_tech","title":"技术选型域","path":"_02_tech_select/_00_tech_select.idx","status":"active"}
-{"id":"domain_arch","title":"架构设计域","path":"_03_architecture_design/_00_architecture_design.idx","status":"active"}
-{"id":"domain_db","title":"数据库与迁移域","path":"_04_db_schema/_00_db_schema.idx","status":"active"}
-{"id":"domain_interface","title":"接口设计域","path":"_05_interface_design/_00_interface_design.idx","status":"active"}
-{"id":"domain_method","title":"方法设计域","path":"_06_method_design/_00_method_design.idx","status":"active"}
-{"id":"domain_call_chain","title":"调用链分析域","path":"_07_call_chain/_00_call_chain.idx","status":"active"}
-{"id":"domain_process","title":"开发过程与任务域","path":"_08_dev_process/_00_dev_process.idx","status":"active"}
+{"id":"domain_foundation","title":"项目基座与全局规范","path":"_00_project_foundation/_00_project_foundation.idx","status":"active"}
+{"id":"domain_vision","title":"产品愿景与分阶段定界","path":"_01_product_vision/_00_product_vision.idx","status":"active"}
+{"id":"domain_feature_spec","title":"特性详细规格与原型契约","path":"_02_feature_spec/_00_feature_spec.idx","status":"active"}
+{"id":"domain_architecture","title":"系统架构设计与模式集群","path":"_03_architecture_design/_00_architecture_design.idx","status":"active"}
+{"id":"domain_contract","title":"工程四要素详细契约","path":"_04_engineering_contract/_00_engineering_contract.idx","status":"active"}
+{"id":"domain_task","title":"任务编排与极速装配","path":"_05_task_orchestration/_00_task_orchestration.idx","status":"active"}
+{"id":"domain_process","title":"开发过程与治理审计","path":"_06_dev_process/_00_dev_process.idx","status":"active"}
 ```
 
 ### 3.2 二级：功能域索引 (`_0N_{domain}/_00_{domain}.idx`)
-* **定位**：某一领域下的业务模块列表（如 `order`、`user`、`payment`）。
-* **示例**（`_05_interface_design/_00_interface_design.idx`）：
+* **定位**：某一领域下的二级子功能或业务模块列表（如 `_04_engineering_contract` 下的 `db_schema`、`interface_design` 等）。
+* **示例**（`_04_engineering_contract/_00_engineering_contract.idx`）：
 ```jsonl
-{"version":"1.0","category":"domain_interface","root":"_05_interface_design"}
-{"id":"model_order","title":"订单模型接口","path":"_01_order/_00_order_interface_design.idx","status":"active"}
-{"id":"model_user","title":"用户模型接口","path":"_02_user/_00_user_interface_design.idx","status":"active"}
-{"id":"model_payment","title":"支付模型接口","path":"_03_payment/_00_payment_interface_design.idx","status":"active"}
+{"version":"1.0","category":"domain_contract","root":"_04_engineering_contract"}
+{"id":"sub_db","title":"数据库与迁移","path":"_01_db_schema/_00_db_schema.idx","status":"active"}
+{"id":"sub_interface","title":"接口契约设计","path":"_02_interface_design/_00_interface_design.idx","status":"active"}
+{"id":"sub_method","title":"方法分类画像","path":"_04_method_design/_00_method_design.idx","status":"active"}
+{"id":"sub_call_chain","title":"调用链路拓扑","path":"_05_call_chain/_00_call_chain.idx","status":"active"}
 ```
 
 ### 3.3 三级：模块索引 (`_0N_{domain}/_01_{model_name}/_00_{model_name}_{domain}.idx`)

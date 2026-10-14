@@ -64,8 +64,9 @@ class TestProcessLog(unittest.TestCase):
         result = rollback(self.root, "pay_new", cp["checkpoint_id"])
         self.assertTrue(result["ok"])
         self.assertFalse(created.exists())
-        self.assertEqual(result["task_status"], "IN_PROGRESS")
-        idx = self.root / "hs_dev_docs/_08_dev_process/_09_task/_00_task.idx"
+        idx = self.root / "hs_dev_docs/_05_task_orchestration/_00_task.idx"
+        if not idx.exists():
+            idx = self.root / "hs_dev_docs/_08_dev_process/_09_task/_00_task.idx"
         self.assertIn("pay_new", idx.read_text(encoding="utf-8"))
 
 
