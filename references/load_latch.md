@@ -19,6 +19,7 @@ L2  打开命中的恰好 1 份 references/*.md（本会话已读过的不重读
     · DESIGN 审讯对齐 / grilling → `grill_orchestration.md`
     · 原型 / 线框 / 无图布局 → `product_prototype.md`
     · 测试 / TDD / seam → `testing.md`
+    · 多语言代码规范 / Linter 门禁 → `coding_standards.md`
     · 深模块 / 重构接口 → `deep_modules.md`
     · 模糊 UI 默认审美 → `frontend_aesthetic.md`（项目已有 DESIGN.md 则切片读它）
     · UI 品牌对标 / 落盘 DESIGN.md → `design_md.md`

@@ -25,7 +25,7 @@
 
 在执行 Git 提交或合并前，必须通过以下自检项：
 0. **全量测试 100% PASS 与 0 报错（硬阻断门禁）**：`make test`（或项目等价命令）100% PASS，**无任何失败、报错或挂起用例**；若有任一报错，**绝对禁止流转 COMPLETED 与交付**，严禁向用户汇报“已完成但有报错待修”，必须就地排查修复直到全绿；触达 seam 的自动化测已存在；**前端页面无未捕获 Console 报错与网络死锁**（Chrome DevTools 审计通过）。
-0b. **代码静态检测零告警零错误（Zero Warnings, Zero Errors Gate）**：语言对应 Linter（ESLint/Ruff/Flake8 等）、类型检查（TSC/Mypy）、死代码扫描（`dead_code_scanner.py`）、规范检查（`verify_consistency.py`）**必须 0 警告（0 Warning）且 0 错误（0 Error）**；任何 Warning 均须当场清理修复，严禁带 Warning 提交或交付。
+0b. **代码静态检测零告警零错误（Zero Warnings, Zero Errors Gate）**：语言对应 Linter（Python: Ruff/Mypy, Go: golangci-lint, Rust: clippy, TS/JS/Vue: ESLint/TSC, Java: Checkstyle/SpotBugs 等，详见 [`coding_standards.md`](coding_standards.md)）、死代码扫描（`dead_code_scanner.py`）、规范检查（`verify_consistency.py`）**必须 0 警告（0 Warning）且 0 错误（0 Error）**；任何 Warning 均须当场清理修复，严禁带 Warning 提交或交付。
 1. **死代码与孤儿方法扫描**：所有新增或修改的方法均在 `_07_call_chain` 中有合法引用路径，或具备白名单注解。
 2. **三同步完整性**：业务逻辑修改已同步更新方法设计文档、DB 迁移脚本（V/U）及单元/契约测试。
 3. **索引完整性**：新增/重命名/删除的文件已同步更新对应的 `.idx` 索引文件。

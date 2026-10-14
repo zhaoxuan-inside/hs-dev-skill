@@ -23,6 +23,7 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | 任务状态合法迁移 | `task_state_machine.md` |
 | **测试方法（一等公民）/ TDD / seam** | `testing.md` |
 | 提交前门禁 / 九级测试分层 | `quality_gates.md` |
+| **多语言开发规范 / Linter 门禁矩阵 / 跨语言六元组** | `coding_standards.md` |
 | **深模块 / seam / Adapter / 删除测试** | `deep_modules.md` |
 | 满配阶段细则 0～6 | `spec_driven_lifecycle.md`（可只读当前阶段节） |
 | **UI 默认审美（本地 Anthropic 蒸馏）** | `frontend_aesthetic.md` |

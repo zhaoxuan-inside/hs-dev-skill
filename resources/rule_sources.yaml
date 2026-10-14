@@ -394,3 +394,58 @@ sources:
     file: README.md
     tags: [DDD, modular-monolith, backend, architecture]
     when: 模块化单体+DDD 实践对照 — 仅 search-cache，禁止整读
+
+  - id: local.coding.standards
+    kind: local
+    path: references/coding_standards.md
+    tags: [规范, 开发规范, 语言规范, Linter, static-check, Go, Java, Python, Rust, TypeScript, Vue, coding-standards]
+    when: 多语言代码开发规范、静态检测门禁与跨语言六元组实现 — 本地必守
+
+  - id: uber.go-guide
+    kind: github_raw
+    repo: uber-go/guide
+    ref: master
+    file: style.md
+    tags: [Go, Golang, style, concurrency, error-handling, uber, 后端]
+    when: Go 语言开发规范、并发安全、错误处理与工程实践（Uber Go Style Guide）
+
+  - id: alibaba.java-guide
+    kind: github_raw
+    repo: alibaba/p3c
+    ref: master
+    file: p3c-formatter/README.md
+    tags: [Java, Alibaba, p3c, 规约, 阿里巴巴, OOP, 异常, 并发, 后端]
+    when: Java 语言开发规范、阿里巴巴 Java 规约与常见避坑点
+
+  - id: google.python-style
+    kind: github_raw
+    repo: google/styleguide
+    ref: gh-pages
+    file: pyguide.md
+    tags: [Python, style, Google, type-annotations, PEP8, 后端]
+    when: Python 编程规范、Type Annotations 与 Google Python 风格指南
+
+  - id: rust-lang.api-guidelines
+    kind: github_raw
+    repo: rust-lang/api-guidelines
+    ref: master
+    file: README.md
+    tags: [Rust, API, guidelines, ownership, safety, error-handling, 系统编程]
+    when: Rust API 设计规范、所有权生命周期与错误处理
+
+  - id: vuejs.style-guide
+    kind: github_raw
+    repo: vuejs/docs
+    ref: main
+    file: src/style-guide/rules-essential.md
+    tags: [Vue, Vue3, style-guide, components, reactivity, 前端]
+    when: Vue.js 3 官方组件与风格指南（必须规则与强烈推荐）
+
+  - id: google.typescript-style
+    kind: github_raw
+    repo: google/gts
+    ref: main
+    file: README.md
+    tags: [TypeScript, TS, Google, gts, linter, 前端, 后端]
+    when: TypeScript 强类型编码规范与 Google Style
+
