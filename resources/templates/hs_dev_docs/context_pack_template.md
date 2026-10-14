@@ -5,7 +5,7 @@
 - **生成时间**：`{timestamp}`
 - **目标域**：`{domain_name}`
 - **Token 预估**：`~{token_estimate}`
-- **VibeCoding 装载原则**：**机器执行契约优先物化**。优先装载 `_01_product_design` 中的 `{feature}_vibe_spec.md` 切片（Tokens/组件树/Gherkin），以及 ADR/架构文档顶部的 `[VIBE_CONTRACT]` 置顶切片；严禁整篇灌入人类版背景论证。
+- **VibeCoding 装载原则**：**机器执行契约优先物化**。优先装载 `_02_feature_spec/_02_vibe_spec` 中的 `{feature}_vibe_spec.md` 切片（Tokens/组件树/Gherkin），以及 ADR/架构文档顶部的 `[VIBE_CONTRACT]` 置顶切片；严禁整篇灌入人类版背景论证。
 
 查询命令（跨平台按需调用）：
 
@@ -21,13 +21,13 @@ UI 触达读 `references/frontend_craft.md`；API 触达读 `references/api_engi
 
 ## 1. 产品与 UI 执行契约切片（物化 Vibe Spec）
 <!-- 
-  【优先物化 _01_product_design/_02_product_design/{feature}_vibe_spec.md】
+  【优先物化 _02_feature_spec/_02_vibe_spec/{feature}_vibe_spec.md】
   包含：精准 Design Tokens、组件树 DOM 骨架、状态机迁移与 Gherkin 验收断言原文。
   S 规模可仅物化 3～8 行 Gherkin DoD 与核心字段。
 -->
 
 ```yaml
-# 引用路径：hs_dev_docs/_01_product_design/_02_product_design/{feature}_vibe_spec.md (L10-L80)
+# 引用路径：hs_dev_docs/_02_feature_spec/_02_vibe_spec/{feature}_vibe_spec.md (L10-L80)
 {从 vibe_spec.md 抽取的精准机器契约}
 ```
 
@@ -41,14 +41,14 @@ UI 触达读 `references/frontend_craft.md`；API 触达读 `references/api_engi
 -->
 
 ```yaml
-# 引用路径：hs_dev_docs/_00_project/_05_decision_record/ADR_xxx.md ([VIBE_CONTRACT] 行段)
+# 引用路径：hs_dev_docs/_00_project_foundation/_03_decision_record/ADR_xxx.md ([VIBE_CONTRACT] 行段)
 {锁定的架构决策与技术栈约束}
 ```
 
 ---
 
 ## 3. 核心数据模型与表结构切片（物化）
-<!-- 引用 _04_db_schema：精准 SQL DDL / 字段与约束原文片段；未触达写 N/A -->
+<!-- 引用 _04_engineering_contract/_01_db_schema：精准 SQL DDL / 字段与约束原文片段；未触达写 N/A -->
 
 ```sql
 {相关表结构与约束原文}
@@ -57,10 +57,10 @@ UI 触达读 `references/frontend_craft.md`；API 触达读 `references/api_engi
 ---
 
 ## 4. 接口与方法契约画像切片（物化 Method Archetypes）
-<!-- 引用 _05_interface_design 与 _06_method_design；细则见 api_engineering.md 与 method_archetypes.md -->
+<!-- 引用 _04_engineering_contract/_02_interface_design 与 _04_engineering_contract/_04_method_design；细则见 api_engineering.md 与 method_archetypes.md -->
 
 ```yaml
-# 引用路径：hs_dev_docs/_06_method_design/.../{method}_design.md
+# 引用路径：hs_dev_docs/_04_engineering_contract/_04_method_design/.../{method}_design.md
 method_name: "{method_name}"
 archetype: "{TRANSFORM | ALGO | GUARD | STATE | ORCHESTRATE | ADAPTER | PRESENT}"
 location: "{file_path} (L{start_line}-L{end_line})"

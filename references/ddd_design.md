@@ -33,7 +33,7 @@ python scripts/rule_fetch.py resolve --id wshobson.architecture-refs --rule adva
 ### 2.1 统一语言（Ubiquitous Language）
 
 - **一上下文一词一义**；代码、测试、PRD、词典同一套名词。  
-- 登记：`hs_dev_docs/_00_project/_02_project_word.dict.yaml`（禁止同义多词）。  
+- 登记：`hs_dev_docs/_00_project_foundation/_02_dictionary/_02_project_word.dict.yaml`（禁止同义多词）。  
 - 术语尴尬/需反复翻译 → 先改语言再加行为。
 
 ### 2.2 限界上下文（Bounded Context）

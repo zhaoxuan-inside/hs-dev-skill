@@ -82,13 +82,13 @@
    - **Entity Attribute（实体属性/时间戳）**：时间戳必须统一使用**过去分词 + `_at`**（如 `created_at`、`updated_at`、`deleted_at`），只作为数据列，禁止用作动作或事件标识。
    - **Payload Action（变更日志类型）**：CDC / Webhook 变更类型统一使用**全大写**（如 `CREATE`、`UPDATE`、`DELETE`）。
 2. **Search-Before-Name 铁律（先搜已有命名，再做新定义）**：
-   - 开发者或 AI Agent 在引入新的事件名、错误码、状态字段或公共常量前，**必须先检索现有代码库与 `hs_dev_docs/_00_project/_02_project_word.dict.yaml`**。
+   - 开发者或 AI Agent 在引入新的事件名、错误码、状态字段或公共常量前，**必须先检索现有代码库与 `hs_dev_docs/_00_project_foundation/_02_dictionary/_02_project_word.dict.yaml`**。
    - 若已有约定词汇，必须直接复用；严禁随意发明 `modify`、`change`、`alter`、`renew`、`bill_order` 等同义别名。
 3. **零裸字符串与单一事实源 (Zero Magic Strings & Single Source of Truth)**：
    - 跨模块或跨服务调用的事件主题（Topic）、状态机枚举、通知类型，**严禁在业务逻辑中直接硬编码裸字符串**。
    - 必须通过集中常量文件收敛导出（如 TS `events.ts`、Python `events.py`、Go `events.go`）。全局搜索时只需定位常量引用符号，杜绝字符串漏搜。
 4. **项目词典与自动化门禁硬拦截**：
-   - 核心领域词汇、标准缩写与禁用同义词列表统一登记在 `_00_project/_02_project_word.dict.yaml`。
+   - 核心领域词汇、标准缩写与禁用同义词列表统一登记在 `_00_project_foundation/_02_dictionary/_02_project_word.dict.yaml`。
    - 提交前 `verify_consistency.py` 将自动扫描代码库与 SQL 迁移文件，命中 `forbidden_alias` 或事件动词原形时直接阻断门禁。
 
 ### 3.5 方法爆炸与影子函数禁令 (Anti-Method Explosion & Shadow Functions)

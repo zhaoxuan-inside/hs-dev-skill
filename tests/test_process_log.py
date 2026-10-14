@@ -66,7 +66,7 @@ class TestProcessLog(unittest.TestCase):
         self.assertFalse(created.exists())
         idx = self.root / "hs_dev_docs/_05_task_orchestration/_00_task.idx"
         if not idx.exists():
-            idx = self.root / "hs_dev_docs/_08_dev_process/_09_task/_00_task.idx"
+            idx = self.root / "hs_dev_docs/_05_task_orchestration/_00_task.idx"
         self.assertIn("pay_new", idx.read_text(encoding="utf-8"))
 
 

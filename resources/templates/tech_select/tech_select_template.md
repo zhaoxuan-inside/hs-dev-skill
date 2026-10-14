@@ -3,7 +3,7 @@
 - **评估领域**：后端服务 / 前端架构 / 移动端 / 存储 / 中间件
 - **评估日期**：{YYYY-MM-DD}
 - **负责人**：{evaluator}
-- **对应 ADR**：`hs_dev_docs/_00_project/_05_decision_record/ADR_001_{tech_name}.md`
+- **对应 ADR**：`hs_dev_docs/_00_project_foundation/_03_decision_record/ADR_001_{tech_name}.md`
 
 ---
 

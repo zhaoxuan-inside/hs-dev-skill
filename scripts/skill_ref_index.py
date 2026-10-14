@@ -32,7 +32,30 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
     "_index.md": ["index", "路由", "目录", "入口"],
     "load_latch.md": ["门闩", "装载", "反合理化", "latch", "跳过", "强制"],
     "right_sizing.md": ["分级", "S", "M", "L", "快路径", "小改动", "right-sizing", "change_size"],
-    "token_budget.md": ["token", "预算", "context_pack", "装载", "SQLite"],
+    "token_budget.md": [
+        "token", "预算", "context_pack", "装载", "SQLite", "doc_index_db", "切片", "免通读", "免扫描",
+    ],
+    "reverse_engineering.md": [
+        "反向工程", "反向重建", "逆向", "reverse", "已有项目", "存量项目", "brownfield", "遗留代码", "规范接入", "架构还原",
+    ],
+    "systematic_debugging.md": [
+        "调试", "bug", "修复", "fix", "排查", "先红后绿", "复现", "回归", "异常", "崩溃", "debugging", "根因分析", "RCA",
+    ],
+    "code_refactoring.md": [
+        "重构", "refactor", "refactoring", "坏味道", "消除坏味道", "等价演进", "特征测试", "保护网", "行为等价", "深模块演进",
+    ],
+    "code_exploration.md": [
+        "代码理解", "探索", "只读", "explore", "时序图", "调用链", "架构理解", "答疑", "咨询", "只读理解", "comprehension",
+    ],
+    "coding_standards.md": [
+        "编码规范", "规范", "linter", "命名", "静态检测", "词态矩阵", "单一事实源", "零裸字符串", "coding_standards", "规范门禁",
+    ],
+    "method_archetypes.md": [
+        "方法设计", "方法画像", "七分类", "archetype", "契约画像", "写前检索", "抗方法爆炸", "影子函数", "单一天理源",
+    ],
+    "auxiliary_governance.md": [
+        "工程治理", "治理", "governance", "机密隔离", "供应链", "安全", "容灾", "cicd", "可观测性", "探针", "功能开关", "governance_toggle",
+    ],
     "grill_orchestration.md": [
         "grill", "grilling", "审讯", "对齐", "澄清", "设计树", "多问", "DESIGN",
         "office-hours", "方案比选", "trade-offs",
@@ -106,9 +129,6 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
     "six_tuple_runtime.md": ["六元组", "compensate", "fallback", "metrics", "recall"],
     "four_level_routing.md": [
         "四级索引", "JSONL", "路由", "底层真理", "检索", "调用图", "依赖图", "代码切片", "索引路由",
-    ],
-    "token_budget.md": [
-        "token", "预算", "装载", "doc_index_db", "切片", "context_pack", "免通读", "免扫描",
     ],
     "task_state_machine.md": ["任务", "状态机", "handoff", "迁移", "ABORTED"],
     "mock_contract_guide.md": ["Mock", "Profile", "契约测试"],

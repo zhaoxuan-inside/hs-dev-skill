@@ -1,7 +1,7 @@
 # 方法类型分类与契约画像指南 (Method Archetypes & Contract Profile)
 
 **何时读**：
-- 阶段 3 详细规格设计（编写/更新 `hs_dev_docs/_06_method_design/`）；
+- 阶段 3 详细规格设计（编写/更新 `hs_dev_docs/_04_engineering_contract/_04_method_design/`）；
 - 阶段 4 上下文装配（Context Pack 中按方法画像物化切片）；
 - 阶段 5 编码与测试实现（依据方法属性收窄上下文、定向跑测、维护修改历史）；
 - 检索命令：`python scripts/skill_ref_index.py search --scenario 方法设计` 或 `search --q 方法类型`
@@ -16,7 +16,7 @@
 
 **“文档定义代码”（Specification Drives Code）原则**：
 - **代码保持纯粹**：源码实现专注于逻辑本身，不充斥冗余元数据注释；
-- **文档作为单一天理源**：方法的设计属性、代码物理定位（行号与行数）、改动敏感度、依赖拓扑与历史修改原理全部沉淀在 `hs_dev_docs/_06_method_design/` 中；
+- **文档作为单一天理源**：方法的设计属性、代码物理定位（行号与行数）、改动敏感度、依赖拓扑与历史修改原理全部沉淀在 `hs_dev_docs/_04_engineering_contract/_04_method_design/` 中；
 - **精准投喂与秒级闭环**：AI 通过检索文档获取切片，毫秒级读取目标代码行段，执行定点测试，并反向更新文档历史记录。
 
 ---
@@ -39,7 +39,7 @@
 
 ## 3. 方法属性机制（七维画像）
 
-在 `hs_dev_docs/_06_method_design/` 中，每个登记的方法均具备以下标准化属性：
+在 `hs_dev_docs/_04_engineering_contract/_04_method_design/` 中，每个登记的方法均具备以下标准化属性：
 
 1. **所属层次与模块**：自上而下的定位锚点（如 `领域核心层 / billing 模块`）。
 2. **代码精准定位与符号锚点（Symbol Anchor 抗脆弱）**：
@@ -96,8 +96,8 @@
 本 Skill 确立**“写前检索、查重优于新建、单一天理源派生轻量索引”**的抗爆炸防护体系：
 
 ### 6.1 单一天理源（SSOT）与派生轻量索引
-- **严禁双重维护文档**：`hs_dev_docs/_06_method_design/` 是全仓方法契约的**单一天理源**，不需要也不允许额外人工维护第二份方法清单；
-- **自动化物化索引（Materialized Cache）**：`scripts/doc_index_db.py` 会自动扫描解析 `_06_method_design/*.md` 中的方法名、分类画像（archetype）、核心功能描述与物理代码坐标，物化为本地 SQLite `methods` 表；
+- **严禁双重维护文档**：`hs_dev_docs/_04_engineering_contract/_04_method_design/` 是全仓方法契约的**单一天理源**，不需要也不允许额外人工维护第二份方法清单；
+- **自动化物化索引（Materialized Cache）**：`scripts/doc_index_db.py` 会自动扫描解析 `_04_engineering_contract/_04_method_design/*.md` 中的方法名、分类画像（archetype）、核心功能描述与物理代码坐标，物化为本地 SQLite `methods` 表；
 - **NLP / 意图极速召回**：在写任何辅助方法前，Agent 执行 `python scripts/doc_index_db.py method-search --q "<业务意图>"`，仅消耗几十 Token 即可获得 Top-3 候选画像。
 
 ### 6.2 编码前的四步决策漏斗 (The 4-Step Decision Funnel)
@@ -114,7 +114,7 @@ Agent 在产生“我需要一个函数来实现 X”的念头时，**绝对禁�
   ├── A. 完全匹配 (100%) ───────► 直接 import 复用，严禁新建
   ├── B. 高度相似 (≥80%) ──────► 扩展入参（Options/可选参数），严禁造影子函数
   ├── C. 单处使用且极微小 (≤3行) ─► 遵循深模块哲学，就地内联 (Inline)，严禁浅抽取
-  └── D. 确认全新通用领域逻辑 ──► 获准新建；必须先在 _06_method_design 登记画像
+  └── D. 确认全新通用领域逻辑 ──► 获准新建；必须先在 _04_engineering_contract/_04_method_design 登记画像
         │
         ▼
 [3. 极窄切片 (Narrow Slice)] ──按画像结果使用 view_file 读取目标 15~30 行代码
@@ -140,7 +140,7 @@ AI Agent 在承接修改任务时，必须严格执行以下工作流：
 ```text
 [1. 意图检索与选型] ──执行 doc_index_db.py method-search 召回候选；确定复用/扩展/新建
         │
-[2. 读文档画像]     ──从 _06_method_design 提取「物理定位行号 + 跑测命令」
+[2. 读文档画像]     ──从 _04_engineering_contract/_04_method_design 提取「物理定位行号 + 跑测命令」
         │
 [3. 极窄上下文]     ──仅 view_file 目标行段（15~30行）及对应单测；严禁加载全量调用链源码
         │
@@ -201,9 +201,9 @@ flowchart TD
 ### 前端 VibeCoding 三大纪律：
 1. **杜绝“几千行上帝组件”**：页面文件只保留 `ORCHESTRATE`（调用 hook）与 `PRESENT`（渲染标签）；业务算式强制下沉为 `ALGO`。
 2. **改逻辑不读 JSX，改样式不读逻辑**：
-   - 当需求为“调整折算规则”时，AI 查阅 `_06_method_design` 仅加载 `calc.ts`（L20-L45），**无需加载包含几百行 Tailwind 类名的 React 组件**，Token 节约 90%。
+   - 当需求为“调整折算规则”时，AI 查阅 `_04_engineering_contract/_04_method_design` 仅加载 `calc.ts`（L20-L45），**无需加载包含几百行 Tailwind 类名的 React 组件**，Token 节约 90%。
 3. **0 DOM 依赖的高速单测**：
    - 核心业务纯函数（`ALGO` / `TRANSFORM` / `STATE` / `GUARD`）脱离浏览器 DOM 与 JSDOM 运行，`vitest run` 0.2 秒反馈，形成即时红绿闭环。
 
 ### 前端方法文档模板标准：
-前端方法设计文档模板见 [`resources/templates/hs_dev_docs/frontend_method_design.md`](../resources/templates/hs_dev_docs/frontend_method_design.md)。前端核心方法必须落盘到 `hs_dev_docs/_06_method_design/_02_{feature}/_01_{method_name}_design.md`，明确标记 `0 DOM 依赖` 测试环境与具体行号范围。
+前端方法设计文档模板见 [`resources/templates/hs_dev_docs/frontend_method_design.md`](../resources/templates/hs_dev_docs/frontend_method_design.md)。前端核心方法必须落盘到 `hs_dev_docs/_04_engineering_contract/_04_method_design/_02_{feature}/_01_{method_name}_design.md`，明确标记 `0 DOM 依赖` 测试环境与具体行号范围。

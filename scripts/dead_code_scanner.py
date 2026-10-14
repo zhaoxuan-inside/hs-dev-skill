@@ -81,9 +81,9 @@ class DeadCodeScanner:
                                     })
 
         if orphan_methods:
-            print(f"[!] Warning: Found {len(orphan_methods)} potentially unreferenced/orphan methods (Not registered in _07_call_chain):")
+            print(f"[!] Warning: Found {len(orphan_methods)} potentially unreferenced/orphan methods (Not registered in _04_engineering_contract/_05_call_chain):")
             for om in orphan_methods:
-                print(f"  - {om['file']}:{om['line']} -> {om['method']} (Consider registering in _07_call_chain or adding @UsedByReflect)")
+                print(f"  - {om['file']}:{om['line']} -> {om['method']} (Consider registering in _04_engineering_contract/_05_call_chain or adding @UsedByReflect)")
         else:
             print("[PASS] Zero dead code detected. All methods are properly mapped in call chains!")
 

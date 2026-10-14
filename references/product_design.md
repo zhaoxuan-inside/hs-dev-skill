@@ -160,16 +160,18 @@
 ## 3. 产出文档结构与“单一真实源 · 双重视图”落地约定
 
 ```text
-hs_dev_docs/_01_product_design/
-├── _00_product_design.idx                 # 索引文件
-├── _01_business_plan/                     # 【第一层：宏观愿景】商业模式、用户客群主职、战略反目标
-├── _02_product_design/                    # 【第二层：微观施工图与契约】
-│   ├── {feature_name}_prd.md              # 视图一（面向人）：产品功能规格书（JTBD/方案比选/规格矩阵/规模评估，声明 Inherits: /DESIGN.md）
-│   └── {feature_name}_vibe_spec.md        # 视图二（面向 VibeCoding）：机器执行契约（Tokens代码映射/组件树DOM骨架/状态机/Gherkin）
-├── _03_product_figma/                     # 【第二层补全：双轨原型】
-│   └── {feature_name}_prototype.md        # 原型施工图：Mermaid 拓扑 + ASCII 空间比例四态线框（声明 Inherits: /DESIGN.md）
-└── _04_phased_roadmap/                    # 【演进规划】
-    └── {feature_name}_phased_plan.md      # MVP 假设、人机交互对齐记录、MoSCoW 分级矩阵与路线图
+hs_dev_docs/
+├── _01_product_vision/
+│   ├── _00_product_vision.idx                 # 愿景与路线图索引
+│   ├── _01_design_charter/                    # 【第一层：宏观品味宪章】DESIGN.md 归档与物理隐喻
+│   ├── _02_phased_roadmap/                    # 【演进规划】MVP 假设、MoSCoW 分级矩阵与路线图
+│   └── _03_business_plan/                     # 【业务意图】商业模式、用户客群主职、战略反目标 (可选)
+└── _02_feature_spec/
+    ├── _00_feature_spec.idx                   # 特性规格索引
+    ├── _01_human_prd/                         # 【第二层：微观施工图】面向人（JTBD/方案比选/规格矩阵/规模评估）
+    ├── _02_vibe_spec/                         # 【第二层：机器契约】面向 VibeCoding（Tokens代码映射/组件树DOM骨架/状态机）
+    ├── _03_prototype_html/                    # 【第二层：单文件可交互原型】多端四态 HTML 预览
+    └── _04_prototype_wireframe/               # 【第二层：线框拓扑】Mermaid 拓扑 + ASCII 空间比例四态线框
 ```
 
 同时，在项目根目录维护 **`DESIGN.md`**，作为全局宏观品味与 Design Tokens 的单一真实源。
@@ -177,13 +179,13 @@ hs_dev_docs/_01_product_design/
 ### 3.1 大型 PRD 分级拆分与微观索引标准 (Hierarchical PRD Splitting)
 当系统规模扩张、包含多模块或 >3 个功能特性时，**严禁将全部功能堆砌在单一巨型 PRD 中**（容易导致 Token 溢出与注意力分散）。必须执行两级拆分：
 1. **L1 全景总览 (`overview_prd.md`)**：
-   - 载体：`_02_product_design/overview_prd.md`（参照 [`overview_prd_template.md`](../resources/templates/product_design/overview_prd_template.md)）；
+   - 载体：`_02_feature_spec/_01_human_prd/overview_prd.md`（参照 [`overview_prd_template.md`](../resources/templates/product_design/overview_prd_template.md)）；
    - 职责：维护全局模块矩阵、特性索引导航表（含 `FEAT-ID`、特性名称、所属模块、优先级、PRD 相对路径）及 Mermaid 功能全景树。
 2. **L2 微观子特性施工图 (`features/{feature_key}_prd.md`)**：
-   - 载体：`_02_product_design/features/{feature_key}_prd.md`（参照 [`sub_feature_prd_template.md`](../resources/templates/product_design/sub_feature_prd_template.md)）；
+   - 载体：`_02_feature_spec/_01_human_prd/features/{feature_key}_prd.md`（参照 [`sub_feature_prd_template.md`](../resources/templates/product_design/sub_feature_prd_template.md)）；
    - 职责：单文档严格控制在 100~250 行，专精当前 `FEAT-ID` 的微观 JTBD、方案比选、字段约束矩阵与 Gherkin 验收标准；
    - 自动化建库：由 `python3 scripts/doc_index_db.py rebuild` 自动化解析入库 `features` 表与 `features_fts`，支持 `feature-search` 毫秒级定向按需召回。
-3. **L2 页面与空间布局原型 (`_03_product_figma/{feature_key}_prototype.md`)**：
+3. **L2 页面与空间布局原型 (`_04_prototype_wireframe/{feature_key}_prototype.md`)**：
    - 自动化建库：由 `doc_index_db.py` 自动化解析页面 ID、路由、布局形态与原型 HTML 入库 `pages` 表与 `pages_fts`，支持 `page-search` 检索页面拓扑。
 
 ---
@@ -220,7 +222,7 @@ hs_dev_docs/_01_product_design/
 | **一源双视图齐套** | 特性级存在面向人的 `{feature}_prd.md`（+双轨原型）与面向机器的 `{feature}_vibe_spec.md`，均显式声明继承 `DESIGN.md`，无语义冲突； |
 | **产品探索与方案比选完备** | 明确定义了 Status Quo、JTBD、Aha Moment、FTUE 冷启动引导及 ≥2 种交互形态的 Trade-offs 比选； |
 | **功能与双轨交互完备** | 功能架构树、端到端旅程（含 FTUE）、详细规格矩阵清晰；双轨原型（Mermaid 拓扑 + ASCII 比例线框）覆盖四态；DoD 采用 Gherkin (`Given/When/Then`) 行为断言； |
-| **分阶段规划与规模评估就绪** | 完成人机交互对齐，`_04_phased_roadmap/` 存在《产品开发分阶段规划书》，MVP 范围明确，完成客观规模评估； |
+| **分阶段规划与规模评估就绪** | 完成人机交互对齐，`_01_product_vision/_02_phased_roadmap/` 存在《产品开发分阶段规划书》，MVP 范围明确，完成客观规模评估； |
 | **纯净无技术侵入** | 严格杜绝在阶段 0 文档中提前塞入底层选型、物理表 DDL、RPC 签名、Saga 补偿、代码单测覆盖率等实现细节； |
 | **无冲突一致性** | PRD 内部及与设计语言、原型、规划书、既有资料之间无未裁决矛盾。 |
 

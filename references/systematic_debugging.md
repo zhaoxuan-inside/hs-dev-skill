@@ -48,11 +48,12 @@ Bug 修复绝非凭直觉“盲修乱试”，更禁止在未确认根因前胡�
 - 做最小必要改动，消除根因；
 - 再次运行复现测试，确保其转为通过（GREEN）。
 
-### Step 4：门禁与防退化归档（Regression Gating & Commit）
-- 运行全量测试套件（`make test` 或 `npm test` 等），确保无级联破坏；
-- 运行静态代码分析（Linter / TypeChecker），确保 0 Error 且 0 Warning；
-- 使用 `python3 scripts/process_log.py checkpoint` 记录修复日志与改动快照；
-- 提交代码：Commit 信息遵循规约，注明修复原因与关联测试。
+### Step 4：契约同步、索引自愈与防退化门禁（Contract Sync & Self-Healing Gating）
+- **契约文档与方法画像同步**：若修复涉及方法内部逻辑、入参扩展或新增测试，同步更新 `_04_engineering_contract/_04_method_design/` 中的方法契约画像与精准单跑测试指令（若触及接口/表结构，同步更新对应契约）；
+- **过程账本与快照留存**：执行 `python3 scripts/process_log.py checkpoint` 记录修复日志与改动快照，在 `_06_dev_process/_01_plan_log` 标记对应断点步骤为 `done`；
+- **双层索引自愈与罗盘刷新**：运行 `python3 scripts/idx_manager.py rebuild` 与 `python3 scripts/doc_index_db.py --root . rebuild` 刷新 SQLite 索引与 SHA-256 Digest，并执行 `python3 scripts/doc_index_db.py --root . generate-guide` 保持 `hs_dev_docs/README.md` 罗盘最新；
+- **全量测试与防退化门禁**：运行全量测试套件（`make test`，确保 100% PASS 且 0 报错），静态检测（Linter / TypeChecker）0 告警 0 错误，执行 `python3 scripts/verify_consistency.py --root . --strict` 严格门禁验证；
+- **本地归档提交**：门禁全绿后完成本地 Commit，严禁带病提交。
 
 ---
 

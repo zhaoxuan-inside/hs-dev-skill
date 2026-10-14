@@ -86,7 +86,7 @@ graph LR
 |------|------|----------|-----------------|
 | | | | |
 
-完整词典：`_00_project/_02_project_word.dict.yaml`。
+完整词典：`_00_project_foundation/_02_dictionary/_02_project_word.dict.yaml`。
 
 ---
 
@@ -135,4 +135,4 @@ Infrastructure / Repo / RPC
 
 - **Do**：
 - **Don't**：
-- 相关 ADR：`_00_project/_05_decision_record/ADR_{xxx}.md`
+- 相关 ADR：`_00_project_foundation/_03_decision_record/ADR_{xxx}.md`

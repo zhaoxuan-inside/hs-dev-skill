@@ -12,7 +12,7 @@
 ---
 
 ## 2. 精确注入设计引用
-- 接口设计：`_05_interface_design/...`
-- 方法设计：`_06_method_design/...`
-- 数据库表：`_04_db_schema/...`
-- 契约参考：`hs_dev_docs/_00_project/_13_mock_contract/...`
+- 接口设计：`_04_engineering_contract/_02_interface_design/...`
+- 方法设计：`_04_engineering_contract/_04_method_design/...`
+- 数据库表：`_04_engineering_contract/_01_db_schema/...`
+- 契约参考：`hs_dev_docs/_04_engineering_contract/_03_mock_contract/...`

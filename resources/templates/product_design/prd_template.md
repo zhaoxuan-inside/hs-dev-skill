@@ -5,9 +5,9 @@
 - **状态**：DRAFT / REVIEWED / FROZEN
 - **产品负责人**：{owner}
 - **宏观品味宪章继承**：`Inherits: /DESIGN.md`（遵循已锁定的视觉调性、Design Tokens、Anti-Slop 护栏与 10 星体验标准；严禁在此重新定义全站色彩或字体）
-- **关联设计语言与原型**：`_03_product_figma/{feature_name}_prototype.md`
-- **面向 VibeCoding 契约**：`_02_product_design/{feature_name}_vibe_spec.md`
-- **关联分阶段规划**：`_04_phased_roadmap/{feature_name}_phased_plan.md`
+- **关联设计语言与原型**：`_02_feature_spec/_04_prototype_wireframe/{feature_name}_prototype.md`
+- **面向 VibeCoding 契约**：`_02_feature_spec/_02_vibe_spec/{feature_name}_vibe_spec.md`
+- **关联分阶段规划**：`_01_product_vision/_02_phased_roadmap/{feature_name}_phased_plan.md`
 
 > [!NOTE]
 > **产出铁律**：本文件专精于**微观特性产品洞察、用户体验与功能规格**。宏观品味与全局设计语言继承自项目根目录 `DESIGN.md`；严禁在本文中写入物理数据库 DDL、代码六元组签名、底层技术选型或单元测试覆盖率数字等研发实现细节（由后续架构与详细设计承接）。

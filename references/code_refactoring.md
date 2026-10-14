@@ -39,14 +39,20 @@
   ```
   若重合度 $\ge 80\%$ 强制复用，严禁产生影子函数。
 
-### 阶段 3：行为等价验证与门禁（Equivalence Verification）
-- **运行特征测试**：保护网测试必须一次性全部通过，断言无任何可观测漂移；
-- **静态检测零告警**：静态分析工具（Linter / TypeChecker / Dead Code Scanner）必须 0 Warning 且 0 Error；
-- **清理临时测试**：若编写了粗糙的临时快照，在此阶段提炼为高质量的正规单元测试；
-- **文档与索引对齐**：更新关联设计文档的方法签名与 digest，提交前运行：
+### 阶段 3：契约同步、索引自愈与行为等价门禁（Contract Sync & Equivalence Verification）
+- **运行特征测试**：保护网测试必须一次性全部通过，断言无任何外部可观测行为漂移；
+- **清理与固化自动化测试**：将临时快照测试提炼为标准工程单元测试，纳入日常测试集；
+- **契约文档与模式档案同步**：
+  - 更新 `_04_engineering_contract/_04_method_design/` 中重构后方法的画像属性、符号锚点、局部依赖拓扑及单跑命令；
+  - 若引入了设计模式，同步更新 `_03_architecture_design/_02_pattern_clusters/` 模式集群档案；
+- **过程账本与快照记录**：在 `_06_dev_process/_01_plan_log` 标记重构步骤为 `done`，`_02_change_log` 记录最终快照；
+- **双层索引自愈与罗盘刷新**：
   ```bash
-  python3 scripts/verify_consistency.py --root .
+  python3 scripts/idx_manager.py rebuild
+  python3 scripts/doc_index_db.py --root . rebuild
+  python3 scripts/doc_index_db.py --root . generate-guide
   ```
+- **静态检测与门禁硬拦截**：静态分析工具（Linter / TypeChecker / Dead Code Scanner）必须 0 Warning 且 0 Error，运行 `python3 scripts/verify_consistency.py --root . --strict` 确保零漂移，方可执行本地 Commit。
 
 ---
 

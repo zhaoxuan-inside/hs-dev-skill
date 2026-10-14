@@ -12,7 +12,7 @@
 | `test/_00_e2e` | 端到端全链路冒烟与运行态测试 | 主流程用例 100% 通过；致命异常链路 100% 覆盖；**双轨制 E2E**：开发期走 Mock Profile 快速冒烟，交付门禁强制直连官方沙箱或 Testcontainers 真实轻量容器（严禁全量假 Mock 蒙混过关）；**集成 Chrome DevTools CDP 自动化**：真实/无头浏览器 Console 错误与未捕获 Promise 异常 100% 清零，关键网络请求 0 挂起 |
 | `test/_01_method_test` | 方法级单元测试 | 核心业务逻辑分支覆盖率 ≥ 85%；降级（Fallback）与补偿（Compensate）逻辑 100% 覆盖 |
 | `test/_02_integration_test` | 数据库/中间件/RPC 联调测试 | 事务原子性、分布式补偿生效、超时熔断与重试正常生效 |
-| `test/_03_contract_test` | 多端/服务契约测试 | 接口请求与响应字段必须与 `_13_mock_contract/` 中的 Schema 严格一致 |
+| `test/_03_contract_test` | 多端/服务契约测试 | 接口请求与响应字段必须与 `_04_engineering_contract/_03_mock_contract/` 中的 Schema 严格一致 |
 | `test/_04_regression_test` | 历史缺陷回归测试 | 历史已知缺陷库中的所有用例持续 100% 通过 |
 | `test/_05_performance_test` | 性能基准与 CWV 指标测试 | 核心接口响应耗时 P99、QPS 无劣化；**集成 LCP/内存泄漏诊断**：LCP ≤ 2.5s（关键资源预加载）、前端 SPA 路由切换与长任务下**无游离 DOM 与事件监听内存泄漏**（Heap Snapshot 稳定） |
 | `test/_06_security_test` | 安全合规扫描 | SQL/NoSQL 注入、XSS、垂直/水平越权、敏感字段日志脱敏校验 |
@@ -26,11 +26,11 @@
 在执行 Git 提交或合并前，必须通过以下自检项：
 0. **全量测试 100% PASS 与 0 报错（硬阻断门禁）**：`make test`（或项目等价命令）100% PASS，**无任何失败、报错或挂起用例**；若有任一报错，**绝对禁止流转 COMPLETED 与交付**，严禁向用户汇报“已完成但有报错待修”，必须就地排查修复直到全绿；触达 seam 的自动化测已存在；**前端页面无未捕获 Console 报错与网络死锁**（Chrome DevTools 审计通过）。
 0b. **代码静态检测零告警零错误（Zero Warnings, Zero Errors Gate）**：语言对应 Linter（Python: Ruff/Mypy, Go: golangci-lint, Rust: clippy, TS/JS/Vue: ESLint/TSC, Java: Checkstyle/SpotBugs 等，详见 [`coding_standards.md`](coding_standards.md)）、死代码扫描（`dead_code_scanner.py`）、规范检查（`verify_consistency.py`）**必须 0 警告（0 Warning）且 0 错误（0 Error）**；任何 Warning 均须当场清理修复，严禁带 Warning 提交或交付。
-0c. **术语防歧义与词态矩阵门禁（Zero Forbidden Synonyms & Lifecycle Grammar Gate）**：统一术语词典 `_00_project/_02_project_word.dict.yaml` 格式完备；`verify_consistency.py` 扫描无 `forbidden_alias` 违规命名，无事件动词原形（如 `order.update`）与时间戳（如 `updated_at`）混用，事件主题必须使用过去分词（如 `order.updated`），事件常量收敛导出无裸字符串。
-1. **死代码与孤儿方法扫描**：所有新增或修改的方法均在 `_07_call_chain` 中有合法引用路径，或具备白名单注解。
+0c. **术语防歧义与词态矩阵门禁（Zero Forbidden Synonyms & Lifecycle Grammar Gate）**：统一术语词典 `_00_project_foundation/_02_dictionary/_02_project_word.dict.yaml` 格式完备；`verify_consistency.py` 扫描无 `forbidden_alias` 违规命名，无事件动词原形（如 `order.update`）与时间戳（如 `updated_at`）混用，事件主题必须使用过去分词（如 `order.updated`），事件常量收敛导出无裸字符串。
+1. **死代码与孤儿方法扫描**：所有新增或修改的方法均在 `_04_engineering_contract/_05_call_chain` 中有合法引用路径，或具备白名单注解。
 2. **三同步完整性**：业务逻辑修改已同步更新方法设计文档、DB 迁移脚本（V/U）及单元/契约测试。
 3. **索引完整性**：新增/重命名/删除的文件已同步更新对应的 `.idx` 索引文件。
-4. **三文件一致性**：`_00_task.idx`、`_01_task_brief/`、`_02_task_detail/` 任务状态与元数据完全吻合。
+4. **三文件一致性**：`_05_task_orchestration/` 下的 `_00_task.idx`、`_01_task_brief/`、`_02_task_detail/` 任务状态与元数据完全吻合。
 5. **专项体验与性能合规**：满足 WCAG a11y 关键对比度与键盘访问；无突出的 LCP 阻塞与内存泄漏隐患。
 6. **多端产物收敛与环境安全**：打包产物必须通过脚手架配置重定向至 `output/<client>` 对应子目录，工作区根目录下严禁散落二进制安装包；移动端发布包强制配对混淆符号表（Mapping/dSYM）；敏感 `.env` 绝不上库，具备 `config/.env.example` 声明契约。
 7. **Git Commit 规范**：提交信息符合 `<type>(<scope>): <subject>` 及相关 Footer 规范；默认仅本地 commit，**用户明确要求推送**时方可 `git push`。

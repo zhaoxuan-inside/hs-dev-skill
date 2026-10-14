@@ -128,7 +128,7 @@ python3 scripts/global_index_db.py search --tag 反向代理
 # Windows
 py -3 scripts/skill_ref_index.py search --scenario UI
 py -3 scripts/rule_fetch.py resolve --id local.api.core
-py -3 scripts/doc_index_db.py --root . slice --path hs_dev_docs/_01_product_design/_02_product_design/xxx_prd.md --start 1 --end 40
+py -3 scripts/doc_index_db.py --root . slice --path hs_dev_docs/_02_feature_spec/_01_human_prd/xxx_prd.md --start 1 --end 40
 py -3 scripts/global_index_db.py search --q nginx --kind note
 ```
 

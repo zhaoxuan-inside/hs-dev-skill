@@ -12,7 +12,7 @@
 3. **语义入口**：用户意图含「继续 / 接着 / 续做 / resume / 继续任务」等 → 先走 §2，禁止当新需求重开满配。  
 4. **最小集**：过程目录只强制维护 `plan_log`、`change_log`、以及回退用的 `error_recovery/snapshots`；其余 `_06_todo` 等可选。
 
-路径根：`hs_dev_docs/_08_dev_process/`。
+路径根：`hs_dev_docs/_06_dev_process/`。
 
 | 目录 | 用途 |
 |------|------|
@@ -77,7 +77,7 @@ R4  从断点下一步推进；禁止重做已 done 步骤，禁止忽略 BLOCKE
   "summary": "实现 create_order 主路径",
   "paths": [
     {"path": "backend/order_service.py", "snapshot": "_04_error_recovery/snapshots/cp_…/backend__order_service.py"},
-    {"path": "hs_dev_docs/_06_method_design/.../….md", "snapshot": "…"}
+    {"path": "hs_dev_docs/_04_engineering_contract/_04_method_design/.../….md", "snapshot": "…"}
   ],
   "status_before": "IN_PROGRESS",
   "plan_step_before": "S3"

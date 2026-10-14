@@ -17,20 +17,20 @@ class TestDocIndexDB(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
         self.root = Path(self.tmp.name)
         docs = self.root / "hs_dev_docs"
-        product = docs / "_01_product_design" / "_02_product_design"
+        product = docs / "_02_feature_spec" / "_01_human_prd"
         product.mkdir(parents=True)
         prd = product / "demo_prd.md"
         prd.write_text(
             "# Demo PRD\n\n支付流程与账户冻结。\n\n## DoD\n- 超时触发补偿\n",
             encoding="utf-8",
         )
-        idx = docs / "_01_product_design" / "_00_product_design.idx"
+        idx = docs / "_02_feature_spec" / "_00_feature_spec.idx"
         mgr = IdxManager(str(idx))
-        mgr.init_idx("product_design", "_01_product_design")
+        mgr.init_idx("feature_spec", "_02_feature_spec")
         mgr.add_entry(
             "demo_prd",
             "Demo PRD 支付",
-            "_02_product_design/demo_prd.md",
+            "_01_human_prd/demo_prd.md",
             auto_digest=True,
         )
 
@@ -48,7 +48,7 @@ class TestDocIndexDB(unittest.TestCase):
                 str(p).replace("\\", "/").endswith(suffix)
                 for suffix in [
                     "hs_dev_docs/_00_project_foundation/_05_doc_index/doc_index.sqlite",
-                    "hs_dev_docs/_00_project/_18_doc_index/doc_index.sqlite",
+                    "hs_dev_docs/_00_project_foundation/_05_doc_index/doc_index.sqlite",
                 ]
             )
         )
@@ -203,7 +203,7 @@ class TestDocIndexDB(unittest.TestCase):
 
     def test_feature_and_page_indexing_and_search(self):
         # 准备 PRD 文件
-        prd_dir = self.root / "hs_dev_docs" / "_01_product_design" / "_02_product_design" / "features"
+        prd_dir = self.root / "hs_dev_docs" / "_02_feature_spec" / "_01_human_prd" / "features"
         prd_dir.mkdir(parents=True, exist_ok=True)
         feat_file = prd_dir / "checkout_prd.md"
         feat_file.write_text(
@@ -219,7 +219,7 @@ class TestDocIndexDB(unittest.TestCase):
         )
 
         # 准备原型与页面布局文件
-        proto_dir = self.root / "hs_dev_docs" / "_01_product_design" / "_03_product_figma"
+        proto_dir = self.root / "hs_dev_docs" / "_02_feature_spec" / "_04_prototype_wireframe"
         proto_dir.mkdir(parents=True, exist_ok=True)
         page_file = proto_dir / "checkout_prototype.md"
         page_file.write_text(
@@ -228,7 +228,7 @@ class TestDocIndexDB(unittest.TestCase):
             "- **路由 / Route**：`/order/checkout`\n"
             "- **所属模块**：checkout\n"
             "- **内容密度 / 布局类型**：主从分栏 (Split View)\n"
-            "- **可交互 HTML 原型预览**：`_03_product_figma/checkout_prototype.html`\n\n"
+            "- **可交互 HTML 原型预览**：`_03_prototype_html/checkout_prototype.html`\n\n"
             "## 页面布局\n"
             "左侧展示商品清单与优惠明细，右侧固定 380px 收银支付抽屉面板。\n",
             encoding="utf-8",
@@ -530,12 +530,12 @@ class TestDocIndexDB(unittest.TestCase):
         db = DocIndexDB(self.root)
         try:
             db.rebuild()
-            target_file = self.root / "hs_dev_docs" / "_01_product_design" / "_02_product_design" / "demo_prd.md"
+            target_file = self.root / "hs_dev_docs" / "_02_feature_spec" / "_01_human_prd" / "demo_prd.md"
             # 外部直接修改该文件（模拟协同开发未跑 rebuild 的场景）
             target_file.write_text("# Demo PRD Updated\n\n外部直改：增加退款风控拦截规则。\n", encoding="utf-8")
 
             # 调用 get 时应该自动触发 JIT 自愈
-            got = db.get("hs_dev_docs/_01_product_design/_02_product_design/demo_prd.md")
+            got = db.get("hs_dev_docs/_02_feature_spec/_01_human_prd/demo_prd.md")
             self.assertTrue(got["ok"])
             self.assertIn("退款风控拦截规则", got["result"]["summary"])
         finally:

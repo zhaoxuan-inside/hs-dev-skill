@@ -3,8 +3,8 @@
 - **功能模块**：{feature_name}
 - **创建时间**：{YYYY-MM-DD}
 - **介质形式**：双轨原型（Mermaid 拓扑 + ASCII 空间比例线框） / UX 四定律 / Design Tokens 规范
-- **关联 PRD**：`_02_product_design/{feature_name}_prd.md`
-- **可交互 HTML 原型预览**：`_03_product_figma/{feature_name}_prototype.html`（多端视口仿真与四态直读）
+- **关联 PRD**：`_02_feature_spec/_01_human_prd/{feature_name}_prd.md`
+- **可交互 HTML 原型预览**：`_02_feature_spec/_03_prototype_html/{feature_name}_prototype.html`（多端视口仿真与四态直读）
 - **宏观品味宪章继承**：`Inherits: /DESIGN.md`
 - **状态**：DRAFT / REVIEWED / FROZEN
 
@@ -141,7 +141,7 @@ flowchart TB
 |                      | | 编号         名称              核心指标 (tabular)   状态    操作       |  |
 |                      | | [Table Header: 12px, Uppercase, w600, Text: #6C7278, Bg: #F7F5F2]       |  |
 |                      | |------------------------------------------------------------------------|  |
-|                      | | #ID-1024     示例业务记录 A     98.5% (Mono)         ●正常   [详情](13px)|
+|                      | | #ID-1024     示例业务记录 A     98.5% (Mono)         ●正常   [详情] (13px)|
 |                      | | #ID-1023     示例业务记录 B     86.0% (Mono)         ○待审   [审核]     |  |
 |                      | +------------------------------------------------------------------------+  |
 |                      | 显示 1-20 条 / 共 24 条 [12px, #6C7278]               [< 上一页] [下一页 >] |

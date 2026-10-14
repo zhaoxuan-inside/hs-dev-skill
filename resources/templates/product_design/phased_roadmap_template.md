@@ -6,8 +6,8 @@
 - **产品负责人**：{owner}
 - **当前实施目标**：Phase 1 (MVP)
 - **关联设计与需求**：
-  - 功能规格 PRD：`_02_product_design/{feature_name}_prd.md`
-  - 设计语言与原型：`_03_product_figma/{feature_name}_prototype.md`
+  - 功能规格 PRD：`_02_feature_spec/_01_human_prd/{feature_name}_prd.md`
+  - 设计语言与原型：`_02_feature_spec/_04_prototype_wireframe/{feature_name}_prototype.md`
 
 > [!NOTE]
 > **定位原则**：本规划书是产品设计向工程研发演进的战略桥梁。通过严密的功能分期与 MVP 裁剪，确保系统以最小成本、最快速度验证核心假设，坚决杜绝一次性全量开发 (Big Bang)。

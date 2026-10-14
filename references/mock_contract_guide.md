@@ -4,7 +4,7 @@
 
 ```text
     ┌───────────────────────────────────────────────┐
-    │  hs_dev_docs/_00_project/_13_mock_contract/   │
+    │  hs_dev_docs/_04_engineering_contract/_03_mock_contract/   │
     │  (单一真理源契约库: JSON Schema / Protobuf)     │
     └───────┬───────────────────────────────┬───────┘
             │ 引用契约                      │ 协议断言
@@ -36,7 +36,7 @@ dataset: order_create_base
 scenario: order_create_timeout
 error_inject: downstream_timeout
 delay_inject: slow_stock_service
-contract_ref: hs_dev_docs/_00_project/_13_mock_contract/order_create.json
+contract_ref: hs_dev_docs/_04_engineering_contract/_03_mock_contract/order_create.json
 ```
 
 ---

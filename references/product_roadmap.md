@@ -97,7 +97,7 @@ Agent **严禁自作主张私自裁减 MVP 范围**！从“全量产品设计�
 
 ## 5. 本阶段产出：《产品开发分阶段规划书》
 
-- **产出文件**：`hs_dev_docs/_01_product_design/_04_phased_roadmap/{feature_name}_phased_plan.md`
+- **产出文件**：`hs_dev_docs/_01_product_vision/_02_phased_roadmap/{feature_name}_phased_plan.md`
 - **模板来源**：`resources/templates/product_design/phased_roadmap_template.md`
 - **核心章节**：
   1. 核心验证假设、团队胃口 (Appetite) 与 MVP 定位

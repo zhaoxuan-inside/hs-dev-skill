@@ -2,7 +2,7 @@
 
 **何时读**：
 - 阶段 2 架构设计：规划子系统解耦、异步流转、分布式事务与防腐层；
-- 阶段 3 详细设计：规划类、接口与具体方法（`_06_method_design`）；
+- 阶段 3 详细设计：规划类、接口与具体方法（`_04_engineering_contract/_04_method_design`）；
 - 阶段 5 编码重构：发现多层嵌套 `if-else`、参数膨胀、散落状态变迁等代码异味（Code Smells）；
 - 检索命令：`python scripts/skill_ref_index.py search --q 设计模式` 或 `search --q 策略模式`
 
@@ -84,7 +84,7 @@
 4. VibeCoding 防破坏硬护栏。
 
 ### 4.2 方法属性精准关联指针（Token 极度收敛）
-在具体方法设计文档（`_06_method_design`）中，**直接打上精准模式集群指针**：
+在具体方法设计文档（`_04_engineering_contract/_04_method_design`）中，**直接打上精准模式集群指针**：
 
 ```markdown
 - **模式集群关联 (patternCluster)**：

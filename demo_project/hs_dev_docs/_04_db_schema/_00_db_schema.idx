@@ -1,2 +1,0 @@
-{"version": "1.0", "category": "db_schema", "root": "_04_db_schema"}
-{"id": "model_payment_db", "title": "支付模型DB设计", "path": "_01_payment/_00_payment_db_schema.idx", "status": "active"}

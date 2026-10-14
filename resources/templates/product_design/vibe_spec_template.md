@@ -1,8 +1,8 @@
 # ==============================================================================
 # VIBECODING EXECUTION SPEC (Machine-Actionable Contract)
 # Target Feature: {feature_name}
-# Source PRD: _02_product_design/{feature_name}_prd.md
-# Source Prototype: _03_product_figma/{feature_name}_prototype.md
+# Source PRD: _02_feature_spec/_01_human_prd/{feature_name}_prd.md
+# Source Prototype: _02_feature_spec/_04_prototype_wireframe/{feature_name}_prototype.md
 # Macro Taste Charter: Inherits /DESIGN.md (全局设计隐喻、基准调色盘与 Anti-Slop 守则)
 # 读写约定：专供 VibeCoding / AI 编码工具快速消费；高信息密度、零叙事废话、可直接映射代码与测试。
 # ==============================================================================

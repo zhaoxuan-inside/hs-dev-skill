@@ -1,6 +1,6 @@
 # 产品开发 Skill 规格定义书
 
-版本：v2.4  
+版本：v2.42.0.0  
 定位：文档驱动开发 + 六元组标准化运行时 + Agent 上下文引擎
 
 ---
@@ -74,166 +74,47 @@
 │   ├── scripts/
 │   │
 │   └── hs_dev_docs/
-│       ├── _00_hs_dev_docs.idx                    # 全局根索引（一级路由）
-│       ├── _00_project/
-│       │   ├── _00_project.idx
+│       ├── README.md                                 # [全局罗盘] 项目文档阅读说明与直接索引导航（置顶 [VIBE_CONTRACT]）
+│       ├── _00_hs_dev_docs.idx                       # 全局根索引（一级路由）
+│       ├── _00_project_foundation/                   # [00 基座与全局规范]
+│       │   ├── _00_project_foundation.idx
 │       │   ├── _01_dev_rule/
-│       │   │   ├── _00_dev_rule.idx
-│       │   │   ├── _01_self_dev_rule.md
-│       │   │   ├── _02_{lang_1}_dev_rule.md
-│       │   │   └── _03_{lang_2}_dev_rule.md
-│       │   ├── _02_project_word.dict.yaml
-│       │   ├── _03_code_map/
-│       │   │   ├── _00_code_map.idx
-│       │   │   ├── _01_module_map.md
-│       │   │   ├── _02_package_map.md
-│       │   │   ├── _03_symbol_index.idx
-│       │   │   ├── _04_dependency_graph.md
-│       │   │   ├── _05_entrypoint.md
-│       │   │   ├── _06_data_flow.md
-│       │   │   ├── _07_control_flow.md
-│       │   │   └── _08_external_dependency.md
-│       │   ├── _04_context_pack_template/
-│       │   │   ├── _00_context_pack.idx
-│       │   │   └── _01_context_pack_template.md
-│       │   ├── _05_decision_record/
-│       │   │   ├── _00_decision_record.idx
-│       │   │   └── _01_adr_template.md
-│       │   ├── _06_known_issue/
-│       │   │   ├── _00_known_issue.idx
-│       │   │   └── _01_issue_playbook.md
-│       │   ├── _07_tech_debt/
-│       │   │   ├── _00_tech_debt.idx
-│       │   │   └── _01_tech_debt_log.md
-│       │   ├── _08_dev_command/
-│       │   │   ├── _00_dev_command.idx
-│       │   │   ├── _01_build.md
-│       │   │   ├── _02_run.md
-│       │   │   ├── _03_test.md
-│       │   │   ├── _04_lint.md
-│       │   │   ├── _05_format.md
-│       │   │   ├── _06_debug.md
-│       │   │   ├── _07_mock_start.md
-│       │   │   ├── _08_db_migrate.md
-│       │   │   └── _09_codegen.md
-│       │   ├── _09_dev_env/
-│       │   │   ├── _00_dev_env.idx
-│       │   │   └── _01_env_vars.md
-│       │   ├── _10_prompt_template/
-│       │   │   ├── _00_prompt_template.idx
-│       │   │   ├── _01_task_planning.md
-│       │   │   ├── _02_code_generation.md
-│       │   │   ├── _03_debugging.md
-│       │   │   ├── _04_refactoring.md
-│       │   │   └── _05_test_generation.md
-│       │   ├── _11_example_lib/
-│       │   │   ├── _00_example_lib.idx
-│       │   │   ├── _01_good_examples.md
-│       │   │   ├── _02_bad_examples.md
-│       │   │   ├── _03_refactor_before_after.md
-│       │   │   ├── _04_interface_usage.md
-│       │   │   ├── _05_test_examples.md
-│       │   │   └── _06_mock_examples.md
-│       │   ├── _12_test_strategy/
-│       │   │   ├── _00_test_strategy.idx
-│       │   │   └── _01_test_strategy.md
-│       │   ├── _13_mock_contract/
-│       │   │   ├── _00_mock_contract.idx
-│       │   │   └── _01_mock_contract.md
-│       │   ├── _14_observability_rule/
-│       │   │   ├── _00_observability_rule.idx
-│       │   │   └── _01_observability_rule.md
-│       │   ├── _15_security_rule/
-│       │   │   ├── _00_security_rule.idx
-│       │   │   └── _01_security_rule.md
-│       │   ├── _16_data_consistency_rule/
-│       │   │   ├── _00_data_consistency_rule.idx
-│       │   │   └── _01_data_consistency_rule.md
-│       │   └── _17_git_commit_rule/
-│       │       ├── _00_git_commit_rule.idx
-│       │       └── _01_commit_message_rule.md
-│       │
-│       ├── _01_product_design/
-│       │   ├── _00_product_design.idx
-│       │   ├── _01_business_plan/
-│       │   ├── _02_product_design/
-│       │   └── _03_product_figma/
-│       │
-│       ├── _02_tech_select/
-│       │   ├── _00_tech_select.idx
-│       │   ├── _01_frontend_tech_select.md
-│       │   ├── _02_android_tech_select.md
-│       │   ├── _03_ios_tech_select.md
-│       │   ├── _04_mac_tech_select.md
-│       │   ├── _05_linux_tech_select.md
-│       │   ├── _06_windows_tech_select.md
-│       │   └── _07_backend_tech_select.md
-│       │
-│       ├── _03_architecture_design/
+│       │   ├── _02_dictionary/                       # _02_project_word.dict.yaml
+│       │   ├── _03_decision_record/                  # ADR 架构决策记录
+│       │   └── _05_doc_index/                        # doc_index.sqlite (FTS5 倒排索引库)
+│       ├── _01_product_vision/                       # [01 产品愿景与定界]
+│       │   ├── _00_product_vision.idx
+│       │   ├── _01_design_charter/                   # DESIGN.md 宏观品味宪章
+│       │   └── _02_phased_roadmap/                   # MVP 裁剪决策与路线图
+│       ├── _02_feature_spec/                         # [02 特性规格与原型契约]
+│       │   ├── _00_feature_spec.idx
+│       │   ├── _01_human_prd/                        # 人类 PRD
+│       │   ├── _02_vibe_spec/                        # 机器执行契约 vibe_spec.md
+│       │   ├── _03_prototype_html/                   # 单文件多端可交互原型
+│       │   └── _04_prototype_wireframe/              # 空间拓扑与多态线框
+│       ├── _03_architecture_design/                  # [03 系统架构设计与模式蓝图]
 │       │   ├── _00_architecture_design.idx
-│       │   ├── _01_frontend_architecture_design.md
-│       │   ├── _02_android_architecture_design.md
-│       │   ├── _03_ios_architecture_design.md
-│       │   ├── _04_mac_architecture_design.md
-│       │   ├── _05_linux_architecture_design.md
-│       │   ├── _06_windows_architecture_design.md
-│       │   └── _07_backend_architecture_design.md
-│       │
-│       ├── _04_db_schema/
-│       │   ├── _00_db_schema.idx
-│       │   └── _01_{model_name}/
-│       │       ├── _00_{model_name}_db_schema.idx
-│       │       ├── _01_{table_name}_design.md
-│       │       └── migrations/
-│       │           ├── _00_migration.idx
-│       │           ├── V1.0.0__init_{table_name}.sql
-│       │           └── U1.0.0__init_{table_name}.sql
-│       │
-│       ├── _05_interface_design/
-│       │   ├── _00_interface_design.idx
-│       │   └── _01_{model_name}/
-│       │       ├── _00_{model_name}_interface_design.idx
-│       │       └── _01_{interface_name}_design.md
-│       │
-│       ├── _06_method_design/
-│       │   ├── _00_method_design.idx
-│       │   └── _01_{model_name}/
-│       │       ├── _00_{model_name}_method_design.idx
-│       │       └── _01_{method_name}_design.md
-│       │
-│       ├── _07_call_chain/
-│       │   ├── _00_call_chain.idx
-│       │   └── _01_{call_source}/
-│       │       ├── _00_{call_source}_call_chain.idx
-│       │       └── _01_{call_source}_call_chain.md
-│       │
-│       └── _08_dev_process/
+│       │   ├── _01_system_architecture/              # 整体架构拓扑与分层蓝图
+│       │   ├── _02_pattern_clusters/                 # GoF 设计模式协同集群档案
+│       │   └── _03_adapter_spec/                     # 第三方/专用 SDK 防腐层规范
+│       ├── _04_engineering_contract/                 # [04 工程四要素详细契约]
+│       │   ├── _00_engineering_contract.idx
+│       │   ├── _01_db_schema/                        # 表结构 DDL 与迁移基线
+│       │   ├── _02_interface_design/                 # RESTful/RPC 接口契约
+│       │   ├── _03_mock_contract/                    # Mock 契约与数据 Profile
+│       │   ├── _04_method_design/                    # 方法七维画像与精准单跑测试
+│       │   └── _05_call_chain/                       # 核心业务调用链 Mermaid 时序拓扑
+│       ├── _05_task_orchestration/                   # [05 任务编排与上下文装载]
+│       │   ├── _00_task_orchestration.idx
+│       │   ├── _01_task_brief/
+│       │   ├── _02_task_detail/
+│       │   ├── _03_task_context_pack/
+│       │   └── _04_task_archive/
+│       └── _06_dev_process/                          # [06 开发过程与治理记录]
 │           ├── _00_dev_process.idx
-│           ├── _01_plan_log/
-│           ├── _02_change_log/
-│           ├── _03_verify_log/
-│           ├── _04_error_recovery/
-│           ├── _05_session_handoff/
-│           ├── _06_todo/
-│           ├── _07_iteration_debt_log/
-│           ├── _08_next_step/
-│           └── _09_task/
-│               ├── _00_task.idx
-│               ├── _00_task_archive.idx
-│               ├── _01_task_brief/
-│               │   ├── _00_task_brief.idx
-│               │   ├── _01_task_brief_001.md
-│               │   └── _02_task_brief_002.md
-│               ├── _02_task_detail/
-│               │   ├── _00_task_detail.idx
-│               │   └── _01_{task_name}/
-│               │       ├── _00_task_detail.md
-│               │       ├── _01_task_part1.md
-│               │       └── _02_verify_record.md
-│               └── _03_task_context_pack/
-│                   ├── _00_context_pack.idx
-│                   └── _01_{task_name}/
-│                       └── _00_context_pack.md
+│           ├── _01_plan_log/                         # 有序计划与断点账本
+│           ├── _02_change_log/                       # 变更流水账本与快照 (非 Git 物理回滚依据)
+│           └── _04_error_recovery/snapshots/         # 故障恢复物理快照
 ```
 
 ---
@@ -362,9 +243,9 @@ U{主}.{次}.{补丁}__{描述}.sql
 1. 业务代码中严禁包含 Mock 桩、Mock 分支、测试数据硬编码；
 2. Mock 必须作为独立服务启动，通过接口或网络层接入；
 3. Mock 代码与 Mock 数据必须分离；
-4. Mock 契约必须与 `_05_interface_design`、`_03_contract_test` 保持一致；
+4. Mock 契约必须与 `_04_engineering_contract/_02_interface_design`、`_03_contract_test` 保持一致；
 5. 测试集通过 profile 组合，不改代码即可切换数据、场景、错误与延迟；
-6. Mock 契约单一真理源位于 `hs_dev_docs/_00_project/_13_mock_contract/`。
+6. Mock 契约单一真理源位于 `hs_dev_docs/_04_engineering_contract/_03_mock_contract/`。
 
 ---
 
@@ -377,9 +258,9 @@ U{主}.{次}.{补丁}__{描述}.sql
 首行为元数据行，包含 `version`、`category`、`root`；其余每行为一个索引条目。
 
 ```jsonl
-{"version":"1.0","category":"interface","root":"_05_interface_design"}
-{"id":"order_create","title":"创建订单与锁库","path":"_05_interface_design/_01_order/_01_order_create_design.md","digest":"a1b2c3d4","status":"active"}
-{"id":"order_cancel","title":"取消订单","path":"_05_interface_design/_01_order/_02_order_cancel_design.md","digest":"e5f6g7h8","status":"active"}
+{"version":"1.0","category":"interface","root":"_04_engineering_contract/_02_interface_design"}
+{"id":"order_create","title":"创建订单与锁库","path":"_04_engineering_contract/_02_interface_design/_01_order/_01_order_create_design.md","digest":"a1b2c3d4","status":"active"}
+{"id":"order_cancel","title":"取消订单","path":"_04_engineering_contract/_02_interface_design/_01_order/_02_order_cancel_design.md","digest":"e5f6g7h8","status":"active"}
 ```
 
 ### 6.2 渐进式四级路由体系
@@ -392,5 +273,5 @@ U{主}.{次}.{补丁}__{描述}.sql
 ### 6.3 任务三文件一致性约束
 
 - `task_id` 为唯一主键。
-- `_00_task.idx`、`_01_task_brief/`、`_02_task_detail/` 中的 `task_id`、`title`、`status`、`updated` 必须一致。
+- `_05_task_orchestration/` 下的 `_00_task.idx`、`_01_task_brief/`、`_02_task_detail/` 中的 `task_id`、`title`、`status`、`updated` 必须一致。
 - 变更顺序：先改 `task_detail`，再同步 `task_brief`，最后更新 `task.idx`。

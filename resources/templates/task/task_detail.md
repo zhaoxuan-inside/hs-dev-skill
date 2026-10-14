@@ -13,10 +13,10 @@
 ---
 
 ## 2. 关联设计文档清单
-- **数据表设计**：`hs_dev_docs/_04_db_schema/...`
-- **接口设计**：`hs_dev_docs/_05_interface_design/...`
-- **方法设计**：`hs_dev_docs/_06_method_design/...`
-- **调用链分析**：`hs_dev_docs/_07_call_chain/...`
+- **数据表设计**：`hs_dev_docs/_04_engineering_contract/_01_db_schema/...`
+- **接口设计**：`hs_dev_docs/_04_engineering_contract/_02_interface_design/...`
+- **方法设计**：`hs_dev_docs/_04_engineering_contract/_04_method_design/...`
+- **调用链分析**：`hs_dev_docs/_04_engineering_contract/_05_call_chain/...`
 
 ---
 
@@ -32,8 +32,8 @@
 ## 4. 涉及文件修改清单 (Diff Tracking)
 ```text
 M backend/src/service/order_service.go
-A hs_dev_docs/_04_db_schema/_01_order/migrations/V1.1.0__add_field.sql
-A hs_dev_docs/_04_db_schema/_01_order/migrations/U1.1.0__add_field.sql
+A hs_dev_docs/_04_engineering_contract/_01_db_schema/_01_order/migrations/V1.1.0__add_field.sql
+A hs_dev_docs/_04_engineering_contract/_01_db_schema/_01_order/migrations/U1.1.0__add_field.sql
 M test/_01_method_test/order_create_test.go
 ```
 

@@ -1018,13 +1018,20 @@ class DocIndexDB:
         return payload
 
     def _index_features(self, conn: sqlite3.Connection) -> int:
-        product_dir = self.docs_root / "_01_product_design"
-        candidate_dirs = [product_dir] if product_dir.exists() else ([self.docs_root] if self.docs_root.exists() else [])
+        feature_dir = self.docs_root / "_02_feature_spec"
+        legacy_product_dir = self.docs_root / "_01_product_design"
+        candidate_dirs = []
+        if feature_dir.exists():
+            candidate_dirs.append(feature_dir)
+        if legacy_product_dir.exists():
+            candidate_dirs.append(legacy_product_dir)
+        if not candidate_dirs and self.docs_root.exists():
+            candidate_dirs = [self.docs_root]
         count = 0
         for cdir in candidate_dirs:
             for fpath in cdir.rglob("*.md"):
                 rel_p = _posix_rel(fpath, self.root)
-                if not ("_02_product_design" in rel_p or "features" in rel_p or "prd" in fpath.name.lower()):
+                if not ("_01_human_prd" in rel_p or "_02_product_design" in rel_p or "features" in rel_p or "prd" in fpath.name.lower()):
                     continue
                 text = _read_text(fpath)
                 if not text:
@@ -1089,13 +1096,27 @@ class DocIndexDB:
         return count
 
     def _index_pages(self, conn: sqlite3.Connection) -> int:
-        product_dir = self.docs_root / "_01_product_design"
-        candidate_dirs = [product_dir] if product_dir.exists() else ([self.docs_root] if self.docs_root.exists() else [])
+        spec_dir = self.docs_root / "_02_feature_spec"
+        legacy_product_dir = self.docs_root / "_01_product_design"
+        candidate_dirs = []
+        if spec_dir.exists():
+            candidate_dirs.append(spec_dir)
+        if legacy_product_dir.exists():
+            candidate_dirs.append(legacy_product_dir)
+        if not candidate_dirs and self.docs_root.exists():
+            candidate_dirs = [self.docs_root]
         count = 0
         for cdir in candidate_dirs:
             for fpath in cdir.rglob("*.md"):
                 rel_p = _posix_rel(fpath, self.root)
-                if not ("_03_product_figma" in rel_p or "_03_product_prototype" in rel_p or "prototype" in fpath.name.lower() or "page" in rel_p):
+                if not (
+                    "_04_prototype_wireframe" in rel_p
+                    or "_03_prototype_html" in rel_p
+                    or "_03_product_figma" in rel_p
+                    or "_03_product_prototype" in rel_p
+                    or "prototype" in fpath.name.lower()
+                    or "page" in rel_p
+                ):
                     continue
                 text = _read_text(fpath)
                 if not text:
@@ -1203,19 +1224,23 @@ class DocIndexDB:
         return count
 
     def _index_data_schemas(self, conn: sqlite3.Connection) -> int:
-        schema_dir = self.docs_root / "_04_db_schema"
-        candidate_dirs = (
-            [schema_dir]
-            if schema_dir.exists()
-            else ([self.docs_root] if self.docs_root.exists() else [])
-        )
+        schema_dir = self.docs_root / "_04_engineering_contract" / "_01_db_schema"
+        legacy_schema_dir = self.docs_root / "_04_db_schema"
+        candidate_dirs = []
+        if schema_dir.exists():
+            candidate_dirs.append(schema_dir)
+        if legacy_schema_dir.exists():
+            candidate_dirs.append(legacy_schema_dir)
+        if not candidate_dirs and self.docs_root.exists():
+            candidate_dirs = [self.docs_root]
         count = 0
         seen_tables = set()
         for cdir in candidate_dirs:
             for fpath in cdir.rglob("*.md"):
                 rel_p = _posix_rel(fpath, self.root)
                 if not (
-                    "_04_db_schema" in rel_p
+                    "_01_db_schema" in rel_p
+                    or "_04_db_schema" in rel_p
                     or "schema" in rel_p.lower()
                     or "table" in rel_p.lower()
                 ):
@@ -1368,12 +1393,19 @@ class DocIndexDB:
                     count += 1
 
         # 2. 扫描方法设计文档中声明的调用链与依赖图 (Mermaid & Tables)
-        method_dir = self.docs_root / "_06_method_design"
-        candidate_dirs = [method_dir] if method_dir.exists() else ([self.docs_root] if self.docs_root.exists() else [])
+        method_dir = self.docs_root / "_04_engineering_contract" / "_04_method_design"
+        legacy_method_dir = self.docs_root / "_06_method_design"
+        candidate_dirs = []
+        if method_dir.exists():
+            candidate_dirs.append(method_dir)
+        if legacy_method_dir.exists():
+            candidate_dirs.append(legacy_method_dir)
+        if not candidate_dirs and self.docs_root.exists():
+            candidate_dirs = [self.docs_root]
         for cdir in candidate_dirs:
             for fpath in cdir.rglob("*.md"):
                 rel_p = _posix_rel(fpath, self.root)
-                if not ("_06_method_design" in rel_p or "method" in rel_p.lower()):
+                if not ("_04_method_design" in rel_p or "_06_method_design" in rel_p or "method" in rel_p.lower()):
                     continue
                 text = _read_text(fpath)
                 if not text:
@@ -2434,11 +2466,11 @@ class DocIndexDB:
 
         guidance = (
             "Anti-Method-Explosion Gate: If candidate matches intent >=80%, REUSE or EXTEND it with optional arguments. "
-            "If no candidate matches and you MUST create a new method, register its contract in hs_dev_docs/_06_method_design first, "
+            "If no candidate matches and you MUST create a new method, register its contract in hs_dev_docs/_04_engineering_contract/_04_method_design first, "
             "and strictly enforce Deep Module & Rule of Three (inline trivial 1-3 line logic)."
             if candidates
             else "No matching method found. If logic is trivial (<=3 lines) and single-use, INLINE it. "
-                 "If truly a new reusable domain method, create its contract profile under hs_dev_docs/_06_method_design first."
+                 "If truly a new reusable domain method, create its contract profile under hs_dev_docs/_04_engineering_contract/_04_method_design first."
         )
 
         return {
@@ -3152,7 +3184,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     p_method = sub.add_parser(
         "method-search",
-        help="Search method contracts in hs_dev_docs/_06_method_design to prevent method explosion",
+        help="Search method contracts in hs_dev_docs/_04_engineering_contract/_04_method_design to prevent method explosion",
     )
     p_method.add_argument("--q", required=True, help="Intent or keywords (e.g. '手机号脱敏' or 'payment')")
     p_method.add_argument("--archetype", default="", help="Filter by archetype: TRANSFORM/ALGO/GUARD/STATE/ORCHESTRATE/ADAPTER/PRESENT")

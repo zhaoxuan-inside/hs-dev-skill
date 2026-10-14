@@ -56,7 +56,7 @@ class TestTaskManager(unittest.TestCase):
 
         plan = self.root / "hs_dev_docs/_06_dev_process/_01_plan_log/order_create_test_plan.md"
         if not plan.exists():
-            plan = self.root / "hs_dev_docs/_08_dev_process/_01_plan_log/order_create_test_plan.md"
+            plan = self.root / "hs_dev_docs/_06_dev_process/_01_plan_log/order_create_test_plan.md"
         self.assertTrue(plan.exists())
 
     def test_illegal_transition_rejected(self):
@@ -74,7 +74,7 @@ class TestTaskManager(unittest.TestCase):
         self.assertEqual(res["change_size"], "M")
         brief_dir = self.root / "hs_dev_docs/_05_task_orchestration/_01_task_brief"
         if not brief_dir.exists():
-            brief_dir = self.root / "hs_dev_docs/_08_dev_process/_09_task/_01_task_brief"
+            brief_dir = self.root / "hs_dev_docs/_05_task_orchestration/_01_task_brief"
         brief_text = "\n".join(p.read_text(encoding="utf-8") for p in brief_dir.glob("*.md"))
         self.assertIn("**change_size**：`M`", brief_text)
 
@@ -93,7 +93,7 @@ class TestTaskManager(unittest.TestCase):
 
         idx_path = self.root / "hs_dev_docs/_05_task_orchestration/_00_task.idx"
         if not idx_path.exists():
-            idx_path = self.root / "hs_dev_docs/_08_dev_process/_09_task/_00_task.idx"
+            idx_path = self.root / "hs_dev_docs/_05_task_orchestration/_00_task.idx"
         IdxManager(str(idx_path)).update_digest()
         verifier = ConsistencyVerifier(str(self.root))
         self.assertTrue(verifier.check_all())

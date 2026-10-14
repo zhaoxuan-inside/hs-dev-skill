@@ -59,9 +59,9 @@
 
 ### 3.3 三级：模块索引 (`_0N_{domain}/_01_{model_name}/_00_{model_name}_{domain}.idx`)
 * **定位**：具体模块下的设计文档清单。
-* **示例**（`_05_interface_design/_01_order/_00_order_interface_design.idx`）：
+* **示例**（`_04_engineering_contract/_02_interface_design/_01_order/_00_order_interface_design.idx`）：
 ```jsonl
-{"version":"1.0","category":"module_interface","root":"_05_interface_design/_01_order"}
+{"version":"1.0","category":"module_interface","root":"_04_engineering_contract/_02_interface_design/_01_order"}
 {"id":"if_order_create","title":"创建交易订单接口","path":"_01_order_create_design.md","digest":"a7f3b8c2","status":"active"}
 {"id":"if_order_cancel","title":"取消订单接口","path":"_02_order_cancel_design.md","digest":"c4d9e1f0","status":"active"}
 ```
@@ -70,7 +70,7 @@
 Agent 在读取第三级锁定到 `_01_order_create_design.md` 后，利用局部阅读工具（指定 StartLine/EndLine）或：
 
 ```bash
-python scripts/doc_index_db.py --root . slice --path hs_dev_docs/_05_interface_design/_01_order/_01_order_create_design.md --start 15 --end 45
+python scripts/doc_index_db.py --root . slice --path hs_dev_docs/_04_engineering_contract/_02_interface_design/_01_order/_01_order_create_design.md --start 15 --end 45
 ```
 
 仅将所需的签名、入参表和异常**物化**进 `_00_context_pack.md`，完成精确开发。禁止只写路径。
@@ -117,12 +117,12 @@ python scripts/doc_index_db.py --root . slice --path hs_dev_docs/_05_interface_d
    - 系统可执行行为正确性的物理裁决者。代码对不对，以测试断言（Assert）能否通过为硬指标。
 6. **运行环境与构建配置真理 (`config/` / `.env.example` / `Makefile` / `package.json`)**：
    - 声明底层系统依赖、编译器工具链、网络拓扑与密钥隔离规约。
-7. **版本控制与过程审计真理 (`.git/` / `_01_plan_log/` / `_02_change_log/*.jsonl`)**：
+7. **版本控制与过程审计真理 (`.git/` / `_06_dev_process/_01_plan_log/` / `_06_dev_process/_02_change_log/*.jsonl`)**：
    - 记录每一行物理代码的增删改历史、任务状态机断点与无损物理回滚镜像。
 
 ### 5.2 派生总结与索引层定位
 
-- **中层总结 (L1 - Derived Summaries)**：如 `_06_method_design`（方法七维画像）、`_05_interface_design`（接口契约）、`_07_call_chain`（调用拓扑）。它们是从上述 L0 物理真理中提炼出来的高密度业务契约视图。
+- **中层总结 (L1 - Derived Summaries)**：如 `_04_engineering_contract/_04_method_design`（方法七维画像）、`_04_engineering_contract/_02_interface_design`（接口契约）、`_04_engineering_contract/_05_call_chain`（调用拓扑）。它们是从上述 L0 物理真理中提炼出来的高密度业务契约视图。
 - **顶层索引 (L2 - Index of Summaries)**：`doc_index.sqlite`（FTS5 / JSONL），对 L1 总结建立的毫秒级倒排索引。
 - **全局文档阅读与直接索引导航 (`hs_dev_docs/README.md`)**：作为连接人类工程师与协同 Agent 的全局导航罗盘，置顶 `[VIBE_CONTRACT]` 机器索引契约，提供 7 大功能域直接索引表与 10 大专用 CLI 指令（详见 [`doc_reading_guide.md`](doc_reading_guide.md)）。可通过 `make doc-guide` 或 `python scripts/doc_index_db.py --root . generate-guide` 自动生成与刷新。
 
@@ -151,15 +151,15 @@ python scripts/doc_index_db.py --root . slice --path hs_dev_docs/_05_interface_d
 
 | 探索 / 开发意图 | 目标底层真理源 | 强制执行的索引 CLI 指令 | 产出物与下游动作 |
 |---|---|---|---|
-| **找功能 / 查业务特性** | `_01_product_design/` (PRD) | `python scripts/doc_index_db.py feature-search --q <关键词>` | 返回关联特性 ID、摘要与 PRD 文件路径 |
-| **找页面 / 布局 / 线框图** | `_01_product_design/` (Pages) | `python scripts/doc_index_db.py page-search --q <关键词>` | 返回页面路由、布局模型与线框图切片 |
-| **查架构设计模式 / 防破坏** | `_02_pattern_clusters/` | `python scripts/doc_index_db.py pattern-search --q <模式名>` | 返回协同方法清单与抗劣化安全护栏 |
+| **找功能 / 查业务特性** | `_02_feature_spec/_01_human_prd/` | `python scripts/doc_index_db.py feature-search --q <关键词>` | 返回关联特性 ID、摘要与 PRD 文件路径 |
+| **找页面 / 布局 / 线框图** | `_02_feature_spec/_04_prototype_wireframe/` | `python scripts/doc_index_db.py page-search --q <关键词>` | 返回页面路由、布局模型与线框图切片 |
+| **查架构设计模式 / 防破坏** | `_03_architecture_design/_02_pattern_clusters/` | `python scripts/doc_index_db.py pattern-search --q <模式名>` | 返回协同方法清单与抗劣化安全护栏 |
 | **查数据表 / DDL 结构** | `migrations/V*.sql`, `data_schemas` | `python scripts/doc_index_db.py schema-search --q <表名>` | 返回字段摘要、关联特性与 DDL 迁移文件路径 |
 | **查方法依赖 / 爆炸半径** | 源码 AST / 调用拓扑 | `python scripts/doc_index_db.py dep-graph --symbol <方法名>` | 输出上游调用者（爆炸半径）与下游被调者（Mock范围）Mermaid 图 |
 | **查全局调用拓扑** | 全局依赖关系表 | `python scripts/doc_index_db.py dep-graph` | 输出系统核心高频 Top 枢纽方法与全局调用拓扑 |
-| **新建方法前意图查重** | `_06_method_design` | `python scripts/doc_index_db.py method-search --q <业务意图>` | 匹配重合度 ≥80% 强制复用，严禁新建同义影子方法 |
+| **新建方法前意图查重** | `_04_engineering_contract/_04_method_design` | `python scripts/doc_index_db.py method-search --q <业务意图>` | 匹配重合度 ≥80% 强制复用，严禁新建同义影子方法 |
 | **代码精准切片** | 源码业务实现 | `python scripts/doc_index_db.py symbol-slice --name <符号名>` | 直接返回函数的精确行号与源码切片（免读大文件） |
-| **查测试用例 / 单跑指令** | `_07_test_design/`, `tests/` | `python scripts/doc_index_db.py test-search --q <关键词>` | 瞬间返回精准单跑命令（如 `pytest test.py::case`） |
-| **查过程账本 / 恢复快照** | `_02_change_log/*.jsonl` | `python scripts/doc_index_db.py audit-search --since <时间>` | 返回指定时间段内的变更快照、修改前状态与影响文件 |
+| **查测试用例 / 单跑指令** | `_04_engineering_contract/`, `test/` | `python scripts/doc_index_db.py test-search --q <关键词>` | 瞬间返回精准单跑命令（如 `pytest test.py::case`） |
+| **查过程账本 / 恢复快照** | `_06_dev_process/_02_change_log/*.jsonl` | `python scripts/doc_index_db.py audit-search --since <时间>` | 返回指定时间段内的变更快照、修改前状态与影响文件 |
 
 

@@ -45,7 +45,7 @@
    - 定义全项目的真实物理隐喻（对标具象产品）、调色盘与 Tokens、Anti-Slop 审美红线与 10 星惊喜标准。
    - 具有全局跨特性约束力，单次定义、长期驻留，防止多功能各自发明设计规范造成风格撕裂。
 2. **微观层：特性级功能规格与交互原型 (Micro Feature Construction Specs)**：
-   - 存放于 `_02_product_design/{feature}_prd.md`、`{feature}_vibe_spec.md` 及原型中；
+   - 存放于 `_02_feature_spec/_01_human_prd/{feature}_prd.md`、`_02_feature_spec/_02_vibe_spec/{feature}_vibe_spec.md` 及原型中；
    - 顶部必须显式声明 `Inherits: /DESIGN.md`，禁止私自重定义全局美学与色盘，专注模块业务流、认知层级与组件局部多态。
 
 > [!IMPORTANT]
@@ -233,10 +233,18 @@ L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范�
 执行严格的提交前质量门禁自检，保障零死代码、零破坏性迁移、零索引漂移。
 
 ### 2. 自检动作
-1. **运行全量测试与运行态走查（测试零报错绝对阻断门禁）**：`make test` 确保 **100% PASS**，**无任何失败、报错或异常用例**；若有任何报错，**绝对禁止将任务置为 COMPLETED，绝对禁止 Git Commit，绝对禁止向用户汇报交付或完工**！严禁出现“代码已交付但有测试报错稍后修”的严重违规，必须就地 Debug 修复直至全绿。前端工程结合 Chrome DevTools CDP 自动化排查，确保无未捕获 Console 报错与网络死锁，满足 WCAG a11y 对比度与 LCP/内存泄漏安全线。
-2. **运行代码静态检测（零告警零错误门禁）**：语言对应 Linter（ESLint/Ruff/Flake8 等）与类型检查（TSC/Mypy）**必须达到 0 警告（0 Warning）且 0 错误（0 Error）**；任何 Warning 均视为阻断性质量缺陷必须就地消除，严禁带 Warning 提交代码。
-3. **运行一致性门禁检查**：`python3 scripts/verify_consistency.py --root .` 确保三文件、索引、V/U 脚本原子配对与目录卫生 100% 合规。
-4. **运行死代码与孤儿方法扫描**：`python3 scripts/dead_code_scanner.py --root .`。
-5. **流转任务状态并归档**：**仅当上述测试全绿、静态检测零告警零错误、一致性验证全部通过后**，方可执行 `python3 scripts/task_manager.py status --id {task_id} --set COMPLETED`（自动归档至 `_00_task_archive.idx`）。
-6. **Git 规范提交**：按照 `<type>(<scope>): <subject>` 规范生成本地 Commit。**默认不** `git push`；**仅当用户明确要求推送**时代为执行并回报结果。
+1. **契约文档与过程账本闭环（Doc & Process Sync）**：核对阶段 5 编码中涉及的所有方法画像、接口契约、表结构变更已在 `_04_engineering_contract/` 中 100% 同步更新；在 `_06_dev_process/_01_plan_log` 标记所有步骤为 `done`，`_02_change_log` 记录最终快照 checkpoint。
+2. **双层索引自愈与全局罗盘刷新（Self-Healing & Guide Refresh）**：
+   ```bash
+   python3 scripts/idx_manager.py rebuild
+   python3 scripts/doc_index_db.py --root . rebuild
+   python3 scripts/doc_index_db.py --root . generate-guide
+   ```
+   确保各子域 `.idx`、SQLite 倒排索引及根目录全局导航阅读说明 `hs_dev_docs/README.md` 处于最新状态且哈希一致。
+3. **运行全量测试与运行态走查（测试零报错绝对阻断门禁）**：`make test` 确保 **100% PASS**，**无任何失败、报错或异常用例**；若有任何报错，**绝对禁止将任务置为 COMPLETED，绝对禁止 Git Commit，绝对禁止向用户汇报交付或完工**！严禁出现“代码已交付但有测试报错稍后修”的严重违规，必须就地 Debug 修复直至全绿。前端工程结合 Chrome DevTools CDP 自动化排查，确保无未捕获 Console 报错与网络死锁，满足 WCAG a11y 对比度与 LCP/内存泄漏安全线。
+4. **运行代码静态检测（零告警零错误门禁）**：语言对应 Linter（ESLint/Ruff/Flake8 等）与类型检查（TSC/Mypy）**必须达到 0 警告（0 Warning）且 0 错误（0 Error）**；任何 Warning 均视为阻断性质量缺陷必须就地消除，严禁带 Warning 提交代码。
+5. **运行一致性门禁检查**：`python3 scripts/verify_consistency.py --root . --strict` 确保三文件、索引、V/U 脚本原子配对与目录卫生 100% 合规。
+6. **运行死代码与孤儿方法扫描**：`python3 scripts/dead_code_scanner.py --root .`。
+7. **流转任务状态并归档**：**仅当上述测试全绿、静态检测零告警零错误、一致性验证全部通过后**，方可执行 `python3 scripts/task_manager.py status --id {task_id} --set COMPLETED`（自动归档至 `_00_task_archive.idx`）。
+8. **Git 规范提交**：按照 `<type>(<scope>): <subject>` 规范生成本地 Commit。**默认不** `git push`；**仅当用户明确要求推送**时代为执行并回报结果。
 

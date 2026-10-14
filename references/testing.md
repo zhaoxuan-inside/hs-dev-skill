@@ -72,7 +72,7 @@
 
 ## 4b. 方法类型属性驱动的精准测试矩阵 (Method Archetype Driven Scope)
 
-在 VibeCoding 实现期，为防止 AI 无脑全量跑测（耗费大量 Token 与时间）或漏测关键风险，**必须依照 `_06_method_design/` 中声明的方法属性精确收窄测试范围**（详见 [`method_archetypes.md`](method_archetypes.md)）：
+在 VibeCoding 实现期，为防止 AI 无脑全量跑测（耗费大量 Token 与时间）或漏测关键风险，**必须依照 `_04_engineering_contract/_04_method_design/` 中声明的方法属性精确收窄测试范围**（详见 [`method_archetypes.md`](method_archetypes.md)）：
 
 | 方法类型 (`archetype`) | 敏感度 (`sensitivity`) | 强制测试范围 (`Test Scope`) | 上下文与跑测指令约束 |
 |---|---|---|---|

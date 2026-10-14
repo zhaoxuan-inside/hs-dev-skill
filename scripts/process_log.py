@@ -319,7 +319,7 @@ def rollback(root: Path, task_id: str, to_checkpoint: str) -> Dict[str, Any]:
 def _active_tasks(root: Path) -> List[Dict[str, Any]]:
     idx = root / "hs_dev_docs/_05_task_orchestration/_00_task.idx"
     if not idx.exists():
-        idx = root / "hs_dev_docs/_08_dev_process/_09_task/_00_task.idx"
+        idx = root / "hs_dev_docs/_05_task_orchestration/_00_task.idx"
     if not idx.exists():
         return []
     mgr = IdxManager(str(idx))

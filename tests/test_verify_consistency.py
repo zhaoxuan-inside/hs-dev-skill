@@ -24,7 +24,7 @@ class TestVerifyConsistency(unittest.TestCase):
 
     def test_detect_missing_undo_migration(self):
         # 创建一个缺少 U 脚本的迁移
-        mig_dir = self.root / "hs_dev_docs/_04_db_schema/_01_order/migrations"
+        mig_dir = self.root / "hs_dev_docs/_04_engineering_contract/_01_db_schema/_01_order/migrations"
         mig_dir.mkdir(parents=True, exist_ok=True)
         (mig_dir / "V1.0.0__create_order.sql").write_text("CREATE TABLE orders (id BIGINT);", encoding="utf-8")
 
@@ -36,7 +36,7 @@ class TestVerifyConsistency(unittest.TestCase):
         self.assertTrue(self.verifier.check_all())
 
     def test_detect_sql_reserved_keyword(self):
-        mig_dir = self.root / "hs_dev_docs/_04_db_schema/_01_order/migrations"
+        mig_dir = self.root / "hs_dev_docs/_04_engineering_contract/_01_db_schema/_01_order/migrations"
         mig_dir.mkdir(parents=True, exist_ok=True)
         (mig_dir / "V1.0.0__create_order.sql").write_text("CREATE TABLE orders (id BIGINT, desc VARCHAR(255));", encoding="utf-8")
         (mig_dir / "U1.0.0__create_order.sql").write_text("DROP TABLE orders;", encoding="utf-8")
@@ -76,7 +76,7 @@ class TestVerifyConsistency(unittest.TestCase):
         self.assertTrue(self.verifier.check_all())
 
     def test_detect_migration_format_error(self):
-        mig_dir = self.root / "hs_dev_docs/_04_db_schema/_01_order/migrations"
+        mig_dir = self.root / "hs_dev_docs/_04_engineering_contract/_01_db_schema/_01_order/migrations"
         mig_dir.mkdir(parents=True, exist_ok=True)
         (mig_dir / "Vinvalid_format.sql").write_text("CREATE TABLE orders (id BIGINT);", encoding="utf-8")
         self.assertFalse(self.verifier.check_all())
@@ -113,7 +113,7 @@ class TestVerifyConsistency(unittest.TestCase):
 
     def test_detect_forbidden_alias(self):
         # 写入一个包含禁用别名 'bill_order' 的 DB 迁移文件
-        mig_dir = self.root / "hs_dev_docs/_04_db_schema/_01_order/migrations"
+        mig_dir = self.root / "hs_dev_docs/_04_engineering_contract/_01_db_schema/_01_order/migrations"
         mig_dir.mkdir(parents=True, exist_ok=True)
         (mig_dir / "V1.0.0__create_order.sql").write_text("CREATE TABLE bill_order (id BIGINT);", encoding="utf-8")
         (mig_dir / "U1.0.0__create_order.sql").write_text("DROP TABLE bill_order;", encoding="utf-8")
@@ -168,7 +168,7 @@ class TestVerifyConsistency(unittest.TestCase):
         self.assertTrue(self.verifier.check_all())
 
         # 2. 验证四段式 DB 迁移脚本格式
-        mig_dir = self.root / "hs_dev_docs/_04_db_schema/_01_order/migrations"
+        mig_dir = self.root / "hs_dev_docs/_04_engineering_contract/_01_db_schema/_01_order/migrations"
         mig_dir.mkdir(parents=True, exist_ok=True)
         (mig_dir / "V1.2.3.10__create_build_logs.sql").write_text(
             "CREATE TABLE build_logs (id BIGINT, build_no INT);", encoding="utf-8"

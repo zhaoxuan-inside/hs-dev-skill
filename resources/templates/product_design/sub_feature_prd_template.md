@@ -6,9 +6,9 @@
 - **优先级**：P0 / P1 / P2
 - **状态**：active / draft / frozen
 - **宏观品味宪章继承**：`Inherits: /DESIGN.md`（严禁在此重新定义全站调性、色彩或字体规范）
-- **上级总览索引**：`_02_product_design/overview_prd.md`
-- **关联界面原型**：`_03_product_figma/{feature_name}_prototype.md`
-- **面向 VibeCoding 契约**：`_02_product_design/features/{feature_name}_vibe_spec.md`
+- **上级总览索引**：`_02_feature_spec/_01_human_prd/overview_prd.md`
+- **关联界面原型**：`_02_feature_spec/_04_prototype_wireframe/{feature_name}_prototype.md`
+- **面向 VibeCoding 契约**：`_02_feature_spec/_02_vibe_spec/{feature_name}_vibe_spec.md`
 
 > [!NOTE]
 > **微观施工图定位**：本子规格书专注于单一业务功能的微观执行契约，控制在 100~250 行内。

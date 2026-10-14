@@ -24,7 +24,7 @@ python scripts/rule_fetch.py search-cache --q Idempotency
    - 变更枚举与状态用 `UPPER_SNAKE`（如 `CREATED`, `UPDATED`）；
    - **事件与 Webhook 主题**：统一使用**名词.过去分词**（`<entity>.<action_past_tense>`，如 `order.created`、`order.updated`），绝对禁止用动词原形（如 `order.update`）或时间戳（如 `updated_at`）作为事件名；
    - **时间戳字段**：统一采用 `created_at`、`updated_at`、`deleted_at`；
-   - **Search-Before-Name 铁律**：新增接口字段、事件名或参数前，必须查阅代码库及 `_00_project/_02_project_word.dict.yaml`，严禁自创同义别名。
+   - **Search-Before-Name 铁律**：新增接口字段、事件名或参数前，必须查阅代码库及 `_00_project_foundation/_02_dictionary/_02_project_word.dict.yaml`，严禁自创同义别名。
 
 产品语义未冻（鉴权归属、计费字段等）→ `work_mode=DESIGN` 问清再写死公开契约。
 
@@ -87,8 +87,8 @@ python scripts/rule_fetch.py search-cache --q Idempotency
 
 | 产物 | 必须体现 |
 |------|----------|
-| `_05_interface_design/..._design.md` | 方法、路径、入出参、错误码表、是否幂等、分页 |
-| `_13_mock_contract/*.json` | 与成功/失败形状一致 |
+| `_04_engineering_contract/_02_interface_design/..._design.md` | 方法、路径、入出参、错误码表、是否幂等、分页 |
+| `_04_engineering_contract/_03_mock_contract/*.json` | 与成功/失败形状一致 |
 | 六元组 + 单测 | 校验失败、冲突、幂等重放、降级路径有覆盖 |
 
 实现期命名/内部拆分细节：**少问**；公开契约与业务字段未决：**回切 DESIGN**。

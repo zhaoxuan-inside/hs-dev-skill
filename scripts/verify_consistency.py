@@ -63,6 +63,9 @@ class ConsistencyVerifier:
         # 8. 检查工程附属机制与治理安全 (Auxiliary Governance & Secret Leaks Guard)
         self._check_auxiliary_governance()
 
+        # 9. 检查废弃历史路径与两级 7 大功能域规范对齐 (Deprecated Legacy Paths Guard)
+        self._check_deprecated_paths()
+
         return self._print_results()
 
     def _check_skill_version(self):
@@ -579,6 +582,45 @@ class ConsistencyVerifier:
         # 5. 可选机制：数据韧性（当启用时）
         if check_dr:
             pass
+
+    def _check_deprecated_paths(self):
+        """检查文档与模板中是否存在废弃的旧路径（确保符合 v2.42 两级 7 大功能域规范）"""
+        target_dirs = [self.root / "references", self.root / "resources" / "templates"]
+        legacy_patterns = [
+            (re.compile(r'hs_dev_docs/_00_project(?!_foundation)'), "hs_dev_docs/_00_project_foundation"),
+            (re.compile(r'hs_dev_docs/_01_product_design'), "hs_dev_docs/_01_product_vision 或 _02_feature_spec"),
+            (re.compile(r'hs_dev_docs/_02_product_design'), "hs_dev_docs/_02_feature_spec/_01_human_prd"),
+            (re.compile(r'hs_dev_docs/_03_product_figma'), "hs_dev_docs/_02_feature_spec/_03_prototype_html"),
+            (re.compile(r'hs_dev_docs/_04_db_schema'), "hs_dev_docs/_04_engineering_contract/_01_db_schema"),
+            (re.compile(r'hs_dev_docs/_05_interface_design'), "hs_dev_docs/_04_engineering_contract/_02_interface_design"),
+            (re.compile(r'hs_dev_docs/_06_method_design'), "hs_dev_docs/_04_engineering_contract/_04_method_design"),
+            (re.compile(r'hs_dev_docs/_06_mock_contract'), "hs_dev_docs/_04_engineering_contract/_03_mock_contract"),
+            (re.compile(r'hs_dev_docs/_07_call_chain'), "hs_dev_docs/_04_engineering_contract/_05_call_chain"),
+            (re.compile(r'hs_dev_docs/_08_dev_process'), "hs_dev_docs/_06_dev_process 或 _05_task_orchestration"),
+        ]
+
+        found_header = False
+        for t_dir in target_dirs:
+            if not t_dir.exists():
+                continue
+            for p in t_dir.rglob("*"):
+                if not p.is_file() or p.suffix not in [".md", ".yaml", ".yml", ".json", ".html"]:
+                    continue
+                try:
+                    text = p.read_text(encoding="utf-8")
+                except Exception:
+                    continue
+                for idx, line in enumerate(text.splitlines(), 1):
+                    for pat, suggestion in legacy_patterns:
+                        if pat.search(line):
+                            if not found_header:
+                                print("  -> Checking Deprecated Legacy Path References...")
+                                found_header = True
+                            rel = p.relative_to(self.root)
+                            self.errors.append(
+                                f"[DEPRECATED PATH ERROR] Legacy path pattern '{pat.pattern}' found in {rel}:{idx}! "
+                                f"Must be updated to '{suggestion}'."
+                            )
 
     def _print_results(self) -> bool:
         print("\n" + "=" * 60)
