@@ -37,7 +37,7 @@
 
 ---
 
-## 3. 方法属性机制（六维画像）
+## 3. 方法属性机制（七维画像）
 
 在 `hs_dev_docs/_06_method_design/` 中，每个登记的方法均具备以下标准化属性：
 
@@ -45,13 +45,18 @@
 2. **代码精准定位（物理坐标）**：标明文件相对路径、起始行号与代码行长。
    > **VibeCoding 收益**：AI 借助 `view_file(StartLine, EndLine)` 毫秒级单屏命中，无需全文扫描，Token 节省达 90%。
 3. **方法类型 (`archetype`)**：7 大标准类型之一。
-4. **改动敏感度与理由 (`sensitivity`)**：
-   - `LOW` / `MEDIUM` / `HIGH` / `CRITICAL`
-   - **独立拆行给出敏感理由**：向 AI 明确阐述破坏后果（如资损、安全越权、级联雪崩）。
-5. **副作用类型与具体副作用 (`sideEffect`)**：
+4. **模式协同集群关联 (`patternCluster`)**：【核心防破坏与精准指针】
+   - 标明所选设计模式（`Strategy` / `Chain of Resp.` / `State` / `Builder` / `Adapter` / `Facade` 等）；
+   - 指向所属模式集群档案文件路径及在集群中的角色（如 `Role: ConcreteStrategy`、`Contract: IPricingStrategy`）；
+   - **直指防破坏护栏锚点**（如 `#4-vibecoding-防破坏红线`）；
+   - > **精准切片收益**：AI 处理该方法时，通过单向指针只读取关联的 15 行护栏切片，**绝对禁止全量扫描或通读整份庞大的设计模式文档库**，实现极致 Token 控制与架构防腐。
+5. **改动敏感度与理由 (`sensitivity`)**：
+   - `LOW` / `MEDIUM` / `HIGH` / `CRITICAL`（属于模式集群核心参与者的方法强制为 `HIGH` 或 `CRITICAL`）；
+   - **独立拆行给出敏感理由**：向 AI 明确阐述破坏后果（如资损、安全越权、设计模式被破坏）。
+6. **副作用类型与具体副作用 (`sideEffect`)**：
    - 类型：`NONE`（严格纯函数）/ `IN_MEMORY`（仅改内存状态）/ `EXTERNAL_IO`（涉及外部 I/O）。
    - **独立拆行给出具体表现**：明确是否有网络请求、DB 写入、入参浅拷贝污染等。
-6. **指导测试范围与执行策略 (`testScope`)**：
+7. **指导测试范围与执行策略 (`testScope`)**：
    - 明确测试文件路径、测试级别（`UNIT` / `CONTRACT` / `INTEGRATION` / `E2E`）；
    - 明确覆盖约束与**精确跑测命令**（如 `npm test -- path/to/test.ts` 或 `pytest tests/test_algo.py`）；
    - **硬性禁止跑全量无关测试**。

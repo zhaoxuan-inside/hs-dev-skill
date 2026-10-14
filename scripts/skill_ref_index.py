@@ -112,6 +112,11 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
         "版本", "版本号", "version", "semver", "发布", "release", "tag", "升级",
         "防漂移", "单源", "变更分级", "补丁", "major", "minor", "patch",
     ],
+    "design_patterns.md": [
+        "设计模式", "模式", "策略模式", "责任链", "状态模式", "建造者", "适配器",
+        "门面", "外观", "发布订阅", "观察者", "模板方法", "模式集群", "pattern",
+        "cluster", "防破坏", "vibecoding", "深模块", "反过度设计",
+    ],
     "cross_platform.md": ["跨平台", "Windows", "Linux", "macOS", "pathlib"],
     "spec_v2_4.md": ["规格", "百科", "争议"],
 }

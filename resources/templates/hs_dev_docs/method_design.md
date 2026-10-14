@@ -11,7 +11,16 @@
 
 ---
 
-## 2. 特征与属性契约 (Attributes Contract)
+## 2. 模式协同集群关联 (Pattern Cluster Association)
+- **所选设计模式**：`{Strategy | Chain of Resp. | State | Builder | Adapter | Facade | Observer | Template Method | None (简单无模式)}`
+- **关联模式集群档案**：`{hs_dev_docs/_03_architecture_design/_02_pattern_clusters/cluster_name.md | 无}`
+- **在集群中的角色**：`{Context | Contract | Registry | ConcreteImplementation | None}`
+- **依从抽象契约**：`{InterfaceName.methodName | 无}`
+- **防破坏护栏锚点**：`{cluster_name.md#4-vibecoding-防破坏红线 | 无}`（**AI 修改前仅需读取此锚点切片，严禁全局通读设计模式库**）
+
+---
+
+## 3. 特征与属性契约 (Attributes Contract)
 - **改动敏感度**：`{LOW | MEDIUM | HIGH | CRITICAL}`
 - **改动敏感理由**：{阐明破坏后果，例如：涉及资金结算，计算偏差将直接产生资损；或纯内部展示格式化，改动影响局限}
 - **副作用类型**：`{NONE | IN_MEMORY | EXTERNAL_IO}`
@@ -19,7 +28,7 @@
 
 ---
 
-## 3. 指导测试范围与策略 (Test Guidance & Scope)
+## 4. 指导测试范围与策略 (Test Guidance & Scope)
 - **测试文件**：`{test_file_path}`
 - **测试级别**：`{UNIT | CONTRACT | INTEGRATION | E2E}`
 - **覆盖约束**：{覆盖率与分支测试要求，例如：100% 分支覆盖率，覆盖边界值、零值与溢出情况}
@@ -28,7 +37,7 @@
 
 ---
 
-## 4. 以本方法为中心的依赖拓扑图 (Ego Dependency Graph)
+## 5. 以本方法为中心的依赖拓扑图 (Ego Dependency Graph)
 ```mermaid
 graph TD
     %% 上游调用方 (Callers)
@@ -44,42 +53,42 @@ graph TD
 
 ---
 
-## 5. 六元组入参与出参规范 (Six-Tuple Specification)
+## 6. 六元组入参与出参规范 (Six-Tuple Specification)
 
-### 5.1 input 入参规范
+### 6.1 input 入参规范
 | 字段路径 | 类型 | 取值范围 / 格式 | 可空 | 描述 |
 |---|---|---|---|---|
 | `{entity}.id` | String | UUID / Snowflake | 否 | 实体唯一标识 |
 | `{entity}.amount` | Decimal | (0, 99999999.99] | 否 | 交易金额 |
 
-### 5.2 output 出参规范
+### 6.2 output 出参规范
 | 字段路径 | 类型 | 取值范围 / 格式 | 可空 | 描述 |
 |---|---|---|---|---|
 | `{entity}.status` | String | ENUM: CREATED, PAID | 否 | 状态 |
 
-### 5.3 context 上下文依赖
+### 6.3 context 上下文依赖
 | 字段路径 | 类型 | 描述 |
 |---|---|---|
 | `context.trace_id` | String | 链路追踪 ID |
 | `context.deadline` | Timestamp | 超时时间截点 |
 
-### 5.4 isolate 隔离约束
+### 6.4 isolate 隔离约束
 | 字段路径 | 类型 | 约束说明 |
 |---|---|---|
 | `isolate.tenant_id` | String | 多租户隔离 ID，只读 |
 
 ---
 
-## 6. 衍生方法规范 (Derivatives: Compensate / Fallback)
+## 7. 衍生方法规范 (Derivatives: Compensate / Fallback)
 
-### 6.1 事务补偿方法 (Compensate Method)
+### 7.1 事务补偿方法 (Compensate Method)
 - **方法名称**：`{method_name}_compensate`
 - **签名**：`exception {method_name}_compensate(input, output, context, isolate, metrics, recall)`
 - **触发条件**：分布式事务下游失败或 Saga 流程回滚。
 - **补偿动作**：释放预占资源、还原业务状态。
 - **异常挂载**：`context.last_exception` 携带失败现场信息。
 
-### 6.2 异常降级方法 (Fallback Method)
+### 7.2 异常降级方法 (Fallback Method)
 - **方法名称**：`{method_name}_fallback`
 - **签名**：`exception {method_name}_fallback(input, output, context, isolate, metrics, recall)`
 - **触发条件**：主方法熔断、下游不可用且不可重试。
@@ -87,7 +96,7 @@ graph TD
 
 ---
 
-## 7. 历史修改与演变记录 (Structured Changelog)
+## 8. 历史修改与演变记录 (Structured Changelog)
 
 ##### `{YYYY-MM-DD}` `[{TASK_ID}]`
 - **需求背景**：{本次修改对应的需求或业务背景}

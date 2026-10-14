@@ -11,7 +11,16 @@
 
 ---
 
-## 2. 特征与属性契约 (Attributes Contract)
+## 2. 模式协同集群关联 (Pattern Cluster Association)
+- **所选设计模式**：`{Strategy | Chain of Resp. | State | Builder | Adapter | Facade | Observer/Pub-Sub | Template Method | None (简单无模式)}`
+- **关联模式集群档案**：`{hs_dev_docs/_03_architecture_design/_02_pattern_clusters/cluster_name.md | 无}`
+- **在集群中的角色**：`{Context | Contract | Registry | ConcreteImplementation | None}`
+- **依从抽象契约**：`{InterfaceName.methodName | 无}`
+- **防破坏护栏锚点**：`{cluster_name.md#4-vibecoding-防破坏红线 | 无}`（**AI 修改前仅需读取此锚点切片，严禁全局通读设计模式库**）
+
+---
+
+## 3. 特征与属性契约 (Attributes Contract)
 - **改动敏感度**：`{LOW | MEDIUM | HIGH | CRITICAL}`
 - **改动敏感理由**：{阐明破坏后果，例如：涉及客户端资金分摊或核心状态机，偏差直接导致结算错误或死锁}
 - **副作用类型**：`{NONE | IN_MEMORY | EXTERNAL_IO}`
@@ -19,7 +28,7 @@
 
 ---
 
-## 3. 指导测试范围与策略 (Test Guidance & Scope)
+## 4. 指导测试范围与策略 (Test Guidance & Scope)
 - **测试环境**：`{Node-Environment (0 DOM) | JSDOM / Browser}`（**ALGO / TRANSFORM / GUARD / STATE 强制 0 DOM**）
 - **测试文件**：`src/{path_to_test_file}`
 - **测试级别**：`{UNIT | CONTRACT | INTEGRATION | E2E}`
@@ -29,7 +38,7 @@
 
 ---
 
-## 4. 以本方法为中心的依赖拓扑图 (Ego Dependency Graph)
+## 5. 以本方法为中心的依赖拓扑图 (Ego Dependency Graph)
 ```mermaid
 graph TD
     %% 上游调用方 (UI 编排层 Hook / 页面)
@@ -45,15 +54,15 @@ graph TD
 
 ---
 
-## 5. 入参与出参类型契约 (Type Signature Contract)
+## 6. 入参与出参类型契约 (Type Signature Contract)
 
-### 5.1 入参规格 (Inputs)
+### 6.1 入参规格 (Inputs)
 | 参数名 | 类型 | 必填 | 约束与说明 |
 |---|---|---|---|
 | `{param1}` | `{Type}` | 是 | {说明} |
 | `{param2}` | `{Type \| null}` | 否 | {说明} |
 
-### 5.2 出参规格 (Outputs)
+### 6.2 出参规格 (Outputs)
 ```typescript
 export interface {MethodName}Result {
   // 明确核心出参字段与类型定义
@@ -62,14 +71,14 @@ export interface {MethodName}Result {
 
 ---
 
-## 6. 异常与边界兜底策略 (Edge Cases & Fallbacks)
+## 7. 异常与边界兜底策略 (Edge Cases & Fallbacks)
 - **边界与空态**：{如列表为空、NaN、Undefined 等场景的兜底返回值}
 - **数值截断/精度**：{如金额计算向下取整、一分钱余数补偿逻辑}
 - **网络/外部降级**：{若是 ADAPTER，说明超时重试或 Mock 兜底数据}
 
 ---
 
-## 7. 历史修改与演变记录 (Structured Changelog)
+## 8. 历史修改与演变记录 (Structured Changelog)
 
 ##### `{YYYY-MM-DD}` `[{TASK_ID}]`
 - **需求背景**：{本次修改对应的需求或业务背景}
