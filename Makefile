@@ -1,4 +1,4 @@
-.PHONY: test verify scan-dead-code init-docs init-global paths index-rebuild index-search global-index-rebuild global-index-search skill-ref-rebuild skill-ref-search rule-list rule-search rule-resolve help
+.PHONY: test verify scan-dead-code init-docs init-global paths index-rebuild index-search global-index-rebuild global-index-search skill-ref-rebuild skill-ref-search rule-list rule-search rule-resolve version version-now help
 
 # 跨平台：Linux/macOS 默认 python3；Windows 可 make PYTHON="py -3" 或 PYTHON=python
 ifeq ($(OS),Windows_NT)
@@ -11,6 +11,8 @@ help:
 	@echo "hs-dev-skill commands (Windows / Linux / macOS):"
 	@echo "  make test           - run unit tests"
 	@echo "  make verify         - pre-commit consistency gates"
+	@echo "  make version        - generate 4-segment timestamp version (MMddHHmmss)"
+	@echo "  make version-now    - get current MMddHHmmss timestamp"
 	@echo "  make scan-dead-code - dead / orphan method scan"
 	@echo "  make init-docs      - init hs_dev_docs skeleton in cwd"
 	@echo "  make init-global    - init ~/.hs-dev-skill (cross-project)"
@@ -32,6 +34,12 @@ test:
 
 verify:
 	$(PYTHON) scripts/verify_consistency.py --root . --strict
+
+version:
+	$(PYTHON) scripts/version_tool.py generate
+
+version-now:
+	$(PYTHON) scripts/version_tool.py now
 
 scan-dead-code:
 	$(PYTHON) scripts/dead_code_scanner.py --root .

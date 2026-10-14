@@ -57,9 +57,9 @@ metadata:
 15. **三端**：`pathlib` + `python3`/`python`/`py -3`（[`cross_platform.md`](references/cross_platform.md)）。
 16. **Token 与降噪（免全量扫描与精准索引收口铁律）**：门闩 + `doc_index_db` / `skill_ref_index` / `rule_fetch` → 切片 → context_pack；代码与文档探索**绝对禁止整目录通读大文件**，必须使用 `doc_index_db` 专属子命令按需召回：查需求走 `feature-search`、查页面拓扑走 `page-search`、查模式集群走 `pattern-search`、查库表DDL走 `schema-search`、查方法依赖/爆炸半径走 `dep-graph`、查方法防膨胀走 `method-search`、查测试单跑走 `test-search`、查审计历史走 `audit-search`、代码精准切片走 `symbol-slice`；禁止整树/`spec_v2_4`/远程规则包开局通读（[`token_budget.md`](references/token_budget.md) / [`four_level_routing.md`](references/four_level_routing.md)）。
 17. **默认 Commit；明确要求才 push**。
-18. **四段式多级版本号与包区分双轨体系**：遵循 `v[主版本].[需求版本].[修复版本].[打包版本]`（`vMAJOR.FEATURE.PATCH.BUILD`）；Skill 自身三处元数据（metadata/正文/README）强一致；项目交付 S/M/L 映射 PATCH/FEATURE/MAJOR，第四段打包版本专用于构建流水线批次自增、生命周期环境包（`-alpha`/`-beta`/`-rc`/`-ga`）及多端分包（`+web`/`+apk`/`+ipa`/`+desktop`/`+srv`）精准包区分；API/DB/Git Tag 严格按多级版本协同演化（[`version_control.md`](references/version_control.md)）。
+18. **四段式多级版本号与包区分双轨体系（本地自治生成 + MMddHHmmss 时间戳）**：遵循 `v[主版本].[需求版本].[修复版本].[打包版本]`（`vMAJOR.FEATURE.PATCH.BUILD`）；Skill 自身三处元数据（metadata/正文/README）强一致；项目交付 S/M/L 映射 PATCH/FEATURE/MAJOR；**第四段打包版本严禁强依赖外部 CI/CD 流水线，必须由本地自主生成，且优先采用 `MMddHHmmss` 格式时间戳（10位月日时分秒）**（如 `python scripts/version_tool.py generate` 生成 `v1.2.0.1014172807`），单调自增、秒级防重、出包时间直观，并支持附加环境阶段（`-alpha`/`-beta`/`-rc`/`-ga`）与多端分包（`+web`/`+apk`/`+ipa`/`+desktop`/`+srv`）精准包区分；API/DB/Git Tag 严格按多级版本协同演化（[`version_control.md`](references/version_control.md)）。
 19. **多端架构与产出收敛控制**：多端客户端工程（Web/移动端/桌面端）代码必须严格收敛于 `apps/<client>/`（`apps/mobile/`, `apps/desktop/`, `apps/web/`, `apps/server/`），跨端共享契约与数据模型收敛于 `packages/`，配置收敛于 `config/`（强制提供 `.env.example`，敏感变量绝不上库）；单工程或经典 Web 分离工程采用 `backend/` 与 `frontend/`；Web、桌面端（Desktop）、移动端（Mobile）打包产物必须通过脚手架配置重定向至根目录 `output/<client>/` 对应子目录，移动端发布包强制配对混淆符号表（Mapping/dSYM），严禁散落破坏工程整洁度。
-20. **工程附属机制与生产级治理支撑**：系统交付必须通过 7 大工程附属治理门禁（[`auxiliary_governance.md`](references/auxiliary_governance.md)）：① 环境配置（`.env.example` 强契约 + 零密钥硬编码 Pre-commit 拦截）；② 软件供应链（Lockfile 强一致 + 严重/高危 CVE 零容忍阻断 + 商业许可合规）；③ CI/CD 与防伪（五阶流水线 + Feature Flags 特性开关 + SBOM 清册 + SHA256 验签）；④ 可观测性（JSON 结构化日志 + 全链路 TraceID + `/livez` `/readyz` `/healthz` 三态探针 + 移动/桌面端符号表强绑定归档）；⑤ 数据韧性（RPO/RTO 指标 + DB 迁移 V/U 原子配对回滚 + 三方调用超时/避退/熔断降级 Circuit Breaker & Fallback）；⑥ 安全与合规（PII 敏感数据脱敏 + OWASP Top 10 防线 + 核心操作不可变审计流水）；⑦ Agent 执行安全护栏（高危破坏命令拦截 + 工作区越界隔离 + 任务超时熔断）。
+20. **工程附属机制与生产级治理支撑（本地自治闭环 · CI/CD 可选）**：系统交付必须通过 7 大工程附属治理门禁（[`auxiliary_governance.md`](references/auxiliary_governance.md)）：构建与验证流程不强绑外部 CI/CD 流水线，本地单机即可闭环驱动五阶门禁与打版；① 环境配置（`.env.example` 强契约 + 零密钥硬编码 Pre-commit 拦截）；② 软件供应链（Lockfile 强一致 + 严重/高危 CVE 零容忍阻断 + 商业许可合规）；③ 构建防伪（本地五阶门禁 + Feature Flags 特性开关 + SBOM 清册 + SHA256 验签）；④ 可观测性（JSON 结构化日志 + 全链路 TraceID + `/livez` `/readyz` `/healthz` 三态探针 + 移动/桌面端符号表强绑定归档）；⑤ 数据韧性（RPO/RTO 指标 + DB 迁移 V/U 原子配对回滚 + 三方调用超时/避退/熔断降级 Circuit Breaker & Fallback）；⑥ 安全与合规（PII 敏感数据脱敏 + OWASP Top 10 防线 + 核心操作不可变审计流水）；⑦ Agent 执行安全护栏（高危破坏命令拦截 + 工作区越界隔离 + 任务超时熔断）。
 
 ---
 
@@ -74,20 +74,21 @@ metadata:
   ├─ EXPLORE (代码理解): 索引检索 → 切片阅读 → 结构化输出业务图谱/时序解答 (纯只读免交付)
   └─ RESUME (任务续做): process_log resume-scan 恢复断点 → 沿既有 plan 继续至终点
 ```
-76: 
-77: **L 满配（BUILD）**：0 产品设计（设计语言+功能规格）+ MVP分阶段规划/冻结 → 1 选型 ADR（按当前阶段范围）→ 2 架构（深模块词汇）→ 3 四要素（API/UI：aesthetic→DESIGN.md→craft / rule_fetch）→ 4 任务+pack+seam → 5 三同步+垂直 TDD → 6 测试全绿（0 报错）+ 静态检测零告警零错误 + 门禁 + 归档 + Commit。
-78: 
-79: **跃迁**：未分级/未过门闩禁止开工；L 的 0→1 须冻结门禁；M/S 禁止为空跑造空文档；`EXPLORE` 只读直通免门禁；`BLOCKED`→落盘→继续至终点。
-80: 
-81: ---
-82: 
-83: ## CLI 速查
-84: 
-85: | 工具 | 用途 | 示例 |
-86: |---|---|---|
-87: | `skill_ref_index.py` | Skill references 场景检索 | `python scripts/skill_ref_index.py search --q 幂等` |
-88: | `rule_fetch.py` | 本地/远程领域规则目录与缓存 | `python scripts/rule_fetch.py search --q React` |
-89: | `doc_index_db.py` | 7大底层数据真理与全维度索引检索切片 (免整盘扫描) | `python scripts/doc_index_db.py feature-search --q "登录"`<br/>`python scripts/doc_index_db.py page-search --q "结算"`<br/>`python scripts/doc_index_db.py pattern-search --q "Strategy"`<br/>`python scripts/doc_index_db.py schema-search --q "orders"`<br/>`python scripts/doc_index_db.py dep-graph --symbol "OrderService.create"`<br/>`python scripts/doc_index_db.py method-search --q "手机号脱敏"`<br/>`python scripts/doc_index_db.py symbol-slice --name "DocIndexDB"`<br/>`python scripts/doc_index_db.py embed-search --q "代码骨架提取"`<br/>`python scripts/doc_index_db.py test-search --q "checkpoint"`<br/>`python scripts/doc_index_db.py audit-search --since "2026-10-14"` |
+
+**L 满配（BUILD）**：0 产品设计（设计语言+功能规格）+ MVP分阶段规划/冻结 → 1 选型 ADR（按当前阶段范围）→ 2 架构（深模块词汇）→ 3 四要素（API/UI：aesthetic→DESIGN.md→craft / rule_fetch）→ 4 任务+pack+seam → 5 三同步+垂直 TDD → 6 测试全绿（0 报错）+ 静态检测零告警零错误 + 门禁 + 归档 + Commit。
+
+**跃迁**：未分级/未过门闩禁止开工；L 的 0→1 须冻结门禁；M/S 禁止为空跑造空文档；`EXPLORE` 只读直通免门禁；`BLOCKED`→落盘→继续至终点。
+
+---
+
+## CLI 速查
+
+| 工具 | 用途 | 示例 |
+|---|---|---|
+| `version_tool.py` | 四段式版本号自主生成 (MMddHHmmss 时间戳/多端后缀) 与解析 | `python scripts/version_tool.py generate --major 1 --feature 2 --patch 0 --client apk`<br/>`python scripts/version_tool.py now` |
+| `skill_ref_index.py` | Skill references 场景检索 | `python scripts/skill_ref_index.py search --q 幂等` |
+| `rule_fetch.py` | 本地/远程领域规则目录与缓存 | `python scripts/rule_fetch.py search --q React` |
+| `doc_index_db.py` | 7大底层数据真理与全维度索引检索切片 (免整盘扫描) | `python scripts/doc_index_db.py feature-search --q "登录"`<br/>`python scripts/doc_index_db.py page-search --q "结算"`<br/>`python scripts/doc_index_db.py pattern-search --q "Strategy"`<br/>`python scripts/doc_index_db.py schema-search --q "orders"`<br/>`python scripts/doc_index_db.py dep-graph --symbol "OrderService.create"`<br/>`python scripts/doc_index_db.py method-search --q "手机号脱敏"`<br/>`python scripts/doc_index_db.py symbol-slice --name "DocIndexDB"`<br/>`python scripts/doc_index_db.py embed-search --q "代码骨架提取"`<br/>`python scripts/doc_index_db.py test-search --q "checkpoint"`<br/>`python scripts/doc_index_db.py audit-search --since "2026-10-14"` |
 | `global_index_db.py` | 全局偏好/学习标签 | `python scripts/global_index_db.py search --tag 反向代理` |
 | `task_manager.py` | 任务三文件+合法状态机+看板渲染 | `python scripts/task_manager.py create --id x --title "…" --change-size M`<br/>`python scripts/task_manager.py dashboard --phase 3` |
 | `code_skeleton.py` | AST/多语言代码骨架提取 (省 90% Token) | `python scripts/code_skeleton.py --path backend/` |
