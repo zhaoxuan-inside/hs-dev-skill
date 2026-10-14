@@ -22,9 +22,9 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
 
     print(f"[*] Initializing hs-dev workspace at: {root} (from_existing={from_existing})")
 
-    # 1. 基础项目层级目录 (多端架构与产出收敛规划)
+    # 1. 基础项目层级目录 (多端架构与产出收敛规划，精简未纳入流程的冗余目录)
     base_dirs = [
-        "apps", "packages", "deploy", "assets",
+        "apps", "packages",
         "backend", "frontend", "linux", "mac", "windows", "android", "ios",
         "output/web_desktop", "output/app_desktop", "output/app_mobile/android",
         "output/app_mobile/ios", "output/server", "logs", "config", "scripts",
@@ -56,19 +56,17 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
         except Exception:
             pass
 
-    # 2. hs_dev_docs 目录层级（一级功能 + 二级子功能严格按 _01_ 序号组织）
+    # 2. hs_dev_docs 目录层级（一级功能 + 二级子功能严格按 _01_ 序号组织，排除全流程不消费的空置死目录）
     doc_dirs = [
         # _00_project_foundation (基座)
         "_00_project_foundation/_01_dev_rule",
         "_00_project_foundation/_02_dictionary",
         "_00_project_foundation/_03_decision_record",
-        "_00_project_foundation/_04_code_map",
         "_00_project_foundation/_05_doc_index",
 
         # _01_product_vision (功能一：愿景与定界)
         "_01_product_vision/_01_design_charter",
         "_01_product_vision/_02_phased_roadmap",
-        "_01_product_vision/_03_business_plan",
 
         # _02_feature_spec (功能二：特性规格与原型契约)
         "_02_feature_spec/_01_human_prd",
@@ -97,9 +95,7 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
         # _06_dev_process (功能六：开发过程与治理记录)
         "_06_dev_process/_01_plan_log",
         "_06_dev_process/_02_change_log",
-        "_06_dev_process/_03_verify_log",
         "_06_dev_process/_04_error_recovery/snapshots",
-        "_06_dev_process/_05_tech_debt",
     ]
     for d in doc_dirs:
         (docs_root / d).mkdir(parents=True, exist_ok=True)
