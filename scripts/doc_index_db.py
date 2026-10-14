@@ -957,6 +957,9 @@ class DocIndexDB:
         # 索引测试用例与执行说明 (Test Cases)
         test_cases_inserted = self._index_test_cases(conn)
 
+        # 索引过程账本与物理审计变更历史 (Audit Changes - Time & Summary dual index)
+        audit_changes_inserted = self._index_audit_changes(conn)
+
         # 索引业务代码与脚本中的符号（类、函数、签名与行号）
         symbols_inserted = self._index_code_symbols(conn)
 
@@ -984,6 +987,7 @@ class DocIndexDB:
             "data_schemas_inserted": schemas_inserted,
             "method_dependencies_inserted": dependencies_inserted,
             "test_cases_inserted": test_cases_inserted,
+            "audit_changes_inserted": audit_changes_inserted,
             "symbols_inserted": symbols_inserted,
             "fts": self.fts_available,
             "rebuilt_at": _utc_now(),
@@ -1527,6 +1531,92 @@ class DocIndexDB:
                             except sqlite3.Error:
                                 pass
                         count += 1
+        return count
+
+    def _index_audit_changes(self, conn: sqlite3.Connection) -> int:
+        count = 0
+        candidate_dirs = [
+            self.docs_root / "_02_change_log",
+            self.docs_root / "_06_dev_process" / "_02_change_log",
+            self.root / ".hs_cache" / "change_log",
+        ]
+        seen_keys = set()
+        for cdir in candidate_dirs:
+            if not cdir.exists():
+                continue
+            for fpath in cdir.rglob("*.jsonl"):
+                rel_p = _posix_rel(fpath, self.root)
+                text = _read_text(fpath)
+                if not text:
+                    continue
+                for line in text.splitlines():
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        rec = json.loads(line)
+                    except Exception:
+                        continue
+                    cp_id = rec.get("checkpoint_id") or rec.get("cp_id") or ""
+                    task_id = rec.get("task_id") or ""
+                    ts = rec.get("at") or rec.get("timestamp") or _utc_now()
+                    summary = rec.get("summary") or ""
+                    paths = rec.get("paths") or []
+                    path_strs = []
+                    for p in paths:
+                        if isinstance(p, dict):
+                            path_strs.append(p.get("path", ""))
+                        else:
+                            path_strs.append(str(p))
+                    affected_files = ", ".join(filter(None, path_strs))
+                    symbols = rec.get("symbols") or []
+                    affected_symbols = ", ".join(symbols) if isinstance(symbols, list) else str(symbols)
+                    audit_key = f"audit:{task_id}@{cp_id}" if cp_id else f"audit:{task_id}@{ts}"
+                    if audit_key in seen_keys:
+                        continue
+                    seen_keys.add(audit_key)
+
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO audit_changes (
+                            audit_key, checkpoint_id, task_id, timestamp, summary,
+                            affected_files, affected_symbols, raw_log_path, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            audit_key,
+                            cp_id,
+                            task_id,
+                            ts,
+                            summary,
+                            affected_files,
+                            affected_symbols,
+                            rel_p,
+                            _utc_now(),
+                        ),
+                    )
+                    if self.fts_available:
+                        try:
+                            conn.execute(
+                                "DELETE FROM audit_changes_fts WHERE audit_key = ?",
+                                (audit_key,),
+                            )
+                            conn.execute(
+                                """
+                                INSERT INTO audit_changes_fts (audit_key, checkpoint_id, summary, affected_files, affected_symbols)
+                                VALUES (?, ?, ?, ?, ?)
+                                """,
+                                (
+                                    audit_key,
+                                    cp_id,
+                                    summary,
+                                    affected_files,
+                                    affected_symbols,
+                                ),
+                            )
+                        except sqlite3.Error:
+                            pass
+                    count += 1
         return count
 
     def _index_code_symbols(self, conn: sqlite3.Connection) -> int:
@@ -2705,6 +2795,89 @@ class DocIndexDB:
             "hint": "Run targeted test via: test.test_command (e.g. pytest <file>::<case>).",
         }
 
+    def audit_search(
+        self,
+        query: str = "",
+        *,
+        since: str = "",
+        until: str = "",
+        task_id: str = "",
+        limit: int = 10,
+    ) -> Dict[str, Any]:
+        conn = self.connect()
+        q = (query or "").strip()
+        since = (since or "").strip()
+        until = (until or "").strip()
+        task_id = (task_id or "").strip()
+
+        ranked: Dict[str, Dict[str, Any]] = {}
+        use_fts = self.fts_available and q and not _has_cjk(q)
+        if use_fts:
+            fts_q = self._fts_query(q)
+            try:
+                sql = """
+                    SELECT a.audit_key, a.checkpoint_id, a.task_id, a.timestamp,
+                           a.summary, a.affected_files, a.affected_symbols, a.raw_log_path,
+                           bm25(audit_changes_fts) AS score
+                    FROM audit_changes_fts
+                    JOIN audit_changes a ON a.audit_key = audit_changes_fts.audit_key
+                    WHERE audit_changes_fts MATCH ?
+                """
+                params: List[Any] = [fts_q]
+                if task_id:
+                    sql += " AND a.task_id = ?"
+                    params.append(task_id)
+                if since:
+                    sql += " AND a.timestamp >= ?"
+                    params.append(since)
+                if until:
+                    sql += " AND a.timestamp <= ?"
+                    params.append(until)
+                sql += " ORDER BY a.timestamp DESC LIMIT ?"
+                params.append(limit * 2)
+                for r in conn.execute(sql, params):
+                    ranked[r["audit_key"]] = dict(r)
+            except sqlite3.Error:
+                use_fts = False
+
+        sql = """
+            SELECT audit_key, checkpoint_id, task_id, timestamp,
+                   summary, affected_files, affected_symbols, raw_log_path, 0.0 AS score
+            FROM audit_changes
+            WHERE 1=1
+        """
+        params = []
+        if q:
+            sql += " AND (checkpoint_id LIKE ? OR summary LIKE ? OR affected_files LIKE ? OR affected_symbols LIKE ?)"
+            like = f"%{q}%"
+            params.extend([like, like, like, like])
+        if task_id:
+            sql += " AND task_id = ?"
+            params.append(task_id)
+        if since:
+            sql += " AND timestamp >= ?"
+            params.append(since)
+        if until:
+            sql += " AND timestamp <= ?"
+            params.append(until)
+        sql += " ORDER BY timestamp DESC LIMIT ?"
+        params.append(limit * 2)
+        for r in conn.execute(sql, params):
+            if r["audit_key"] not in ranked:
+                ranked[r["audit_key"]] = dict(r)
+
+        results = list(ranked.values())[:limit]
+        return {
+            "ok": True,
+            "query": q,
+            "since": since or None,
+            "until": until or None,
+            "task_id": task_id or None,
+            "count": len(results),
+            "audit_records": results,
+            "hint": "Inspect snapshot or rollback via: python scripts/process_log.py rollback --task <task> --to <cp_id>",
+        }
+
 
 def _print_json(payload: Dict[str, Any]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -2763,6 +2936,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     p_test.add_argument("--feature", default="", help="Filter by feature ID")
     p_test.add_argument("--target", default="", help="Filter by target method/symbol")
     p_test.add_argument("--limit", type=int, default=5)
+
+    p_audit = sub.add_parser("audit-search", help="Search change log audit history by time range, file, symbol or summary")
+    p_audit.add_argument("--q", default="", help="Keyword in summary, file, checkpoint or symbol")
+    p_audit.add_argument("--since", default="", help="Start timestamp ISO-8601 (e.g. '2026-10-14')")
+    p_audit.add_argument("--until", default="", help="End timestamp ISO-8601 (e.g. '2026-10-15')")
+    p_audit.add_argument("--task", default="", help="Filter by task ID")
+    p_audit.add_argument("--limit", type=int, default=10)
 
     p_method = sub.add_parser(
         "method-search",
@@ -2875,6 +3055,19 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     args.q,
                     feature=args.feature,
                     target=args.target,
+                    limit=args.limit,
+                )
+            )
+            return 0
+        if args.command == "audit-search":
+            if not db.db_path.exists():
+                db.rebuild()
+            _print_json(
+                db.audit_search(
+                    args.q,
+                    since=args.since,
+                    until=args.until,
+                    task_id=args.task,
                     limit=args.limit,
                 )
             )

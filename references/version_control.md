@@ -76,3 +76,31 @@ Skill 自身发布或迭代时，必须保证以下三处版本号**绝对一致
    - Tag 命名遵循 `v{MAJOR}.{MINOR}.{PATCH}`（如 `v1.2.0`）；
    - 提交信息遵循 Conventional Commits（`feat:`, `fix:`, `refactor:`, `BREAKING CHANGE:`）；
    - 在任务详情与交付说明中记录版本发布日志（Release Notes / CHANGELOG）。
+
+---
+
+### 3.5 运行环境依赖与基线声明 (Runtime Environment & Toolchain Declaration)
+业界主流研发框架与优秀 Skill 的实践表明：**代码离开运行环境声明是无法自愈执行的**。系统必须在最底层数据物理骨架中固化运行环境基线：
+1. **声明式环境清单 (Declarative Environment Manifests)**：
+   - **Python**：通过 `pyproject.toml` 或 `requirements.txt` 固化核心依赖版本；通过 `.python-version` 锁定 Python 大版本（例如 `>=3.10`）。
+   - **Node / Frontend**：在 `package.json` 中声明 `engines: { "node": ">=18.0.0", "npm": ">=9.0.0" }`，并签入 `package-lock.json` 或 `pnpm-lock.yaml` 消除间接依赖漂移。
+   - **Go / Rust / Java**：通过 `go.mod`、`Cargo.toml` 或 `pom.xml` 声明依赖版本与最低编译工具链要求。
+2. **运行时环境变量真理与安全隔离**：
+   - 根目录必须提供 `.env.example`，作为所有运行期环境变量配置项的权威字典清单；
+   - 严禁将真实敏感密钥（API Key、生产数据库密码）提交进 Git 版本库；
+   - 架构设计文档中必须配套 `hs_dev_docs/_03_arch_design/runtime_env.md`，记录网络拓扑、监听端口与三方中间件（Redis/MQ/S3）基线。
+3. **三端跨平台兼容铁律**：
+   - 所有运行时脚本与路径处理必须坚持 POSIX 风格正斜杠 `/` 与 UTF-8 编码；
+   - 严禁在脚本中硬编码操作系统专属路径（如 `C:\\...` 或 `/usr/local/...`）或强依赖平台专属 shell 外部程序。
+
+---
+
+### 3.6 变更账本与版本审计双索引 (Process Audit & Change Log Dual-Indexing)
+面向 Agent 辅助研发与连续性续做，版本审计采用**双轨记录与双索引检索**体系：
+1. **双轨版本账本**：
+   - **宏观业务发布轨**：`CHANGELOG.md` 遵循 Keep a Changelog 规范（Added, Changed, Deprecated, Removed, Fixed, Security），供团队人类开发者查阅；
+   - **微观过程审计轨**：`_02_change_log/{task_id}_changes.jsonl` 记录每一步改动的物理快照、修改前状态与精准文件列表，供非 Git 毫秒级回滚与断点续做。
+2. **时间与简述双索引物理加速**：
+   - **时间索引 (Time B-Tree Index)**：在 `audit_changes(timestamp)` 建立物理索引，支持按毫秒/秒级时间窗口 (`--since`, `--until`) 极速切片审计时间线，无需全盘扫描巨型 JSONL。
+   - **简述与影响面索引 (Summary & Impact FTS5 Index)**：在 `audit_changes_fts(checkpoint_id, summary, affected_files, affected_symbols)` 建立全文索引，支持通过文件路径、方法名或意图关键字秒级定位历史断点。
+

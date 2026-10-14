@@ -437,7 +437,78 @@ class TestDocIndexDB(unittest.TestCase):
         finally:
             db.close()
 
+    def test_audit_changes_dual_indexing_and_search(self):
+        log_dir = self.root / "hs_dev_docs" / "_02_change_log"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        task_log = log_dir / "TASK-001_changes.jsonl"
+        task_log.write_text(
+            json.dumps({
+                "checkpoint_id": "cp_20261014_100000",
+                "task_id": "TASK-001",
+                "at": "2026-10-14T10:00:00Z",
+                "step_id": "S1",
+                "summary": "重构订单支付聚合根与状态机验证",
+                "paths": [{"path": "backend/order/aggregate.py"}, {"path": "backend/order/state.py"}],
+                "symbols": ["OrderAggregate.pay", "OrderState.transition"],
+            }, ensure_ascii=False) + "\n" +
+            json.dumps({
+                "checkpoint_id": "cp_20261014_103000",
+                "task_id": "TASK-001",
+                "at": "2026-10-14T10:30:00Z",
+                "step_id": "S2",
+                "summary": "新增微信与支付宝支付渠道适配器",
+                "paths": [{"path": "backend/order/adapter.py"}],
+                "symbols": ["WeChatPayAdapter.pay", "AlipayAdapter.pay"],
+            }, ensure_ascii=False) + "\n" +
+            json.dumps({
+                "checkpoint_id": "cp_20261014_111500",
+                "task_id": "TASK-002",
+                "at": "2026-10-14T11:15:00Z",
+                "step_id": "S1",
+                "summary": "修复库存超卖负数并发漏洞",
+                "paths": [{"path": "backend/inventory/service.py"}],
+                "symbols": ["InventoryService.deduct"],
+            }, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+
+        db = DocIndexDB(self.root)
+        try:
+            info = db.rebuild()
+            self.assertEqual(info["audit_changes_inserted"], 3)
+
+            # 1. 验证按关键词搜索 (FTS / LIKE)
+            res_kw = db.audit_search("微信")
+            self.assertTrue(res_kw["ok"])
+            self.assertGreaterEqual(res_kw["count"], 1)
+            self.assertEqual(res_kw["audit_records"][0]["checkpoint_id"], "cp_20261014_103000")
+
+            # 2. 验证按受影响文件搜索
+            res_file = db.audit_search("inventory/service.py")
+            self.assertTrue(res_file["ok"])
+            self.assertGreaterEqual(res_file["count"], 1)
+            self.assertEqual(res_file["audit_records"][0]["task_id"], "TASK-002")
+
+            # 3. 验证时间范围区间过滤 (B-Tree index on timestamp)
+            res_time = db.audit_search(since="2026-10-14T10:00:00Z", until="2026-10-14T10:45:00Z")
+            self.assertTrue(res_time["ok"])
+            self.assertEqual(res_time["count"], 2)
+            self.assertEqual(res_time["audit_records"][0]["checkpoint_id"], "cp_20261014_103000")
+            self.assertEqual(res_time["audit_records"][1]["checkpoint_id"], "cp_20261014_100000")
+
+            # 4. 验证任务 ID 过滤
+            res_task = db.audit_search(task_id="TASK-001")
+            self.assertTrue(res_task["ok"])
+            self.assertEqual(res_task["count"], 2)
+
+            # 5. 验证 stats
+            st = db.stats()
+            self.assertEqual(st["audit_changes"], 3)
+        finally:
+            db.close()
+
 
 if __name__ == "__main__":
     unittest.main()
+
 
