@@ -28,6 +28,7 @@ L2  打开命中的恰好 1 份 references/*.md（本会话已读过的不重读
     · 后端分层 / 微服务 / Saga → `backend_arch.md`
     · 前端模块 / FSD → `frontend_arch.md`
     · API 契约 → `api_engineering.md`
+    · 方法设计 / 契约画像 / 精准跑测 → `method_archetypes.md`
     · 任务状态迁移 → `task_state_machine.md`
 L3  触达 UI/API/架构且本地不够用 → `rule_fetch`（书规则、FSD、wshobson、品牌 DESIGN.md…）；禁止预拉全部远程包
 L4  项目文档：doc_index_db search|slice → context_pack；禁止整树 hs_dev_docs

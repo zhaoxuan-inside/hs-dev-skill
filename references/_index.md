@@ -35,6 +35,7 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | API 本地高频 | `api_engineering.md` |
 | 领域规则远程按需（书规则 / FSD / wshobson…） | `rule_library.md` |
 | 六元组签名与衍生方法 | `six_tuple_runtime.md` |
+| **方法类型分类 / 契约画像 / 精准测试矩阵** | `method_archetypes.md` |
 | Token / SQLite / context_pack | `token_budget.md` |
 | 四级 JSONL 路由 | `four_level_routing.md` |
 | Mock Profile | `mock_contract_guide.md` |

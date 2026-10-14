@@ -41,7 +41,7 @@
 | M/L 阶段 0 | lifecycle 阶段 0 节 | `learn_and_prefer`（模糊 UI） |
 | L 阶段 1 | lifecycle 阶段 1 | `learn_and_prefer` |
 | L 阶段 2 | lifecycle 阶段 2 | — |
-| M/L 阶段 3 | lifecycle 阶段 3；改方法时 `six_tuple_runtime` | 本地 craft；深化用 `rule_library` + `rule_fetch` |
+| M/L 阶段 3 | lifecycle 阶段 3；改方法时 `six_tuple_runtime` / `method_archetypes` | 本地 craft；深化用 `rule_library` + `rule_fetch` |
 | 阶段 4 | 本文 + 必要时 `four_level_routing` | `task_state_machine` |
 | 阶段 5 | （已读过的不重复） | craft / `rule_fetch resolve --rule …`（按触达） |
 | 阶段 6 | `quality_gates.md` | — |

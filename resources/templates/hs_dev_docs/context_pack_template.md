@@ -56,11 +56,18 @@ UI 触达读 `references/frontend_craft.md`；API 触达读 `references/api_engi
 
 ---
 
-## 4. 接口与六元组方法签名切片（物化）
-<!-- 引用 _05_interface_design 与 _06_method_design；API 细则见 api_engineering.md -->
+## 4. 接口与方法契约画像切片（物化 Method Archetypes）
+<!-- 引用 _05_interface_design 与 _06_method_design；细则见 api_engineering.md 与 method_archetypes.md -->
 
-```text
-{相关接口路径、请求体 Schema、六元组方法签名原文}
+```yaml
+# 引用路径：hs_dev_docs/_06_method_design/.../{method}_design.md
+method_name: "{method_name}"
+archetype: "{TRANSFORM | ALGO | GUARD | STATE | ORCHESTRATE | ADAPTER | PRESENT}"
+location: "{file_path} (L{start_line}-L{end_line})"
+sensitivity: "{LOW | MEDIUM | HIGH | CRITICAL}"
+test_command: "{specific_test_command}"
+# 签名与入参约束：
+signature: "exception {method_name}(input, output, context, isolate, metrics, recall)"
 ```
 
 ---

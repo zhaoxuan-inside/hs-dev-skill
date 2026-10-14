@@ -66,6 +66,21 @@
 | **M** | 触达方法/API 单测或契约测绿；相关回归不破 |
 | **L** | 阶段 5 全套：方法测 + 契约 + 主路径；阶段 6 `make test` 全绿 |
 
+---
+
+## 4b. 方法类型属性驱动的精准测试矩阵 (Method Archetype Driven Scope)
+
+在 VibeCoding 实现期，为防止 AI 无脑全量跑测（耗费大量 Token 与时间）或漏测关键风险，**必须依照 `_06_method_design/` 中声明的方法属性精确收窄测试范围**（详见 [`method_archetypes.md`](method_archetypes.md)）：
+
+| 方法类型 (`archetype`) | 敏感度 (`sensitivity`) | 强制测试范围 (`Test Scope`) | 上下文与跑测指令约束 |
+|---|---|---|---|
+| **`TRANSFORM`** / **`PRESENT`** | `LOW` | **纯单元测试 (`UNIT`)** | 仅加载该方法与单测；**严禁跑 E2E/集成测试** |
+| **`ALGO`** | `MEDIUM` ~ `CRITICAL` | **算法单测 (`UNIT`)** | 覆盖边界值、零值与溢出断言；必须秒级执行 |
+| **`GUARD`** | `HIGH` ~ `CRITICAL` | **守卫拦截单测 (`UNIT`)** | 双向覆盖：合法放行 + 非法越权拦截 100% 断言 |
+| **`STATE`** | `CRITICAL` | **状态机矩阵测试 (`UNIT`)** | 全合法跃迁与非法跃迁拦截矩阵 100% 覆盖 |
+| **`ADAPTER`** | `MEDIUM` | **Mock 契约测试 (`CONTRACT`)** | 校验 I/O 序列化与异常捕获；使用 Mock Profile，不连真实外部网络 |
+| **`ORCHESTRATE`** | `HIGH` ~ `CRITICAL` | **用例集成测试 (`INTEGRATION`)** | Mock 外部 I/O；重点覆盖主流程与分支调度；触达六元组时 compensate/fallback 100% 覆盖 |
+
 层级目录与覆盖率数字以 [`quality_gates.md`](quality_gates.md) 为准；**本文件管方法与节奏，那份管分层与清单**。
 
 提交前：测试全绿 ∧ `verify_consistency` ∧（若适用）死代码扫描。失败 → 禁止 Commit「先交再补」。
