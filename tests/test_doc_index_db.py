@@ -97,6 +97,55 @@ class TestDocIndexDB(unittest.TestCase):
         code = main(["--root", str(self.root), "stats"])
         self.assertEqual(code, 0)
 
+    def test_method_search_anti_explosion(self):
+        docs = self.root / "hs_dev_docs"
+        method_dir = docs / "_06_method_design" / "_01_privacy"
+        method_dir.mkdir(parents=True, exist_ok=True)
+        m_file = method_dir / "_01_mask_phone_design.md"
+        m_file.write_text(
+            "# 方法设计规范：mask_phone\n\n"
+            "## 1. 基础与位置画像 (Location & Profile)\n"
+            "- **所属层次**：领域核心层\n"
+            "- **所属模块**：`privacy`\n"
+            "- **文件路径**：`src/utils/privacy.py`\n"
+            "- **代码定位**：第 `20` 行，共 `15` 行（行范围：`20-34`）\n"
+            "- **方法签名**：`str mask_phone(phone: str, country_code: str = '')`\n"
+            "- **方法类型**：`TRANSFORM`\n"
+            "- **功能描述**：手机号脱敏掩码，保留前3后4位\n\n"
+            "## 2. 特征与属性契约 (Attributes Contract)\n"
+            "- **改动敏感度**：`LOW`\n"
+            "- **副作用类型**：`NONE`\n",
+            encoding="utf-8",
+        )
+
+        db = DocIndexDB(self.root)
+        try:
+            db.rebuild()
+            stats = db.stats()
+            self.assertGreaterEqual(stats["methods"], 1)
+
+            # 语义 / 关键词检索
+            res = db.method_search("脱敏")
+            self.assertTrue(res["ok"])
+            self.assertEqual(res["count"], 1)
+            candidate = res["candidates"][0]
+            self.assertEqual(candidate["name"], "mask_phone")
+            self.assertEqual(candidate["archetype"], "TRANSFORM")
+            self.assertEqual(candidate["lines"], "20-34")
+            self.assertIn("REUSE_OR_EXTEND", candidate["action_recommendation"])
+
+            # 英文符号查询
+            res_en = db.method_search("mask_phone", archetype="TRANSFORM")
+            self.assertTrue(res_en["ok"])
+            self.assertEqual(res_en["count"], 1)
+
+            # 空查询或无匹配
+            res_none = db.method_search("不存在的复杂计算方法XYZ")
+            self.assertEqual(res_none["count"], 0)
+            self.assertIn("No matching method found", res_none["guidance"])
+        finally:
+            db.close()
+
 
 if __name__ == "__main__":
     unittest.main()

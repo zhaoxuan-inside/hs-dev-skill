@@ -11,13 +11,13 @@ from pathlib import Path
 from idx_manager import IdxManager
 
 
-def init_full_workspace(workspace_root: str):
+def init_full_workspace(workspace_root: str, from_existing: bool = False):
     root = Path(workspace_root).resolve()
     docs_root = root / "hs_dev_docs"
     mock_root = root / "mock"
     test_root = root / "test"
 
-    print(f"[*] Initializing hs-dev workspace at: {root}")
+    print(f"[*] Initializing hs-dev workspace at: {root} (from_existing={from_existing})")
 
     # 1. 基础项目层级目录 (多端架构与产出收敛规划)
     base_dirs = [
@@ -160,6 +160,37 @@ def init_full_workspace(workspace_root: str):
                 encoding="utf-8"
             )
 
+    # 4.1 若为已有项目反向重建 (from_existing)，探测技术栈并写入基线 ADR
+    if from_existing:
+        adr_file = docs_root / "_00_project/_05_decision_record/ADR_001_tech_baseline.md"
+        if not adr_file.exists():
+            detected_stacks = []
+            if (root / "package.json").exists():
+                detected_stacks.append("Node.js / JavaScript/TypeScript Ecosystem")
+            if (root / "requirements.txt").exists() or (root / "pyproject.toml").exists():
+                detected_stacks.append("Python Ecosystem")
+            if (root / "go.mod").exists():
+                detected_stacks.append("Go Ecosystem")
+            if (root / "pom.xml").exists() or (root / "build.gradle").exists():
+                detected_stacks.append("JVM / Java/Kotlin Ecosystem")
+            if (root / "Cargo.toml").exists():
+                detected_stacks.append("Rust Ecosystem")
+
+            stack_summary = ", ".join(detected_stacks) if detected_stacks else "Standard Polyglot Stack"
+            adr_content = f"""# ADR-001: 存量项目技术栈基线固化
+
+## [VIBE_CONTRACT] 机器执行契约
+- 状态：ACCEPTED
+- 场景：已有项目反向重建（intent=REVERSE）
+- 锁定技术栈：{stack_summary}
+- 执行禁令：禁止在未明确发起新选型 ADR 前破坏当前技术栈基线
+
+## [HUMAN_RATIONALE]
+通过 init_hs_dev_docs.py --from-existing 自动扫描已有工程并锁定技术栈基线，供后续四要素与索引构建对齐。
+"""
+            adr_file.write_text(adr_content, encoding="utf-8")
+            print(f"[*] Generated reverse engineering baseline ADR: {adr_file.name}")
+
     # 5. 重建跨平台 SQLite 文档索引（FTS5 + LIKE，可重复执行）
     try:
         from doc_index_db import DocIndexDB
@@ -189,8 +220,9 @@ def init_full_workspace(workspace_root: str):
 def main():
     parser = argparse.ArgumentParser(description="Initialize hs-dev-docs directory structure")
     parser.add_argument("--root", default=".", help="Target workspace root directory")
+    parser.add_argument("--from-existing", action="store_true", help="Reverse engineer and onboard an existing codebase")
     args = parser.parse_args()
-    init_full_workspace(args.root)
+    init_full_workspace(args.root, from_existing=args.from_existing)
 
 
 if __name__ == "__main__":

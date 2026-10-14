@@ -91,6 +91,12 @@
    - 核心领域词汇、标准缩写与禁用同义词列表统一登记在 `_00_project/_02_project_word.dict.yaml`。
    - 提交前 `verify_consistency.py` 将自动扫描代码库与 SQL 迁移文件，命中 `forbidden_alias` 或事件动词原形时直接阻断门禁。
 
+### 3.5 方法爆炸与影子函数禁令 (Anti-Method Explosion & Shadow Functions)
+AI 辅助编程（VibeCoding）最容易落入“只建不选、方法爆炸”的陷阱。以下行为在本项目中**一律视为代码坏味道并阻断合并**：
+- ❌ **严禁未经检索直接新建辅助方法**：编写任何通用转换（`TRANSFORM`）、算法（`ALGO`）、守卫（`GUARD`）或适配逻辑前，**严禁凭空新建函数**。必须首先调用 `python scripts/doc_index_db.py method-search --q <业务意图>` 检索现有方法画像。
+- ❌ **严禁同义影子函数 (Shadow Functions)**：若已有方法已覆盖 ≥80% 逻辑，**严禁创建 `formatDate2`、`parseUserCustom`、`validateMobileHelper` 等近义变体**。必须采用可选入参（Options Pattern / Overload）扩展旧函数并保持单测兼容。
+- ❌ **严禁浅透传与过度微小抽取 (Shallow Modules)**：严禁为了盲目追求“单一职责”将仅有 1~3 行且全仓仅使用一次的代码抽取为公共方法。遵循深模块原则与三次原则（Rule of Three），单次使用的轻微逻辑**强制就地内联（Inline）**。
+
 ---
 
 ## 4. 六元组与方法分类在主流语言中的实现范式 (Polyglot Six-Tuple)

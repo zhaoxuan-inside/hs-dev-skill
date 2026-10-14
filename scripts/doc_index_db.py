@@ -83,6 +83,95 @@ def _read_text(path: Path) -> str:
             return ""
 
 
+def _parse_method_profile(text: str, doc_rel_path: str) -> Optional[Dict[str, Any]]:
+    is_method_path = "_06_method_design" in doc_rel_path or "method_design" in doc_rel_path
+    has_method_header = "方法类型" in text or "基础与位置画像" in text or "基础画像与位置" in text
+    if not (is_method_path or has_method_header):
+        return None
+
+    name = ""
+    m_title = re.search(r"^#\s*方法设计(?:规范|与契约画像模板)?[:：]\s*([A-Za-z0-9_]+)", text, re.MULTILINE)
+    if m_title:
+        name = m_title.group(1).strip()
+
+    m_sig = re.search(r"-\s*\*\*方法签名\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+    signature = m_sig.group(1).strip() if m_sig else ""
+    if (not name or name == "{method_name}") and signature:
+        sig_match = re.search(r"(?:[A-Za-z0-9_<>\[\]]+\s+)?([A-Za-z0-9_]+)\s*\(", signature)
+        if sig_match:
+            name = sig_match.group(1).strip()
+    if not name or name == "{method_name}":
+        base = Path(doc_rel_path).stem
+        base = re.sub(r"^_\d+_", "", base)
+        base = re.sub(r"_design$", "", base)
+        name = base
+
+    m_arch = re.search(r"-\s*\*\*方法类型\*\*[:：]\s*`?([A-Za-z_]+)`?", text)
+    archetype = m_arch.group(1).strip() if m_arch else ""
+    if "{" in archetype:
+        archetype = ""
+
+    m_mod = re.search(r"-\s*\*\*所属模块\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+    module = m_mod.group(1).strip() if m_mod else ""
+    if "（" in module or "(" in module:
+        module = re.split(r"[（\(]", module)[0].strip()
+    if "{" in module:
+        module = ""
+
+    m_layer = re.search(r"-\s*\*\*所属层次\*\*[:：]\s*([^\r\n]+)", text)
+    layer = m_layer.group(1).strip() if m_layer else ""
+    if "{" in layer:
+        layer = ""
+
+    m_desc = re.search(r"-\s*\*\*功能描述\*\*[:：]\s*([^\r\n]+)", text)
+    description = m_desc.group(1).strip() if m_desc else ""
+    if "{" in description:
+        description = ""
+
+    m_file = re.search(r"-\s*\*\*文件路径\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+    file_path = m_file.group(1).strip() if m_file else ""
+    if "{" in file_path:
+        file_path = ""
+
+    start_line = None
+    line_count = None
+    end_line = None
+    m_loc = re.search(r"第\s*`?(\d+)`?\s*行.*?共\s*`?(\d+)`?\s*行.*?`?(\d+)[-~](\d+)`?", text)
+    if m_loc:
+        start_line = int(m_loc.group(1))
+        line_count = int(m_loc.group(2))
+        end_line = int(m_loc.group(4))
+    else:
+        m_range = re.search(r"行范围[:：]\s*`?(\d+)[-~](\d+)`?", text)
+        if m_range:
+            start_line = int(m_range.group(1))
+            end_line = int(m_range.group(2))
+            line_count = end_line - start_line + 1
+
+    m_sens = re.search(r"-\s*\*\*改动敏感度\*\*[:：]\s*`?([A-Za-z_]+)`?", text)
+    sensitivity = m_sens.group(1).strip() if m_sens else "LOW"
+    if "{" in sensitivity:
+        sensitivity = "LOW"
+
+    return {
+        "method_key": f"method:{name}@{doc_rel_path}",
+        "name": name,
+        "archetype": archetype,
+        "module": module,
+        "layer": layer,
+        "description": description,
+        "signature": signature,
+        "file_path": file_path,
+        "start_line": start_line,
+        "line_count": line_count,
+        "end_line": end_line,
+        "sensitivity": sensitivity,
+        "doc_path": doc_rel_path,
+        "updated_at": _utc_now(),
+    }
+
+
+
 class DocIndexDB:
     def __init__(self, workspace_root: str | Path):
         self.root = Path(workspace_root).resolve()
@@ -137,6 +226,26 @@ class DocIndexDB:
             );
             CREATE INDEX IF NOT EXISTS idx_docs_domain ON docs(domain);
             CREATE INDEX IF NOT EXISTS idx_docs_path ON docs(path);
+
+            CREATE TABLE IF NOT EXISTS methods (
+                method_key TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                archetype TEXT,
+                module TEXT,
+                layer TEXT,
+                description TEXT,
+                signature TEXT,
+                file_path TEXT,
+                start_line INTEGER,
+                line_count INTEGER,
+                end_line INTEGER,
+                sensitivity TEXT,
+                doc_path TEXT NOT NULL,
+                updated_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_methods_name ON methods(name);
+            CREATE INDEX IF NOT EXISTS idx_methods_archetype ON methods(archetype);
+            CREATE INDEX IF NOT EXISTS idx_methods_module ON methods(module);
             """
         )
         self.fts_available = self._try_init_fts(conn)
@@ -156,6 +265,18 @@ class DocIndexDB:
                 )
                 """
             )
+            conn.execute(
+                """
+                CREATE VIRTUAL TABLE IF NOT EXISTS methods_fts USING fts5(
+                    method_key UNINDEXED,
+                    name,
+                    description,
+                    signature,
+                    module,
+                    tokenize='unicode61'
+                )
+                """
+            )
             conn.commit()
             return True
         except sqlite3.Error:
@@ -164,9 +285,11 @@ class DocIndexDB:
     def rebuild(self) -> Dict[str, Any]:
         conn = self.connect()
         conn.execute("DELETE FROM docs")
+        conn.execute("DELETE FROM methods")
         if self.fts_available:
             try:
                 conn.execute("DELETE FROM docs_fts")
+                conn.execute("DELETE FROM methods_fts")
             except sqlite3.Error:
                 self.fts_available = False
 
@@ -334,6 +457,13 @@ class DocIndexDB:
             if p.is_file():
                 yield p
 
+        # 扫描 _06_method_design 下所有可能未在 .idx 中登记的方法设计文档
+        method_dir = self.docs_root / "_06_method_design"
+        if method_dir.exists():
+            for p in sorted(method_dir.rglob("*.md")):
+                if p.is_file():
+                    yield p
+
     def _model_from_path(self, rel_posix: str) -> str:
         parts = rel_posix.split("/")
         for p in parts:
@@ -394,6 +524,59 @@ class DocIndexDB:
                 )
             except sqlite3.Error:
                 self.fts_available = False
+
+        # 自动提取并注册方法契约画像（若属于方法设计文档）
+        body = row.get("body") or ""
+        path = row.get("path") or ""
+        if body and ("_06_method_design" in path or "method_design" in path or "方法类型" in body):
+            method_prof = _parse_method_profile(body, path)
+            if method_prof and method_prof.get("name"):
+                self._upsert_method(conn, method_prof)
+
+    def _upsert_method(self, conn: sqlite3.Connection, m: Dict[str, Any]) -> None:
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO methods(
+                method_key, name, archetype, module, layer, description,
+                signature, file_path, start_line, line_count, end_line,
+                sensitivity, doc_path, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                m["method_key"],
+                m.get("name") or "",
+                m.get("archetype") or "",
+                m.get("module") or "",
+                m.get("layer") or "",
+                m.get("description") or "",
+                m.get("signature") or "",
+                m.get("file_path") or "",
+                m.get("start_line"),
+                m.get("line_count"),
+                m.get("end_line"),
+                m.get("sensitivity") or "LOW",
+                m["doc_path"],
+                m.get("updated_at") or _utc_now(),
+            ),
+        )
+        if self.fts_available:
+            try:
+                conn.execute("DELETE FROM methods_fts WHERE method_key = ?", (m["method_key"],))
+                conn.execute(
+                    """
+                    INSERT INTO methods_fts(method_key, name, description, signature, module)
+                    VALUES (?, ?, ?, ?, ?)
+                    """,
+                    (
+                        m["method_key"],
+                        m.get("name") or "",
+                        m.get("description") or "",
+                        m.get("signature") or "",
+                        m.get("module") or "",
+                    ),
+                )
+            except sqlite3.Error:
+                pass
 
     def search(
         self,
@@ -582,13 +765,129 @@ class DocIndexDB:
     def stats(self) -> Dict[str, Any]:
         conn = self.connect()
         count = conn.execute("SELECT COUNT(*) AS c FROM docs").fetchone()["c"]
+        m_count = conn.execute("SELECT COUNT(*) AS c FROM methods").fetchone()["c"]
         meta = {r["key"]: r["value"] for r in conn.execute("SELECT key, value FROM meta")}
         return {
             "ok": True,
             "db_path": str(self.db_path),
             "docs": count,
+            "methods": m_count,
             "fts": self.fts_available or meta.get("fts") == "1",
             "meta": meta,
+        }
+
+    def _row_to_method_result(self, r: sqlite3.Row, source: str) -> Dict[str, Any]:
+        start = r["start_line"]
+        end = r["end_line"]
+        lines = f"{start}-{end}" if start and end else (str(start) if start else "")
+        return {
+            "method_key": r["method_key"],
+            "name": r["name"],
+            "archetype": r["archetype"],
+            "module": r["module"],
+            "layer": r["layer"],
+            "description": r["description"],
+            "signature": r["signature"],
+            "file_path": r["file_path"],
+            "lines": lines,
+            "sensitivity": r["sensitivity"],
+            "doc_path": r["doc_path"],
+            "source": source,
+        }
+
+    def method_search(
+        self,
+        query: str,
+        *,
+        archetype: str = "",
+        module: str = "",
+        limit: int = 5,
+    ) -> Dict[str, Any]:
+        conn = self.connect()
+        q = (query or "").strip()
+        if not q:
+            return {
+                "ok": False,
+                "error": "empty query",
+                "count": 0,
+                "candidates": [],
+                "hint": "Provide --q with natural language intent or method name.",
+            }
+
+        ranked: Dict[str, Dict[str, Any]] = {}
+        use_fts = self.fts_available and not _has_cjk(q)
+        if use_fts:
+            fts_q = self._fts_query(q)
+            try:
+                sql = """
+                    SELECT m.method_key, m.name, m.archetype, m.module, m.layer,
+                           m.description, m.signature, m.file_path, m.start_line,
+                           m.line_count, m.end_line, m.sensitivity, m.doc_path,
+                           bm25(methods_fts) AS score
+                    FROM methods_fts
+                    JOIN methods m ON m.method_key = methods_fts.method_key
+                    WHERE methods_fts MATCH ?
+                """
+                params: List[Any] = [fts_q]
+                if archetype:
+                    sql += " AND m.archetype = ?"
+                    params.append(archetype.upper())
+                if module:
+                    sql += " AND m.module = ?"
+                    params.append(module)
+                sql += " ORDER BY score LIMIT ?"
+                params.append(limit * 2)
+                for r in conn.execute(sql, params):
+                    ranked[r["method_key"]] = self._row_to_method_result(r, source="fts")
+            except sqlite3.Error:
+                use_fts = False
+
+        like = f"%{q}%"
+        sql = """
+            SELECT method_key, name, archetype, module, layer, description,
+                   signature, file_path, start_line, line_count, end_line,
+                   sensitivity, doc_path, 0.0 AS score
+            FROM methods
+            WHERE (name LIKE ? OR description LIKE ? OR signature LIKE ? OR module LIKE ?)
+        """
+        params = [like, like, like, like]
+        if archetype:
+            sql += " AND archetype = ?"
+            params.append(archetype.upper())
+        if module:
+            sql += " AND module = ?"
+            params.append(module)
+        sql += " LIMIT ?"
+        params.append(limit * 2)
+        for r in conn.execute(sql, params):
+            if r["method_key"] not in ranked:
+                ranked[r["method_key"]] = self._row_to_method_result(r, source="like")
+
+        candidates = list(ranked.values())[:limit]
+        for c in candidates:
+            c["action_recommendation"] = (
+                "REUSE_OR_EXTEND (优先直接复用或通过可选入参扩展现有方法，绝对禁止新建影子函数或同义变体)"
+            )
+
+        guidance = (
+            "Anti-Method-Explosion Gate: If candidate matches intent >=80%, REUSE or EXTEND it with optional arguments. "
+            "If no candidate matches and you MUST create a new method, register its contract in hs_dev_docs/_06_method_design first, "
+            "and strictly enforce Deep Module & Rule of Three (inline trivial 1-3 line logic)."
+            if candidates
+            else "No matching method found. If logic is trivial (<=3 lines) and single-use, INLINE it. "
+                 "If truly a new reusable domain method, create its contract profile under hs_dev_docs/_06_method_design first."
+        )
+
+        return {
+            "ok": True,
+            "query": q,
+            "archetype": archetype or None,
+            "module": module or None,
+            "fts_used": use_fts,
+            "count": len(candidates),
+            "candidates": candidates,
+            "guidance": guidance,
+            "db_path": str(self.db_path),
         }
 
 
@@ -617,6 +916,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     p_search.add_argument("--model", default="", help="Filter model slug")
     p_search.add_argument("--limit", type=int, default=DEFAULT_LIMIT)
 
+    p_method = sub.add_parser(
+        "method-search",
+        help="Search method contracts in hs_dev_docs/_06_method_design to prevent method explosion",
+    )
+    p_method.add_argument("--q", required=True, help="Intent or keywords (e.g. '手机号脱敏' or 'payment')")
+    p_method.add_argument("--archetype", default="", help="Filter by archetype: TRANSFORM/ALGO/GUARD/STATE/ORCHESTRATE/ADAPTER/PRESENT")
+    p_method.add_argument("--module", default="", help="Filter by module")
+    p_method.add_argument("--limit", type=int, default=5)
+
     p_get = sub.add_parser("get", help="Get one doc by path or doc_key")
     p_get.add_argument("--path", required=True)
 
@@ -643,6 +951,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     args.q,
                     domain=args.domain,
                     model=args.model,
+                    limit=args.limit,
+                )
+            )
+            return 0
+        if args.command == "method-search":
+            if not db.db_path.exists():
+                db.rebuild()
+            _print_json(
+                db.method_search(
+                    args.q,
+                    archetype=args.archetype,
+                    module=args.module,
                     limit=args.limit,
                 )
             )

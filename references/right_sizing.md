@@ -8,24 +8,38 @@
 
 ---
 
-## 1. 分级判定（会话第一步，≤10 行落盘）
+## 1. 意图与分级判定（会话第一步，≤10 行落盘）
 
-在阶段 0 写 PRD 之前，先判定 `change_size` 与 `work_mode`，写入任务 brief / context_pack 首行或 PRD 元数据：
+在阶段 0 写 PRD 或动手前，先判定 `intent`、`change_size` 与 `work_mode`，写入任务 brief / context_pack 首行或 PRD 元数据：
+
+### 1.1 场景意图判定（Intent）
+
+| 场景意图 `intent` | 核心目标 | 专属指南 | 核心原则 |
+|---|---|---|---|
+| **BUILD** | 从零构建项目或全新独立功能域 | [`spec_driven_lifecycle.md`](spec_driven_lifecycle.md) | 满配 0→6 推进；两层解耦；MVP 激进裁剪 |
+| **REVERSE** | 已有项目反向重建、Schema/API 提取与规范接入 | [`reverse_engineering.md`](reverse_engineering.md) | 代码即事实；非侵入式分析；生成四级索引 |
+| **FIX** | 已有代码缺陷修复、排查偶发异常 | [`systematic_debugging.md`](systematic_debugging.md) | 科学假设驱动；先红后绿（必须先写失败测试） |
+| **REFACTOR** | 消除坏味道、提炼深模块、模式落地 | [`code_refactoring.md`](code_refactoring.md) | 保护网先决（快照/不变量）；零可观测行为漂移 |
+| **EXPLORE** | 纯只读理解代码、梳理时序、架构答疑 | [`code_exploration.md`](code_exploration.md) | 纯只读；免任务文件/免PRD/免Commit/免门禁 |
+| **RESUME** | 任务续做、恢复断点或快照回退 | [`process_continuity.md`](process_continuity.md) | 沿用既有 plan_log，不当新需求重开 |
+
+### 1.2 规模与模式判定（S / M / L & Work Mode）
 
 | 级别 | 判定（满足即取该级；冲突取更高） | 典型例子 |
 |------|----------------------------------|----------|
-| **S（快路径）** | 不改产品语义/对外契约/DB schema/限界上下文；局部代码或文案/样式/测试/配置 | 修空指针、改文案、补单测、调 CSS、修正日志 |
-| **M（补丁路径）** | 改已有功能行为或内部接口，但**不**新开限界上下文、不换技术栈、不新增表族 | 加可选字段、改校验规则、补一个端点、修补偿逻辑 |
-| **L（满配路径）** | 新功能/新域、换栈、新表或破坏性 API、架构边界变化、模糊 UI/新技术需对标 | 新支付域、换 ORM、公开 API 破坏性变更 |
+| **S（快路径）** | 不改产品语义/对外契约/DB schema/限界上下文；局部代码或文案/样式/测试/配置 | 修空指针、改文案、补单测、调 CSS、局部重构 |
+| **M（补丁/增量路径）** | 改已有功能行为或内部接口，但**不**新开限界上下文、不换技术栈、不新增表族 | 加可选字段、改校验规则、单模块反向重建、模块级重构 |
+| **L（满配路径）** | 新功能/新域、换栈、新表或破坏性 API、架构边界变化、模糊 UI/新技术需对标 | 新支付域、全工程逆向治理、换 ORM、公开 API 破坏性变更 |
 
 **同时写 `work_mode`**（详见 [`confidence_decision.md`](confidence_decision.md)）：
 
 | `work_mode` | 默认何时 |
 |---|---|
+| **READONLY** | `intent=EXPLORE` 时强制锁定；只读检索解答，禁止写任务/代码/Commit |
 | **DESIGN** | M/L 冻结未过；需求模糊；写/改 PRD·ADR·架构·契约；不确定 |
 | **IMPLEMENT** | S 且 DoD 已清；或冻结已过、按已定设计编码/修测 |
 
-**不确定时**：`change_size=M`，`work_mode=DESIGN`（不要默认 L；不要默认少问）。用户口头说「随便改一下」若触及契约/表结构 → 升为 M/L。用户说「跳过澄清 / 直接做」→ 按 [`confidence_decision.md`](confidence_decision.md) §1.5 收紧处理（禁止项不可跳过）。
+**不确定时**：`intent=BUILD`，`change_size=M`，`work_mode=DESIGN`。用户口头说「随便改一下」若触及契约/表结构 → 升为 M/L。用户说「跳过澄清 / 直接做」→ 按 [`confidence_decision.md`](confidence_decision.md) §1.5 收紧处理（禁止项不可跳过）。
 
 ---
 

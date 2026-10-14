@@ -84,25 +84,73 @@
 
 ---
 
-## 6. 面向 VibeCoding 的执行守则（降低 Token 与极速反馈）
+## 6. 防方法爆炸与查重选型优先机制 (Method Discovery & Anti-Explosion Gate)
+
+在 AI 辅助编程（VibeCoding）中，大模型自回归生成的本能往往是**“无脑新建函数”**而不是“选择/复用已有方法”，导致项目中充斥着大量功能重合的影子函数（如 `formatDate2`、`parseMobileUtil`、`checkUserHelper`），造成灾难性的**方法爆炸（Method Explosion）**。
+
+若试图将全库已有函数直接塞入 Prompt，又会引发严重的 **Prompt 膨胀与上下文稀释（Attention Dilution）**。
+
+本 Skill 确立**“写前检索、查重优于新建、单一天理源派生轻量索引”**的抗爆炸防护体系：
+
+### 6.1 单一天理源（SSOT）与派生轻量索引
+- **严禁双重维护文档**：`hs_dev_docs/_06_method_design/` 是全仓方法契约的**单一天理源**，不需要也不允许额外人工维护第二份方法清单；
+- **自动化物化索引（Materialized Cache）**：`scripts/doc_index_db.py` 会自动扫描解析 `_06_method_design/*.md` 中的方法名、分类画像（archetype）、核心功能描述与物理代码坐标，物化为本地 SQLite `methods` 表；
+- **NLP / 意图极速召回**：在写任何辅助方法前，Agent 执行 `python scripts/doc_index_db.py method-search --q "<业务意图>"`，仅消耗几十 Token 即可获得 Top-3 候选画像。
+
+### 6.2 编码前的四步决策漏斗 (The 4-Step Decision Funnel)
+Agent 在产生“我需要一个函数来实现 X”的念头时，**绝对禁止直接落笔写代码**，必须遵循以下漏斗：
+
+```text
+[新需求 / 业务意图]
+        │
+        ▼
+[1. 意图检索 (Search)] ──调用 doc_index_db.py method-search --q "业务意图"
+        │
+        ▼
+[2. 画像决策 (Decision)]
+  ├── A. 完全匹配 (100%) ───────► 直接 import 复用，严禁新建
+  ├── B. 高度相似 (≥80%) ──────► 扩展入参（Options/可选参数），严禁造影子函数
+  ├── C. 单处使用且极微小 (≤3行) ─► 遵循深模块哲学，就地内联 (Inline)，严禁浅抽取
+  └── D. 确认全新通用领域逻辑 ──► 获准新建；必须先在 _06_method_design 登记画像
+        │
+        ▼
+[3. 极窄切片 (Narrow Slice)] ──按画像结果使用 view_file 读取目标 15~30 行代码
+        │
+        ▼
+[4. 实施变更与定点跑测] ──执行专属测试命令，绿灯后同步回写文档
+```
+
+### 6.3 抗爆炸三大防线原则
+1. **写前必搜（Search Before Create）**：未经 `method-search` 检索直接创建公共函数属于严重违纪。
+2. **扩展优于重造（Extend over Duplicate）**：现有方法入参若不支持某些新格式，采用可扩展配置对象（如 `options` 或可选参数）进行平滑扩展，保持向后兼容，杜绝 `methodV2`。
+3. **三次原则与深模块（Rule of Three & Deep Modules）**：
+   - 1 处使用：直接内联在调用处（Private/Local）；
+   - 2 处使用：容忍少量复制，不急于抽象；
+   - 3 处以上使用：且属于跨用例核心逻辑，才抽为公共方法并建档。
+
+---
+
+## 7. 面向 VibeCoding 的执行守则（降低 Token 与极速反馈）
 
 AI Agent 在承接修改任务时，必须严格执行以下工作流：
 
 ```text
-[1. 读文档画像] ──检索 method_design.md 提取「文件路径 + 行号范围 + 跑测命令」
+[1. 意图检索与选型] ──执行 doc_index_db.py method-search 召回候选；确定复用/扩展/新建
         │
-[2. 极窄上下文] ──仅 view_file 目标行段及对应测试文件；严禁加载全量调用链源码
+[2. 读文档画像]     ──从 _06_method_design 提取「物理定位行号 + 跑测命令」
         │
-[3. 实施变更]   ──按方法类型与规范精准修改代码
+[3. 极窄上下文]     ──仅 view_file 目标行段（15~30行）及对应单测；严禁加载全量调用链源码
         │
-[4. 定点跑测]   ──执行文档指定的专属测试命令；严禁全量跑测；绿灯后结束
+[4. 实施精准变更]   ──按方法类型与规范修改或扩展逻辑
         │
-[5. 同步回写]   ──更新文档中的代码行号定位与三段式历史修改记录
+[5. 定点跑测]       ──执行文档指定的专属测试命令；严禁全量跑测；绿灯后结束
+        │
+[6. 同步回写]       ──更新文档中的代码行号定位与三段式历史修改记录
 ```
 
 ---
 
-## 7. 前端工程化落地与实战映射 (Frontend Architecture Mapping)
+## 8. 前端工程化落地与实战映射 (Frontend Architecture Mapping)
 
 前端开发是 VibeCoding 中“逻辑与样式混杂、组件爆炸、单测最难落地”的重灾区。将 7 大方法规范严格映射到现代前端（React / Vue / Svelte）中，能彻底斩断“大组件”对 Token 的消耗：
 

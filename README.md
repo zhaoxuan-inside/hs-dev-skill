@@ -3,11 +3,11 @@
 > **质量优先 + 审讯式对齐 + 测试一等公民 + 深模块词汇 + 文档驱动 + S/M/L 分级**
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
-[![Spec Version](https://img.shields.io/badge/skill-v2.37-blue.svg)](SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v2.39-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS），**替代已废弃的 `hs-project-skill`**。目标：**质量大于一切**——审讯式 DESIGN（跳过收紧）、一源双视图（人类产品设计书 + VibeCoding 执行契约）、双轨原型必产（Mermaid 拓扑 + ASCII 比例线框）、垂直领域能力融合（OpenPencil / Generative UI 原型、Modern Web Guidance 规范、Chrome DevTools 运行时/a11y/CWV 门禁）、全局统一术语与词态矩阵（Ubiquitous Language 单一事实源 · Command动词原形/Event过去分词/Attribute时间戳严格解耦 · Search-Before-Name · 零裸字符串）、多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）、选型架构顶置契约切片（隔离废案）、GoF 23 种设计模式选型决策树与模式协同集群档案、方法类型七分类与七维契约画像（精准测试矩阵 + patternCluster 关联指针毫秒级局部命中）、分步正确（seam + 垂直 TDD）。续做靠 `plan_log`/`change_log`（语义「继续」）；回退靠快照而非 git。入口 [`SKILL.md`](SKILL.md)；先写 `change_size`+`work_mode`，过装载门闩后再干活。
+`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS），**替代已废弃的 `hs-project-skill`**。目标：**质量大于一切**——全场景意图路由（BUILD 从零构建 / REVERSE 存量反向重建 / FIX 调试修复 / REFACTOR 重构 / EXPLORE 只读理解 / RESUME 续做）、审讯式 DESIGN（跳过收紧）、一源双视图（人类产品设计书 + VibeCoding 执行契约）、双轨原型必产（Mermaid 拓扑 + ASCII 比例线框）、垂直领域能力融合（OpenPencil / Generative UI 原型、Modern Web Guidance 规范、Chrome DevTools 运行时/a11y/CWV 门禁）、全局统一术语与词态矩阵（Ubiquitous Language 单一事实源 · Command动词原形/Event过去分词/Attribute时间戳严格解耦 · Search-Before-Name · 零裸字符串）、多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）、选型架构顶置契约切片（隔离废案）、GoF 23 种设计模式选型决策树与模式协同集群档案、方法类型七分类与七维契约画像（精准测试矩阵 + patternCluster 关联指针毫秒级局部命中 · 抗方法爆炸门禁与写前意图检索选型 `doc_index_db method-search`）、分步正确（seam + 垂直 TDD）。续做靠 `plan_log`/`change_log`（语义「继续」）；回退靠快照而非 git。入口 [`SKILL.md`](SKILL.md)；先写 `intent`+`change_size`+`work_mode`，过装载门闩后再干活。
 
 ---
 
@@ -50,6 +50,7 @@ python scripts/skill_ref_index.py rebuild # Skill 详规场景索引
 
 ## 核心特性
 
+0. **全场景立体意图路由（BUILD / REVERSE / FIX / REFACTOR / EXPLORE / RESUME）**：根据工程诉求无缝分流——从零构建 0→6、已有项目反向重建（Schema/API 提取与索引化）、系统化调试与先红后绿 Bug 修复、行为等价保护网重构、纯只读免交付代码理解。见 [right_sizing.md](references/right_sizing.md) / [reverse_engineering.md](references/reverse_engineering.md) / [systematic_debugging.md](references/systematic_debugging.md) / [code_refactoring.md](references/code_refactoring.md) / [code_exploration.md](references/code_exploration.md)。
 1. **质量优先与硬阻断门禁**：分步正确 + 测试一等公民（测试 100% PASS 零报错绝对阻断交付、代码静态检测零告警零错误、DDT 与双轨制 E2E 规约）。见 [testing.md](references/testing.md) / [quality_gates.md](references/quality_gates.md)。
 2. **审讯式 DESIGN 对齐与方案博弈**：设计树前沿轮询 + 产品探索拷问（`gstack /office-hours`）+ 交互方案 Trade-offs 比选；跳过澄清收紧。见 [grill_orchestration.md](references/grill_orchestration.md) / [confidence_decision.md](references/confidence_decision.md)。
 3. **产品设计一源双视图与 MVP 规划**：先产品探索五步推演，再输出**面向人类的《产品设计书》**（PRD + 双轨线框原型）与**面向 VibeCoding 的《机器执行契约》**（Tokens/组件树/状态机/Gherkin DoD），彻底杜绝 AI 叙事幻觉与 Token 浪费；通过人机交互对齐产出《产品开发分阶段规划书》。见 [product_design.md](references/product_design.md) / [product_roadmap.md](references/product_roadmap.md) / [product_prototype.md](references/product_prototype.md)。

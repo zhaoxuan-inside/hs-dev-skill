@@ -10,11 +10,19 @@
 ## 1. 门闩步骤（动手前强制，≤5 步）
 
 ```text
-L0  写 change_size=S|M|L 与 work_mode=DESIGN|IMPLEMENT（见 right_sizing / confidence_decision）
-    · 语义为「继续/继续任务/接着做/resume」→ 先记 work_mode 沿用 plan，勿当新需求
+L0  判定意图与分级：
+    · 写 intent=BUILD|REVERSE|FIX|REFACTOR|EXPLORE|RESUME
+    · 交付型（BUILD/REVERSE/FIX/REFACTOR）写 change_size=S|M|L 与 work_mode=DESIGN|IMPLEMENT
+    · 只读型（EXPLORE）自动为 work_mode=READONLY（豁免任务三文件、PRD、Commit 与门禁）
+    · 语义为「继续/继续任务/接着做/resume」→ intent=RESUME，沿用既有 plan_log，勿当新需求
 L1  路由：python scripts/skill_ref_index.py search --q <场景词> --limit 5
     或只读 references/_index.md 表格一行（二选一，勿两者都做）
 L2  打开命中的恰好 1 份 references/*.md（本会话已读过的不重读）
+    · 从零构建 / 完整特性 → `product_design.md` / `spec_driven_lifecycle.md`
+    · 已有项目反向重建 → `reverse_engineering.md`
+    · Bug 修复 / 系统化排查 → `systematic_debugging.md`
+    · 代码重构 / 消除坏味道 → `code_refactoring.md`
+    · 代码理解 / 只读探查 → `code_exploration.md`
     · 继续 / 续做 / 回退 → `process_continuity.md`（并跑 process_log resume-scan）
     · DESIGN 审讯对齐 / grilling → `grill_orchestration.md`
     · 原型 / 线框 / 无图布局 → `product_prototype.md`

@@ -42,5 +42,9 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | 四级 JSONL 路由 | `four_level_routing.md` |
 | Mock Profile | `mock_contract_guide.md` |
 | **版本号控制与单源防漂移 / SemVer / 发布 Tag** | `version_control.md` |
+| **反向重建：已有项目接入规范与知识库逆向** | `reverse_engineering.md` |
+| **Bug 修复：系统化调试与测试驱动修补** | `systematic_debugging.md` |
+| **代码重构：行为等价保护网与深模块演进** | `code_refactoring.md` |
+| **代码理解：只读免交付检索与架构探查** | `code_exploration.md` |
 | 学习笔记 / 偏好 / GitHub 对标 | `learn_and_prefer.md` |
 | Win/Linux/macOS 路径与解释器 | `cross_platform.md` |

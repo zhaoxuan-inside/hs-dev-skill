@@ -1,25 +1,23 @@
 ---
 name: hs-dev-skill
 description: >-
-  Use when starting or iterating product projects (replaces hs-project-skill):
-  business plan optional, product prototype required when UI (Mermaid OK),
-  tech selection, architecture, APIs/DB/UI, six-tuple, bugfixes under
-  hs_dev_docs, resume via plan_log/change_log when user says continue/继续,
-  non-git task rollback via snapshots, task plans. Quality-first: grill DESIGN
-  (skip tightly gated), tests first-class, S/M/L, PRD freeze, ADR, legal task
-  transitions, SQLite packs, local Commit. First step: change_size + work_mode.
-  Do not use for one-off scripts, drive-by third-party edits, or user opt-out.
+  Use for product project lifecycle & code engineering: supports full scenarios
+  (BUILD new project, REVERSE brownfield onboarding, FIX systematic debugging,
+  REFACTOR invariant-safe restructuring, EXPLORE read-only comprehension, and RESUME).
+  Quality-first: grill DESIGN (skip tightly gated), tests first-class (zero errors),
+  intent matrix + S/M/L right-sizing, PRD freeze, ADR, legal task transitions,
+  SQLite packs, local Commit. First step: intent + change_size + work_mode.
 license: MIT
 compatibility: Requires Python >= 3.8 (stdlib sqlite3; Win/Linux/macOS)
 metadata:
   author: hardstone
-  version: "2.37"
+  version: "2.39"
 ---
 
 # 产品开发 Skill (hs-dev-skill)
 
-版本：v2.37  
-核心定位：**质量优先（分步正确 + 测试一等公民 · 测试零报错硬阻断交付 · 静态检测零告警零错误 · 数据驱动测试 DDT 与双轨制 E2E 规约 · 多语言编码规范与 Linter 门禁矩阵 · 全局统一术语与防歧义词典 Ubiquitous Language / 词态矩阵 Command/Event/Attribute / Search-Before-Name / 零裸字符串 Zero Magic Strings）+ 文档驱动（方法类型七分类 · 属性契约七维画像 · patternCluster 单向指针局部切片防破坏 · 物理行号定位 · 精准测试分级矩阵 · 局部依赖拓扑 · 三段式修改原理）+ 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构与模式设计（[VIBE_CONTRACT] 顶置切片 · GoF 23 种设计模式选型决策树 · 模式协同集群档案 · VibeCoding 防破坏三铁律）+ MVP 激进裁剪决策（CEO 砍半法则 · 团队胃口时间箱 · Day 1 垂直曳光弹切片）+ 垂直领域能力融合（OpenPencil 矢量规约 · Generative UI 动态交互仿真 · Modern Web Guidance 现代合规 · Chrome DevTools 运行态/CWV/a11y 质量门禁 · 专用 SDK 防腐 Adapter）+ 多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）+ 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
+版本：v2.39  
+核心定位：**全场景意图路由（BUILD 从零构建 · REVERSE 存量反向重建 · FIX 系统化调试 · REFACTOR 行为等价重构 · EXPLORE 只读代码理解 · RESUME 任务续做）+ 质量优先（分步正确 + 测试一等公民 · 测试零报错硬阻断交付 · 静态检测零告警零错误 · 数据驱动测试 DDT 与双轨制 E2E 规约 · 多语言编码规范与 Linter 门禁矩阵 · 全局统一术语与防歧义词典 Ubiquitous Language / 词态矩阵 Command/Event/Attribute / Search-Before-Name / 零裸字符串 Zero Magic Strings）+ 文档驱动（方法类型七分类 · 属性契约七维画像 · patternCluster 单向指针局部切片防破坏 · 物理行号定位 · 精准测试分级矩阵 · 局部依赖拓扑 · 三段式修改原理 · 抗方法爆炸门禁与写前意图检索选型 `doc_index_db method-search`）+ 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构与模式设计（[VIBE_CONTRACT] 顶置切片 · GoF 23 种设计模式选型决策树 · 模式协同集群档案 · VibeCoding 防破坏三铁律）+ MVP 激进裁剪决策（CEO 砍半法则 · 团队胃口时间箱 · Day 1 垂直曳光弹切片）+ 垂直领域能力融合（OpenPencil 矢量规约 · Generative UI 动态交互仿真 · Modern Web Guidance 现代合规 · Chrome DevTools 运行态/CWV/a11y 质量门禁 · 专用 SDK 防腐 Adapter）+ 多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）+ 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
 **替代**：原 `hs-project-skill` 已废弃，统一用本 Skill。
 
 **装载门闩（反合理化 × Token）**：动手前必须完成 [`load_latch.md`](references/load_latch.md) L0～L2（分级 + 索引路由 + **恰好 1 份**详规）。禁止「跳过 Skill 先干」；也禁止整目录通读。场景有 ≥1% 可能适用 → **必须跑** `skill_ref_index search`（或读 `_index` 一行），命中再打开。
@@ -29,7 +27,7 @@ metadata:
 ## 核心驱动铁律
 
 0. **质量优先（测试零报错硬阻断 + 静态检测零告警 + 全局统一定义单一事实源）**：分步的正确最大可能保证最终的正确；测试是一等公民（[`testing.md`](references/testing.md)）。全量测试必须 100% PASS 且 0 报错；静态代码检测（Linter / TypeChecker / 死代码扫描 / 多语言规范矩阵，见 [`coding_standards.md`](references/coding_standards.md)）必须 0 Warning 且 0 Error；强制执行**单一事实源与词态矩阵**（Command 动词原形 / Event 过去分词如 `order.updated` / Attribute `_at` 时间戳，严禁使用 `update` 或 `updated_at` 当事件名；严禁硬编码裸字符串；严禁发明同义词别名，见 `_02_project_word.dict.yaml`）；未达标前**绝对禁止**流转 COMPLETED 交付或执行 Commit（严禁向用户汇报「已完成但有若干报错待修」）；可演示但无测试证明的行为不算完成（S 无逻辑变更除外）。
-1. **先分级 + 定模式**：写 `change_size=S|M|L` 与 `work_mode=DESIGN|IMPLEMENT`（[`right_sizing.md`](references/right_sizing.md) / [`confidence_decision.md`](references/confidence_decision.md)）。禁止未分级按满配 0→6。不确定：`change_size=M`，`work_mode=DESIGN`。
+1. **全场景意图路由与变更分级**：会话第一步判定 `intent=BUILD|REVERSE|FIX|REFACTOR|EXPLORE|RESUME`（[`right_sizing.md`](references/right_sizing.md)）。交付型（BUILD/REVERSE/FIX/REFACTOR）写 `change_size=S|M|L` 与 `work_mode=DESIGN|IMPLEMENT`（[`confidence_decision.md`](references/confidence_decision.md)）；只读型（`EXPLORE`）自动锁定 `work_mode=READONLY`，仅检索切片回答，彻底豁免任务包、PRD、Commit 与门禁阻断（[`code_exploration.md`](references/code_exploration.md)）。禁止未分级按满配 0→6。不确定：`intent=BUILD`，`change_size=M`，`work_mode=DESIGN`。
 2. **装载门闩**：未过 L0～L2 禁止探代码开工或写 PRD 正文（[`load_latch.md`](references/load_latch.md)）。语义为「继续/继续任务」时 L2 优先 [`process_continuity.md`](references/process_continuity.md)。
 3. **持续推进**：除 DESIGN 前沿等待 / 实现期询问闸门 /（M/L）冻结未过 / `BLOCKED` 外禁止空转；确认后立刻继续至路径终点（测试全绿+静态零告警+门禁+归档+本地 Commit）。
 4. **审讯式对齐与方案比选后再编码**：`DESIGN` 走 [`grill_orchestration.md`](references/grill_orchestration.md)（融合 `gstack /office-hours` 痛点拷问与 `superpowers` 多方案 Trade-offs 博弈）；**跳过澄清收紧**（不可逆/计费权限/对外契约/持久化/影响选型的产品空白 → 禁止跳过，见 confidence_decision）。S 数行 DoD；M/L 阶段 0。
@@ -53,7 +51,7 @@ metadata:
 9. **设计多问 / 实现少问**：`DESIGN` = 审讯式澄清（跳过受 §4 收紧）；`IMPLEMENT` 仅四条件闸门才问（[`confidence_decision.md`](references/confidence_decision.md)）。实现中暴露产品空白 → 回切 DESIGN。
 10. **续做 = plan_log + change_log**：语义「继续」→ `process_log.py resume-scan`；**回退不依赖 git** → `process_log.py rollback`（[`process_continuity.md`](references/process_continuity.md)）。
 11. **状态机合法迁移**：禁止跳步；终态重开仅回退 `--force`（[`task_state_machine.md`](references/task_state_machine.md)）。
-12. **实现必测、运行态干净与双轨 E2E**：确认 seam → 垂直切片红绿重构（[`testing.md`](references/testing.md)）；测试数据集（`_08_test_data`）支持 DDT 但严禁脆弱绝对相等，须 Schema Match + 核心不变量断言；Mock 聚焦外部 Adapter 环境；双轨制 E2E（开发走 Mock 冒烟，交付门禁直连容器/沙箱，严禁假 E2E）；提交前与阶段 6 必须 `make test` 100% 绿（0 报错）∧ 静态检测 0 告警 0 错误 ∧ `verify_consistency --strict`；前端集成 Chrome DevTools CDP 自动化排查、WCAG a11y 审计与 LCP/内存泄漏诊断门禁。改文件前先 `process_log.py checkpoint`。
+12. **实现必测、运行态干净与抗方法爆炸**：确认 seam → 垂直切片红绿重构（[`testing.md`](references/testing.md)）；**写前意图检索与抗方法爆炸铁律**：编写任何通用转换/计算/校验/适配方法前，严禁直接新建，必须先执行 `python scripts/doc_index_db.py --root . method-search --q <业务意图>` 召回候选，重合 ≥80% 强制复用或可选参数扩展，严禁影子函数；遵从深模块与三次原则，微小单次逻辑就地内联（[`method_archetypes.md`](references/method_archetypes.md) / [`coding_standards.md`](references/coding_standards.md)）；测试数据集（`_08_test_data`）支持 DDT 但严禁脆弱绝对相等，须 Schema Match + 核心不变量断言；Mock 聚焦外部 Adapter 环境；双轨制 E2E（开发走 Mock 冒烟，交付门禁直连容器/沙箱，严禁假 E2E）；提交前与阶段 6 必须 `make test` 100% 绿（0 报错）∧ 静态检测 0 告警 0 错误 ∧ `verify_consistency --strict`；前端集成 Chrome DevTools CDP 自动化排查、WCAG a11y 审计与 LCP/内存泄漏诊断门禁。改文件前先 `process_log.py checkpoint`。
 13. **学习/偏好**：`~/.hs-dev-skill/`；`global_index_db.py search`，禁止整目录通读。
 14. **模糊新技术/UI/架构**：GitHub 高星对标 ≥2；范式见 `dev_paradigm`；深模块见 `deep_modules`；前端结构见 `frontend_arch`；后端见 `backend_arch`；复杂域才读 `ddd_design`（远程按需）。
 15. **三端**：`pathlib` + `python3`/`python`/`py -3`（[`cross_platform.md`](references/cross_platform.md)）。
@@ -64,19 +62,21 @@ metadata:
 
 ---
 
-## 执行流程（先分级）
+## 执行流程（意图路由 + 变更分级）
 
 ```text
-[change_size + work_mode] ── load_latch L0～L2
-  ├─ DESIGN: 审讯式设计树多问 → 冻结 → 切 IMPLEMENT
-  ├─ S + IMPLEMENT: 轻量对齐 → seam+测驱动实现 → 门禁子集 → Commit
-  ├─ M: 迷你阶段0 → 触达面详设 → 任务/pack → 测驱动实现 → 门禁 → Commit
-  └─ L: 0→1→2→3→4→5→6（细则见 spec_driven_lifecycle.md）
+[intent + change_size + work_mode] ── load_latch L0～L2
+  ├─ BUILD (从零构建): 0→1→2→3→4→5→6 满配 (或 M/S 剪枝) → TDD → 门禁 → Commit
+  ├─ REVERSE (反向重建): 资产扫描 → Schema/API提取 → 建立四级索引与词典 → 对齐门禁
+  ├─ FIX (Bug修复): 根因假设 → 最小复现用例 RED → 精准修复 GREEN → 回归门禁 → Commit
+  ├─ REFACTOR (代码重构): 固化行为保护网 → 消除坏味道/深模块提炼 → 零行为漂移验证 → Commit
+  ├─ EXPLORE (代码理解): 索引检索 → 切片阅读 → 结构化输出业务图谱/时序解答 (纯只读免交付)
+  └─ RESUME (任务续做): process_log resume-scan 恢复断点 → 沿既有 plan 继续至终点
 ```
 
-**L 满配**：0 产品设计（设计语言+功能规格）+ MVP分阶段规划/冻结 → 1 选型 ADR（按当前阶段范围）→ 2 架构（深模块词汇）→ 3 四要素（API/UI：aesthetic→DESIGN.md→craft / rule_fetch）→ 4 任务+pack+seam → 5 三同步+垂直 TDD → 6 测试全绿（0 报错）+ 静态检测零告警零错误 + 门禁 + 归档 + Commit。
+**L 满配（BUILD）**：0 产品设计（设计语言+功能规格）+ MVP分阶段规划/冻结 → 1 选型 ADR（按当前阶段范围）→ 2 架构（深模块词汇）→ 3 四要素（API/UI：aesthetic→DESIGN.md→craft / rule_fetch）→ 4 任务+pack+seam → 5 三同步+垂直 TDD → 6 测试全绿（0 报错）+ 静态检测零告警零错误 + 门禁 + 归档 + Commit。
 
-**跃迁**：未分级/未过门闩禁止开工；L 的 0→1 须冻结门禁；M/S 禁止为空跑造空文档；`BLOCKED`→落盘→继续至终点。
+**跃迁**：未分级/未过门闩禁止开工；L 的 0→1 须冻结门禁；M/S 禁止为空跑造空文档；`EXPLORE` 只读直通免门禁；`BLOCKED`→落盘→继续至终点。
 
 ---
 
@@ -86,12 +86,12 @@ metadata:
 |---|---|---|
 | `skill_ref_index.py` | Skill references 场景检索 | `python scripts/skill_ref_index.py search --q 幂等` |
 | `rule_fetch.py` | 本地/远程领域规则目录与缓存 | `python scripts/rule_fetch.py search --q React` |
-| `doc_index_db.py` | 项目文档 search/slice | `python scripts/doc_index_db.py --root . search --q kw` |
+| `doc_index_db.py` | 项目文档 search/slice/方法查重 | `python scripts/doc_index_db.py --root . search --q kw`<br/>`python scripts/doc_index_db.py --root . method-search --q "扣款"` |
 | `global_index_db.py` | 全局偏好/学习标签 | `python scripts/global_index_db.py search --tag 反向代理` |
 | `task_manager.py` | 任务三文件+合法状态机 | `python scripts/task_manager.py create --id x --title "…" --change-size M` |
 | `process_log.py` | plan/change 续做与非 git 回退 | `python scripts/process_log.py resume-scan` / `checkpoint` / `rollback` |
 | `verify_consistency.py` | 提交前门禁 | `python scripts/verify_consistency.py --root .` |
-| `init_hs_dev_docs.py` / `init_hs_global.py` | 初始化项目文档 / 全局区 | `python scripts/init_hs_global.py` |
+| `init_hs_dev_docs.py` / `init_hs_global.py` | 初始化项目文档 (支持 `--from-existing`) / 全局区 | `python scripts/init_hs_dev_docs.py --from-existing` |
 | `hs_paths.py` / `idx_manager.py` / `dead_code_scanner.py` | 路径 / 索引 / 死代码 | 见各脚本 `--help` |
 
 解释器：Linux/macOS `python3`；Windows `python` 或 `py -3`。
@@ -101,6 +101,10 @@ metadata:
 ## 手册指针
 
 - [`_index.md`](references/_index.md) · [`load_latch.md`](references/load_latch.md) · [`right_sizing.md`](references/right_sizing.md) · [`token_budget.md`](references/token_budget.md)
+- [`reverse_engineering.md`](references/reverse_engineering.md)（已有项目反向重建 · Schema/API 逆向与四级索引）
+- [`systematic_debugging.md`](references/systematic_debugging.md)（系统化调试 · 科学假设 · 先红后绿 · 防退化门禁）
+- [`code_refactoring.md`](references/code_refactoring.md)（代码重构 · 特征测试保护网 · 深模块演进 · 零行为漂移）
+- [`code_exploration.md`](references/code_exploration.md)（代码理解 · 纯只读免交付 · 切片检索与图谱还原）
 - [`grill_orchestration.md`](references/grill_orchestration.md) · [`confidence_decision.md`](references/confidence_decision.md)（审讯式 DESIGN / IMPLEMENT 少问；跳过收紧）
 - [`product_design.md`](references/product_design.md)（设计语言与产品功能双支柱 · 产出纯净铁律）· [`product_roadmap.md`](references/product_roadmap.md)（MVP 裁剪与分阶段实施 · 人机交互对齐）· [`product_prototype.md`](references/product_prototype.md) · [`process_continuity.md`](references/process_continuity.md)
 - [`testing.md`](references/testing.md) · [`quality_gates.md`](references/quality_gates.md) · [`coding_standards.md`](references/coding_standards.md) · [`deep_modules.md`](references/deep_modules.md)
