@@ -129,6 +129,66 @@ class CodeSkeletonExtractor:
 
         return symbols
 
+    def extract_dependencies(self, file_path: Path) -> List[Dict[str, Any]]:
+        """提取代码中的方法/函数间调用依赖"""
+        if not file_path.is_file():
+            return []
+        ext = file_path.suffix.lower()
+        content = file_path.read_text(encoding="utf-8", errors="ignore")
+        if ext != ".py":
+            return []
+        try:
+            tree = ast.parse(content)
+        except Exception:
+            return []
+
+        deps: List[Dict[str, Any]] = []
+        ignored_builtins = {
+            "print", "len", "range", "isinstance", "getattr", "setattr", "int", "str", "float",
+            "bool", "dict", "list", "set", "tuple", "min", "max", "sum", "any", "all", "enumerate",
+            "zip", "super", "open", "type", "hasattr", "issubclass", "round", "abs", "sorted",
+        }
+
+        for node in tree.body:
+            if isinstance(node, ast.ClassDef):
+                cls_name = node.name
+                for item in node.body:
+                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        source_symbol = f"{cls_name}.{item.name}"
+                        for subnode in ast.walk(item):
+                            if isinstance(subnode, ast.Call):
+                                target = self._resolve_call_target(subnode)
+                                if target and target != source_symbol and target not in ignored_builtins and not any(target.startswith(b + ".") for b in ignored_builtins):
+                                    deps.append({
+                                        "source_symbol": source_symbol,
+                                        "target_symbol": target,
+                                        "dep_type": "INTERNAL_CALL",
+                                        "source_file": str(file_path),
+                                    })
+            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                source_symbol = node.name
+                for subnode in ast.walk(node):
+                    if isinstance(subnode, ast.Call):
+                        target = self._resolve_call_target(subnode)
+                        if target and target != source_symbol and target not in ignored_builtins and not any(target.startswith(b + ".") for b in ignored_builtins):
+                            deps.append({
+                                "source_symbol": source_symbol,
+                                "target_symbol": target,
+                                "dep_type": "INTERNAL_CALL",
+                                "source_file": str(file_path),
+                            })
+        return deps
+
+    def _resolve_call_target(self, call_node: ast.Call) -> Optional[str]:
+        if isinstance(call_node.func, ast.Name):
+            return call_node.func.id
+        elif isinstance(call_node.func, ast.Attribute):
+            val = call_node.func.value
+            if isinstance(val, ast.Name):
+                return f"{val.id}.{call_node.func.attr}"
+            return call_node.func.attr
+        return None
+
     def _extract_c_like_symbols(self, content: str, file_path: Path) -> List[Dict[str, Any]]:
         lines = content.splitlines()
         symbols = []

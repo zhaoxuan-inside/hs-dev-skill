@@ -339,6 +339,44 @@ class TestDocIndexDB(unittest.TestCase):
         finally:
             db.close()
 
+    def test_method_dependencies_and_dep_graph(self):
+        backend_dir = self.root / "backend"
+        backend_dir.mkdir(parents=True, exist_ok=True)
+        code_file = backend_dir / "service.py"
+        code_file.write_text(
+            "class OrderService:\n"
+            "    def create_order(self, uid: int) -> bool:\n"
+            "        self.validate_user(uid)\n"
+            "        self.save_record()\n"
+            "        return True\n"
+            "    def validate_user(self, uid: int) -> bool:\n"
+            "        return True\n"
+            "    def save_record(self) -> None:\n"
+            "        pass\n",
+            encoding="utf-8",
+        )
+
+        db = DocIndexDB(self.root)
+        try:
+            info = db.rebuild()
+            self.assertGreaterEqual(info["method_dependencies_inserted"], 2)
+
+            # Ego Graph 测试
+            ego = db.dep_graph("OrderService.create_order")
+            self.assertTrue(ego["ok"])
+            self.assertEqual(ego["scope"], "EGO")
+            self.assertGreaterEqual(ego["callees_count"], 2)
+            self.assertIn("validate_user", ego["mermaid"])
+            self.assertIn("save_record", ego["mermaid"])
+
+            # Global Graph 测试
+            glob = db.dep_graph("")
+            self.assertTrue(glob["ok"])
+            self.assertEqual(glob["scope"], "GLOBAL")
+            self.assertGreaterEqual(glob["total_dependencies"], 2)
+        finally:
+            db.close()
+
 
 if __name__ == "__main__":
     unittest.main()

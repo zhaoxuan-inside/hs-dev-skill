@@ -894,6 +894,9 @@ class DocIndexDB:
         patterns_inserted = self._index_pattern_clusters(conn)
         schemas_inserted = self._index_data_schemas(conn)
 
+        # 索引方法间依赖关系拓扑 (Global & Local Micro Dependencies)
+        dependencies_inserted = self._index_method_dependencies(conn)
+
         # 索引业务代码与脚本中的符号（类、函数、签名与行号）
         symbols_inserted = self._index_code_symbols(conn)
 
@@ -919,6 +922,7 @@ class DocIndexDB:
             "pages_inserted": pages_inserted,
             "pattern_clusters_inserted": patterns_inserted,
             "data_schemas_inserted": schemas_inserted,
+            "method_dependencies_inserted": dependencies_inserted,
             "symbols_inserted": symbols_inserted,
             "fts": self.fts_available,
             "rebuilt_at": _utc_now(),
@@ -1219,6 +1223,116 @@ class DocIndexDB:
                         except sqlite3.Error:
                             pass
                     count += 1
+        return count
+
+    def _index_method_dependencies(self, conn: sqlite3.Connection) -> int:
+        count = 0
+        extractor = CodeSkeletonExtractor()
+        code_dirs = [
+            self.root / "backend",
+            self.root / "frontend",
+            self.root / "apps",
+            self.root / "packages",
+            self.root / "src",
+            self.root / "scripts",
+        ]
+        # 1. 扫描 AST 代码依赖
+        for cdir in code_dirs:
+            if not cdir.exists():
+                continue
+            for fpath in cdir.rglob("*.py"):
+                rel_p = _posix_rel(fpath, self.root)
+                if any(x in rel_p for x in ("node_modules", ".git", "output", "__pycache__", "dist", "vendor", ".hs_cache")):
+                    continue
+                deps = extractor.extract_dependencies(fpath)
+                for d in deps:
+                    dep_key = f"dep:{d['source_symbol']}->{d['target_symbol']}@{rel_p}"
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO method_dependencies (
+                            dep_key, source_symbol, target_symbol, dep_type, source_file, target_file, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            dep_key,
+                            d["source_symbol"],
+                            d["target_symbol"],
+                            d.get("dep_type", "INTERNAL_CALL"),
+                            rel_p,
+                            "",
+                            _utc_now(),
+                        ),
+                    )
+                    count += 1
+
+        # 2. 扫描方法设计文档中声明的调用链与依赖图 (Mermaid & Tables)
+        method_dir = self.docs_root / "_06_method_design"
+        candidate_dirs = [method_dir] if method_dir.exists() else ([self.docs_root] if self.docs_root.exists() else [])
+        for cdir in candidate_dirs:
+            for fpath in cdir.rglob("*.md"):
+                rel_p = _posix_rel(fpath, self.root)
+                if not ("_06_method_design" in rel_p or "method" in rel_p.lower()):
+                    continue
+                text = _read_text(fpath)
+                if not text:
+                    continue
+                doc_method_name = ""
+                m_prof = _parse_method_profile(text, rel_p)
+                if m_prof and m_prof.get("name"):
+                    doc_method_name = m_prof["name"]
+                if not doc_method_name:
+                    continue
+
+                # 匹配 Mermaid 中的拓扑箭头: A --> B 或 A -> B
+                mermaid_arrows = re.findall(r"([A-Za-z0-9_.]+)\s*(?:-->|->)\s*([A-Za-z0-9_.]+)", text)
+                for src, tgt in mermaid_arrows:
+                    if src.lower() in ("caller", "context", "client", "service") or tgt.lower() in ("caller", "context", "client"):
+                        continue
+                    dep_key = f"dep:{src}->{tgt}@{rel_p}"
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO method_dependencies (
+                            dep_key, source_symbol, target_symbol, dep_type, source_file, target_file, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            dep_key,
+                            src,
+                            tgt,
+                            "DOC_CALL_CHAIN",
+                            rel_p,
+                            "",
+                            _utc_now(),
+                        ),
+                    )
+                    count += 1
+
+                # 匹配依赖表格行: | 依赖目标方法 | ... | 依赖类型 |
+                table_pattern = re.compile(r"\|\s*`?([A-Za-z0-9_.]+?)`?\s*\|\s*([^|]*?)\s*\|\s*`?([A-Za-z_]+)?`?\s*\|")
+                for m in table_pattern.finditer(text):
+                    tgt_symbol = m.group(1).strip()
+                    dep_type = m.group(3).strip() if m.group(3) else "SYNC_CALL"
+                    if tgt_symbol.lower() in ("依赖目标方法", "target", "方法名", "---"):
+                        continue
+                    if tgt_symbol != doc_method_name:
+                        dep_key = f"dep:{doc_method_name}->{tgt_symbol}@{rel_p}"
+                        conn.execute(
+                            """
+                            INSERT OR REPLACE INTO method_dependencies (
+                                dep_key, source_symbol, target_symbol, dep_type, source_file, target_file, updated_at
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                            """,
+                            (
+                                dep_key,
+                                doc_method_name,
+                                tgt_symbol,
+                                dep_type,
+                                rel_p,
+                                "",
+                                _utc_now(),
+                            ),
+                        )
+                        count += 1
         return count
 
     def _index_code_symbols(self, conn: sqlite3.Connection) -> int:
@@ -2214,6 +2328,114 @@ class DocIndexDB:
             "hint": "Check V/U migrations or db_table_design via db.slice(schema.ddl_path).",
         }
 
+    def dep_graph(
+        self,
+        symbol_name: str = "",
+        *,
+        direction: str = "both",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        conn = self.connect()
+        sym = (symbol_name or "").strip()
+
+        if sym:
+            callers = []
+            callees = []
+
+            if direction in ("in", "both"):
+                cur = conn.execute(
+                    """
+                    SELECT source_symbol, target_symbol, dep_type, source_file
+                    FROM method_dependencies
+                    WHERE target_symbol = ? OR target_symbol LIKE ?
+                    LIMIT ?
+                    """,
+                    (sym, f"%.{sym}", limit),
+                )
+                callers = [dict(r) for r in cur.fetchall()]
+
+            if direction in ("out", "both"):
+                cur = conn.execute(
+                    """
+                    SELECT source_symbol, target_symbol, dep_type, source_file
+                    FROM method_dependencies
+                    WHERE source_symbol = ? OR source_symbol LIKE ?
+                    LIMIT ?
+                    """,
+                    (sym, f"%.{sym}", limit),
+                )
+                callees = [dict(r) for r in cur.fetchall()]
+
+            mermaid_lines = [
+                "graph TD",
+                f'    Target["★ {sym}"]:::target',
+                "    classDef target fill:#ffe6e6,stroke:#ff5722,stroke-width:2px;",
+            ]
+            for idx, c in enumerate(callers):
+                cid = f"In_{idx}"
+                mermaid_lines.append(
+                    f'    {cid}["{c["source_symbol"]}"] -->|{c["dep_type"]}| Target'
+                )
+            for idx, c in enumerate(callees):
+                cid = f"Out_{idx}"
+                mermaid_lines.append(
+                    f'    Target -->|{c["dep_type"]}| {cid}["{c["target_symbol"]}"]'
+                )
+
+            return {
+                "ok": True,
+                "scope": "EGO",
+                "symbol": sym,
+                "callers_count": len(callers),
+                "callers": callers,
+                "callees_count": len(callees),
+                "callees": callees,
+                "mermaid": "\n".join(mermaid_lines),
+                "hint": "Ego Dependency Graph: check callers for blast radius and callees for mock scope.",
+            }
+        else:
+            total_count = conn.execute(
+                "SELECT COUNT(*) AS c FROM method_dependencies"
+            ).fetchone()["c"]
+            cur = conn.execute(
+                """
+                SELECT source_symbol, target_symbol, dep_type, source_file
+                FROM method_dependencies
+                LIMIT ?
+                """,
+                (limit,),
+            )
+            edges = [dict(r) for r in cur.fetchall()]
+
+            hubs_cur = conn.execute(
+                """
+                SELECT target_symbol AS symbol, COUNT(*) AS in_degree
+                FROM method_dependencies
+                GROUP BY target_symbol
+                ORDER BY in_degree DESC
+                LIMIT 5
+                """
+            )
+            top_hubs = [dict(r) for r in hubs_cur.fetchall()]
+
+            mermaid_lines = ["graph TD"]
+            for idx, e in enumerate(edges):
+                s = e["source_symbol"].replace(".", "_")
+                t = e["target_symbol"].replace(".", "_")
+                mermaid_lines.append(
+                    f'    {s}["{e["source_symbol"]}"] -->|{e["dep_type"]}| {t}["{e["target_symbol"]}"]'
+                )
+
+            return {
+                "ok": True,
+                "scope": "GLOBAL",
+                "total_dependencies": total_count,
+                "top_hubs": top_hubs,
+                "edges_sample": edges,
+                "mermaid": "\n".join(mermaid_lines),
+                "hint": "Global Call Graph: query specific method via dep-graph --symbol <name>.",
+            }
+
 
 def _print_json(payload: Dict[str, Any]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -2261,6 +2483,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     p_schema.add_argument("--module", default="", help="Filter by module")
     p_schema.add_argument("--feature", default="", help="Filter by feature ID")
     p_schema.add_argument("--limit", type=int, default=5)
+
+    p_dep = sub.add_parser("dep-graph", help="Generate global or local micro ego dependency graph")
+    p_dep.add_argument("--symbol", default="", help="Method symbol name for ego dependency graph (omit for global graph)")
+    p_dep.add_argument("--direction", default="both", choices=["in", "out", "both"], help="Graph direction")
+    p_dep.add_argument("--limit", type=int, default=25)
 
     p_method = sub.add_parser(
         "method-search",
@@ -2350,6 +2577,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     args.q,
                     module=args.module,
                     feature=args.feature,
+                    limit=args.limit,
+                )
+            )
+            return 0
+        if args.command == "dep-graph":
+            if not db.db_path.exists():
+                db.rebuild()
+            _print_json(
+                db.dep_graph(
+                    args.symbol,
+                    direction=args.direction,
                     limit=args.limit,
                 )
             )
