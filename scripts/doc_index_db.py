@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import os
 import re
@@ -513,6 +514,62 @@ def _parse_ddl_schemas(text: str, doc_rel_path: str) -> List[Dict[str, Any]]:
     return results
 
 
+def _parse_test_case_spec(text: str, doc_rel_path: str) -> List[Dict[str, Any]]:
+    """
+    解析测试用例规格说明书，提取用例 ID、关联特性、目标方法、测试层级与单跑指令
+    """
+    results: List[Dict[str, Any]] = []
+
+    case_id = ""
+    id_m = re.search(r"-\s*\*\*.*?(?:用例标识|用例ID|Case ID).*?\*\*[:：]\s*`?([A-Za-z0-9_.-]+)`?", text, re.IGNORECASE)
+    if id_m:
+        case_id = id_m.group(1).strip()
+    if not case_id:
+        case_id = Path(doc_rel_path).stem.replace("_spec", "").replace("test_", "")
+
+    feat_m = re.search(r"-\s*\*\*.*?(?:关联业务特性|关联特性|Feature ID).*?\*\*[:：]\s*`?([A-Za-z0-9_.-]+)`?", text, re.IGNORECASE)
+    feat_id = feat_m.group(1).strip() if feat_m else ""
+
+    target_m = re.search(r"-\s*\*\*.*?(?:目标方法/符号|目标符号|Target Symbol).*?\*\*[:：]\s*`?([A-Za-z0-9_.-]+)`?", text, re.IGNORECASE)
+    target_symbol = target_m.group(1).strip() if target_m else ""
+
+    layer_m = re.search(r"-\s*\*\*.*?(?:测试层级|Test Layer).*?\*\*[:：]\s*`?([A-Za-z_]+)`?", text)
+    layer = layer_m.group(1).strip() if layer_m else "UNIT"
+
+    mod_m = re.search(r"-\s*\*\*.*?(?:所属业务模块|所属模块|Module).*?\*\*[:：]\s*`?([A-Za-z0-9_]+)`?", text)
+    module = mod_m.group(1).strip() if mod_m else ""
+
+    file_m = re.search(r"-\s*\*\*.*?(?:测试代码文件|测试文件|Test File).*?\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+    test_file = file_m.group(1).strip() if file_m else ""
+
+    cmd_m = re.search(r"-\s*\*\*.*?(?:精确单跑指令|单跑指令|Test Command).*?\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+    test_cmd = cmd_m.group(1).strip() if cmd_m else ""
+
+    ddt_m = re.search(r"-\s*\*\*.*?(?:DDT 数据集|数据集|Dataset).*?\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+    ddt_dataset = ddt_m.group(1).strip() if ddt_m else ""
+
+    desc_m = re.search(r"-\s*\*\*.*?(?:业务意图|用例意图).*?\*\*[:：]\s*([^\r\n]+)", text)
+    if desc_m:
+        desc = desc_m.group(1).strip()
+    else:
+        title_m = re.search(r"^#\s*.*?(?:测试用例规格说明书|测试用例说明书|测试用例)?[:：]\s*([^\r\n]+)", text, re.MULTILINE)
+        desc = title_m.group(1).strip() if title_m else Path(doc_rel_path).stem
+
+    results.append({
+        "case_key": f"tc:{case_id}@{doc_rel_path}",
+        "case_id": case_id,
+        "feature_id": feat_id,
+        "target_symbol": target_symbol,
+        "layer": layer,
+        "module": module,
+        "description": desc,
+        "test_file": test_file,
+        "test_command": test_cmd,
+        "ddt_dataset": ddt_dataset,
+    })
+    return results
+
+
 class DocIndexDB:
     def __init__(self, workspace_root: str | Path):
         self.root = Path(workspace_root).resolve()
@@ -897,6 +954,9 @@ class DocIndexDB:
         # 索引方法间依赖关系拓扑 (Global & Local Micro Dependencies)
         dependencies_inserted = self._index_method_dependencies(conn)
 
+        # 索引测试用例与执行说明 (Test Cases)
+        test_cases_inserted = self._index_test_cases(conn)
+
         # 索引业务代码与脚本中的符号（类、函数、签名与行号）
         symbols_inserted = self._index_code_symbols(conn)
 
@@ -923,6 +983,7 @@ class DocIndexDB:
             "pattern_clusters_inserted": patterns_inserted,
             "data_schemas_inserted": schemas_inserted,
             "method_dependencies_inserted": dependencies_inserted,
+            "test_cases_inserted": test_cases_inserted,
             "symbols_inserted": symbols_inserted,
             "fts": self.fts_available,
             "rebuilt_at": _utc_now(),
@@ -1332,6 +1393,139 @@ class DocIndexDB:
                                 _utc_now(),
                             ),
                         )
+                        count += 1
+        return count
+
+    def _index_test_cases(self, conn: sqlite3.Connection) -> int:
+        count = 0
+        test_doc_dirs = [
+            self.docs_root / "_07_test_design",
+            self.docs_root / "_08_test_data",
+            self.docs_root,
+        ]
+        seen_case_keys = set()
+        for d in test_doc_dirs:
+            if not d.exists():
+                continue
+            for fpath in d.rglob("*.md"):
+                rel_p = _posix_rel(fpath, self.root)
+                if "test" not in rel_p.lower() and "spec" not in rel_p.lower():
+                    continue
+                text = _read_text(fpath)
+                if not text:
+                    continue
+                parsed = _parse_test_case_spec(text, rel_p)
+                for tc in parsed:
+                    if tc["case_key"] in seen_case_keys:
+                        continue
+                    seen_case_keys.add(tc["case_key"])
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO test_cases (
+                            case_key, case_id, feature_id, target_symbol, layer, module,
+                            description, test_file, test_command, ddt_dataset, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            tc["case_key"],
+                            tc["case_id"],
+                            tc.get("feature_id", ""),
+                            tc.get("target_symbol", ""),
+                            tc.get("layer", "UNIT"),
+                            tc.get("module", ""),
+                            tc.get("description", ""),
+                            tc.get("test_file", ""),
+                            tc.get("test_command", ""),
+                            tc.get("ddt_dataset", ""),
+                            _utc_now(),
+                        ),
+                    )
+                    if self.fts_available:
+                        try:
+                            conn.execute(
+                                "DELETE FROM test_cases_fts WHERE case_key = ?",
+                                (tc["case_key"],),
+                            )
+                            conn.execute(
+                                """
+                                INSERT INTO test_cases_fts (case_key, case_id, description, target_symbol, test_command)
+                                VALUES (?, ?, ?, ?, ?)
+                                """,
+                                (
+                                    tc["case_key"],
+                                    tc["case_id"],
+                                    tc.get("description", ""),
+                                    tc.get("target_symbol", ""),
+                                    tc.get("test_command", ""),
+                                ),
+                            )
+                        except sqlite3.Error:
+                            pass
+                    count += 1
+
+        # 扫描物理测试代码 (test/, tests/) 提取测试方法与单跑指令
+        code_test_dirs = [self.root / "test", self.root / "tests"]
+        for tdir in code_test_dirs:
+            if not tdir.exists():
+                continue
+            for fpath in tdir.rglob("test_*.py"):
+                rel_p = _posix_rel(fpath, self.root)
+                text = _read_text(fpath)
+                if not text:
+                    continue
+                try:
+                    tree = ast.parse(text, filename=str(fpath))
+                except Exception:
+                    continue
+
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.FunctionDef) and node.name.startswith("test_"):
+                        case_id = node.name
+                        ckey = f"tc:{case_id}@{rel_p}"
+                        if ckey in seen_case_keys:
+                            continue
+                        seen_case_keys.add(ckey)
+                        doc = ast.get_docstring(node) or ""
+                        first_line = doc.strip().splitlines()[0] if doc.strip() else f"Test {case_id}"
+                        target = case_id[5:]  # 去掉前缀 test_
+                        test_cmd = f"pytest {rel_p}::{case_id}"
+                        layer = "INTEGRATION" if "integration" in rel_p.lower() or "integration" in case_id.lower() else "UNIT"
+                        conn.execute(
+                            """
+                            INSERT OR REPLACE INTO test_cases (
+                                case_key, case_id, feature_id, target_symbol, layer, module,
+                                description, test_file, test_command, ddt_dataset, updated_at
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            """,
+                            (
+                                ckey,
+                                case_id,
+                                "",
+                                target,
+                                layer,
+                                "test",
+                                first_line,
+                                rel_p,
+                                test_cmd,
+                                "",
+                                _utc_now(),
+                            ),
+                        )
+                        if self.fts_available:
+                            try:
+                                conn.execute(
+                                    "DELETE FROM test_cases_fts WHERE case_key = ?",
+                                    (ckey,),
+                                )
+                                conn.execute(
+                                    """
+                                    INSERT INTO test_cases_fts (case_key, case_id, description, target_symbol, test_command)
+                                    VALUES (?, ?, ?, ?, ?)
+                                    """,
+                                    (ckey, case_id, first_line, target, test_cmd),
+                                )
+                            except sqlite3.Error:
+                                pass
                         count += 1
         return count
 
@@ -2436,6 +2630,81 @@ class DocIndexDB:
                 "hint": "Global Call Graph: query specific method via dep-graph --symbol <name>.",
             }
 
+    def test_search(
+        self,
+        query: str,
+        *,
+        feature: str = "",
+        target: str = "",
+        limit: int = 5,
+    ) -> Dict[str, Any]:
+        conn = self.connect()
+        q = (query or "").strip()
+        if not q and not feature and not target:
+            return {
+                "ok": False,
+                "error": "empty query",
+                "count": 0,
+                "tests": [],
+                "hint": "Provide --q with test case keyword, or --feature / --target filter.",
+            }
+
+        ranked: Dict[str, Dict[str, Any]] = {}
+        use_fts = self.fts_available and q and not _has_cjk(q)
+        if use_fts:
+            fts_q = self._fts_query(q)
+            try:
+                sql = """
+                    SELECT t.case_key, t.case_id, t.feature_id, t.target_symbol, t.layer,
+                           t.module, t.description, t.test_file, t.test_command, t.ddt_dataset,
+                           bm25(test_cases_fts) AS score
+                    FROM test_cases_fts
+                    JOIN test_cases t ON t.case_key = test_cases_fts.case_key
+                    WHERE test_cases_fts MATCH ?
+                """
+                params: List[Any] = [fts_q]
+                if feature:
+                    sql += " AND t.feature_id = ?"
+                    params.append(feature)
+                if target:
+                    sql += " AND (t.target_symbol = ? OR t.target_symbol LIKE ?)"
+                    params.extend([target, f"%{target}%"])
+                sql += " ORDER BY score LIMIT ?"
+                params.append(limit * 2)
+                for r in conn.execute(sql, params):
+                    ranked[r["case_key"]] = dict(r)
+            except sqlite3.Error:
+                use_fts = False
+
+        like = f"%{q}%"
+        sql = """
+            SELECT case_key, case_id, feature_id, target_symbol, layer,
+                   module, description, test_file, test_command, ddt_dataset, 0.0 AS score
+            FROM test_cases
+            WHERE (case_id LIKE ? OR description LIKE ? OR target_symbol LIKE ? OR test_command LIKE ?)
+        """
+        params = [like, like, like, like]
+        if feature:
+            sql += " AND feature_id = ?"
+            params.append(feature)
+        if target:
+            sql += " AND (target_symbol = ? OR target_symbol LIKE ?)"
+            params.extend([target, f"%{target}%"])
+        sql += " LIMIT ?"
+        params.append(limit * 2)
+        for r in conn.execute(sql, params):
+            if r["case_key"] not in ranked:
+                ranked[r["case_key"]] = dict(r)
+
+        results = list(ranked.values())[:limit]
+        return {
+            "ok": True,
+            "query": q,
+            "count": len(results),
+            "tests": results,
+            "hint": "Run targeted test via: test.test_command (e.g. pytest <file>::<case>).",
+        }
+
 
 def _print_json(payload: Dict[str, Any]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -2488,6 +2757,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     p_dep.add_argument("--symbol", default="", help="Method symbol name for ego dependency graph (omit for global graph)")
     p_dep.add_argument("--direction", default="both", choices=["in", "out", "both"], help="Graph direction")
     p_dep.add_argument("--limit", type=int, default=25)
+
+    p_test = sub.add_parser("test-search", help="Search test cases & execution specs (FTS5 + LIKE fallback)")
+    p_test.add_argument("--q", default="", help="Test case keyword or symbol")
+    p_test.add_argument("--feature", default="", help="Filter by feature ID")
+    p_test.add_argument("--target", default="", help="Filter by target method/symbol")
+    p_test.add_argument("--limit", type=int, default=5)
 
     p_method = sub.add_parser(
         "method-search",
@@ -2588,6 +2863,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 db.dep_graph(
                     args.symbol,
                     direction=args.direction,
+                    limit=args.limit,
+                )
+            )
+            return 0
+        if args.command == "test-search":
+            if not db.db_path.exists():
+                db.rebuild()
+            _print_json(
+                db.test_search(
+                    args.q,
+                    feature=args.feature,
+                    target=args.target,
                     limit=args.limit,
                 )
             )

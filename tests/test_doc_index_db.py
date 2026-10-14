@@ -377,6 +377,67 @@ class TestDocIndexDB(unittest.TestCase):
         finally:
             db.close()
 
+    def test_test_case_indexing_and_search(self):
+        # 1. 建立测试规格说明书
+        test_doc_dir = self.root / "hs_dev_docs" / "_07_test_design"
+        test_doc_dir.mkdir(parents=True, exist_ok=True)
+        spec_file = test_doc_dir / "test_auth_service_spec.md"
+        spec_file.write_text(
+            "# 测试用例规格说明书：用户身份认证鉴权契约\n\n"
+            "- **用例标识**：`TC-AUTH-001`\n"
+            "- **关联业务特性**：`FEAT-AUTH-LOGIN`\n"
+            "- **所属业务模块**：`auth`\n"
+            "- **测试层级**：`INTEGRATION`\n"
+            "- **目标方法/符号**：`AuthService.verify_token`\n"
+            "- **测试代码文件**：`tests/test_auth.py`\n"
+            "- **精确单跑指令**：`pytest tests/test_auth.py::test_verify_token_valid`\n"
+            "- **DDT 数据集**：`tests/data/tokens.json`\n"
+            "- **业务意图**：校验 JWT 令牌在有效期内的解析与权限校验逻辑\n",
+            encoding="utf-8",
+        )
+
+        # 2. 建立实际测试代码文件
+        test_code_dir = self.root / "tests"
+        test_code_dir.mkdir(parents=True, exist_ok=True)
+        py_test_file = test_code_dir / "test_auth.py"
+        py_test_file.write_text(
+            "def test_verify_token_valid():\n"
+            "    '''Verify valid auth token returns expected user'''\n"
+            "    assert True\n",
+            encoding="utf-8",
+        )
+
+        db = DocIndexDB(self.root)
+        try:
+            info = db.rebuild()
+            self.assertGreaterEqual(info["test_cases_inserted"], 2)
+
+            # 按关键字搜索测试用例
+            res = db.test_search("TC-AUTH-001")
+            self.assertTrue(res["ok"])
+            self.assertGreaterEqual(res["count"], 1)
+            first = res["tests"][0]
+            self.assertEqual(first["case_id"], "TC-AUTH-001")
+            self.assertEqual(first["feature_id"], "FEAT-AUTH-LOGIN")
+            self.assertIn("pytest tests/test_auth.py", first["test_command"])
+
+            # 按 target_symbol 过滤搜索
+            target_res = db.test_search("", target="AuthService.verify_token")
+            self.assertTrue(target_res["ok"])
+            self.assertGreaterEqual(target_res["count"], 1)
+
+            # 搜索从代码提取的测试
+            code_res = db.test_search("test_verify_token_valid")
+            self.assertTrue(code_res["ok"])
+            self.assertGreaterEqual(code_res["count"], 1)
+
+            # 验证 stats
+            st = db.stats()
+            self.assertGreaterEqual(st["test_cases"], 2)
+        finally:
+            db.close()
+
 
 if __name__ == "__main__":
     unittest.main()
+
