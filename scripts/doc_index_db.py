@@ -21,6 +21,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from hs_paths import ensure_utf8_stdout
 from idx_manager import IdxManager, calculate_digest
+from code_skeleton import CodeSkeletonExtractor
 
 # 相对仓库根：权威文档树下的可重建缓存（勿手改）
 DB_REL_DIR = Path("hs_dev_docs") / "_00_project_foundation" / "_05_doc_index"
@@ -253,6 +254,20 @@ class DocIndexDB:
             CREATE INDEX IF NOT EXISTS idx_methods_name ON methods(name);
             CREATE INDEX IF NOT EXISTS idx_methods_archetype ON methods(archetype);
             CREATE INDEX IF NOT EXISTS idx_methods_module ON methods(module);
+
+            CREATE TABLE IF NOT EXISTS code_symbols (
+                symbol_key TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                kind TEXT,
+                file_path TEXT NOT NULL,
+                signature TEXT,
+                start_line INTEGER,
+                end_line INTEGER,
+                docstring TEXT,
+                updated_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_symbols_name ON code_symbols(name);
+            CREATE INDEX IF NOT EXISTS idx_symbols_file ON code_symbols(file_path);
             """
         )
         self.fts_available = self._try_init_fts(conn)
@@ -284,6 +299,18 @@ class DocIndexDB:
                 )
                 """
             )
+            conn.execute(
+                """
+                CREATE VIRTUAL TABLE IF NOT EXISTS symbols_fts USING fts5(
+                    symbol_key UNINDEXED,
+                    name,
+                    signature,
+                    file_path,
+                    docstring,
+                    tokenize='unicode61'
+                )
+                """
+            )
             conn.commit()
             return True
         except sqlite3.Error:
@@ -293,10 +320,14 @@ class DocIndexDB:
         conn = self.connect()
         conn.execute("DELETE FROM docs")
         conn.execute("DELETE FROM methods")
+        conn.execute("DELETE FROM code_symbols")
         if self.fts_available:
             try:
                 conn.execute("DELETE FROM docs_fts")
                 conn.execute("DELETE FROM methods_fts")
+                conn.execute("DELETE FROM symbols_fts")
+            except sqlite3.Error:
+                self.fts_available = False
             except sqlite3.Error:
                 self.fts_available = False
 
@@ -329,6 +360,9 @@ class DocIndexDB:
             )
             inserted += 1
 
+        # 索引业务代码与脚本中的符号（类、函数、签名与行号）
+        symbols_inserted = self._index_code_symbols(conn)
+
         conn.execute(
             "INSERT OR REPLACE INTO meta(key, value) VALUES (?, ?)",
             ("rebuilt_at", _utc_now()),
@@ -347,12 +381,64 @@ class DocIndexDB:
             "db_path": str(self.db_path),
             "db_path_posix": self.db_path.as_posix(),
             "inserted": inserted,
+            "symbols_inserted": symbols_inserted,
             "fts": self.fts_available,
             "rebuilt_at": _utc_now(),
         }
         # 重建后释放连接，避免 Windows 文件锁
         self.close()
         return payload
+
+    def _index_code_symbols(self, conn: sqlite3.Connection) -> int:
+        extractor = CodeSkeletonExtractor()
+        code_dirs = [
+            self.root / "backend",
+            self.root / "frontend",
+            self.root / "apps",
+            self.root / "packages",
+            self.root / "src",
+            self.root / "scripts",
+        ]
+        count = 0
+        for cdir in code_dirs:
+            if not cdir.exists():
+                continue
+            for ext in (".py", ".ts", ".js", ".go", ".rs", ".java"):
+                for fpath in cdir.rglob(f"*{ext}"):
+                    rel_p = _posix_rel(fpath, self.root)
+                    if any(x in rel_p for x in ("node_modules", ".git", "output", "__pycache__", "dist", "vendor", ".hs_cache")):
+                        continue
+                    syms = extractor.extract_symbols_metadata(fpath)
+                    for s in syms:
+                        s_key = f"sym:{s['name']}@{rel_p}:{s['start_line']}"
+                        conn.execute(
+                            """
+                            INSERT OR REPLACE INTO code_symbols (
+                                symbol_key, name, kind, file_path, signature, start_line, end_line, docstring, updated_at
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            """,
+                            (
+                                s_key,
+                                s["name"],
+                                s["kind"],
+                                rel_p,
+                                s["signature"],
+                                s["start_line"],
+                                s["end_line"],
+                                s["docstring"],
+                                _utc_now(),
+                            ),
+                        )
+                        if self.fts_available:
+                            try:
+                                conn.execute(
+                                    "INSERT INTO symbols_fts (symbol_key, name, signature, file_path, docstring) VALUES (?, ?, ?, ?, ?)",
+                                    (s_key, s["name"], s["signature"], rel_p, s["docstring"]),
+                                )
+                            except sqlite3.Error:
+                                pass
+                        count += 1
+        return count
 
     def _guess_domain(self, rel_posix: str) -> str:
         parts = rel_posix.split("/")
@@ -791,12 +877,14 @@ class DocIndexDB:
         conn = self.connect()
         count = conn.execute("SELECT COUNT(*) AS c FROM docs").fetchone()["c"]
         m_count = conn.execute("SELECT COUNT(*) AS c FROM methods").fetchone()["c"]
+        s_count = conn.execute("SELECT COUNT(*) AS c FROM code_symbols").fetchone()["c"]
         meta = {r["key"]: r["value"] for r in conn.execute("SELECT key, value FROM meta")}
         return {
             "ok": True,
             "db_path": str(self.db_path),
             "docs": count,
             "methods": m_count,
+            "code_symbols": s_count,
             "fts": self.fts_available or meta.get("fts") == "1",
             "meta": meta,
         }
@@ -915,6 +1003,85 @@ class DocIndexDB:
             "db_path": str(self.db_path),
         }
 
+    def symbol_search(self, query: str, limit: int = 10) -> Dict[str, Any]:
+        """按符号名或签名搜索代码中的类、函数、方法（毫秒级，防止盲目扫代码）"""
+        conn = self.connect()
+        q = (query or "").strip()
+        if not q:
+            return {"ok": True, "query": q, "count": 0, "symbols": []}
+
+        rows = []
+        if self.fts_available and not _has_cjk(q):
+            try:
+                cur = conn.execute(
+                    """
+                    SELECT s.name, s.kind, s.file_path, s.signature, s.start_line, s.end_line, s.docstring
+                    FROM symbols_fts f
+                    JOIN code_symbols s ON f.symbol_key = s.symbol_key
+                    WHERE symbols_fts MATCH ?
+                    LIMIT ?
+                    """,
+                    (f'"{q}"*', limit),
+                )
+                rows = [dict(r) for r in cur.fetchall()]
+            except sqlite3.Error:
+                pass
+
+        if not rows:
+            cur = conn.execute(
+                """
+                SELECT name, kind, file_path, signature, start_line, end_line, docstring
+                FROM code_symbols
+                WHERE name LIKE ? OR signature LIKE ?
+                ORDER BY CASE WHEN name = ? THEN 0 WHEN name LIKE ? THEN 1 ELSE 2 END
+                LIMIT ?
+                """,
+                (f"%{q}%", f"%{q}%", q, f"{q}%", limit),
+            )
+            rows = [dict(r) for r in cur.fetchall()]
+
+        return {
+            "ok": True,
+            "query": q,
+            "count": len(rows),
+            "symbols": rows,
+            "db_path": str(self.db_path),
+        }
+
+    def symbol_slice(self, symbol_name: str) -> Dict[str, Any]:
+        """根据符号名称直接定位并提取源代码切片（免全量文件读取）"""
+        conn = self.connect()
+        cur = conn.execute(
+            """
+            SELECT name, kind, file_path, signature, start_line, end_line, docstring
+            FROM code_symbols
+            WHERE name = ? OR name LIKE ?
+            ORDER BY CASE WHEN name = ? THEN 0 ELSE 1 END
+            LIMIT 1
+            """,
+            (symbol_name, f"%.{symbol_name}", symbol_name),
+        )
+        row = cur.fetchone()
+        if not row:
+            return {"ok": False, "error": f"Symbol '{symbol_name}' not found in code_symbols index"}
+        r = dict(row)
+        full_path = self.root / r["file_path"]
+        if not full_path.exists():
+            return {"ok": False, "error": f"Source file '{r['file_path']}' not found on disk"}
+
+        lines = full_path.read_text(encoding="utf-8", errors="replace").splitlines()
+        s_line = max(1, r["start_line"])
+        e_line = min(len(lines), r["end_line"])
+        slice_content = "\n".join(lines[s_line - 1 : e_line])
+        return {
+            "ok": True,
+            "symbol": r,
+            "total_file_lines": len(lines),
+            "start_line": s_line,
+            "end_line": e_line,
+            "content": slice_content,
+        }
+
 
 def _print_json(payload: Dict[str, Any]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -949,6 +1116,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     p_method.add_argument("--archetype", default="", help="Filter by archetype: TRANSFORM/ALGO/GUARD/STATE/ORCHESTRATE/ADAPTER/PRESENT")
     p_method.add_argument("--module", default="", help="Filter by module")
     p_method.add_argument("--limit", type=int, default=5)
+
+    p_sym = sub.add_parser("symbol-search", help="Search code symbols (classes, functions, methods) in codebase")
+    p_sym.add_argument("--q", required=True, help="Symbol name or keyword")
+    p_sym.add_argument("--limit", type=int, default=10)
+
+    p_sym_slice = sub.add_parser("symbol-slice", help="Slice code directly by symbol name")
+    p_sym_slice.add_argument("--name", required=True, help="Symbol name (e.g. 'TaskManager' or 'render_dashboard')")
 
     p_get = sub.add_parser("get", help="Get one doc by path or doc_key")
     p_get.add_argument("--path", required=True)
@@ -991,6 +1165,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     limit=args.limit,
                 )
             )
+            return 0
+        if args.command == "symbol-search":
+            if not db.db_path.exists():
+                db.rebuild()
+            _print_json(db.symbol_search(args.q, limit=args.limit))
+            return 0
+        if args.command == "symbol-slice":
+            if not db.db_path.exists():
+                db.rebuild()
+            _print_json(db.symbol_slice(args.name))
             return 0
         if args.command == "get":
             if not db.db_path.exists():

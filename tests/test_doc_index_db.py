@@ -152,6 +152,38 @@ class TestDocIndexDB(unittest.TestCase):
         finally:
             db.close()
 
+    def test_symbol_search_and_slice(self):
+        backend_dir = self.root / "backend"
+        backend_dir.mkdir(parents=True, exist_ok=True)
+        py_file = backend_dir / "user_service.py"
+        py_file.write_text(
+            "class UserService:\n"
+            "    def register_user(self, username: str) -> bool:\n"
+            "        '''Register new user'''\n"
+            "        return True\n",
+            encoding="utf-8",
+        )
+
+        db = DocIndexDB(self.root)
+        try:
+            db.rebuild()
+            stats = db.stats()
+            self.assertGreaterEqual(stats["code_symbols"], 2)
+
+            res = db.symbol_search("register_user")
+            self.assertTrue(res["ok"])
+            self.assertGreaterEqual(res["count"], 1)
+            self.assertEqual(res["symbols"][0]["name"], "UserService.register_user")
+
+            # Slice test
+            slice_res = db.symbol_slice("register_user")
+            self.assertTrue(slice_res["ok"])
+            self.assertIn("def register_user", slice_res["content"])
+            self.assertEqual(slice_res["start_line"], 2)
+            self.assertEqual(slice_res["end_line"], 4)
+        finally:
+            db.close()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -53,6 +53,114 @@ class CodeSkeletonExtractor:
             "skeleton": skeleton_text,
         }
 
+    def extract_symbols_metadata(self, file_path: Path) -> List[Dict[str, Any]]:
+        """提取代码中的结构化符号列表（用于 SQLite 索引库）"""
+        if not file_path.is_file():
+            return []
+        ext = file_path.suffix.lower()
+        content = file_path.read_text(encoding="utf-8", errors="ignore")
+        if ext == ".py":
+            return self._extract_python_symbols(content, file_path)
+        return self._extract_c_like_symbols(content, file_path)
+
+    def _extract_python_symbols(self, content: str, file_path: Path) -> List[Dict[str, Any]]:
+        try:
+            tree = ast.parse(content)
+        except Exception:
+            return []
+
+        def format_args(args: ast.arguments) -> str:
+            arg_strs = []
+            for a in args.args:
+                anno = f": {ast.unparse(a.annotation)}" if a.annotation else ""
+                arg_strs.append(f"{a.arg}{anno}")
+            return ", ".join(arg_strs)
+
+        symbols = []
+        for node in tree.body:
+            if isinstance(node, ast.ClassDef):
+                doc = ast.get_docstring(node) or ""
+                doc_first = doc.strip().splitlines()[0] if doc else ""
+                end_lineno = getattr(node, "end_lineno", node.lineno)
+                bases_str = f"({', '.join(ast.unparse(b) for b in node.bases)})" if node.bases else ""
+                symbols.append({
+                    "name": node.name,
+                    "kind": "class",
+                    "file_path": str(file_path),
+                    "signature": f"class {node.name}{bases_str}",
+                    "start_line": node.lineno,
+                    "end_line": end_lineno,
+                    "docstring": doc_first,
+                })
+                for item in node.body:
+                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        f_doc = ast.get_docstring(item) or ""
+                        f_doc_first = f_doc.strip().splitlines()[0] if f_doc else ""
+                        fn_end = getattr(item, "end_lineno", item.lineno)
+                        prefix = "async def " if isinstance(item, ast.AsyncFunctionDef) else "def "
+                        ret = f" -> {ast.unparse(item.returns)}" if item.returns else ""
+                        arg_str = format_args(item.args)
+                        symbols.append({
+                            "name": f"{node.name}.{item.name}",
+                            "kind": "method",
+                            "file_path": str(file_path),
+                            "signature": f"{prefix}{item.name}({arg_str}){ret}",
+                            "start_line": item.lineno,
+                            "end_line": fn_end,
+                            "docstring": f_doc_first,
+                        })
+
+            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                f_doc = ast.get_docstring(node) or ""
+                f_doc_first = f_doc.strip().splitlines()[0] if f_doc else ""
+                end_lineno = getattr(node, "end_lineno", node.lineno)
+                prefix = "async def " if isinstance(node, ast.AsyncFunctionDef) else "def "
+                ret = f" -> {ast.unparse(node.returns)}" if node.returns else ""
+                arg_str = format_args(node.args)
+                symbols.append({
+                    "name": node.name,
+                    "kind": "function",
+                    "file_path": str(file_path),
+                    "signature": f"{prefix}{node.name}({arg_str}){ret}",
+                    "start_line": node.lineno,
+                    "end_line": end_lineno,
+                    "docstring": f_doc_first,
+                })
+
+        return symbols
+
+    def _extract_c_like_symbols(self, content: str, file_path: Path) -> List[Dict[str, Any]]:
+        lines = content.splitlines()
+        symbols = []
+        patterns = [
+            (re.compile(r"^\s*(export\s+)?(class|interface|type)\s+([A-Za-z0-9_]+)"), "type"),
+            (re.compile(r"^\s*(export\s+)?(async\s+)?function\s+([A-Za-z0-9_]+)"), "function"),
+            (re.compile(r"^\s*(export\s+)?const\s+([A-Za-z0-9_]+)\s*=\s*(async\s*)?\("), "function"),
+            (re.compile(r"^\s*func\s+(\([^\)]+\)\s+)?([A-Za-z0-9_]+)"), "function"),
+            (re.compile(r"^\s*type\s+([A-Za-z0-9_]+)\s+(struct|interface)"), "type"),
+            (re.compile(r"^\s*(pub\s+)?(fn|struct|enum|trait)\s+([A-Za-z0-9_]+)"), "type"),
+        ]
+        for i, line in enumerate(lines, start=1):
+            stripped = line.strip()
+            if not stripped or stripped.startswith(("//", "/*", "*", "#")):
+                continue
+            for pat, kind in patterns:
+                m = pat.search(line)
+                if m:
+                    name = m.groups()[-1]
+                    clean_sig = re.sub(r"\{.*$", "", stripped).strip()
+                    symbols.append({
+                        "name": name,
+                        "kind": kind,
+                        "file_path": str(file_path),
+                        "signature": clean_sig,
+                        "start_line": i,
+                        "end_line": i,
+                        "docstring": "",
+                    })
+                    break
+        return symbols
+
     def _extract_python_ast(self, content: str) -> tuple[str, int]:
         """使用标准库 ast 进行高保真提取"""
         try:

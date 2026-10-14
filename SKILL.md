@@ -86,7 +86,7 @@ metadata:
 |---|---|---|
 | `skill_ref_index.py` | Skill references 场景检索 | `python scripts/skill_ref_index.py search --q 幂等` |
 | `rule_fetch.py` | 本地/远程领域规则目录与缓存 | `python scripts/rule_fetch.py search --q React` |
-| `doc_index_db.py` | 项目文档 search/slice/方法查重 | `python scripts/doc_index_db.py --root . search --q kw`<br/>`python scripts/doc_index_db.py --root . method-search --q "扣款"` |
+| `doc_index_db.py` | 文档+代码符号统一检索与切片 | `python scripts/doc_index_db.py --root . search --q kw`<br/>`python scripts/doc_index_db.py --root . symbol-search --q "Order"`<br/>`python scripts/doc_index_db.py --root . symbol-slice --name "create_order"` |
 | `global_index_db.py` | 全局偏好/学习标签 | `python scripts/global_index_db.py search --tag 反向代理` |
 | `task_manager.py` | 任务三文件+合法状态机+看板渲染 | `python scripts/task_manager.py create --id x --title "…" --change-size M`<br/>`python scripts/task_manager.py dashboard --phase 3` |
 | `code_skeleton.py` | AST/多语言代码骨架提取 (省 90% Token) | `python scripts/code_skeleton.py --path backend/` |
