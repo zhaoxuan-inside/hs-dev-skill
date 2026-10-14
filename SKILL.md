@@ -88,7 +88,7 @@ metadata:
 | `rule_fetch.py` | 本地/远程领域规则目录与缓存 | `python scripts/rule_fetch.py search --q React` |
 | `doc_index_db.py` | 项目文档 search/slice/方法查重 | `python scripts/doc_index_db.py --root . search --q kw`<br/>`python scripts/doc_index_db.py --root . method-search --q "扣款"` |
 | `global_index_db.py` | 全局偏好/学习标签 | `python scripts/global_index_db.py search --tag 反向代理` |
-| `task_manager.py` | 任务三文件+合法状态机 | `python scripts/task_manager.py create --id x --title "…" --change-size M` |
+| `task_manager.py` | 任务三文件+合法状态机+看板渲染 | `python scripts/task_manager.py create --id x --title "…" --change-size M`<br/>`python scripts/task_manager.py dashboard --phase 3` |
 | `process_log.py` | plan/change 续做与非 git 回退 | `python scripts/process_log.py resume-scan` / `checkpoint` / `rollback` |
 | `verify_consistency.py` | 提交前门禁 | `python scripts/verify_consistency.py --root .` |
 | `init_hs_dev_docs.py` / `init_hs_global.py` | 初始化项目文档 (支持 `--from-existing`) / 全局区 | `python scripts/init_hs_dev_docs.py --from-existing` |

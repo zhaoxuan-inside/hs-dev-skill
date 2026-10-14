@@ -109,6 +109,20 @@ class TestTaskManager(unittest.TestCase):
         )
         self.assertTrue(os.path.exists(handoff_path))
 
+    def test_render_dashboard(self):
+        self.tm.create_task("task_dash_1", "看板测试任务", change_size="M")
+        dash_md = self.tm.render_dashboard(intent="BUILD", phase="3", change_size="M")
+        self.assertIn("实时执行看板", dash_md)
+        self.assertIn("```mermaid", dash_md)
+        self.assertIn("task_dash_1", dash_md)
+        self.assertIn("Phase 3: 阶段 3: 契约六元组", dash_md)
+
+        # Output to file test
+        out_file = self.root / "dashboard.md"
+        self.tm.render_dashboard(intent="BUILD", phase="2", output_path=str(out_file))
+        self.assertTrue(out_file.exists())
+        self.assertIn("Phase 2", out_file.read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -83,3 +83,14 @@ python scripts/task_manager.py status --id {task_id} --set IN_PROGRESS --force  
 ```
 
 按快照恢复文件；git 可选附赠，不是引擎。
+
+---
+
+## 5. 实时执行看板 (Live Dashboard)
+
+通过 CLI 一键渲染包含当前阶段流转图 (Mermaid)、任务矩阵与门禁状态的 Markdown 看板，可直接输出为会话 Artifact：
+
+```bash
+python scripts/task_manager.py dashboard --intent BUILD --phase 3 --change-size M --output <artifact_path>
+```
+
