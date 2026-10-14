@@ -24,7 +24,17 @@ Bug 修复绝非凭直觉“盲修乱试”，更禁止在未确认根因前胡�
 
 ### Step 1：现象收集与假设生成（Hypothesis Generation）
 - **收集现场**：获取完整错误堆栈、输入入参、环境状态与期望行为；
-- **切片定位**：使用四级索引或 `python3 scripts/doc_index_db.py --root . search --q <关键字>` 召回涉事方法与调用链；
+- **切片定位与依赖探查**：强制使用 `doc_index_db` 专属索引指令定位现场，杜绝暴力盲搜：
+  ```bash
+  # 1. 查找涉事类与方法切片 (免读大文件)
+  python3 scripts/doc_index_db.py symbol-slice --name "<涉事方法名>"
+  # 2. 查局部微依赖图与爆炸半径 (分析 Callers 影响面与 Callees Mock 边界)
+  python3 scripts/doc_index_db.py dep-graph --symbol "<涉事类名.方法名>"
+  # 3. 检索该方法已有的测试用例与精准单跑指令
+  python3 scripts/doc_index_db.py test-search --target "<涉事方法名>"
+  # 4. 追溯该文件/方法近期的改动审计历史
+  python3 scripts/doc_index_db.py audit-search --q "<涉事文件或方法>"
+  ```
 - **提出根因假设**：明确形式化假设：“在输入 X 且状态为 Y 时，由于逻辑 Z 未处理，导致产生错误 E”。
 
 ### Step 2：最小复现用例（Write Failing Test First - RED）
@@ -34,7 +44,7 @@ Bug 修复绝非凭直觉“盲修乱试”，更禁止在未确认根因前胡�
 
 ### Step 3：精准切片修复（Make it GREEN）
 - 依据 [`method_archetypes.md`](method_archetypes.md) 识别涉事方法的七分类与七维契约；
-- 执行 `python3 scripts/doc_index_db.py --root . method-search --q <业务意图>` 查重，严禁为了修 Bug 新增重复影子函数；
+- 执行 `python3 scripts/doc_index_db.py method-search --q <业务意图>` 查重，严禁为了修 Bug 新增重复影子函数；
 - 做最小必要改动，消除根因；
 - 再次运行复现测试，确保其转为通过（GREEN）。
 

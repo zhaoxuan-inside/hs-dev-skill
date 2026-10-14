@@ -104,7 +104,12 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
     "learn_and_prefer.md": ["学习", "偏好", "GitHub", "对标", "标签"],
     "spec_driven_lifecycle.md": ["生命周期", "阶段", "门禁", "PRD", "冻结", "原型"],
     "six_tuple_runtime.md": ["六元组", "compensate", "fallback", "metrics", "recall"],
-    "four_level_routing.md": ["四级索引", "JSONL", "路由"],
+    "four_level_routing.md": [
+        "四级索引", "JSONL", "路由", "底层真理", "检索", "调用图", "依赖图", "代码切片", "索引路由",
+    ],
+    "token_budget.md": [
+        "token", "预算", "装载", "doc_index_db", "切片", "context_pack", "免通读", "免扫描",
+    ],
     "task_state_machine.md": ["任务", "状态机", "handoff", "迁移", "ABORTED"],
     "mock_contract_guide.md": ["Mock", "Profile", "契约测试"],
     "quality_gates.md": ["门禁", "verify", "提交前", "覆盖率", "九级"],

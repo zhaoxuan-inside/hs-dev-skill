@@ -22,17 +22,26 @@
 ```
 
 ### Step 1：语义检索与切片定位（Progressive Slicing）
-- 依据用户疑问关键词，优先运行工程索引：
+- 依据用户疑问关键词，优先运行工程索引（免整盘全量通读）：
   ```bash
-  python3 scripts/doc_index_db.py --root . search --q "<疑问关键词>"
+  # 查找代码符号、类或函数
+  python3 scripts/doc_index_db.py symbol-search --q "<疑问关键词>"
+  # 直接提取符号代码切片（省 90% Token，自动按 AST 动态计算准确行号）
+  python3 scripts/doc_index_db.py symbol-slice --name "<目标符号名>"
+  # 若涉及需求或数据模式，查 feature-search 或 schema-search
+  python3 scripts/doc_index_db.py feature-search --q "<业务意图>"
   ```
-- 锁定目标文件后，使用局部切片读取（`doc_index_db slice` 或局部行段阅读），避免无意义全文通读。
+- 锁定目标文件后，使用局部切片读取（`symbol-slice` 或 `doc_index_db slice`），严禁大文件全量通读。
 
 ### Step 2：局部依赖与调用链还原（Call-Chain Trace）
-- 追溯核心方法的生命周期：
-  - **入口**：API 控制器、事件消费者或 CLI 指令；
-  - **编排**：领域服务、深模块业务逻辑；
-  - **出口**：数据库持久化、外部 RPC 或消息发布；
+- 直接使用方法依赖微图（Ego Graph）自动生成调用拓扑与爆炸半径：
+  ```bash
+  python3 scripts/doc_index_db.py dep-graph --symbol "<涉事类名.方法名>"
+  ```
+- 追溯核心方法的生命周期（直接复用生成的 Mermaid 关系）：
+  - **入口（Callers）**：API 控制器、事件消费者或上游业务方；
+  - **编排**：领域服务、深模块核心逻辑；
+  - **出口（Callees）**：数据库持久化、外部 RPC 或下游子方法；
 - 识别关键状态变化与防御性分支。
 
 ### Step 3：结构化解答与图谱输出（Structured Delivery）

@@ -52,19 +52,29 @@
 
 ---
 
-## 3. SQLite 文档索引（`doc_index_db.py`）
+## 3. SQLite 底层真理与全维度索引（`doc_index_db.py`）
 
 | 项 | 约定 |
 |---|---|
-| 路径 | `hs_dev_docs/_00_project/_18_doc_index/doc_index.sqlite`（`pathlib`，三端） |
+| 路径 | `hs_dev_docs/_00_project_foundation/_05_doc_index/doc_index.sqlite`（`pathlib`，三端） |
 | 依赖 | 仅标准库 `sqlite3`；FTS5 优先，失败或中文查询回退 `LIKE` |
 | 重建 | `python scripts/doc_index_db.py --root . rebuild` |
-| 检索 | `... search --q <kw> [--domain ...] [--limit 8]` → JSON（path + summary） |
-| 切片 | `... slice --path <rel> --start N --end M` → 行级 JSON |
+| 功能搜索 | `... feature-search --q <特性关键词>` → 定位 PRD 与功能 ID（免读 PRD 全文） |
+| 原型搜索 | `... page-search --q <页面关键词>` → 定位线框图与路由（免读 UI 全文） |
+| 模式搜索 | `... pattern-search --q <设计模式>` → 定位协同群与安全护栏（防破坏） |
+| 数据搜索 | `... schema-search --q <表名>` → 定位字段摘要与迁移 DDL 脚本 |
+| 依赖拓扑 | `... dep-graph --symbol <方法名>` → 输出局部微依赖图与爆炸半径 |
+| 方法查重 | `... method-search --q <业务意图>` → 意图重合 ≥80% 强制复用（防方法爆炸） |
+| 符号切片 | `... symbol-slice --name <方法/类名>` → 精准提取代码片段（省 90% Token） |
+| 用例检索 | `... test-search --q <关键词>` → 瞬间返回单跑命令（如 `pytest ...`） |
+| 审计检索 | `... audit-search --since <时间>` → 时间线与影响文件精准检索（免读 JSONL） |
+| 文档检索 | `... search --q <kw> [--domain ...] [--limit 8]` → JSON（path + summary） |
+| 切片阅读 | `... slice --path <rel> --start N --end M` → 行级 JSON |
 | 同步 | 批量改文档/索引后 rebuild；`init_hs_dev_docs` 结束时自动 rebuild |
 | Git | `*.sqlite` 默认不提交（可重建）；门禁缺失仅 warning |
 
 语义检索（embedding / SemanticGrip 类）为**可选二级召回**：候选必须回落到 `path` + `digest`，不得替代结构化索引。
+
 
 ---
 
