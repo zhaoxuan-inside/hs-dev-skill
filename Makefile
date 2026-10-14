@@ -31,7 +31,7 @@ test:
 	$(PYTHON) -m unittest discover -s examples/order_service/test/_01_method_test -p "test_*.py"
 
 verify:
-	$(PYTHON) scripts/verify_consistency.py --root .
+	$(PYTHON) scripts/verify_consistency.py --root . --strict
 
 scan-dead-code:
 	$(PYTHON) scripts/dead_code_scanner.py --root .

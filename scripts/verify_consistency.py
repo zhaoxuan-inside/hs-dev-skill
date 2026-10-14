@@ -14,10 +14,11 @@ from idx_manager import IdxManager
 
 
 class ConsistencyVerifier:
-    def __init__(self, workspace_root: str):
+    def __init__(self, workspace_root: str, strict: bool = False):
         self.root = Path(workspace_root).resolve()
         self.docs_root = self.root / "hs_dev_docs"
         self.mock_root = self.root / "mock"
+        self.strict = strict
         self.errors = []
         self.warnings = []
 
@@ -218,6 +219,8 @@ class ConsistencyVerifier:
                 if line.startswith("contract_ref:"):
                     ref_path = line.split(":", 1)[1].strip().strip('"').strip("'")
                     target = self.root / ref_path
+                    if not target.exists() and (self.docs_root.parent / ref_path).exists():
+                        target = self.docs_root.parent / ref_path
                     if not target.exists():
                         self.warnings.append(f"[MOCK PROFILE WARNING] {pf.name} contract_ref not found on disk: {ref_path}")
 
@@ -237,7 +240,8 @@ class ConsistencyVerifier:
         try:
             from doc_index_db import DocIndexDB
 
-            db = DocIndexDB(self.root)
+            target_root = self.docs_root.parent
+            db = DocIndexDB(target_root)
             st = db.stats()
             db.close()
             if st.get("docs", 0) <= 0:
@@ -276,6 +280,12 @@ class ConsistencyVerifier:
             for w in self.warnings:
                 print(f"  {w}")
 
+        if self.strict and self.warnings:
+            self.errors.append(
+                f"[STRICT GATE ERROR] Strict mode enabled (Zero Warnings Policy): "
+                f"{len(self.warnings)} warning(s) treated as blocking error(s)!"
+            )
+
         if not self.errors:
             print("[PASS] All consistency and quality gate checks passed successfully! Ready for commit.")
             print("=" * 60)
@@ -291,9 +301,14 @@ class ConsistencyVerifier:
 def main():
     parser = argparse.ArgumentParser(description="Skill Quality Gate & Triple-File Consistency Verifier")
     parser.add_argument("--root", default=".", help="Target workspace root")
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Zero-warning mode: treat any warnings as blocking errors (Zero Warnings Policy)",
+    )
     args = parser.parse_args()
 
-    verifier = ConsistencyVerifier(args.root)
+    verifier = ConsistencyVerifier(args.root, strict=args.strict)
     success = verifier.check_all()
     sys.exit(0 if success else 1)
 

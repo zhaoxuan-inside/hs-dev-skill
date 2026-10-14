@@ -93,6 +93,24 @@ class TestVerifyConsistency(unittest.TestCase):
         stray_apk.unlink()
         self.assertTrue(self.verifier.check_all())
 
+    def test_strict_mode_blocks_warnings(self):
+        # 产生一个 warning: 存在 .env 但无 .env.example
+        env_example = self.root / "config" / ".env.example"
+        if env_example.exists():
+            env_example.unlink()
+        dot_env = self.root / ".env"
+        dot_env.write_text("SECRET=123\n", encoding="utf-8")
+        
+        # 默认模式下仅产生 warning，返回 True
+        default_verifier = ConsistencyVerifier(str(self.root), strict=False)
+        self.assertTrue(default_verifier.check_all())
+        self.assertTrue(len(default_verifier.warnings) > 0)
+
+        # strict 模式下（零告警策略），warning 升级为 blocking error，返回 False
+        strict_verifier = ConsistencyVerifier(str(self.root), strict=True)
+        self.assertFalse(strict_verifier.check_all())
+        self.assertTrue(any("[STRICT GATE ERROR]" in e for e in strict_verifier.errors))
+
 
 if __name__ == "__main__":
     unittest.main()

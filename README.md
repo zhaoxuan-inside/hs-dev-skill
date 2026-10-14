@@ -3,7 +3,7 @@
 > **质量优先 + 审讯式对齐 + 测试一等公民 + 深模块词汇 + 文档驱动 + S/M/L 分级**
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
-[![Spec Version](https://img.shields.io/badge/skill-v2.33-blue.svg)](SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v2.34-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -50,7 +50,7 @@ python scripts/skill_ref_index.py rebuild # Skill 详规场景索引
 
 ## 核心特性
 
-1. **质量优先**：分步正确 + 测试一等公民（seam 确认 → 垂直 TDD）。见 [testing.md](references/testing.md) / [quality_gates.md](references/quality_gates.md)。
+1. **质量优先与硬阻断门禁**：分步正确 + 测试一等公民（测试 100% PASS 零报错绝对阻断交付、代码静态检测零告警零错误、DDT 与双轨制 E2E 规约）。见 [testing.md](references/testing.md) / [quality_gates.md](references/quality_gates.md)。
 2. **审讯式 DESIGN 对齐与方案博弈**：设计树前沿轮询 + 产品探索拷问（`gstack /office-hours`）+ 交互方案 Trade-offs 比选；跳过澄清收紧。见 [grill_orchestration.md](references/grill_orchestration.md) / [confidence_decision.md](references/confidence_decision.md)。
 3. **产品设计一源双视图与 MVP 规划**：先产品探索五步推演，再输出**面向人类的《产品设计书》**（PRD + 双轨线框原型）与**面向 VibeCoding 的《机器执行契约》**（Tokens/组件树/状态机/Gherkin DoD），彻底杜绝 AI 叙事幻觉与 Token 浪费；通过人机交互对齐产出《产品开发分阶段规划书》。见 [product_design.md](references/product_design.md) / [product_roadmap.md](references/product_roadmap.md) / [product_prototype.md](references/product_prototype.md)。
 4. **变更分级（Right-Sizing）**：`change_size=S|M|L`。见 [right_sizing.md](references/right_sizing.md)。

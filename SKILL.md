@@ -13,13 +13,13 @@ license: MIT
 compatibility: Requires Python >= 3.8 (stdlib sqlite3; Win/Linux/macOS)
 metadata:
   author: hardstone
-  version: "2.33"
+  version: "2.34"
 ---
 
 # 产品开发 Skill (hs-dev-skill)
 
-版本：v2.33  
-核心定位：**质量优先（分步正确 + 测试一等公民）+ 文档驱动（方法类型七分类 · 属性契约画像 · 物理行号定位 · 精准测试分级矩阵 · 局部依赖拓扑 · 三段式修改原理）+ 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构选型置顶契约切片（[VIBE_CONTRACT] 隔离废案）+ MVP 激进裁剪决策（CEO 砍半法则 · 团队胃口时间箱 · Day 1 垂直曳光弹切片）+ 垂直领域能力融合（OpenPencil 矢量规约 · Generative UI 动态交互仿真 · Modern Web Guidance 现代合规 · Chrome DevTools 运行态/CWV/a11y 质量门禁 · 专用 SDK 防腐 Adapter）+ 多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）+ 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
+版本：v2.34  
+核心定位：**质量优先（分步正确 + 测试一等公民 · 测试零报错硬阻断交付 · 静态检测零告警零错误 · 数据驱动测试 DDT 与双轨制 E2E 规约）+ 文档驱动（方法类型七分类 · 属性契约画像 · 物理行号定位 · 精准测试分级矩阵 · 局部依赖拓扑 · 三段式修改原理）+ 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构选型置顶契约切片（[VIBE_CONTRACT] 隔离废案）+ MVP 激进裁剪决策（CEO 砍半法则 · 团队胃口时间箱 · Day 1 垂直曳光弹切片）+ 垂直领域能力融合（OpenPencil 矢量规约 · Generative UI 动态交互仿真 · Modern Web Guidance 现代合规 · Chrome DevTools 运行态/CWV/a11y 质量门禁 · 专用 SDK 防腐 Adapter）+ 多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）+ 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
 **替代**：原 `hs-project-skill` 已废弃，统一用本 Skill。
 
 **装载门闩（反合理化 × Token）**：动手前必须完成 [`load_latch.md`](references/load_latch.md) L0～L2（分级 + 索引路由 + **恰好 1 份**详规）。禁止「跳过 Skill 先干」；也禁止整目录通读。场景有 ≥1% 可能适用 → **必须跑** `skill_ref_index search`（或读 `_index` 一行），命中再打开。
@@ -28,10 +28,10 @@ metadata:
 
 ## 核心驱动铁律
 
-0. **质量优先**：分步的正确最大可能保证最终的正确；测试是一等公民（[`testing.md`](references/testing.md)）。可演示但无测试证明的行为不算完成（S 无逻辑变更除外）。
+0. **质量优先（测试零报错硬阻断 + 静态检测零告警）**：分步的正确最大可能保证最终的正确；测试是一等公民（[`testing.md`](references/testing.md)）。全量测试必须 100% PASS 且 0 报错；静态代码检测（Linter / TypeChecker / 死代码扫描）必须 0 Warning 且 0 Error；未达标前**绝对禁止**流转 COMPLETED 交付或执行 Commit（严禁向用户汇报「已完成但有若干报错待修」）；可演示但无测试证明的行为不算完成（S 无逻辑变更除外）。
 1. **先分级 + 定模式**：写 `change_size=S|M|L` 与 `work_mode=DESIGN|IMPLEMENT`（[`right_sizing.md`](references/right_sizing.md) / [`confidence_decision.md`](references/confidence_decision.md)）。禁止未分级按满配 0→6。不确定：`change_size=M`，`work_mode=DESIGN`。
 2. **装载门闩**：未过 L0～L2 禁止探代码开工或写 PRD 正文（[`load_latch.md`](references/load_latch.md)）。语义为「继续/继续任务」时 L2 优先 [`process_continuity.md`](references/process_continuity.md)。
-3. **持续推进**：除 DESIGN 前沿等待 / 实现期询问闸门 /（M/L）冻结未过 / `BLOCKED` 外禁止空转；确认后立刻继续至路径终点（测试绿+门禁+归档+本地 Commit）。
+3. **持续推进**：除 DESIGN 前沿等待 / 实现期询问闸门 /（M/L）冻结未过 / `BLOCKED` 外禁止空转；确认后立刻继续至路径终点（测试全绿+静态零告警+门禁+归档+本地 Commit）。
 4. **审讯式对齐与方案比选后再编码**：`DESIGN` 走 [`grill_orchestration.md`](references/grill_orchestration.md)（融合 `gstack /office-hours` 痛点拷问与 `superpowers` 多方案 Trade-offs 博弈）；**跳过澄清收紧**（不可逆/计费权限/对外契约/持久化/影响选型的产品空白 → 禁止跳过，见 confidence_decision）。S 数行 DoD；M/L 阶段 0。
 5. **单文件 HTML 可交互原型与多端可视化确认（开发者签收门禁）**：专业级产品与 UX 设计能力（[`product_design.md`](references/product_design.md) / [`product_prototype.md`](references/product_prototype.md)）；
    - **宏观品味宪章**：项目根目录 `DESIGN.md`（[`design_md.md`](references/design_md.md)）作为永久记忆，确立具象物理隐喻、Design Tokens、Anti-Slop 审美红线与 10 星标准；
@@ -53,7 +53,7 @@ metadata:
 9. **设计多问 / 实现少问**：`DESIGN` = 审讯式澄清（跳过受 §4 收紧）；`IMPLEMENT` 仅四条件闸门才问（[`confidence_decision.md`](references/confidence_decision.md)）。实现中暴露产品空白 → 回切 DESIGN。
 10. **续做 = plan_log + change_log**：语义「继续」→ `process_log.py resume-scan`；**回退不依赖 git** → `process_log.py rollback`（[`process_continuity.md`](references/process_continuity.md)）。
 11. **状态机合法迁移**：禁止跳步；终态重开仅回退 `--force`（[`task_state_machine.md`](references/task_state_machine.md)）。
-12. **实现必测与运行态干净**：确认 seam → 垂直切片红绿重构（[`testing.md`](references/testing.md)）；阶段 6 / 提交前测试必须绿；前端集成 Chrome DevTools CDP 自动化排查、WCAG a11y 审计与 LCP/内存泄漏诊断门禁。改文件前先 `process_log.py checkpoint`。
+12. **实现必测、运行态干净与双轨 E2E**：确认 seam → 垂直切片红绿重构（[`testing.md`](references/testing.md)）；测试数据集（`_08_test_data`）支持 DDT 但严禁脆弱绝对相等，须 Schema Match + 核心不变量断言；Mock 聚焦外部 Adapter 环境；双轨制 E2E（开发走 Mock 冒烟，交付门禁直连容器/沙箱，严禁假 E2E）；提交前与阶段 6 必须 `make test` 100% 绿（0 报错）∧ 静态检测 0 告警 0 错误 ∧ `verify_consistency --strict`；前端集成 Chrome DevTools CDP 自动化排查、WCAG a11y 审计与 LCP/内存泄漏诊断门禁。改文件前先 `process_log.py checkpoint`。
 13. **学习/偏好**：`~/.hs-dev-skill/`；`global_index_db.py search`，禁止整目录通读。
 14. **模糊新技术/UI/架构**：GitHub 高星对标 ≥2；范式见 `dev_paradigm`；深模块见 `deep_modules`；前端结构见 `frontend_arch`；后端见 `backend_arch`；复杂域才读 `ddd_design`（远程按需）。
 15. **三端**：`pathlib` + `python3`/`python`/`py -3`（[`cross_platform.md`](references/cross_platform.md)）。
@@ -74,7 +74,7 @@ metadata:
   └─ L: 0→1→2→3→4→5→6（细则见 spec_driven_lifecycle.md）
 ```
 
-**L 满配**：0 产品设计（设计语言+功能规格）+ MVP分阶段规划/冻结 → 1 选型 ADR（按当前阶段范围）→ 2 架构（深模块词汇）→ 3 四要素（API/UI：aesthetic→DESIGN.md→craft / rule_fetch）→ 4 任务+pack+seam → 5 三同步+垂直 TDD → 6 测试绿+门禁+归档+Commit。
+**L 满配**：0 产品设计（设计语言+功能规格）+ MVP分阶段规划/冻结 → 1 选型 ADR（按当前阶段范围）→ 2 架构（深模块词汇）→ 3 四要素（API/UI：aesthetic→DESIGN.md→craft / rule_fetch）→ 4 任务+pack+seam → 5 三同步+垂直 TDD → 6 测试全绿（0 报错）+ 静态检测零告警零错误 + 门禁 + 归档 + Commit。
 
 **跃迁**：未分级/未过门闩禁止开工；L 的 0→1 须冻结门禁；M/S 禁止为空跑造空文档；`BLOCKED`→落盘→继续至终点。
 
