@@ -174,6 +174,18 @@ hs_dev_docs/_01_product_design/
 
 同时，在项目根目录维护 **`DESIGN.md`**，作为全局宏观品味与 Design Tokens 的单一真实源。
 
+### 3.1 大型 PRD 分级拆分与微观索引标准 (Hierarchical PRD Splitting)
+当系统规模扩张、包含多模块或 >3 个功能特性时，**严禁将全部功能堆砌在单一巨型 PRD 中**（容易导致 Token 溢出与注意力分散）。必须执行两级拆分：
+1. **L1 全景总览 (`overview_prd.md`)**：
+   - 载体：`_02_product_design/overview_prd.md`（参照 [`overview_prd_template.md`](../resources/templates/product_design/overview_prd_template.md)）；
+   - 职责：维护全局模块矩阵、特性索引导航表（含 `FEAT-ID`、特性名称、所属模块、优先级、PRD 相对路径）及 Mermaid 功能全景树。
+2. **L2 微观子特性施工图 (`features/{feature_key}_prd.md`)**：
+   - 载体：`_02_product_design/features/{feature_key}_prd.md`（参照 [`sub_feature_prd_template.md`](../resources/templates/product_design/sub_feature_prd_template.md)）；
+   - 职责：单文档严格控制在 100~250 行，专精当前 `FEAT-ID` 的微观 JTBD、方案比选、字段约束矩阵与 Gherkin 验收标准；
+   - 自动化建库：由 `python3 scripts/doc_index_db.py rebuild` 自动化解析入库 `features` 表与 `features_fts`，支持 `feature-search` 毫秒级定向按需召回。
+3. **L2 页面与空间布局原型 (`_03_product_figma/{feature_key}_prototype.md`)**：
+   - 自动化建库：由 `doc_index_db.py` 自动化解析页面 ID、路由、布局形态与原型 HTML 入库 `pages` 表与 `pages_fts`，支持 `page-search` 检索页面拓扑。
+
 ---
 
 ## 4. 全量产品设计后的下一步：MVP 与分阶段实施

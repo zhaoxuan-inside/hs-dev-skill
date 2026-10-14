@@ -179,6 +179,203 @@ def _parse_method_profile(text: str, doc_rel_path: str) -> Optional[Dict[str, An
     }
 
 
+def _parse_features(text: str, doc_rel_path: str) -> List[Dict[str, Any]]:
+    """
+    解析 PRD 文档中的特性定义，支持：
+    1. 全局功能特性索引映射表中的表格行 (| `FEAT-001` | 特性名称 | 模块 | 优先级 | ...)
+    2. 文档内章节级的微观特性 (如 ### 5.1 功能项：发布商品 (`FEAT-001`))
+    3. 单文档整体作为 Feature (如 sub_feature_prd_template, prd_template)
+    """
+    results: List[Dict[str, Any]] = []
+
+    # 1. 尝试从全局映射表中提取表格行
+    table_pattern = re.compile(
+        r"\|\s*`?(FEAT-[A-Za-z0-9_-]+)`?\s*\|\s*([^|]+?)\s*\|\s*`?([A-Za-z0-9_-]+)?`?\s*\|\s*`?([P0-3])?`?\s*\|\s*`?([A-Za-z_-]+)?`?\s*\|\s*([^|]+?)\s*\|"
+    )
+    for m in table_pattern.finditer(text):
+        feat_id = m.group(1).strip()
+        feat_name = m.group(2).strip()
+        module = m.group(3).strip() if m.group(3) else ""
+        prio = m.group(4).strip() if m.group(4) else "P1"
+        status = m.group(5).strip() if m.group(5) else "active"
+        target_prd = m.group(6).strip() if m.group(6) else doc_rel_path
+        target_prd = re.sub(r"[\[\]`]", "", target_prd).strip()
+        results.append({
+            "feature_key": f"feat:{feat_id}@{doc_rel_path}",
+            "feature_id": feat_id,
+            "name": feat_name,
+            "domain": "product_design",
+            "module": module,
+            "summary": f"{feat_name} ({module})",
+            "prd_path": target_prd if "hs_dev_docs" in target_prd else str(Path(doc_rel_path).parent / target_prd).replace("\\", "/"),
+            "priority": prio,
+            "status": status,
+        })
+
+    # 2. 尝试从章节级别提取子特性: ### 5.1 功能项：{name} (`FEAT-001`)
+    section_pattern = re.compile(
+        r"^###\s+(?:(?:\d+\.)*\d+\s+)?(?:功能(?:项)?|Feature)[:：]?\s*([^(\r\n]+?)(?:\s*[(（]`?([A-Za-z0-9_-]+)`?[)）])?$",
+        re.MULTILINE,
+    )
+    for m in section_pattern.finditer(text):
+        feat_name = m.group(1).strip()
+        feat_id = m.group(2).strip() if m.group(2) else ""
+        start_pos = m.end()
+        next_head = re.search(r"^#{2,3}\s+", text[start_pos:], re.MULTILINE)
+        section_body = (
+            text[start_pos : start_pos + next_head.start()] if next_head else text[start_pos : start_pos + 1000]
+        )
+
+        if not feat_id:
+            id_m = re.search(r"(?:特性ID|Feature ID)[:：]\s*`?([A-Za-z0-9_-]+)`?", section_body)
+            if id_m:
+                feat_id = id_m.group(1).strip()
+            else:
+                feat_id = f"FEAT-{Path(doc_rel_path).stem}-{len(results)+1}"
+
+        sum_m = re.search(r"-\s*\*\*功能概述[^*]*\*\*[:：]\s*([^\r\n]+)", section_body)
+        summary = sum_m.group(1).strip() if sum_m else section_body.strip()[:200]
+        summary = re.sub(r"[\r\n]+", " ", summary).strip()
+
+        results.append({
+            "feature_key": f"feat:{feat_id}@{doc_rel_path}",
+            "feature_id": feat_id,
+            "name": feat_name,
+            "domain": "product_design",
+            "module": Path(doc_rel_path).parent.name if Path(doc_rel_path).parent.name != "_02_product_design" else "",
+            "summary": summary,
+            "prd_path": doc_rel_path,
+            "priority": "P1",
+            "status": "active",
+        })
+
+    # 3. 如果未匹配到表格行或章节特性，则整篇文档作为一个完整 PRD 特性
+    if not results:
+        doc_feat_id = ""
+        id_m = re.search(r"-\s*\*\*.*?(?:特性ID|Feature ID).*?\*\*[:：]\s*`?([A-Za-z0-9_-]+)`?", text, re.IGNORECASE)
+        if id_m:
+            doc_feat_id = id_m.group(1).strip()
+        if not doc_feat_id:
+            doc_feat_id = Path(doc_rel_path).stem.replace("_prd", "")
+
+        name = ""
+        name_m = re.search(r"-\s*\*\*.*?(?:特性名称|功能名称|需求名称|需求/功能名称).*?\*\*[:：]\s*([^\r\n]+)", text)
+        if name_m:
+            name = name_m.group(1).strip()
+        if not name:
+            name_m2 = re.search(r"^#\s*.*?(?:PRD|产品需求|特性)?[:：]\s*([^\r\n]+)", text, re.MULTILINE)
+            name = name_m2.group(1).strip() if name_m2 else Path(doc_rel_path).stem
+
+        module = ""
+        mod_m = re.search(r"-\s*\*\*.*?(?:所属模块|功能模块).*?\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+        if mod_m:
+            module = mod_m.group(1).strip()
+
+        prio = "P1"
+        prio_m = re.search(r"-\s*\*\*.*?优先级.*?\*\*[:：]\s*`?([A-Za-z0-9_-]+)`?", text)
+        if prio_m:
+            prio = prio_m.group(1).strip()
+
+        status = "active"
+        stat_m = re.search(r"-\s*\*\*.*?状态.*?\*\*[:：]\s*`?([A-Za-z_-]+)`?", text)
+        if stat_m:
+            status = stat_m.group(1).strip()
+
+        sum_m = re.search(r"-\s*\*\*.*?一句话价值主张.*?\*\*[:：]\s*([^\r\n]+)", text)
+        if sum_m:
+            summary = sum_m.group(1).strip()
+        else:
+            jtbd_m = re.search(r"(?:用户雇佣任务|JTBD)[^:\r\n]*[:：]\s*([^\r\n]+)", text)
+            summary = jtbd_m.group(1).strip() if jtbd_m else _extract_summary(text, name)
+
+        results.append({
+            "feature_key": f"feat:{doc_feat_id}@{doc_rel_path}",
+            "feature_id": doc_feat_id,
+            "name": name,
+            "domain": "product_design",
+            "module": module,
+            "summary": summary,
+            "prd_path": doc_rel_path,
+            "priority": prio,
+            "status": status,
+        })
+
+    return results
+
+
+def _parse_pages(text: str, doc_rel_path: str) -> List[Dict[str, Any]]:
+    """
+    解析原型与布局文档，提取页面 ID、名称、路由、布局形态与原型 HTML
+    """
+    results: List[Dict[str, Any]] = []
+
+    page_id = ""
+    id_m = re.search(r"-\s*\*\*.*?(?:页面ID|Page ID).*?\*\*[:：]\s*`?([A-Za-z0-9_-]+)`?", text, re.IGNORECASE)
+    if id_m:
+        page_id = id_m.group(1).strip()
+    if not page_id:
+        page_id = Path(doc_rel_path).stem.replace("_prototype", "").replace("_layout", "")
+
+    name = ""
+    name_m = re.search(r"-\s*\*\*.*?(?:页面名称).*?\*\*[:：]\s*([^\r\n]+)", text)
+    if name_m:
+        name = name_m.group(1).strip()
+    if not name:
+        title_m = re.search(r"^#\s*.*?(?:原型规范|界面原型|页面)?[:：]\s*([^\r\n]+)", text, re.MULTILINE)
+        name = title_m.group(1).strip() if title_m else Path(doc_rel_path).stem
+
+    route = ""
+    route_m = re.search(r"-\s*\*\*.*?(?:路由|Route).*?\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+    if route_m:
+        route = route_m.group(1).strip()
+    else:
+        r_match = re.search(r"(/[\w/-]+)", text)
+        route = r_match.group(1) if r_match else f"/{page_id}"
+
+    module = ""
+    mod_m = re.search(r"-\s*\*\*.*?(?:功能模块|所属模块).*?\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+    if mod_m:
+        module = mod_m.group(1).strip()
+
+    html_proto = ""
+    html_m = re.search(r"-\s*\*\*.*?(?:可交互 HTML 原型预览|HTML 原型).*?\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+    if html_m:
+        html_proto = html_m.group(1).strip()
+
+    layout_type = ""
+    layout_m = re.search(r"-\s*\*\*.*?(?:内容密度|布局类型|布局形态).*?\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+    if layout_m:
+        layout_type = layout_m.group(1).strip()
+    else:
+        if "主从" in text or "Split" in text:
+            layout_type = "主从分栏 (Split View)"
+        elif "单列" in text:
+            layout_type = "单列流式 (Single Column)"
+        elif "看板" in text or "Kanban" in text:
+            layout_type = "多列看板 (Kanban Board)"
+        else:
+            layout_type = "标准布局 (Standard)"
+
+    summary = ""
+    sum_m = re.search(r"##\s*(?:视觉调性与设计哲学|页面布局|空间比例线框图)[^\n]*\n+([\s\S]{1,300})", text)
+    if sum_m:
+        summary = re.sub(r"[\r\n]+", " ", sum_m.group(1).strip())[:250]
+    if not summary:
+        summary = _extract_summary(text, name)
+
+    results.append({
+        "page_key": f"page:{page_id}@{doc_rel_path}",
+        "page_id": page_id,
+        "name": name,
+        "route": route,
+        "module": module,
+        "prototype_html": html_proto,
+        "layout_type": layout_type,
+        "summary": summary,
+        "doc_path": doc_rel_path,
+    })
+    return results
+
 
 class DocIndexDB:
     def __init__(self, workspace_root: str | Path):
@@ -524,6 +721,10 @@ class DocIndexDB:
             )
             inserted += 1
 
+        # 索引产品功能规格 (Features) 与原型页面布局 (Pages)
+        features_inserted = self._index_features(conn)
+        pages_inserted = self._index_pages(conn)
+
         # 索引业务代码与脚本中的符号（类、函数、签名与行号）
         symbols_inserted = self._index_code_symbols(conn)
 
@@ -545,6 +746,8 @@ class DocIndexDB:
             "db_path": str(self.db_path),
             "db_path_posix": self.db_path.as_posix(),
             "inserted": inserted,
+            "features_inserted": features_inserted,
+            "pages_inserted": pages_inserted,
             "symbols_inserted": symbols_inserted,
             "fts": self.fts_available,
             "rebuilt_at": _utc_now(),
@@ -552,6 +755,115 @@ class DocIndexDB:
         # 重建后释放连接，避免 Windows 文件锁
         self.close()
         return payload
+
+    def _index_features(self, conn: sqlite3.Connection) -> int:
+        product_dir = self.docs_root / "_01_product_design"
+        candidate_dirs = [product_dir] if product_dir.exists() else ([self.docs_root] if self.docs_root.exists() else [])
+        count = 0
+        for cdir in candidate_dirs:
+            for fpath in cdir.rglob("*.md"):
+                rel_p = _posix_rel(fpath, self.root)
+                if not ("_02_product_design" in rel_p or "features" in rel_p or "prd" in fpath.name.lower()):
+                    continue
+                text = _read_text(fpath)
+                if not text:
+                    continue
+                feats = _parse_features(text, rel_p)
+                for f in feats:
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO features (
+                            feature_key, feature_id, name, domain, module, summary, prd_path, priority, status, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            f["feature_key"],
+                            f["feature_id"],
+                            f["name"],
+                            f.get("domain", ""),
+                            f.get("module", ""),
+                            f.get("summary", ""),
+                            f["prd_path"],
+                            f.get("priority", "P1"),
+                            f.get("status", "active"),
+                            _utc_now(),
+                        ),
+                    )
+                    if self.fts_available:
+                        try:
+                            conn.execute("DELETE FROM features_fts WHERE feature_key = ?", (f["feature_key"],))
+                            conn.execute(
+                                """
+                                INSERT INTO features_fts (feature_key, feature_id, name, summary, domain, module)
+                                VALUES (?, ?, ?, ?, ?, ?)
+                                """,
+                                (
+                                    f["feature_key"],
+                                    f["feature_id"],
+                                    f["name"],
+                                    f.get("summary", ""),
+                                    f.get("domain", ""),
+                                    f.get("module", ""),
+                                ),
+                            )
+                        except sqlite3.Error:
+                            pass
+                    count += 1
+        return count
+
+    def _index_pages(self, conn: sqlite3.Connection) -> int:
+        product_dir = self.docs_root / "_01_product_design"
+        candidate_dirs = [product_dir] if product_dir.exists() else ([self.docs_root] if self.docs_root.exists() else [])
+        count = 0
+        for cdir in candidate_dirs:
+            for fpath in cdir.rglob("*.md"):
+                rel_p = _posix_rel(fpath, self.root)
+                if not ("_03_product_figma" in rel_p or "_03_product_prototype" in rel_p or "prototype" in fpath.name.lower() or "page" in rel_p):
+                    continue
+                text = _read_text(fpath)
+                if not text:
+                    continue
+                pages = _parse_pages(text, rel_p)
+                for p in pages:
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO pages (
+                            page_key, page_id, name, route, module, prototype_html, layout_type, summary, doc_path, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            p["page_key"],
+                            p["page_id"],
+                            p["name"],
+                            p.get("route", ""),
+                            p.get("module", ""),
+                            p.get("prototype_html", ""),
+                            p.get("layout_type", ""),
+                            p.get("summary", ""),
+                            p["doc_path"],
+                            _utc_now(),
+                        ),
+                    )
+                    if self.fts_available:
+                        try:
+                            conn.execute("DELETE FROM pages_fts WHERE page_key = ?", (p["page_key"],))
+                            conn.execute(
+                                """
+                                INSERT INTO pages_fts (page_key, page_id, name, route, summary)
+                                VALUES (?, ?, ?, ?, ?)
+                                """,
+                                (
+                                    p["page_key"],
+                                    p["page_id"],
+                                    p["name"],
+                                    p.get("route", ""),
+                                    p.get("summary", ""),
+                                ),
+                            )
+                        except sqlite3.Error:
+                            pass
+                    count += 1
+        return count
 
     def _index_code_symbols(self, conn: sqlite3.Connection) -> int:
         extractor = CodeSkeletonExtractor()
@@ -1260,6 +1572,142 @@ class DocIndexDB:
             "content": slice_content,
         }
 
+    def feature_search(
+        self,
+        query: str,
+        *,
+        module: str = "",
+        limit: int = 5,
+    ) -> Dict[str, Any]:
+        conn = self.connect()
+        q = (query or "").strip()
+        if not q:
+            return {
+                "ok": False,
+                "error": "empty query",
+                "count": 0,
+                "features": [],
+                "hint": "Provide --q with feature keywords or feature ID (e.g. FEAT-001).",
+            }
+
+        ranked: Dict[str, Dict[str, Any]] = {}
+        use_fts = self.fts_available and not _has_cjk(q)
+        if use_fts:
+            fts_q = self._fts_query(q)
+            try:
+                sql = """
+                    SELECT f.feature_key, f.feature_id, f.name, f.domain, f.module,
+                           f.summary, f.prd_path, f.priority, f.status,
+                           bm25(features_fts) AS score
+                    FROM features_fts
+                    JOIN features f ON f.feature_key = features_fts.feature_key
+                    WHERE features_fts MATCH ?
+                """
+                params: List[Any] = [fts_q]
+                if module:
+                    sql += " AND f.module = ?"
+                    params.append(module)
+                sql += " ORDER BY score LIMIT ?"
+                params.append(limit * 2)
+                for r in conn.execute(sql, params):
+                    ranked[r["feature_key"]] = dict(r)
+            except sqlite3.Error:
+                use_fts = False
+
+        like = f"%{q}%"
+        sql = """
+            SELECT feature_key, feature_id, name, domain, module,
+                   summary, prd_path, priority, status, 0.0 AS score
+            FROM features
+            WHERE (feature_id LIKE ? OR name LIKE ? OR summary LIKE ? OR module LIKE ?)
+        """
+        params = [like, like, like, like]
+        if module:
+            sql += " AND module = ?"
+            params.append(module)
+        sql += " LIMIT ?"
+        params.append(limit * 2)
+        for r in conn.execute(sql, params):
+            if r["feature_key"] not in ranked:
+                ranked[r["feature_key"]] = dict(r)
+
+        results = list(ranked.values())[:limit]
+        return {
+            "ok": True,
+            "query": q,
+            "count": len(results),
+            "features": results,
+            "hint": "Inspect PRD spec via db.slice(feature.prd_path).",
+        }
+
+    def page_search(
+        self,
+        query: str,
+        *,
+        route: str = "",
+        limit: int = 5,
+    ) -> Dict[str, Any]:
+        conn = self.connect()
+        q = (query or "").strip()
+        if not q:
+            return {
+                "ok": False,
+                "error": "empty query",
+                "count": 0,
+                "pages": [],
+                "hint": "Provide --q with page name, route or layout keyword.",
+            }
+
+        ranked: Dict[str, Dict[str, Any]] = {}
+        use_fts = self.fts_available and not _has_cjk(q)
+        if use_fts:
+            fts_q = self._fts_query(q)
+            try:
+                sql = """
+                    SELECT p.page_key, p.page_id, p.name, p.route, p.module,
+                           p.prototype_html, p.layout_type, p.summary, p.doc_path,
+                           bm25(pages_fts) AS score
+                    FROM pages_fts
+                    JOIN pages p ON p.page_key = pages_fts.page_key
+                    WHERE pages_fts MATCH ?
+                """
+                params: List[Any] = [fts_q]
+                if route:
+                    sql += " AND p.route LIKE ?"
+                    params.append(f"%{route}%")
+                sql += " ORDER BY score LIMIT ?"
+                params.append(limit * 2)
+                for r in conn.execute(sql, params):
+                    ranked[r["page_key"]] = dict(r)
+            except sqlite3.Error:
+                use_fts = False
+
+        like = f"%{q}%"
+        sql = """
+            SELECT page_key, page_id, name, route, module,
+                   prototype_html, layout_type, summary, doc_path, 0.0 AS score
+            FROM pages
+            WHERE (page_id LIKE ? OR name LIKE ? OR route LIKE ? OR summary LIKE ? OR layout_type LIKE ?)
+        """
+        params = [like, like, like, like, like]
+        if route:
+            sql += " AND route LIKE ?"
+            params.append(f"%{route}%")
+        sql += " LIMIT ?"
+        params.append(limit * 2)
+        for r in conn.execute(sql, params):
+            if r["page_key"] not in ranked:
+                ranked[r["page_key"]] = dict(r)
+
+        results = list(ranked.values())[:limit]
+        return {
+            "ok": True,
+            "query": q,
+            "count": len(results),
+            "pages": results,
+            "hint": "View wireframe & layout topology via db.slice(page.doc_path).",
+        }
+
 
 def _print_json(payload: Dict[str, Any]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -1285,6 +1733,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     p_search.add_argument("--domain", default="", help="Filter domain folder name")
     p_search.add_argument("--model", default="", help="Filter model slug")
     p_search.add_argument("--limit", type=int, default=DEFAULT_LIMIT)
+
+    p_feat = sub.add_parser("feature-search", help="Search product features in PRD specifications")
+    p_feat.add_argument("--q", required=True, help="Feature name, ID or description")
+    p_feat.add_argument("--module", default="", help="Filter by module")
+    p_feat.add_argument("--limit", type=int, default=5)
+
+    p_page = sub.add_parser("page-search", help="Search pages, routes and UI wireframe layouts")
+    p_page.add_argument("--q", required=True, help="Page name, route or layout keyword")
+    p_page.add_argument("--route", default="", help="Filter by route path")
+    p_page.add_argument("--limit", type=int, default=5)
 
     p_method = sub.add_parser(
         "method-search",
@@ -1328,6 +1786,28 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     args.q,
                     domain=args.domain,
                     model=args.model,
+                    limit=args.limit,
+                )
+            )
+            return 0
+        if args.command == "feature-search":
+            if not db.db_path.exists():
+                db.rebuild()
+            _print_json(
+                db.feature_search(
+                    args.q,
+                    module=args.module,
+                    limit=args.limit,
+                )
+            )
+            return 0
+        if args.command == "page-search":
+            if not db.db_path.exists():
+                db.rebuild()
+            _print_json(
+                db.page_search(
+                    args.q,
+                    route=args.route,
                     limit=args.limit,
                 )
             )

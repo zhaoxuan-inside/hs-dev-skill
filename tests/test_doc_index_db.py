@@ -196,7 +196,66 @@ class TestDocIndexDB(unittest.TestCase):
             self.assertIn("test_cases", stats)
             self.assertIn("method_dependencies", stats)
             self.assertIn("audit_changes", stats)
-            self.assertEqual(stats["features"], 0)
+            self.assertGreaterEqual(stats["features"], 1)
+            self.assertEqual(stats["pattern_clusters"], 0)
+        finally:
+            db.close()
+
+    def test_feature_and_page_indexing_and_search(self):
+        # 准备 PRD 文件
+        prd_dir = self.root / "hs_dev_docs" / "_01_product_design" / "_02_product_design" / "features"
+        prd_dir.mkdir(parents=True, exist_ok=True)
+        feat_file = prd_dir / "checkout_prd.md"
+        feat_file.write_text(
+            "# 子特性需求与功能规格说明书 (Feature PRD)：极速收银台\n\n"
+            "- **特性ID (Feature ID)**：`FEAT-101`\n"
+            "- **特性名称**：极速收银台与聚合支付\n"
+            "- **所属模块**：checkout\n"
+            "- **优先级**：P0\n"
+            "- **状态**：active\n\n"
+            "## 1. 特性洞察与核心价值界定\n"
+            "- **一句话价值主张**：一键拉起收银台，支持微信与支付宝聚合扫码支付。\n",
+            encoding="utf-8",
+        )
+
+        # 准备原型与页面布局文件
+        proto_dir = self.root / "hs_dev_docs" / "_01_product_design" / "_03_product_figma"
+        proto_dir.mkdir(parents=True, exist_ok=True)
+        page_file = proto_dir / "checkout_prototype.md"
+        page_file.write_text(
+            "# 产品设计语言与界面原型规范：极速收银台\n\n"
+            "- **页面ID**：`PAGE-101`\n"
+            "- **路由 / Route**：`/order/checkout`\n"
+            "- **所属模块**：checkout\n"
+            "- **内容密度 / 布局类型**：主从分栏 (Split View)\n"
+            "- **可交互 HTML 原型预览**：`_03_product_figma/checkout_prototype.html`\n\n"
+            "## 页面布局\n"
+            "左侧展示商品清单与优惠明细，右侧固定 380px 收银支付抽屉面板。\n",
+            encoding="utf-8",
+        )
+
+        db = DocIndexDB(self.root)
+        try:
+            info = db.rebuild()
+            self.assertGreaterEqual(info["features_inserted"], 1)
+            self.assertGreaterEqual(info["pages_inserted"], 1)
+
+            # Feature Search 测试
+            f_res = db.feature_search("聚合支付")
+            self.assertTrue(f_res["ok"])
+            self.assertGreaterEqual(f_res["count"], 1)
+            f_item = f_res["features"][0]
+            self.assertEqual(f_item["feature_id"], "FEAT-101")
+            self.assertEqual(f_item["module"], "checkout")
+
+            # Page Search 测试
+            p_res = db.page_search("收银台")
+            self.assertTrue(p_res["ok"])
+            self.assertGreaterEqual(p_res["count"], 1)
+            p_item = p_res["pages"][0]
+            self.assertEqual(p_item["page_id"], "PAGE-101")
+            self.assertEqual(p_item["route"], "/order/checkout")
+            self.assertIn("主从分栏", p_item["layout_type"])
         finally:
             db.close()
 
