@@ -124,6 +124,7 @@ python scripts/doc_index_db.py --root . slice --path hs_dev_docs/_05_interface_d
 
 - **中层总结 (L1 - Derived Summaries)**：如 `_06_method_design`（方法七维画像）、`_05_interface_design`（接口契约）、`_07_call_chain`（调用拓扑）。它们是从上述 L0 物理真理中提炼出来的高密度业务契约视图。
 - **顶层索引 (L2 - Index of Summaries)**：`doc_index.sqlite`（FTS5 / JSONL），对 L1 总结建立的毫秒级倒排索引。
+- **全局文档阅读与直接索引导航 (`hs_dev_docs/README.md`)**：作为连接人类工程师与协同 Agent 的全局导航罗盘，置顶 `[VIBE_CONTRACT]` 机器索引契约，提供 7 大功能域直接索引表与 10 大专用 CLI 指令（详见 [`doc_reading_guide.md`](doc_reading_guide.md)）。可通过 `make doc-guide` 或 `python scripts/doc_index_db.py --root . generate-guide` 自动生成与刷新。
 
 **抗脆弱铁律**：严禁在文档中硬编码绝对行号。改用**符号锚点 (Symbol Anchor)**，由底层 AST 动态求值物理行号，消除代码格式化或修改造成的行号漂移。
 

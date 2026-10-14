@@ -3180,6 +3180,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     p_slice.add_argument("--end", type=int, default=None)
     p_slice.add_argument("--max-lines", type=int, default=SLICE_MAX_LINES)
 
+    p_guide = sub.add_parser(
+        "generate-guide",
+        help="Generate or refresh hs_dev_docs/README.md reading guide and rebuild SQLite index",
+    )
+    p_guide.add_argument("--project-name", default=None, help="Optional project name")
+
     args = parser.parse_args(argv)
     db = DocIndexDB(args.root)
     try:
@@ -3324,6 +3330,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     max_lines=args.max_lines,
                 )
             )
+            return 0
+        if args.command == "generate-guide":
+            from init_hs_dev_docs import generate_doc_reading_guide
+            guide_p = generate_doc_reading_guide(args.root, project_name=args.project_name, verbose=False)
+            info = db.rebuild()
+            _print_json({
+                "ok": True,
+                "guide_path": str(guide_p),
+                "rebuild_info": info,
+            })
             return 0
     finally:
         db.close()

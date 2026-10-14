@@ -1,4 +1,4 @@
-.PHONY: test verify scan-dead-code init-docs init-global paths index-rebuild index-search global-index-rebuild global-index-search skill-ref-rebuild skill-ref-search rule-list rule-search rule-resolve version version-now help
+.PHONY: test verify scan-dead-code init-docs doc-guide init-global paths index-rebuild index-search global-index-rebuild global-index-search skill-ref-rebuild skill-ref-search rule-list rule-search rule-resolve version version-now help
 
 # 跨平台：Linux/macOS 默认 python3；Windows 可 make PYTHON="py -3" 或 PYTHON=python
 ifeq ($(OS),Windows_NT)
@@ -16,6 +16,7 @@ help:
 	@echo "  make governance-status - show governance feature toggle status"
 	@echo "  make scan-dead-code - dead / orphan method scan"
 	@echo "  make init-docs      - init hs_dev_docs skeleton in cwd"
+	@echo "  make doc-guide      - generate or refresh hs_dev_docs/README.md reading guide"
 	@echo "  make init-global    - init ~/.hs-dev-skill (cross-project)"
 	@echo "  make paths          - print resolved global paths for this OS"
 	@echo "  make index-rebuild  - rebuild SQLite doc index (token-saving query cache)"
@@ -50,6 +51,9 @@ scan-dead-code:
 
 init-docs:
 	$(PYTHON) scripts/init_hs_dev_docs.py --root .
+
+doc-guide:
+	$(PYTHON) scripts/doc_index_db.py --root . generate-guide
 
 init-global:
 	$(PYTHON) scripts/init_hs_global.py

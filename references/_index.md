@@ -47,5 +47,6 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | **Bug 修复：系统化调试与测试驱动修补** | `systematic_debugging.md` |
 | **代码重构：行为等价保护网与深模块演进** | `code_refactoring.md` |
 | **代码理解：只读免交付检索与架构探查** | `code_exploration.md` |
+| **项目文档阅读说明与跨 Agent 索引机制规范** | `doc_reading_guide.md` |
 | 学习笔记 / 偏好 / GitHub 对标 | `learn_and_prefer.md` |
 | Win/Linux/macOS 路径与解释器 | `cross_platform.md` |

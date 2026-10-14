@@ -123,6 +123,10 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
         "cluster", "防破坏", "vibecoding", "深模块", "反过度设计",
     ],
     "cross_platform.md": ["跨平台", "Windows", "Linux", "macOS", "pathlib"],
+    "doc_reading_guide.md": [
+        "文档阅读说明", "阅读说明", "文档体系", "索引导航", "doc_reading_guide",
+        "reading_guide", "跨Agent", "Agent协同", "全局索引", "README.md",
+    ],
     "spec_v2_4.md": ["规格", "百科", "争议"],
 }
 

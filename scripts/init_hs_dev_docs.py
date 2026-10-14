@@ -6,7 +6,10 @@ init_hs_dev_docs.py
 
 import os
 import sys
+import json
+import re
 import argparse
+from datetime import datetime, timezone
 from pathlib import Path
 from idx_manager import IdxManager
 
@@ -210,6 +213,9 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
             adr_file.write_text(adr_content, encoding="utf-8")
             print(f"[*] Generated reverse engineering baseline ADR: {adr_file.name}")
 
+    # 4.2 生成项目文档阅读说明与直接索引导航 (hs_dev_docs/README.md)
+    generate_doc_reading_guide(root)
+
     # 5. 重建跨平台 SQLite 文档索引（FTS5 + LIKE，可重复执行）
     try:
         from doc_index_db import DocIndexDB
@@ -236,11 +242,198 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
     )
 
 
+def generate_doc_reading_guide(workspace_root: str, project_name: str = None, verbose: bool = True) -> Path:
+    """
+    生成或刷新 hs_dev_docs/README.md（项目文档阅读说明与直接索引导航），
+    同时在 _00_hs_dev_docs.idx 中注册并自愈摘要哈希，方便人类与协同 Agent 快速导航与索引。
+    """
+    root = Path(workspace_root).resolve()
+    docs_root = root / "hs_dev_docs"
+    if not docs_root.exists():
+        docs_root.mkdir(parents=True, exist_ok=True)
+
+    if not project_name:
+        pkg_json = root / "package.json"
+        pyproject = root / "pyproject.toml"
+        cargo = root / "Cargo.toml"
+        if pkg_json.exists():
+            try:
+                data = json.loads(pkg_json.read_text(encoding="utf-8"))
+                project_name = data.get("name")
+            except Exception:
+                pass
+        if not project_name and pyproject.exists():
+            try:
+                m = re.search(r'name\s*=\s*["\']([^"\']+)["\']', pyproject.read_text(encoding="utf-8"))
+                if m:
+                    project_name = m.group(1)
+            except Exception:
+                pass
+        if not project_name and cargo.exists():
+            try:
+                m = re.search(r'name\s*=\s*["\']([^"\']+)["\']', cargo.read_text(encoding="utf-8"))
+                if m:
+                    project_name = m.group(1)
+            except Exception:
+                pass
+        if not project_name:
+            project_name = root.name or "hs-dev-project"
+
+    gen_time = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    # 优先加载模板
+    tmpl_file = Path(__file__).resolve().parent.parent / "resources" / "templates" / "hs_dev_docs" / "doc_reading_guide_template.md"
+    if tmpl_file.exists():
+        base_content = tmpl_file.read_text(encoding="utf-8")
+        base_content = base_content.replace("{PROJECT_NAME}", project_name).replace("{GENERATION_TIME}", gen_time)
+    else:
+        base_content = f"""# 项目文档阅读说明与全局索引导航 (Project Documentation Reading Guide & Index)
+
+> **项目名称**：`{project_name}`  
+> **体系规格**：符合《产品开发 Skill 规格定义书 v2.4+》  
+> **文档中枢根目录**：`hs_dev_docs/`  
+> **倒排索引数据库**：`hs_dev_docs/_00_project_foundation/_05_doc_index/doc_index.sqlite`  
+> **全局根索引**：`hs_dev_docs/_00_hs_dev_docs.idx`  
+> **生成时间**：`{gen_time}`
+
+---
+
+## [VIBE_CONTRACT] 机器极速索引契约 (Machine-Actionable Index Manifest)
+```yaml
+vibe_index_contract:
+  docs_root: "hs_dev_docs"
+  index_db_path: "hs_dev_docs/_00_project_foundation/_05_doc_index/doc_index.sqlite"
+  root_idx_path: "hs_dev_docs/_00_hs_dev_docs.idx"
+  dictionary_path: "hs_dev_docs/_00_project_foundation/_02_dictionary/_02_project_word.dict.yaml"
+
+  domain_routing:
+    _00_project_foundation: "hs_dev_docs/_00_project_foundation/_00_project_foundation.idx"
+    _01_product_vision: "hs_dev_docs/_01_product_vision/_00_product_vision.idx"
+    _02_feature_spec: "hs_dev_docs/_02_feature_spec/_00_feature_spec.idx"
+    _03_architecture_design: "hs_dev_docs/_03_architecture_design/_00_architecture_design.idx"
+    _04_engineering_contract: "hs_dev_docs/_04_engineering_contract/_00_engineering_contract.idx"
+    _05_task_orchestration: "hs_dev_docs/_05_task_orchestration/_00_task_orchestration.idx"
+    _06_dev_process: "hs_dev_docs/_06_dev_process/_00_dev_process.idx"
+
+  agent_cli_shortcuts:
+    feature_search: "python scripts/doc_index_db.py --root . feature-search --q <关键词>"
+    page_search: "python scripts/doc_index_db.py --root . page-search --q <页面/功能>"
+    pattern_search: "python scripts/doc_index_db.py --root . pattern-search --q <模式名>"
+    schema_search: "python scripts/doc_index_db.py --root . schema-search --q <表名>"
+    dep_graph: "python scripts/doc_index_db.py --root . dep-graph --symbol <类名.方法名>"
+    method_search: "python scripts/doc_index_db.py --root . method-search --q <业务意图>"
+    symbol_slice: "python scripts/doc_index_db.py --root . symbol-slice --name <符号名>"
+    test_search: "python scripts/doc_index_db.py --root . test-search --q <方法/类名>"
+    audit_search: "python scripts/doc_index_db.py --root . audit-search --since <YYYY-MM-DD>"
+    embed_search: "python scripts/doc_index_db.py --root . embed-search --q <语义查询>"
+    text_search: "python scripts/doc_index_db.py --root . search --q <关键词>"
+    line_slice: "python scripts/doc_index_db.py --root . slice --path <相对路径> --start <行> --end <行>"
+
+guardrails:
+  - "FORBIDDEN: 严禁全量通读 hs_dev_docs 目录大文件（Token 预算硬性拦截）"
+  - "MUST: 查阅代码与文档优先使用 doc_index_db 专属子命令进行局部切片"
+  - "MUST: 跨 Agent 遵循统一术语单一事实源（_02_project_word.dict.yaml）"
+  - "MUST: 代码与契约变更后必须执行 python scripts/doc_index_db.py --root . rebuild 自愈索引"
+```
+"""
+
+    # 动态扫描已归档关键契约与文档
+    adrs = sorted(list(docs_root.glob("_00_project_foundation/_03_decision_record/ADR_*.md")) +
+                  list(docs_root.glob("_00_project/_05_decision_record/ADR_*.md")))
+    prds = sorted(list(docs_root.glob("_02_feature_spec/_01_human_prd/*.md")) +
+                  list(docs_root.glob("_01_product_vision/_01_human_prd/*.md")) +
+                  list(docs_root.glob("_01_product_design/_02_product_design/*.md")))
+    prototypes = sorted(list(docs_root.glob("_02_feature_spec/_03_prototype_html/*.html")) +
+                        list(docs_root.glob("_01_product_design/_03_product_figma/*.html")))
+    schemas = sorted(list(docs_root.glob("_04_engineering_contract/_01_db_schema/**/*.sql")) +
+                     list(docs_root.glob("_04_db_schema/**/*.sql")))
+    interfaces = sorted(list(docs_root.glob("_04_engineering_contract/_02_interface_design/**/*.md")) +
+                        list(docs_root.glob("_05_interface_design/**/*.md")))
+
+    if adrs or prds or prototypes or schemas or interfaces:
+        dyn_lines = [
+            "\n---\n",
+            "## 6. 当前项目已归档关键契约与文档索引 (Live Project Key Documents)\n",
+            "本区块由 `generate_doc_reading_guide` 动态扫描并聚合当前工作区中已存在的实际设计资产：\n"
+        ]
+        if adrs:
+            dyn_lines.append("### 6.1 架构决策记录 (ADRs)")
+            for a in adrs:
+                rel = a.relative_to(docs_root).as_posix()
+                dyn_lines.append(f"- [`{a.name}`]({rel})")
+            dyn_lines.append("")
+        if prds:
+            dyn_lines.append("### 6.2 产品需求与规格 (PRDs)")
+            for p in prds:
+                rel = p.relative_to(docs_root).as_posix()
+                dyn_lines.append(f"- [`{p.name}`]({rel})")
+            dyn_lines.append("")
+        if prototypes:
+            dyn_lines.append("### 6.3 交互原型 (Prototypes)")
+            for proto in prototypes:
+                rel = proto.relative_to(docs_root).as_posix()
+                dyn_lines.append(f"- [`{proto.name}`]({rel})")
+            dyn_lines.append("")
+        if schemas:
+            dyn_lines.append("### 6.4 数据模型与迁移 (Schemas)")
+            for s in schemas:
+                rel = s.relative_to(docs_root).as_posix()
+                dyn_lines.append(f"- [`{s.name}`]({rel})")
+            dyn_lines.append("")
+        if interfaces:
+            dyn_lines.append("### 6.5 接口设计契约 (Interfaces)")
+            for i in interfaces:
+                rel = i.relative_to(docs_root).as_posix()
+                dyn_lines.append(f"- [`{i.name}`]({rel})")
+            dyn_lines.append("")
+        base_content = base_content + "\n" + "\n".join(dyn_lines)
+
+    # 写入主文档
+    guide_file = docs_root / "README.md"
+    guide_file.write_text(base_content, encoding="utf-8")
+    if verbose:
+        print(f"[*] Generated project documentation reading guide: {guide_file}")
+
+    # 如果存在 _05_doc_index 目录，也写入索引说明
+    doc_index_dir = docs_root / "_00_project_foundation" / "_05_doc_index"
+    if doc_index_dir.exists():
+        sub_readme = doc_index_dir / "README.md"
+        sub_readme_content = """# 文档倒排索引数据库与查询说明 (Doc Index Database)
+
+本目录存放基于 SQLite (FTS5 + LIKE) 构建的高速文档索引缓存：
+- **索引数据库**：`doc_index.sqlite`
+- **全局文档阅读与导航说明**：请查阅根目录 [hs_dev_docs/README.md](../../README.md)
+- **常用查询命令**：
+  - `python scripts/doc_index_db.py --root . search --q "<关键词>"`
+  - `python scripts/doc_index_db.py --root . feature-search --q "<特性名>"`
+  - `python scripts/doc_index_db.py --root . method-search --q "<业务意图>"`
+  - `python scripts/doc_index_db.py --root . symbol-slice --name "<类名/方法名>"`
+"""
+        sub_readme.write_text(sub_readme_content, encoding="utf-8")
+
+    # 注册到 _00_hs_dev_docs.idx
+    root_idx = docs_root / "_00_hs_dev_docs.idx"
+    if root_idx.exists():
+        r_mgr = IdxManager(str(root_idx))
+        r_mgr.add_entry("doc_reading_guide", "项目文档阅读说明与全局索引导航", "README.md", auto_digest=True)
+        r_mgr.update_digest()
+
+    return guide_file
+
+
 def main():
     parser = argparse.ArgumentParser(description="Initialize hs-dev-docs directory structure")
     parser.add_argument("--root", default=".", help="Target workspace root directory")
     parser.add_argument("--from-existing", action="store_true", help="Reverse engineer and onboard an existing codebase")
+    parser.add_argument("--generate-guide", action="store_true", help="Generate or refresh project documentation reading guide only")
+    parser.add_argument("--project-name", default=None, help="Optional project name")
     args = parser.parse_args()
+
+    if args.generate_guide:
+        guide_p = generate_doc_reading_guide(args.root, project_name=args.project_name)
+        print(f"[SUCCESS] Documentation reading guide created: {guide_p}")
+        return
+
     init_full_workspace(args.root, from_existing=args.from_existing)
 
 
