@@ -1,6 +1,81 @@
-# 统一项目术语词典
+# ==============================================================================
+# 项目术语与命名统一词典 (Project Term & Naming Dictionary)
+# 作用：建立全局统一语言（Ubiquitous Language）与单一事实源（Single Source of Truth），
+#       消除同义词重复定义、语义漂移与事件/动作/时间戳混淆（如 update vs updated vs updated_at）。
+# ==============================================================================
+
+# 1. 语法与词态矩阵规则 (Lifecycle Grammar & Part-of-Speech Matrix)
+grammar_rules:
+  command:
+    part_of_speech: "动词原形 (Imperative Verb)"
+    convention: "snake_case 或 camelCase"
+    example: "update_order / cancel_payment"
+    description: "表示发起一个动作或指令（请求尚未发生，可能被拒绝）"
+  domain_event:
+    part_of_speech: "名词.过去分词 (Past Participle) 或 PascalCase"
+    convention: "<entity>.<action_past_tense> (如 order.updated / user.created)"
+    example: "order.updated / payment.succeeded / OrderUpdated"
+    description: "表示领域内已经发生的事实（只读广播，严禁用动词原形如 order.update，严禁用时间戳如 updated_at）"
+  property_timestamp:
+    part_of_speech: "名词或过去分词 + _at"
+    convention: "<action_past_tense>_at"
+    example: "created_at / updated_at / deleted_at"
+    description: "实体的时间戳属性，严禁用作动作名或事件名"
+  payload_action:
+    part_of_speech: "全大写动名词或动词 (Upper Snake Case)"
+    convention: "CREATE / UPDATE / DELETE"
+    example: "action: 'UPDATE'"
+    description: "变更日志、CDC 或 Webhook Payload 内部的操作类型枚举"
+
+# 2. 内置生命周期标准词汇 (Standard Lifecycle Built-in Terms)
+lifecycle_terms:
+  - concept: "创建 / 登记"
+    command: "create"
+    event: "created"
+    timestamp: "created_at"
+    payload_action: "CREATE"
+    forbidden_alias: ["make", "add_new", "build_entity"]
+
+  - concept: "更新 / 修改"
+    command: "update"
+    event: "updated"
+    timestamp: "updated_at"
+    payload_action: "UPDATE"
+    forbidden_alias: ["modify", "change", "alter", "renew", "on_update"]
+
+  - concept: "删除 / 注销"
+    command: "delete"
+    event: "deleted"
+    timestamp: "deleted_at"
+    payload_action: "DELETE"
+    forbidden_alias: ["remove", "destroy", "drop_entity"]
+
+  - concept: "发布 / 生效"
+    command: "publish"
+    event: "published"
+    timestamp: "published_at"
+    payload_action: "PUBLISH"
+    forbidden_alias: ["release", "send_out"]
+
+# 3. 业务领域实体词典 (Domain Model & Business Terms)
 terms:
-  - term: "示例实体"
-    en_name: "example_entity"
-    abbr: "ex_ent"
+  - term: "交易订单"
+    en_name: "order"
+    abbr: "ord"
     scope: "domain_model"
+    desc: "用户在平台发起的商品交易购买单据"
+    forbidden_alias: ["trade_info", "indent", "bill_order"]
+
+  - term: "库存锁定"
+    en_name: "stock_lock"
+    abbr: "stk_lck"
+    scope: "method"
+    desc: "下单时预占库存的操作"
+    forbidden_alias: ["reserve_stock", "hold_inventory"]
+
+  - term: "支付凭证"
+    en_name: "payment_receipt"
+    abbr: "pay_rcpt"
+    scope: "domain_model"
+    desc: "第三方支付渠道返回的成功凭据"
+    forbidden_alias: ["pay_voucher", "trans_proof"]

@@ -12,13 +12,19 @@ python scripts/rule_fetch.py search-cache --q Idempotency
 
 ---
 
-## 1. 契约优先
+## 1. 契约优先与命名规约
 
 1. 先定输入/输出类型与错误形状，再写实现与 Mock JSON。
 2. Input 与 Output 分离（Output 含服务端字段：`id`、时间戳等）。
 3. 列表必须分页（`page`/`pageSize` 或 cursor + `pagination` 元数据）。
 4. 扩展只加可选字段；禁止改类型/删字段而不走显式迁移/版本策略。
-5. 命名稳定：REST 用复数名词；布尔 `is/has/can`；枚举 `UPPER_SNAKE`。
+5. **词态矩阵与命名稳定**：
+   - REST 路径用复数名词（`/orders`）；
+   - 布尔字段用 `is/has/can`；
+   - 变更枚举与状态用 `UPPER_SNAKE`（如 `CREATED`, `UPDATED`）；
+   - **事件与 Webhook 主题**：统一使用**名词.过去分词**（`<entity>.<action_past_tense>`，如 `order.created`、`order.updated`），绝对禁止用动词原形（如 `order.update`）或时间戳（如 `updated_at`）作为事件名；
+   - **时间戳字段**：统一采用 `created_at`、`updated_at`、`deleted_at`；
+   - **Search-Before-Name 铁律**：新增接口字段、事件名或参数前，必须查阅代码库及 `_00_project/_02_project_word.dict.yaml`，严禁自创同义别名。
 
 产品语义未冻（鉴权归属、计费字段等）→ `work_mode=DESIGN` 问清再写死公开契约。
 

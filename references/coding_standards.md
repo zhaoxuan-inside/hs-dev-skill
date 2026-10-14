@@ -71,6 +71,26 @@
 - ❌ **严禁凭证硬编码**：API Key、数据库密码、Token 绝不上库，必须从环境变量读取并提供 `.env.example` 声明。
 - ❌ **严禁反射与绕过封装**：禁止为了测试或偷懒而通过反射修改私有变量或跳过校验守卫。
 
+### 3.4 命名统一性、词态矩阵与单一事实源 (Ubiquitous Language & Naming Invariants)
+开发与 AI 生成过程中，极易出现**同义不同词、词态混淆与语义漂移（Semantic Drift）**（例如同一个更新概念，在指令中叫 `update`，事件中叫 `order.update`，时间戳叫 `updated_at`，甚至派生出 `modify`、`change`、`alter` 等同义词），导致全局代码检索断裂、监听漏网和维护灾难。
+
+本 Skill 强制执行以下四项命名守卫法则：
+
+1. **三概念严格解耦与词态矩阵 (Grammar Matrix)**：
+   - **Command（动作/指令）**：必须使用**动词原形**（如 `update_order` / `create_user`）。表示请求尚未执行，可能会被拒绝。
+   - **Domain Event（领域事件）**：必须使用**过去分词**（如 `order.updated` / `user.created` 或 PascalCase `OrderUpdated`）。表示系统内已客观发生的事实，只读通知。**严禁使用动词原形（如 `order.update`）作为事件名；严禁把时间戳属性作为事件名**。
+   - **Entity Attribute（实体属性/时间戳）**：时间戳必须统一使用**过去分词 + `_at`**（如 `created_at`、`updated_at`、`deleted_at`），只作为数据列，禁止用作动作或事件标识。
+   - **Payload Action（变更日志类型）**：CDC / Webhook 变更类型统一使用**全大写**（如 `CREATE`、`UPDATE`、`DELETE`）。
+2. **Search-Before-Name 铁律（先搜已有命名，再做新定义）**：
+   - 开发者或 AI Agent 在引入新的事件名、错误码、状态字段或公共常量前，**必须先检索现有代码库与 `hs_dev_docs/_00_project/_02_project_word.dict.yaml`**。
+   - 若已有约定词汇，必须直接复用；严禁随意发明 `modify`、`change`、`alter`、`renew`、`bill_order` 等同义别名。
+3. **零裸字符串与单一事实源 (Zero Magic Strings & Single Source of Truth)**：
+   - 跨模块或跨服务调用的事件主题（Topic）、状态机枚举、通知类型，**严禁在业务逻辑中直接硬编码裸字符串**。
+   - 必须通过集中常量文件收敛导出（如 TS `events.ts`、Python `events.py`、Go `events.go`）。全局搜索时只需定位常量引用符号，杜绝字符串漏搜。
+4. **项目词典与自动化门禁硬拦截**：
+   - 核心领域词汇、标准缩写与禁用同义词列表统一登记在 `_00_project/_02_project_word.dict.yaml`。
+   - 提交前 `verify_consistency.py` 将自动扫描代码库与 SQL 迁移文件，命中 `forbidden_alias` 或事件动词原形时直接阻断门禁。
+
 ---
 
 ## 4. 六元组与方法分类在主流语言中的实现范式 (Polyglot Six-Tuple)

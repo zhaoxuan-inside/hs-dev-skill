@@ -57,6 +57,9 @@ class ConsistencyVerifier:
         # 6. 检查多端工程架构卫生与打包产物输出隔离 (Output & Workspace Hygiene)
         self._check_workspace_hygiene()
 
+        # 7. 检查项目术语统一定义词典与防歧义命名规约 (Project Terminology & Anti-Drift Check)
+        self._check_project_dictionary()
+
         return self._print_results()
 
     def _check_skill_version(self):
@@ -272,6 +275,181 @@ class ConsistencyVerifier:
             self.warnings.append(
                 "[CONFIG WARNING] Local .env exists but missing .env.example template in config/ or root!"
             )
+
+    def _check_project_dictionary(self):
+        """
+        检查项目统一定义词典 (_02_project_word.dict.yaml) 与防歧义命名规约。
+        拦截：
+        1. 词典不存在时警告提示；
+        2. 词典内同义词冲突或缺少关键字段；
+        3. 代码、DB 迁移和设计文档中使用了 forbidden_alias（禁用别名）；
+        4. 事件命名动词原形漂移与时间戳混淆（如使用 order.update 或将 updated_at 命名为事件）。
+        """
+        print("  -> Checking Project Word Dictionary & Terminology Consistency...")
+        dict_file = self.docs_root / "_00_project" / "_02_project_word.dict.yaml"
+        if not dict_file.exists():
+            self.warnings.append(
+                "[TERMINOLOGY WARNING] Missing hs_dev_docs/_00_project/_02_project_word.dict.yaml. "
+                "Ubiquitous language dictionary is strongly recommended."
+            )
+            return
+
+        dict_text = dict_file.read_text(encoding="utf-8")
+        data = None
+        try:
+            import yaml  # type: ignore
+            data = yaml.safe_load(dict_text)
+        except Exception:
+            pass
+
+        # 解析 terms 与 lifecycle_terms
+        terms_list = []
+        lifecycle_terms_list = []
+        if isinstance(data, dict):
+            terms_list = data.get("terms", []) or []
+            lifecycle_terms_list = data.get("lifecycle_terms", []) or []
+        else:
+            # 基础简易解析兜底
+            current_term = {}
+            for line in dict_text.splitlines():
+                line = line.strip()
+                if line.startswith("- term:"):
+                    if current_term and "en_name" in current_term:
+                        terms_list.append(current_term)
+                    current_term = {"term": line.split(":", 1)[1].strip().strip('"').strip("'")}
+                elif line.startswith("en_name:"):
+                    current_term["en_name"] = line.split(":", 1)[1].strip().strip('"').strip("'")
+                elif line.startswith("forbidden_alias:"):
+                    raw = line.split(":", 1)[1].strip().strip("[]")
+                    aliases = [a.strip().strip('"').strip("'") for a in raw.split(",") if a.strip()]
+                    current_term["forbidden_alias"] = aliases
+            if current_term and "en_name" in current_term:
+                terms_list.append(current_term)
+
+        # 收集禁用别名映射: alias -> (en_name, concept)
+        forbidden_map = {}
+        defined_en_names = set()
+
+        for item in terms_list:
+            if not isinstance(item, dict):
+                continue
+            en_name = item.get("en_name")
+            if en_name:
+                if en_name in defined_en_names:
+                    self.errors.append(f"[DICTIONARY ERROR] Duplicate en_name '{en_name}' in _02_project_word.dict.yaml")
+                defined_en_names.add(en_name)
+
+            for alias in item.get("forbidden_alias", []) or []:
+                alias = str(alias).strip()
+                if alias:
+                    forbidden_map[alias.lower()] = (en_name or item.get("term", "unknown"), item.get("term", ""))
+
+        for item in lifecycle_terms_list:
+            if not isinstance(item, dict):
+                continue
+            concept = item.get("concept", "")
+            cmd = item.get("command", "")
+            evt = item.get("event", "")
+            for alias in item.get("forbidden_alias", []) or []:
+                alias = str(alias).strip()
+                if alias:
+                    forbidden_map[alias.lower()] = (f"{cmd}/{evt}", concept)
+
+        # 检查内部冲突：forbidden_alias 与 defined_en_names 重合
+        for alias, (target, _) in forbidden_map.items():
+            if alias in defined_en_names:
+                self.errors.append(
+                    f"[DICTIONARY CONFLICT] Forbidden alias '{alias}' is also registered as valid en_name '{target}'!"
+                )
+
+        # 扫描关键工程目录：DB 迁移、接口设计、方法设计、后端与前端源码
+        if forbidden_map:
+            scan_dirs = [
+                self.docs_root / "_04_db_schema",
+                self.docs_root / "_05_interface_design",
+                self.docs_root / "_06_method_design",
+                self.root / "backend",
+                self.root / "frontend",
+                self.root / "apps",
+                self.root / "packages",
+                self.root / "src",
+            ]
+            if (self.root / "demo_project" / "backend").exists() and self.root != self.docs_root.parent:
+                scan_dirs.append(self.root / "demo_project" / "backend")
+
+            for sdir in scan_dirs:
+                if not sdir.exists():
+                    continue
+                for fpath in sdir.rglob("*"):
+                    if not fpath.is_file() or fpath.suffix not in [
+                        ".sql", ".py", ".ts", ".js", ".go", ".rs", ".java", ".md", ".json", ".yaml"
+                    ]:
+                        continue
+                    if fpath.name.endswith(".idx") or fpath.name.endswith(".sqlite") or "project_word.dict.yaml" in fpath.name:
+                        continue
+                    try:
+                        content = fpath.read_text(encoding="utf-8", errors="ignore")
+                    except Exception:
+                        continue
+
+                    # 扫描禁用词
+                    for alias, (approved, concept) in forbidden_map.items():
+                        pattern = r'(?<![a-zA-Z0-9_])' + re.escape(alias) + r'(?![a-zA-Z0-9_])'
+                        if re.search(pattern, content, re.IGNORECASE):
+                            try:
+                                rel_p = fpath.relative_to(self.root)
+                            except ValueError:
+                                rel_p = fpath.name
+                            self.errors.append(
+                                f"[TERMINOLOGY ERROR] {rel_p} uses forbidden alias '{alias}'. "
+                                f"Please use approved term '{approved}' (Concept: {concept}) defined in _02_project_word.dict.yaml."
+                            )
+
+        # 检查事件动词原形/时间戳混淆 (Event Semantic Drift)
+        drift_pattern = re.compile(r'["\']([a-zA-Z0-9_-]+\.(?:update|create|delete))["\']')
+        timestamp_event_pattern = re.compile(r'["\']([a-zA-Z0-9_-]+\.(?:updated_at|created_at|deleted_at))["\']')
+
+        code_scan_dirs = [
+            self.docs_root / "_05_interface_design",
+            self.root / "backend",
+            self.root / "frontend",
+            self.root / "apps",
+            self.root / "packages",
+            self.root / "src",
+        ]
+        for cdir in code_scan_dirs:
+            if not cdir.exists():
+                continue
+            for fpath in cdir.rglob("*"):
+                if not fpath.is_file() or fpath.suffix not in [".py", ".ts", ".js", ".go", ".rs", ".java", ".md"]:
+                    continue
+                if fpath.name.endswith(".idx"):
+                    continue
+                try:
+                    content = fpath.read_text(encoding="utf-8", errors="ignore")
+                except Exception:
+                    continue
+
+                for match in drift_pattern.finditer(content):
+                    term_found = match.group(1)
+                    try:
+                        rel_p = fpath.relative_to(self.root)
+                    except ValueError:
+                        rel_p = fpath.name
+                    self.errors.append(
+                        f"[EVENT GRAMMAR ERROR] {rel_p} uses imperative verb in event topic '{term_found}'. "
+                        f"Domain events must use past participle (e.g., .updated, .created, .deleted)."
+                    )
+                for match in timestamp_event_pattern.finditer(content):
+                    term_found = match.group(1)
+                    try:
+                        rel_p = fpath.relative_to(self.root)
+                    except ValueError:
+                        rel_p = fpath.name
+                    self.errors.append(
+                        f"[EVENT GRAMMAR ERROR] {rel_p} uses timestamp field name '{term_found}' as event topic. "
+                        f"Timestamps are properties, not events."
+                    )
 
     def _print_results(self) -> bool:
         print("\n" + "=" * 60)

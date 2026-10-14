@@ -151,10 +151,14 @@ def init_full_workspace(workspace_root: str):
     # 4. 生成统一术语词典模板
     dict_file = docs_root / "_00_project/_02_project_word.dict.yaml"
     if not dict_file.exists():
-        dict_file.write_text(
-            "# 统一项目术语词典\nterms:\n  - term: \"示例实体\"\n    en_name: \"example_entity\"\n    abbr: \"ex_ent\"\n    scope: \"domain_model\"\n",
-            encoding="utf-8"
-        )
+        tmpl_file = Path(__file__).resolve().parent.parent / "resources" / "templates" / "project_word.dict.yaml"
+        if tmpl_file.exists():
+            dict_file.write_text(tmpl_file.read_text(encoding="utf-8"), encoding="utf-8")
+        else:
+            dict_file.write_text(
+                "# 统一项目术语词典\nterms:\n  - term: \"示例实体\"\n    en_name: \"example_entity\"\n    abbr: \"ex_ent\"\n    scope: \"domain_model\"\n",
+                encoding="utf-8"
+            )
 
     # 5. 重建跨平台 SQLite 文档索引（FTS5 + LIKE，可重复执行）
     try:

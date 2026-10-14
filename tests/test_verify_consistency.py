@@ -111,6 +111,49 @@ class TestVerifyConsistency(unittest.TestCase):
         self.assertFalse(strict_verifier.check_all())
         self.assertTrue(any("[STRICT GATE ERROR]" in e for e in strict_verifier.errors))
 
+    def test_detect_forbidden_alias(self):
+        # 写入一个包含禁用别名 'bill_order' 的 DB 迁移文件
+        mig_dir = self.root / "hs_dev_docs/_04_db_schema/_01_order/migrations"
+        mig_dir.mkdir(parents=True, exist_ok=True)
+        (mig_dir / "V1.0.0__create_order.sql").write_text("CREATE TABLE bill_order (id BIGINT);", encoding="utf-8")
+        (mig_dir / "U1.0.0__create_order.sql").write_text("DROP TABLE bill_order;", encoding="utf-8")
+
+        self.assertFalse(self.verifier.check_all())
+        self.assertTrue(any("[TERMINOLOGY ERROR]" in e and "bill_order" in e for e in self.verifier.errors))
+
+        # 修复为合法名称 'orders' 后通过
+        (mig_dir / "V1.0.0__create_order.sql").write_text("CREATE TABLE orders (id BIGINT);", encoding="utf-8")
+        (mig_dir / "U1.0.0__create_order.sql").write_text("DROP TABLE orders;", encoding="utf-8")
+        self.assertTrue(self.verifier.check_all())
+
+    def test_detect_event_grammar_drift(self):
+        # 在 backend 源码中使用了动词原形作为事件 topic: 'order.update'
+        backend_dir = self.root / "backend"
+        backend_dir.mkdir(parents=True, exist_ok=True)
+        code_file = backend_dir / "order_events.py"
+        code_file.write_text('ORDER_EVENT = "order.update"\n', encoding="utf-8")
+
+        self.assertFalse(self.verifier.check_all())
+        self.assertTrue(any("[EVENT GRAMMAR ERROR]" in e and "order.update" in e for e in self.verifier.errors))
+
+        # 纠正为过去分词 'order.updated'
+        code_file.write_text('ORDER_EVENT = "order.updated"\n', encoding="utf-8")
+        self.assertTrue(self.verifier.check_all())
+
+    def test_detect_event_grammar_timestamp(self):
+        # 在 backend 源码中将时间戳字段误用为事件 topic: 'order.updated_at'
+        backend_dir = self.root / "backend"
+        backend_dir.mkdir(parents=True, exist_ok=True)
+        code_file = backend_dir / "order_events.py"
+        code_file.write_text('ORDER_EVENT = "order.updated_at"\n', encoding="utf-8")
+
+        self.assertFalse(self.verifier.check_all())
+        self.assertTrue(any("[EVENT GRAMMAR ERROR]" in e and "order.updated_at" in e for e in self.verifier.errors))
+
+        code_file.unlink()
+        self.assertTrue(self.verifier.check_all())
+
 
 if __name__ == "__main__":
     unittest.main()
+
