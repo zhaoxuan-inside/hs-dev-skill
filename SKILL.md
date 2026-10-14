@@ -11,13 +11,13 @@ license: MIT
 compatibility: Requires Python >= 3.8 (stdlib sqlite3; Win/Linux/macOS)
 metadata:
   author: hardstone
-  version: "2.40"
+  version: "2.41.0.0"
 ---
 
 # 产品开发 Skill (hs-dev-skill)
 
-版本：v2.40  
-核心定位：**全场景意图路由（BUILD 从零构建 · REVERSE 存量反向重建 · FIX 系统化调试 · REFACTOR 行为等价重构 · EXPLORE 只读代码理解 · RESUME 任务续做）+ 质量优先（分步正确 + 测试一等公民 · 测试零报错硬阻断交付 · 静态检测零告警零错误 · 数据驱动测试 DDT 与双轨制 E2E 规约 · 多语言编码规范与 Linter 门禁矩阵 · 全局统一术语与防歧义词典 Ubiquitous Language / 词态矩阵 Command/Event/Attribute / Search-Before-Name / 零裸字符串 Zero Magic Strings）+ 三层收口漏斗与抗脆弱机制（L0 物理代码真理 ➔ L1 文档业务契约 ➔ L2 顶层极速索引；符号锚点 Symbol Anchor 动态求值彻底消除静态行号漂移）+ 核心功能两级目录规约（一级功能 _01_ ~ _06_ + 二级子功能原子拆分，严格遵循 _01_xxx 顺序命名规则，彻底消除深层嵌套，实现 Domain+Category 二元高信噪比精准检索与极速切片装配）+ 文档驱动（方法类型七分类 · 属性契约七维画像 · patternCluster 单向指针局部切片防破坏 · 物理行号实现后自动回填 · 精准测试分级矩阵 · 局部依赖拓扑 · 三段式修改原理 · 抗方法爆炸门禁与写前意图检索选型 `doc_index_db method-search`）+ 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构与模式设计（[VIBE_CONTRACT] 顶置切片 · GoF 23 种设计模式选型决策树 · 模式协同集群档案 · VibeCoding 防破坏三铁律）+ MVP 激进裁剪决策（CEO 砍半法则【质疑式裁剪·开发者裁定】 · 团队胃口时间箱 · Day 1 垂直曳光弹切片）+ 垂直领域能力融合（OpenPencil 矢量规约 · Generative UI 动态交互仿真 · Modern Web Guidance 现代合规 · Chrome DevTools 运行态/CWV/a11y 质量门禁 · 专用 SDK 防腐 Adapter）+ 多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）+ 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；版本号双轨控制；默认本地 Commit**  
+版本：v2.41.0.0  
+核心定位：**全场景意图路由（BUILD 从零构建 · REVERSE 存量反向重建 · FIX 系统化调试 · REFACTOR 行为等价重构 · EXPLORE 只读代码理解 · RESUME 任务续做）+ 质量优先（分步正确 + 测试一等公民 · 测试零报错硬阻断交付 · 静态检测零告警零错误 · 数据驱动测试 DDT 与双轨制 E2E 规约 · 多语言编码规范与 Linter 门禁矩阵 · 全局统一术语与防歧义词典 Ubiquitous Language / 词态矩阵 Command/Event/Attribute / Search-Before-Name / 零裸字符串 Zero Magic Strings）+ 三层收口漏斗与抗脆弱机制（L0 物理代码真理 ➔ L1 文档业务契约 ➔ L2 顶层极速索引；符号锚点 Symbol Anchor 动态求值彻底消除静态行号漂移）+ 核心功能两级目录规约（一级功能 _01_ ~ _06_ + 二级子功能原子拆分，严格遵循 _01_xxx 顺序命名规则，彻底消除深层嵌套，实现 Domain+Category 二元高信噪比精准检索与极速切片装配）+ 文档驱动（方法类型七分类 · 属性契约七维画像 · patternCluster 单向指针局部切片防破坏 · 物理行号实现后自动回填 · 精准测试分级矩阵 · 局部依赖拓扑 · 三段式修改原理 · 抗方法爆炸门禁与写前意图检索选型 `doc_index_db method-search`）+ 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构与模式设计（[VIBE_CONTRACT] 顶置切片 · GoF 23 种设计模式选型决策树 · 模式协同集群档案 · VibeCoding 防破坏三铁律）+ MVP 激进裁剪决策（CEO 砍半法则【质疑式裁剪·开发者裁定】 · 团队胃口时间箱 · Day 1 垂直曳光弹切片）+ 垂直领域能力融合（OpenPencil 矢量规约 · Generative UI 动态交互仿真 · Modern Web Guidance 现代合规 · Chrome DevTools 运行态/CWV/a11y 质量门禁 · 专用 SDK 防腐 Adapter）+ 多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）+ 四段式多级版本控制（v[主版本].[需求版本].[修复版本].[打包版本] · 多级子版本号精确包区分）+ 工程附属机制全景治理支撑（环境配置与机密隔离 · 软件供应链与 CVE 阻断 · CI/CD 流水线与制品防伪 SBOM · 可观测性与三态健康探针 · 数据韧性与双向容灾回滚 · 安全防御与 PII 隐私脱敏 · Agent 执行安全沙箱护栏）+ 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；默认本地 Commit**  
 **替代**：原 `hs-project-skill` 已废弃，统一用本 Skill。
 
 **装载门闩（反合理化 × Token）**：动手前必须完成 [`load_latch.md`](references/load_latch.md) L0～L2（分级 + 索引路由 + **恰好 1 份**详规）。禁止「跳过 Skill 先干」；也禁止整目录通读。场景有 ≥1% 可能适用 → **必须跑** `skill_ref_index search`（或读 `_index` 一行），命中再打开。
@@ -57,8 +57,9 @@ metadata:
 15. **三端**：`pathlib` + `python3`/`python`/`py -3`（[`cross_platform.md`](references/cross_platform.md)）。
 16. **Token 与降噪（免全量扫描与精准索引收口铁律）**：门闩 + `doc_index_db` / `skill_ref_index` / `rule_fetch` → 切片 → context_pack；代码与文档探索**绝对禁止整目录通读大文件**，必须使用 `doc_index_db` 专属子命令按需召回：查需求走 `feature-search`、查页面拓扑走 `page-search`、查模式集群走 `pattern-search`、查库表DDL走 `schema-search`、查方法依赖/爆炸半径走 `dep-graph`、查方法防膨胀走 `method-search`、查测试单跑走 `test-search`、查审计历史走 `audit-search`、代码精准切片走 `symbol-slice`；禁止整树/`spec_v2_4`/远程规则包开局通读（[`token_budget.md`](references/token_budget.md) / [`four_level_routing.md`](references/four_level_routing.md)）。
 17. **默认 Commit；明确要求才 push**。
-18. **版本号双轨控制与防漂移**：遵循 SemVer（`vX.Y.Z`）；Skill 自身三处元数据（metadata/正文/README）强一致；项目交付 S/M/L 映射 PATCH/MINOR/MAJOR；API/DB 严格按版本演进（[`version_control.md`](references/version_control.md)）。
+18. **四段式多级版本号与包区分双轨体系**：遵循 `v[主版本].[需求版本].[修复版本].[打包版本]`（`vMAJOR.FEATURE.PATCH.BUILD`）；Skill 自身三处元数据（metadata/正文/README）强一致；项目交付 S/M/L 映射 PATCH/FEATURE/MAJOR，第四段打包版本专用于构建流水线批次自增、生命周期环境包（`-alpha`/`-beta`/`-rc`/`-ga`）及多端分包（`+web`/`+apk`/`+ipa`/`+desktop`/`+srv`）精准包区分；API/DB/Git Tag 严格按多级版本协同演化（[`version_control.md`](references/version_control.md)）。
 19. **多端架构与产出收敛控制**：多端客户端工程（Web/移动端/桌面端）代码必须严格收敛于 `apps/<client>/`（`apps/mobile/`, `apps/desktop/`, `apps/web/`, `apps/server/`），跨端共享契约与数据模型收敛于 `packages/`，配置收敛于 `config/`（强制提供 `.env.example`，敏感变量绝不上库）；单工程或经典 Web 分离工程采用 `backend/` 与 `frontend/`；Web、桌面端（Desktop）、移动端（Mobile）打包产物必须通过脚手架配置重定向至根目录 `output/<client>/` 对应子目录，移动端发布包强制配对混淆符号表（Mapping/dSYM），严禁散落破坏工程整洁度。
+20. **工程附属机制与生产级治理支撑**：系统交付必须通过 7 大工程附属治理门禁（[`auxiliary_governance.md`](references/auxiliary_governance.md)）：① 环境配置（`.env.example` 强契约 + 零密钥硬编码 Pre-commit 拦截）；② 软件供应链（Lockfile 强一致 + 严重/高危 CVE 零容忍阻断 + 商业许可合规）；③ CI/CD 与防伪（五阶流水线 + Feature Flags 特性开关 + SBOM 清册 + SHA256 验签）；④ 可观测性（JSON 结构化日志 + 全链路 TraceID + `/livez` `/readyz` `/healthz` 三态探针 + 移动/桌面端符号表强绑定归档）；⑤ 数据韧性（RPO/RTO 指标 + DB 迁移 V/U 原子配对回滚 + 三方调用超时/避退/熔断降级 Circuit Breaker & Fallback）；⑥ 安全与合规（PII 敏感数据脱敏 + OWASP Top 10 防线 + 核心操作不可变审计流水）；⑦ Agent 执行安全护栏（高危破坏命令拦截 + 工作区越界隔离 + 任务超时熔断）。
 
 ---
 
@@ -86,7 +87,7 @@ metadata:
 86: |---|---|---|
 87: | `skill_ref_index.py` | Skill references 场景检索 | `python scripts/skill_ref_index.py search --q 幂等` |
 88: | `rule_fetch.py` | 本地/远程领域规则目录与缓存 | `python scripts/rule_fetch.py search --q React` |
-89: | `doc_index_db.py` | 7大底层数据真理与全维度索引检索切片 (免整盘扫描) | `python scripts/doc_index_db.py feature-search --q "登录"`<br/>`python scripts/doc_index_db.py page-search --q "结算"`<br/>`python scripts/doc_index_db.py pattern-search --q "Strategy"`<br/>`python scripts/doc_index_db.py schema-search --q "orders"`<br/>`python scripts/doc_index_db.py dep-graph --symbol "OrderService.create"`<br/>`python scripts/doc_index_db.py method-search --q "手机号脱敏"`<br/>`python scripts/doc_index_db.py symbol-slice --name "DocIndexDB"`<br/>`python scripts/doc_index_db.py test-search --q "checkpoint"`<br/>`python scripts/doc_index_db.py audit-search --since "2026-10-14"` |
+89: | `doc_index_db.py` | 7大底层数据真理与全维度索引检索切片 (免整盘扫描) | `python scripts/doc_index_db.py feature-search --q "登录"`<br/>`python scripts/doc_index_db.py page-search --q "结算"`<br/>`python scripts/doc_index_db.py pattern-search --q "Strategy"`<br/>`python scripts/doc_index_db.py schema-search --q "orders"`<br/>`python scripts/doc_index_db.py dep-graph --symbol "OrderService.create"`<br/>`python scripts/doc_index_db.py method-search --q "手机号脱敏"`<br/>`python scripts/doc_index_db.py symbol-slice --name "DocIndexDB"`<br/>`python scripts/doc_index_db.py embed-search --q "代码骨架提取"`<br/>`python scripts/doc_index_db.py test-search --q "checkpoint"`<br/>`python scripts/doc_index_db.py audit-search --since "2026-10-14"` |
 | `global_index_db.py` | 全局偏好/学习标签 | `python scripts/global_index_db.py search --tag 反向代理` |
 | `task_manager.py` | 任务三文件+合法状态机+看板渲染 | `python scripts/task_manager.py create --id x --title "…" --change-size M`<br/>`python scripts/task_manager.py dashboard --phase 3` |
 | `code_skeleton.py` | AST/多语言代码骨架提取 (省 90% Token) | `python scripts/code_skeleton.py --path backend/` |
@@ -117,6 +118,6 @@ metadata:
 - [`learn_and_prefer.md`](references/learn_and_prefer.md) · [`spec_driven_lifecycle.md`](references/spec_driven_lifecycle.md)
 - [`six_tuple_runtime.md`](references/six_tuple_runtime.md) · [`four_level_routing.md`](references/four_level_routing.md)
 - [`task_state_machine.md`](references/task_state_machine.md) · [`mock_contract_guide.md`](references/mock_contract_guide.md)
-- [`version_control.md`](references/version_control.md)（双轨版本号控制 / SemVer / 发布 Tag） · [`cross_platform.md`](references/cross_platform.md)
+- [`version_control.md`](references/version_control.md)（四段式版本控制 / 多级包区分 / 发布 Tag） · [`auxiliary_governance.md`](references/auxiliary_governance.md)（工程附属机制全景治理 / 环境机密 / 供应链 / CI/CD / 探针 / 容灾 / 隐私） · [`cross_platform.md`](references/cross_platform.md)
 - [`spec_v2_4.md`](references/spec_v2_4.md)（争议按节；禁止开局通读）
 - [`resources/rule_sources.yaml`](resources/rule_sources.yaml) · [`resources/templates/`](resources/templates/) · [`examples/order_service/`](examples/order_service/)

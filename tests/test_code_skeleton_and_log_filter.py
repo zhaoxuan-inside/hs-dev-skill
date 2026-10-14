@@ -72,6 +72,62 @@ def standalone_helper(data: dict) -> str:
         self.assertIn("FAIL: test_something", fail_res)
         self.assertIn("AssertionError", fail_res)
 
+    def test_multilang_skeleton_and_deps(self):
+        extractor = CodeSkeletonExtractor()
+
+        # 1. Dart / Flutter
+        dart_code = """
+import 'package:flutter/material.dart';
+
+class OrderScreen extends StatelessWidget {
+  final String orderId;
+  OrderScreen({required this.orderId});
+
+  @override
+  Widget build(BuildContext context) {
+    OrderService.fetchDetail(orderId);
+    return Scaffold(body: Center(child: Text(orderId)));
+  }
+}
+"""
+        dart_file = self.root / "order_screen.dart"
+        dart_file.write_text(dart_code, encoding="utf-8")
+        dart_res = extractor.extract_file(dart_file)
+        self.assertIn("class OrderScreen", dart_res["skeleton"])
+        self.assertIn("Widget build", dart_res["skeleton"])
+
+        dart_symbols = extractor.extract_symbols_metadata(dart_file)
+        symbol_names = [s["name"] for s in dart_symbols]
+        self.assertIn("OrderScreen", symbol_names)
+        self.assertIn("build", symbol_names)
+
+        dart_deps = extractor.extract_dependencies(dart_file)
+        dep_targets = [d["target_symbol"] for d in dart_deps]
+        self.assertIn("package:flutter/material.dart", dep_targets)
+        self.assertIn("OrderService.fetchDetail", dep_targets)
+
+        # 2. Java
+        java_code = """
+package com.demo.order;
+import com.demo.payment.PaymentService;
+
+public class OrderController {
+    public ResponseEntity<String> createOrder(OrderDTO dto) {
+        PaymentService.processPayment(dto);
+        return ok("created");
+    }
+}
+"""
+        java_file = self.root / "OrderController.java"
+        java_file.write_text(java_code, encoding="utf-8")
+        java_res = extractor.extract_file(java_file)
+        self.assertIn("public class OrderController", java_res["skeleton"])
+        java_deps = extractor.extract_dependencies(java_file)
+        java_targets = [d["target_symbol"] for d in java_deps]
+        self.assertIn("com.demo.payment.PaymentService", java_targets)
+        self.assertIn("PaymentService.processPayment", java_targets)
+
 
 if __name__ == "__main__":
     unittest.main()
+

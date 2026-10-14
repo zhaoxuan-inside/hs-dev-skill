@@ -41,7 +41,8 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | Token / SQLite / context_pack | `token_budget.md` |
 | 四级 JSONL 路由 | `four_level_routing.md` |
 | Mock Profile | `mock_contract_guide.md` |
-| **版本号控制与单源防漂移 / SemVer / 发布 Tag** | `version_control.md` |
+| **四段式版本控制 / 多级包区分 / 发布 Tag** | `version_control.md` |
+| **工程附属机制与治理支撑 / 环境机密 / 供应链 / CI/CD / 探针 / 容灾 / 隐私** | `auxiliary_governance.md` |
 | **反向重建：已有项目接入规范与知识库逆向** | `reverse_engineering.md` |
 | **Bug 修复：系统化调试与测试驱动修补** | `systematic_debugging.md` |
 | **代码重构：行为等价保护网与深模块演进** | `code_refactoring.md` |

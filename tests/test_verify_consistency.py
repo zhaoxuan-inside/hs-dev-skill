@@ -153,6 +153,67 @@ class TestVerifyConsistency(unittest.TestCase):
         code_file.unlink()
         self.assertTrue(self.verifier.check_all())
 
+    def test_four_segment_version_and_migrations(self):
+        # 1. 验证四段式 Skill 版本匹配
+        skill_file = self.root / "SKILL.md"
+        readme_file = self.root / "README.md"
+        skill_file.write_text(
+            "---\nmetadata:\n  version: \"2.41.0.0\"\n---\n# hs-dev-skill\n版本：v2.41.0.0\n",
+            encoding="utf-8",
+        )
+        readme_file.write_text(
+            "[![Spec Version](https://img.shields.io/badge/skill-v2.41.0.0-blue.svg)](SKILL.md)\n",
+            encoding="utf-8",
+        )
+        self.assertTrue(self.verifier.check_all())
+
+        # 2. 验证四段式 DB 迁移脚本格式
+        mig_dir = self.root / "hs_dev_docs/_04_db_schema/_01_order/migrations"
+        mig_dir.mkdir(parents=True, exist_ok=True)
+        (mig_dir / "V1.2.3.10__create_build_logs.sql").write_text(
+            "CREATE TABLE build_logs (id BIGINT, build_no INT);", encoding="utf-8"
+        )
+        (mig_dir / "U1.2.3.10__create_build_logs.sql").write_text(
+            "DROP TABLE build_logs;", encoding="utf-8"
+        )
+        self.assertTrue(self.verifier.check_all())
+
+    def test_detect_secret_leak(self):
+        backend_dir = self.root / "backend"
+        backend_dir.mkdir(parents=True, exist_ok=True)
+        secret_file = backend_dir / "api_client.py"
+        # 写入假密钥触发检测
+        secret_file.write_text(
+            'API_KEY = "sk-abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLM"\n',
+            encoding="utf-8",
+        )
+        self.assertFalse(self.verifier.check_all())
+        self.assertTrue(any("[SECRET LEAK ERROR]" in e for e in self.verifier.errors))
+
+        # 修复为从环境变量读取后通过
+        secret_file.write_text(
+            'import os\nAPI_KEY = os.environ.get("OPENAI_API_KEY", "")\n',
+            encoding="utf-8",
+        )
+        self.assertTrue(self.verifier.check_all())
+
+    def test_detect_missing_lockfile(self):
+        frontend_dir = self.root / "frontend"
+        frontend_dir.mkdir(parents=True, exist_ok=True)
+        pkg_json = frontend_dir / "package.json"
+        pkg_json.write_text('{"name": "test-app", "version": "1.0.0"}\n', encoding="utf-8")
+
+        # 无 lockfile 时应产生供应链警告
+        verifier = ConsistencyVerifier(str(self.root), strict=False)
+        self.assertTrue(verifier.check_all())
+        self.assertTrue(any("[SUPPLY CHAIN WARNING]" in w for w in verifier.warnings))
+
+        # 补齐 package-lock.json 后警告消失
+        (frontend_dir / "package-lock.json").write_text('{"lockfileVersion": 3}\n', encoding="utf-8")
+        verifier_clean = ConsistencyVerifier(str(self.root), strict=False)
+        self.assertTrue(verifier_clean.check_all())
+        self.assertFalse(any("[SUPPLY CHAIN WARNING]" in w for w in verifier_clean.warnings))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -51,6 +51,9 @@ index-rebuild:
 index-search:
 	$(PYTHON) scripts/doc_index_db.py --root . search --q "$(Q)" --limit 8
 
+index-embed-search:
+	$(PYTHON) scripts/doc_index_db.py --root . embed-search --q "$(Q)" --limit 8
+
 skill-ref-rebuild:
 	$(PYTHON) scripts/skill_ref_index.py rebuild
 

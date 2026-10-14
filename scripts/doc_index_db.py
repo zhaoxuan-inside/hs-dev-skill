@@ -23,6 +23,15 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 from hs_paths import ensure_utf8_stdout
 from idx_manager import IdxManager, calculate_digest
 from code_skeleton import CodeSkeletonExtractor
+from nlp_embed_engine import (
+    tokenize_cjk_for_fts,
+    build_fts_query,
+    get_embedding_provider,
+    pack_vector,
+    unpack_vector,
+    cosine_similarity,
+    has_cjk,
+)
 
 # 相对仓库根：权威文档树下的可重建缓存（勿手改）
 DB_REL_DIR = Path("hs_dev_docs") / "_00_project_foundation" / "_05_doc_index"
@@ -764,6 +773,17 @@ class DocIndexDB:
             );
             CREATE INDEX IF NOT EXISTS idx_audit_checkpoint ON audit_changes(checkpoint_id);
             CREATE INDEX IF NOT EXISTS idx_audit_time ON audit_changes(timestamp);
+
+            -- 17: 语义向量特征索引表 (Embedding Vectors)
+            CREATE TABLE IF NOT EXISTS embeddings (
+                entity_key TEXT PRIMARY KEY,
+                entity_type TEXT NOT NULL,
+                dim INTEGER NOT NULL,
+                vector_blob BLOB NOT NULL,
+                text_preview TEXT,
+                updated_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_emb_type ON embeddings(entity_type);
             """
         )
         self.fts_available = self._try_init_fts(conn)
@@ -900,6 +920,7 @@ class DocIndexDB:
         conn.execute("DELETE FROM test_cases")
         conn.execute("DELETE FROM method_dependencies")
         conn.execute("DELETE FROM audit_changes")
+        conn.execute("DELETE FROM embeddings")
         if self.fts_available:
             try:
                 conn.execute("DELETE FROM docs_fts")
@@ -1040,14 +1061,30 @@ class DocIndexDB:
                                 (
                                     f["feature_key"],
                                     f["feature_id"],
-                                    f["name"],
-                                    f.get("summary", ""),
+                                    tokenize_cjk_for_fts(f["name"]),
+                                    tokenize_cjk_for_fts(f.get("summary", "")),
                                     f.get("domain", ""),
                                     f.get("module", ""),
                                 ),
                             )
                         except sqlite3.Error:
                             pass
+
+                    # 插入 feature 语义向量
+                    try:
+                        emb_p = get_embedding_provider()
+                        f_text = f"{f['feature_id']} {f['name']} {f.get('summary', '')}".strip()
+                        if f_text:
+                            vec = emb_p.embed_text(f_text)
+                            conn.execute(
+                                """
+                                INSERT OR REPLACE INTO embeddings (entity_key, entity_type, dim, vector_blob, text_preview, updated_at)
+                                VALUES (?, ?, ?, ?, ?, ?)
+                                """,
+                                (f["feature_key"], "feature", len(vec), pack_vector(vec), f_text[:200], _utc_now()),
+                            )
+                    except Exception:
+                        pass
                     count += 1
         return count
 
@@ -1095,9 +1132,9 @@ class DocIndexDB:
                                 (
                                     p["page_key"],
                                     p["page_id"],
-                                    p["name"],
+                                    tokenize_cjk_for_fts(p["name"]),
                                     p.get("route", ""),
-                                    p.get("summary", ""),
+                                    tokenize_cjk_for_fts(p.get("summary", "")),
                                 ),
                             )
                         except sqlite3.Error:
@@ -1155,9 +1192,9 @@ class DocIndexDB:
                                     c["cluster_key"],
                                     c["feature_id"],
                                     c["pattern_name"],
-                                    c["cluster_name"],
+                                    tokenize_cjk_for_fts(c["cluster_name"]),
                                     c.get("participating_symbols", ""),
-                                    c.get("guardrails", ""),
+                                    tokenize_cjk_for_fts(c.get("guardrails", "")),
                                 ),
                             )
                         except sqlite3.Error:
@@ -1224,8 +1261,8 @@ class DocIndexDB:
                                     s["table_name"],
                                     s.get("layer", "db"),
                                     s.get("module", ""),
-                                    s.get("description", ""),
-                                    s.get("fields_summary", ""),
+                                    tokenize_cjk_for_fts(s.get("description", "")),
+                                    tokenize_cjk_for_fts(s.get("fields_summary", "")),
                                 ),
                             )
                         except sqlite3.Error:
@@ -1281,8 +1318,8 @@ class DocIndexDB:
                                     s["table_name"],
                                     s.get("layer", "db"),
                                     s.get("module", ""),
-                                    s.get("description", ""),
-                                    s.get("fields_summary", ""),
+                                    tokenize_cjk_for_fts(s.get("description", "")),
+                                    tokenize_cjk_for_fts(s.get("fields_summary", "")),
                                 ),
                             )
                         except sqlite3.Error:
@@ -1458,7 +1495,7 @@ class DocIndexDB:
                                 (
                                     tc["case_key"],
                                     tc["case_id"],
-                                    tc.get("description", ""),
+                                    tokenize_cjk_for_fts(tc.get("description", "")),
                                     tc.get("target_symbol", ""),
                                     tc.get("test_command", ""),
                                 ),
@@ -1526,7 +1563,7 @@ class DocIndexDB:
                                     INSERT INTO test_cases_fts (case_key, case_id, description, target_symbol, test_command)
                                     VALUES (?, ?, ?, ?, ?)
                                     """,
-                                    (ckey, case_id, first_line, target, test_cmd),
+                                    (ckey, case_id, tokenize_cjk_for_fts(first_line), target, test_cmd),
                                 )
                             except sqlite3.Error:
                                 pass
@@ -1609,7 +1646,7 @@ class DocIndexDB:
                                 (
                                     audit_key,
                                     cp_id,
-                                    summary,
+                                    tokenize_cjk_for_fts(summary),
                                     affected_files,
                                     affected_symbols,
                                 ),
@@ -1633,12 +1670,13 @@ class DocIndexDB:
         for cdir in code_dirs:
             if not cdir.exists():
                 continue
-            for ext in (".py", ".ts", ".js", ".go", ".rs", ".java"):
+            for ext in (".py", ".ts", ".js", ".go", ".rs", ".java", ".kt", ".dart", ".cpp", ".c", ".h"):
                 for fpath in cdir.rglob(f"*{ext}"):
                     rel_p = _posix_rel(fpath, self.root)
                     if any(x in rel_p for x in ("node_modules", ".git", "output", "__pycache__", "dist", "vendor", ".hs_cache")):
                         continue
                     syms = extractor.extract_symbols_metadata(fpath)
+                    emb_provider = get_embedding_provider()
                     for s in syms:
                         s_key = f"sym:{s['name']}@{rel_p}:{s['start_line']}"
                         conn.execute(
@@ -1663,10 +1701,26 @@ class DocIndexDB:
                             try:
                                 conn.execute(
                                     "INSERT INTO symbols_fts (symbol_key, name, signature, file_path, docstring) VALUES (?, ?, ?, ?, ?)",
-                                    (s_key, s["name"], s["signature"], rel_p, s["docstring"]),
+                                    (s_key, s["name"], s["signature"], rel_p, tokenize_cjk_for_fts(s["docstring"])),
                                 )
                             except sqlite3.Error:
                                 pass
+
+                        # 插入关键代码符号的向量 Embedding
+                        try:
+                            s_text = f"{s['kind']} {s['name']} {s.get('signature', '')} {s.get('docstring', '')}".strip()
+                            if s_text and len(s_text) > 4:
+                                vec = emb_provider.embed_text(s_text)
+                                conn.execute(
+                                    """
+                                    INSERT OR REPLACE INTO embeddings (entity_key, entity_type, dim, vector_blob, text_preview, updated_at)
+                                    VALUES (?, ?, ?, ?, ?, ?)
+                                    """,
+                                    (s_key, "symbol", len(vec), pack_vector(vec), s_text[:200], _utc_now()),
+                                )
+                        except Exception:
+                            pass
+
                         count += 1
         return count
 
@@ -1857,14 +1911,30 @@ class DocIndexDB:
                     """,
                     (
                         row["doc_key"],
-                        row.get("title") or "",
-                        row.get("summary") or "",
-                        row.get("body") or "",
+                        tokenize_cjk_for_fts(row.get("title") or ""),
+                        tokenize_cjk_for_fts(row.get("summary") or ""),
+                        tokenize_cjk_for_fts((row.get("body") or "")[:BODY_MAX]),
                         row["path"],
                     ),
                 )
             except sqlite3.Error:
                 self.fts_available = False
+
+        # 计算并保存文档向量 Embedding
+        try:
+            emb_provider = get_embedding_provider()
+            embed_text = f"{row.get('title') or ''} {row.get('summary') or ''}".strip()
+            if embed_text:
+                vec = emb_provider.embed_text(embed_text)
+                conn.execute(
+                    """
+                    INSERT OR REPLACE INTO embeddings (entity_key, entity_type, dim, vector_blob, text_preview, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (row["doc_key"], "doc", len(vec), pack_vector(vec), embed_text[:200], _utc_now()),
+                )
+        except Exception:
+            pass
 
         # 自动提取并注册方法契约画像（若属于方法设计文档）
         body = row.get("body") or ""
@@ -1911,13 +1981,29 @@ class DocIndexDB:
                     (
                         m["method_key"],
                         m.get("name") or "",
-                        m.get("description") or "",
+                        tokenize_cjk_for_fts(m.get("description") or ""),
                         m.get("signature") or "",
                         m.get("module") or "",
                     ),
                 )
             except sqlite3.Error:
                 pass
+
+        # 计算并保存方法向量 Embedding
+        try:
+            emb_provider = get_embedding_provider()
+            m_text = f"{m.get('name') or ''} {m.get('description') or ''} {m.get('signature') or ''}".strip()
+            if m_text:
+                vec = emb_provider.embed_text(m_text)
+                conn.execute(
+                    """
+                    INSERT OR REPLACE INTO embeddings (entity_key, entity_type, dim, vector_blob, text_preview, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (m["method_key"], "method", len(vec), pack_vector(vec), m_text[:200], _utc_now()),
+                )
+        except Exception:
+            pass
 
     def search(
         self,
@@ -1939,7 +2025,7 @@ class DocIndexDB:
 
         ranked: Dict[str, Dict[str, Any]] = {}
 
-        use_fts = self.fts_available and not _has_cjk(q)
+        use_fts = self.fts_available
         if use_fts:
             fts_q = self._fts_query(q)
             try:
@@ -2009,6 +2095,9 @@ class DocIndexDB:
         }
 
     def _fts_query(self, q: str) -> str:
+        res = build_fts_query(q)
+        if res:
+            return res
         tokens = re.findall(r"[A-Za-z0-9_\.\-]+", q)
         if not tokens:
             return '"' + q.replace('"', " ") + '"'
@@ -2028,9 +2117,123 @@ class DocIndexDB:
             "source": source,
         }
 
+    def semantic_search(
+        self,
+        query: str,
+        *,
+        entity_type: str = "",
+        limit: int = DEFAULT_LIMIT,
+    ) -> Dict[str, Any]:
+        """基于向量特征与余弦相似度的纯语义向量检索"""
+        conn = self.connect()
+        q = (query or "").strip()
+        if not q:
+            return {"ok": False, "error": "empty query", "count": 0, "results": []}
+
+        provider = get_embedding_provider()
+        q_vec = provider.embed_text(q)
+
+        sql = "SELECT entity_key, entity_type, dim, vector_blob, text_preview FROM embeddings"
+        params: List[Any] = []
+        if entity_type:
+            sql += " WHERE entity_type = ?"
+            params.append(entity_type)
+
+        scored = []
+        for row in conn.execute(sql, params):
+            vec = unpack_vector(row["vector_blob"])
+            sim = cosine_similarity(q_vec, vec)
+            scored.append({
+                "entity_key": row["entity_key"],
+                "entity_type": row["entity_type"],
+                "similarity": round(sim, 4),
+                "text_preview": row["text_preview"],
+            })
+
+        scored.sort(key=lambda x: x["similarity"], reverse=True)
+        top_results = scored[:limit]
+
+        # 关联实体详情
+        results = []
+        for item in top_results:
+            ekey = item["entity_key"]
+            etype = item["entity_type"]
+            detail: Dict[str, Any] = {}
+            if etype == "doc":
+                d_row = conn.execute("SELECT path, title, summary, domain FROM docs WHERE doc_key = ?", (ekey,)).fetchone()
+                if d_row:
+                    detail = dict(d_row)
+            elif etype == "method":
+                m_row = conn.execute("SELECT name, signature, description, file_path, doc_path FROM methods WHERE method_key = ?", (ekey,)).fetchone()
+                if m_row:
+                    detail = dict(m_row)
+            elif etype == "feature":
+                f_row = conn.execute("SELECT feature_id, name, summary, prd_path FROM features WHERE feature_key = ?", (ekey,)).fetchone()
+                if f_row:
+                    detail = dict(f_row)
+            elif etype == "symbol":
+                s_row = conn.execute("SELECT name, kind, file_path, signature FROM code_symbols WHERE symbol_key = ?", (ekey,)).fetchone()
+                if s_row:
+                    detail = dict(s_row)
+            item["detail"] = detail
+            results.append(item)
+
+        return {
+            "ok": True,
+            "query": q,
+            "provider": provider.name,
+            "dim": provider.dim,
+            "count": len(results),
+            "results": results,
+            "hint": "Semantic vector search with cosine similarity.",
+        }
+
+    def _jit_verify_or_refresh(self, conn: sqlite3.Connection, target_file: Path) -> None:
+        """JIT 校验单文件 digest，若发生外部协同漂移则即刻原地单文件增量修复刷新"""
+        if not target_file.is_file():
+            return
+        curr_digest = calculate_digest(str(target_file))
+        rel = _posix_rel(target_file, self.root)
+        row = conn.execute(
+            "SELECT doc_key, digest, path FROM docs WHERE path = ? OR path LIKE ? LIMIT 1",
+            (rel, f"%{target_file.name}"),
+        ).fetchone()
+
+        if not row or row["digest"] != (curr_digest or ""):
+            # 原地增量刷新该文档
+            text = _read_text(target_file)
+            doc_key = row["doc_key"] if row else f"file:{rel}"
+            doc_path = row["path"] if row else rel
+            self._upsert(
+                conn,
+                {
+                    "doc_key": doc_key,
+                    "domain": self._guess_domain(rel),
+                    "model": "",
+                    "title": target_file.name,
+                    "path": doc_path,
+                    "digest": curr_digest or "",
+                    "status": "active",
+                    "summary": _extract_summary(text, target_file.name),
+                    "body": text[:BODY_MAX],
+                    "kind": target_file.suffix.lstrip(".") or "file",
+                    "updated_at": _utc_now(),
+                },
+            )
+            conn.commit()
+
     def get(self, path: str) -> Dict[str, Any]:
         conn = self.connect()
         rel = Path(path).as_posix()
+        candidates = [
+            self.root / rel,
+            self.docs_root / path,
+            self.root / "hs_dev_docs" / path,
+        ]
+        phy_target = next((p for p in candidates if p.is_file()), None)
+        if phy_target:
+            self._jit_verify_or_refresh(conn, phy_target)
+
         row = conn.execute(
             "SELECT * FROM docs WHERE path = ? OR doc_key = ? LIMIT 1",
             (rel, path),
@@ -2077,6 +2280,9 @@ class DocIndexDB:
         target = next((p for p in candidates if p.is_file()), None)
         if target is None:
             return {"ok": False, "error": f"file not found: {path}", "lines": []}
+
+        conn = self.connect()
+        self._jit_verify_or_refresh(conn, target)
 
         all_lines = _read_text(target).splitlines()
         start = max(1, int(start))
@@ -2172,7 +2378,7 @@ class DocIndexDB:
             }
 
         ranked: Dict[str, Dict[str, Any]] = {}
-        use_fts = self.fts_available and not _has_cjk(q)
+        use_fts = self.fts_available
         if use_fts:
             fts_q = self._fts_query(q)
             try:
@@ -2255,7 +2461,7 @@ class DocIndexDB:
             return {"ok": True, "query": q, "count": 0, "symbols": []}
 
         rows = []
-        if self.fts_available and not _has_cjk(q):
+        if self.fts_available:
             try:
                 cur = conn.execute(
                     """
@@ -2265,7 +2471,7 @@ class DocIndexDB:
                     WHERE symbols_fts MATCH ?
                     LIMIT ?
                     """,
-                    (f'"{q}"*', limit),
+                    (self._fts_query(q), limit),
                 )
                 rows = [dict(r) for r in cur.fetchall()]
             except sqlite3.Error:
@@ -2345,7 +2551,7 @@ class DocIndexDB:
             }
 
         ranked: Dict[str, Dict[str, Any]] = {}
-        use_fts = self.fts_available and not _has_cjk(q)
+        use_fts = self.fts_available
         if use_fts:
             fts_q = self._fts_query(q)
             try:
@@ -2413,7 +2619,7 @@ class DocIndexDB:
             }
 
         ranked: Dict[str, Dict[str, Any]] = {}
-        use_fts = self.fts_available and not _has_cjk(q)
+        use_fts = self.fts_available
         if use_fts:
             fts_q = self._fts_query(q)
             try:
@@ -2482,7 +2688,7 @@ class DocIndexDB:
             }
 
         ranked: Dict[str, Dict[str, Any]] = {}
-        use_fts = self.fts_available and not _has_cjk(q)
+        use_fts = self.fts_available
         if use_fts:
             fts_q = self._fts_query(q)
             try:
@@ -2557,7 +2763,7 @@ class DocIndexDB:
             }
 
         ranked: Dict[str, Dict[str, Any]] = {}
-        use_fts = self.fts_available and not _has_cjk(q)
+        use_fts = self.fts_available
         if use_fts:
             fts_q = self._fts_query(q)
             try:
@@ -2740,7 +2946,7 @@ class DocIndexDB:
             }
 
         ranked: Dict[str, Dict[str, Any]] = {}
-        use_fts = self.fts_available and q and not _has_cjk(q)
+        use_fts = self.fts_available and bool(q)
         if use_fts:
             fts_q = self._fts_query(q)
             try:
@@ -2811,7 +3017,7 @@ class DocIndexDB:
         task_id = (task_id or "").strip()
 
         ranked: Dict[str, Dict[str, Any]] = {}
-        use_fts = self.fts_available and q and not _has_cjk(q)
+        use_fts = self.fts_available and bool(q)
         if use_fts:
             fts_q = self._fts_query(q)
             try:
@@ -2960,6 +3166,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     p_sym_slice = sub.add_parser("symbol-slice", help="Slice code directly by symbol name")
     p_sym_slice.add_argument("--name", required=True, help="Symbol name (e.g. 'TaskManager' or 'render_dashboard')")
 
+    p_embed = sub.add_parser("embed-search", help="Semantic vector search using embeddings (Cosine similarity)")
+    p_embed.add_argument("--q", required=True, help="Natural language query or intent")
+    p_embed.add_argument("--type", default="", choices=["", "doc", "method", "feature", "symbol"], help="Filter entity type")
+    p_embed.add_argument("--limit", type=int, default=DEFAULT_LIMIT)
+
     p_get = sub.add_parser("get", help="Get one doc by path or doc_key")
     p_get.add_argument("--path", required=True)
 
@@ -3093,6 +3304,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             if not db.db_path.exists():
                 db.rebuild()
             _print_json(db.symbol_slice(args.name))
+            return 0
+        if args.command == "embed-search":
+            if not db.db_path.exists():
+                db.rebuild()
+            _print_json(db.semantic_search(args.q, entity_type=args.type, limit=args.limit))
             return 0
         if args.command == "get":
             if not db.db_path.exists():

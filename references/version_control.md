@@ -1,106 +1,118 @@
-# 版本号控制与演进规则指南 (Version Control Rules)
+# 版本号控制与多级包区分演进指南 (Version Control & Multi-Level Packaging)
 
 **何时读**：
 - 规划软件发布、版本升级、制定对外 API 策略、新增数据库迁移脚本（阶段 3 详设 / 阶段 6 交付归档）；
+- 进行多端分包构建、区分环境构建包、管理 CI/CD 流水线产物（Web/Mobile/Desktop/Server 独立包标识）；
 - 维护或升级 Skill 本身时（修改 `SKILL.md`、`README.md` 元数据或扩展规范）。
-- 检索命令：`python scripts/skill_ref_index.py search --scenario 版本`
+- 检索命令：`python scripts/skill_ref_index.py search --scenario 版本` 或 `search --q "版本号 四段式 打包版本"`
 
 ---
 
-## 1. 核心定位与双轨控制原则
+## 1. 核心定位与四段式版本定义体系
 
-本指南确立**双轨版本控制体系**，以 **SemVer 2.0.0（语义化版本，Semantic Versioning）** 为统一基石：
-1. **轨 A：Skill 自身版本控制（Skill Package Lifecycle）**：保障 `hs-dev-skill` 作为研发基础设施的单源一致、向下兼容与规范演进。
-2. **轨 B：工程项目研发与交付版本控制（Project Deliverable Lifecycle）**：规范由本 Skill 驱动的业务系统在阶段 0～6 全生命周期中的软件版本发布、变更分级映射、API 演化、DB 迁移及 Git Tag 门禁。
+本规范确立统一的四段式多级版本号体系：
 
----
+$$\mathbf{v[\text{主版本}].[\text{需求版本}].[\text{修复版本}].[\text{打包版本}]} \quad (\mathbf{v\text{MAJOR}.\text{FEATURE}.\text{PATCH}.\text{BUILD}})$$
 
-## 2. 轨 A：Skill 自身版本控制规则 (Skill Package)
+通过**多级子版本号**，精准承载架构演化、业务需求、缺陷修复与多端/多环境工程打包区分：
 
-### 2.1 版本号格式与定义
-格式采用语义化版本：`v{MAJOR}.{MINOR}` 或 `v{MAJOR}.{MINOR}.{PATCH}`（当前为 `v2.22`）。
-- **MAJOR (主版本)**：发生破坏性方法论变更（例如状态机合法跃迁硬逻辑不兼容重构、核心目录或索引体系破坏性重写、移除或废弃核心 CLI/产物）；
-- **MINOR (次版本)**：新增规约文档、新增阶段支持、新增 CLI 脚本/子命令、扩展门禁检查项（且兼容现有项目）；
-- **PATCH (修订版本)**：文档错别字修正、Bug 修复、补充单测、微调示例与模板。
-
-### 2.2 三处元数据单源一致性铁律 (Single Source of Truth)
-Skill 自身发布或迭代时，必须保证以下三处版本号**绝对一致**，严禁出现版本漂移：
-1. `SKILL.md` frontmatter 的 `metadata.version`（例如 `"2.22"`）；
-2. `SKILL.md` 正文首部的 `版本：v2.22`；
-3. `README.md` 的 Shields badge（例如 `[![Spec Version](https://img.shields.io/badge/skill-v2.22-blue.svg)](SKILL.md)`）。
-
-`verify_consistency.py` 会将上述三处一致性作为门禁进行检查，发现不一致直接报错阻断。
+| 层级 | 名称 | 字段位 | 递增与触发场景 | 演进示例 | 归零规则 |
+|---|---|---|---|---|---|
+| **L1** | **主版本 (Major)** | 第一位 | 架构性重构、破坏性变更 (Breaking Changes)、系统边界重新划分、协议不可逆升级 | `v1.2.3.10` → `v2.0.0.0` | 需求/修复/打包版本全部归 0 |
+| **L2** | **需求版本 (Feature)** | 第二位 | 阶段 0~6 新业务功能上线、新增向下兼容模块/API/DB表、对应需求 PRD 冻结与实施 (M/L) | `v1.2.3.10` → `v1.3.0.0` | 修复/打包版本全部归 0 |
+| **L3** | **修复版本 (Patch)** | 第三位 | 缺陷 Bugfix (S 分级)、内部非功能重构、安全补丁、测试扩充与局部性能优化 | `v1.2.3.10` → `v1.2.4.0` | 打包版本归 0 |
+| **L4** | **打包版本 (Build)** | 第四位 | CI/CD 构建批次、流水线自增序列、多端与多平台分包、多环境部署包区分 | `v1.2.3.10` → `v1.2.3.11` | 独立单调递增或附加子包后缀 |
 
 ---
 
-## 3. 轨 B：工程研发与交付版本控制规则 (Project & Deliverable)
+## 2. 多级子版本号与包区分机制 (Multi-Level Package Differentiation)
 
-### 3.1 变更分级 (Right-Sizing) 与交付版本映射
-需求与任务分级（[`right_sizing.md`](right_sizing.md)）直接决定发布版本号的跃迁梯度：
+在现代全栈与多端软件研发中，同一套业务源码往往需要在同一发布周期输出不同目标平台（Web, Android, iOS, Desktop, Server）及不同生命周期阶段（Alpha, Beta, RC, GA）的软件包。**第四段【打包版本】专用于多级包区分**：
+
+### 2.1 流水线构建序列号区分 (Pipeline Build Sequence)
+- 格式：`v{MAJOR}.{FEATURE}.{PATCH}.{BUILD_NUMBER}`
+- 规则：每次由 CI/CD 流水线触发编译打包时，`BUILD_NUMBER` 严格单调递增（例如 `v1.2.0.1024`）。
+- 作用：构建产物、SBOM 资产清册及 `SHA256SUMS` 唯一锚定特定构建事件，彻底消灭“同名包覆盖”造成的生产灾难。
+
+### 2.2 运行生命周期与环境包区分 (Lifecycle & Environment Tier)
+通过第四位附加环境阶段标识，区分研发流转阶段：
+- **开发内测包**：`v1.2.0.1-alpha` 或 `v1.2.0.1.dev`（用于开发者本地或极早期功能验证）；
+- **联调集成包**：`v1.2.0.1-beta`（用于前后端联调、测试团队集成测试）；
+- **准发布候选包**：`v1.2.0.1-rc.1`（Release Candidate，用于阶段 6 交付验收与预发冒烟）；
+- **正式生产包**：`v1.2.0.1`（或 `v1.2.0.1-ga`，通过全量质量门禁后的线上签发包）。
+
+### 2.3 多端/多平台分包区分 (Multi-Client Target Sub-Packaging)
+依据 Skill 规约，跨端客户端源码收敛于 `apps/<client>/`，打包产出物收敛于 `output/<client>/`。当同一批次触发多端构建时，通过多级子版本号后缀区分各端独立交付包：
+
+```text
+源码版本基线: v1.2.0.1
+   ├─ Web 交付包:      output/web/app-v1.2.0.1+web.tar.gz
+   ├─ Android 客户端:   output/mobile/app-v1.2.0.1+apk.apk (配套 mapping-v1.2.0.1+apk.txt)
+   ├─ iOS 客户端:       output/mobile/app-v1.2.0.1+ipa.ipa (配套 dSYM-v1.2.0.1+ipa.zip)
+   ├─ Desktop 桌面端:   output/desktop/app-v1.2.0.1+desktop.dmg / .exe
+   └─ Server 容器镜像:  registry.example.com/app:v1.2.0.1-srv
+```
+
+*注：遵循 SemVer 2.0.0 构建元数据规约，`+` 或 `-` 后续子串属于包区分元数据，包版本比较时以基础四段式为准。*
+
+---
+
+## 3. 双轨控制体系
+
+### 3.1 轨 A：Skill 自身版本控制规则 (Skill Package)
+保障 `hs-dev-skill` 作为研发基础设施的单源一致性与兼容性：
+- 采用四段式多级版本号：`v{MAJOR}.{FEATURE}.{PATCH}.{BUILD}`（当前为 `v2.41.0.0`）。
+  - **MAJOR (主版本)**：发生方法论与架构破裂（如状态机破坏性重构、核心目录结构废弃、硬门禁逻辑变更）；
+  - **FEATURE (需求版本)**：新增大规约文档、新增全套生命周期机制（如本期的工程附属机制矩阵）；
+  - **PATCH (修复版本)**：规约细化、Bugfix、单测补充、文档格式修正；
+  - **BUILD (打包版本)**：Skill 发行构建序列、发布打包流水线批次。
+
+#### 三处元数据单源一致性铁律 (Single Source of Truth)
+Skill 自身发布时，以下三处版本号必须**绝对一致**，由 `verify_consistency.py` 自动化检查阻断：
+1. `SKILL.md` frontmatter 的 `metadata.version`（例如 `"2.41.0.0"`）；
+2. `SKILL.md` 正文首部的 `版本：v2.41.0.0`；
+3. `README.md` 的 Shields badge（例如 `[![Spec Version](https://img.shields.io/badge/skill-v2.41.0.0-blue.svg)](SKILL.md)`）。
+
+---
+
+### 3.2 轨 B：工程研发与交付版本控制规则 (Project & Deliverable)
+
+#### 变更分级 (Right-Sizing) 与四段式版本映射
+需求与任务分级（[`right_sizing.md`](right_sizing.md)）直接驱动版本跃迁：
 
 | 变更分级 | 对应版本跃迁 | 典型场景 | 门禁与发布策略 |
 |---|---|---|---|
-| **S (Small)** | **PATCH** (`X.Y.Z → X.Y.Z+1`) | 纯内部 Bugfix、安全热补丁、局部非逻辑重构、无对外影响的文档/样式调整 | 跑通单测与局部回归；不触发 API/DB 主版本变更 |
-| **M (Medium)** | **MINOR** (`X.Y.Z → X.Y+1.0`) | 新增向下兼容的业务功能、新增接口/字段、新增数据库表或字段 | 阶段 0 PRD 冻结；DB 前向+回滚脚本；契约测试通过 |
-| **L (Large)** | **MAJOR** (`X.Y.Z → X+1.0.0`) 或重首发 | 存在破坏性变更（Breaking Changes）、跨微服务边界重构、核心数据模型重做 | 阶段 0～6 满配；架构选型与 ADR；全层级测试 100% 绿 |
-
-预发布流水线状态流转：`alpha`（内部开发自测）→ `beta`（联调与集成测试）→ `rc`（Release Candidate 阶段 6 准发布）→ `GA`（正式发布）。
-
-### 3.2 API 接口版本控制 (API Versioning)
-1. **单一现行版本优先**：优先采用「单一主版本 + 向后兼容只增可选字段」策略，避免维护多套运行中代码。
-2. **破坏性变更显式版本化**：
-   - 当必须变更已有字段类型、删除字段或改变鉴权方式时，禁止在原有路由上原地破坏。
-   - 采用显式路由版本（如 `/api/v1/orders` → `/api/v2/orders`）或 Header 驱动版本（如 `Accept: application/vnd.company.v2+json`）。
-3. **废弃声明周期 (Sunset & Deprecation)**：
-   - 旧版本在下线前，必须至少经历一个 MINOR 版本的过渡期。
-   - 响应中返回 `Deprecation: true` 与 `Sunset: <Date>` 标准头；接口文档明确标注文档标记 `[DEPRECATED]`。
-4. **Mock 契约与版本同步**：
-   - 契约文件 `_13_mock_contract/` 中记录版本标签，严格防止客户端与服务端假想对齐。
-
-### 3.3 数据库迁移版本控制 (Database Migration Versioning)
-1. **Flyway 风格单调递增**：
-   - 脚本必须严格遵循：`V{MAJOR}.{MINOR}.{PATCH}__{description}.sql`；
-   - 回滚脚本必须强制配对：`U{MAJOR}.{MINOR}.{PATCH}__{description}.sql`；
-   - 版本号必须在所属模块下单调严格递增，严禁在已执行的旧版本之间强插历史版本。
-2. **基线脚本不可篡改**：已合并/已发布的迁移脚本严禁二次修改；如有修正必须新建前向迁移版本。
-3. **数据行级乐观锁版本号**：
-   - 核心业务表强制包含 `version INT NOT NULL DEFAULT 1` 字段；
-   - 严禁使用 `desc` 作为列名（避免保留字冲突，用 `description`）。
-
-### 3.4 阶段 6 交付发布与 Git Tag 门禁
-1. **版本发布门禁**：
-   - 全量测试 `make test` 100% 通过；
-   - 规范检查 `python scripts/verify_consistency.py --root .` 100% 通过；
-   - 死代码扫描 `python scripts/dead_code_scanner.py --root .` 零孤儿方法。
-2. **Git Tag 规范**：
-   - Tag 命名遵循 `v{MAJOR}.{MINOR}.{PATCH}`（如 `v1.2.0`）；
-   - 提交信息遵循 Conventional Commits（`feat:`, `fix:`, `refactor:`, `BREAKING CHANGE:`）；
-   - 在任务详情与交付说明中记录版本发布日志（Release Notes / CHANGELOG）。
+| **S (Small)** | **PATCH** (`X.Y.Z.B → X.Y.Z+1.0`) | 内部 Bugfix、安全补丁、无对外影响的非逻辑微调 | 跑通单测与局部回归；不触发 API/DB 主版本与需求版本变更 |
+| **M (Medium)** | **FEATURE** (`X.Y.Z.B → X.Y+1.0.0`) | 新增向下兼容的业务功能、新增接口/字段、新增数据库表或字段 | 阶段 0 PRD 冻结；DB 前向+回滚双向脚本；契约测试全通过 |
+| **L (Large)** | **MAJOR** (`X.Y.Z.B → X+1.0.0.0`) | 破坏性重构、跨领域边界大版本升级、核心数据模型颠覆 | 阶段 0～6 满配；架构 ADR；全量测试 100% 绿；依赖与安全硬阻断 |
+| **BUILD** | **BUILD** (`X.Y.Z.B → X.Y.Z.B+1`) | 仅触发打包、多端重新编译、容器重新打镜像 | 静态检测与冒烟验证，输出多端包及 SBOM |
 
 ---
 
-### 3.5 运行环境依赖与基线声明 (Runtime Environment & Toolchain Declaration)
-业界主流研发框架与优秀 Skill 的实践表明：**代码离开运行环境声明是无法自愈执行的**。系统必须在最底层数据物理骨架中固化运行环境基线：
-1. **声明式环境清单 (Declarative Environment Manifests)**：
-   - **Python**：通过 `pyproject.toml` 或 `requirements.txt` 固化核心依赖版本；通过 `.python-version` 锁定 Python 大版本（例如 `>=3.10`）。
-   - **Node / Frontend**：在 `package.json` 中声明 `engines: { "node": ">=18.0.0", "npm": ">=9.0.0" }`，并签入 `package-lock.json` 或 `pnpm-lock.yaml` 消除间接依赖漂移。
-   - **Go / Rust / Java**：通过 `go.mod`、`Cargo.toml` 或 `pom.xml` 声明依赖版本与最低编译工具链要求。
-2. **运行时环境变量真理与安全隔离**：
-   - 根目录必须提供 `.env.example`，作为所有运行期环境变量配置项的权威字典清单；
-   - 严禁将真实敏感密钥（API Key、生产数据库密码）提交进 Git 版本库；
-   - 架构设计文档中必须配套 `hs_dev_docs/_03_arch_design/runtime_env.md`，记录网络拓扑、监听端口与三方中间件（Redis/MQ/S3）基线。
-3. **三端跨平台兼容铁律**：
-   - 所有运行时脚本与路径处理必须坚持 POSIX 风格正斜杠 `/` 与 UTF-8 编码；
-   - 严禁在脚本中硬编码操作系统专属路径（如 `C:\\...` 或 `/usr/local/...`）或强依赖平台专属 shell 外部程序。
+## 4. API、数据库与 Git Tag 的多级版本协同规约
 
----
+### 4.1 API 接口版本控制 (API Versioning)
+1. **URL 路由聚焦主版本**：路由路径只保留主版本（如 `/api/v1/orders`），避免因为需求小特性频繁破坏客户端路由。
+2. **HTTP Header 携带完整四段式**：
+   - 客户端请求可携带：`X-Client-Version: v1.2.0.1+apk`；
+   - 服务端响应返回：`X-App-Version: v1.2.0.1`，实现精细化客户端版本识别与灰度分流。
+3. **破坏性变更与废弃声明 (Sunset)**：
+   - 当旧接口需下线时，必须在需求版本变更时标记 `[DEPRECATED]`，并在响应头返回 `Deprecation: true` 与 `Sunset: <Date>`。
 
-### 3.6 变更账本与版本审计双索引 (Process Audit & Change Log Dual-Indexing)
-面向 Agent 辅助研发与连续性续做，版本审计采用**双轨记录与双索引检索**体系：
-1. **双轨版本账本**：
-   - **宏观业务发布轨**：`CHANGELOG.md` 遵循 Keep a Changelog 规范（Added, Changed, Deprecated, Removed, Fixed, Security），供团队人类开发者查阅；
-   - **微观过程审计轨**：`_02_change_log/{task_id}_changes.jsonl` 记录每一步改动的物理快照、修改前状态与精准文件列表，供非 Git 毫秒级回滚与断点续做。
-2. **时间与简述双索引物理加速**：
-   - **时间索引 (Time B-Tree Index)**：在 `audit_changes(timestamp)` 建立物理索引，支持按毫秒/秒级时间窗口 (`--since`, `--until`) 极速切片审计时间线，无需全盘扫描巨型 JSONL。
-   - **简述与影响面索引 (Summary & Impact FTS5 Index)**：在 `audit_changes_fts(checkpoint_id, summary, affected_files, affected_symbols)` 建立全文索引，支持通过文件路径、方法名或意图关键字秒级定位历史断点。
+### 4.2 数据库迁移版本控制 (Database Migration Versioning)
+1. **四段式或三段式单调递增脚本**：
+   - 升级脚本：`V{MAJOR}_{FEATURE}_{PATCH}_{BUILD}__{description}.sql`（或精简为 `V{MAJOR}.{FEATURE}.{PATCH}__{desc}.sql`）；
+   - 回滚脚本强制配对：`U{MAJOR}_{FEATURE}_{PATCH}_{BUILD}__{description}.sql`；
+   - 严禁在已发布的历史脚本之间强插新版本。
+2. **数据表行级乐观锁版本号**：
+   - 核心业务表强制包含 `version INT NOT NULL DEFAULT 1` 字段，杜绝并发覆写。
 
+### 4.3 Git Tag 规范与交付门禁
+1. **Git Tag 命名**：
+   - 全局发布 Tag：`v{MAJOR}.{FEATURE}.{PATCH}.{BUILD}`（例如 `v1.2.0.1`）；
+   - 客户端专属 Tag：`v1.2.0.1-web`、`v1.2.0.1-apk`。
+2. **阶段 6 交付门禁硬阻断**：
+   - 全量测试 `make test` 100% 通过（0 报错）；
+   - 规范检查 `python scripts/verify_consistency.py --root . --strict` 100% 通过；
+   - 环境变量与机密扫描 0 泄露，Lockfile 100% 对齐；
+   - Conventional Commits 规范校验通过，Release Notes 归档。

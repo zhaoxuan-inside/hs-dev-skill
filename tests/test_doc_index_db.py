@@ -507,8 +507,43 @@ class TestDocIndexDB(unittest.TestCase):
         finally:
             db.close()
 
+    def test_chinese_nlp_and_embedding_search(self):
+        db = DocIndexDB(self.root)
+        try:
+            db.rebuild()
+            # 1. 中文 FTS 词流匹配（支付流程与账户冻结）
+            res = db.search("冻结流程", limit=5)
+            self.assertTrue(res["ok"])
+            self.assertGreaterEqual(res["count"], 1)
+            self.assertTrue(res["fts_used"])
+
+            # 2. 向量 Embedding 语义检索
+            sem_res = db.semantic_search("支付流程与账户冻结", limit=3)
+            self.assertTrue(sem_res["ok"])
+            self.assertGreaterEqual(sem_res["count"], 1)
+            top_hit = sem_res["results"][0]
+            self.assertGreater(top_hit["similarity"], 0.2)
+        finally:
+            db.close()
+
+    def test_jit_drift_self_healing(self):
+        db = DocIndexDB(self.root)
+        try:
+            db.rebuild()
+            target_file = self.root / "hs_dev_docs" / "_01_product_design" / "_02_product_design" / "demo_prd.md"
+            # 外部直接修改该文件（模拟协同开发未跑 rebuild 的场景）
+            target_file.write_text("# Demo PRD Updated\n\n外部直改：增加退款风控拦截规则。\n", encoding="utf-8")
+
+            # 调用 get 时应该自动触发 JIT 自愈
+            got = db.get("hs_dev_docs/_01_product_design/_02_product_design/demo_prd.md")
+            self.assertTrue(got["ok"])
+            self.assertIn("退款风控拦截规则", got["result"]["summary"])
+        finally:
+            db.close()
+
 
 if __name__ == "__main__":
     unittest.main()
+
 
 

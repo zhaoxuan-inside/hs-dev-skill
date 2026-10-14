@@ -27,11 +27,11 @@ class ConsistencyVerifier:
         self.errors.clear()
         self.warnings.clear()
 
-        if not self.docs_root.exists():
+        if not self.docs_root.exists() or not (self.docs_root / "_00_hs_dev_docs.idx").exists():
             if (self.root / "demo_project" / "hs_dev_docs").exists():
                 self.docs_root = self.root / "demo_project" / "hs_dev_docs"
                 self.mock_root = self.root / "demo_project" / "mock"
-            else:
+            elif not self.docs_root.exists():
                 self.errors.append("hs_dev_docs directory does not exist! Please run init_hs_dev_docs.py first.")
                 self._print_results()
                 return False
@@ -59,6 +59,9 @@ class ConsistencyVerifier:
 
         # 7. 检查项目术语统一定义词典与防歧义命名规约 (Project Terminology & Anti-Drift Check)
         self._check_project_dictionary()
+
+        # 8. 检查工程附属机制与治理安全 (Auxiliary Governance & Secret Leaks Guard)
+        self._check_auxiliary_governance()
 
         return self._print_results()
 
@@ -201,7 +204,7 @@ class ConsistencyVerifier:
 
             v_versions = {}
             for vf in v_files:
-                match = re.match(r"V([0-9\.]+__(.+))\.sql", vf.name)
+                match = re.match(r"V([0-9\._]+__(.+))\.sql", vf.name)
                 if match:
                     ver_desc = match.group(1)
                     v_versions[ver_desc] = vf
@@ -465,6 +468,80 @@ class ConsistencyVerifier:
                         f"[EVENT GRAMMAR ERROR] {rel_p} uses timestamp field name '{term_found}' as event topic. "
                         f"Timestamps are properties, not events."
                     )
+
+    def _check_auxiliary_governance(self):
+        """
+        检查工程附属机制与治理支撑：
+        1. 敏感凭据/密钥硬编码防泄漏扫描 (Zero-Secrets Policy)；
+        2. 依赖锁文件存在性检查 (Lockfile Hygiene)；
+        3. 环境变量模板契约 (.env.example)；
+        """
+        print("  -> Checking Auxiliary Governance & Secret Leaks Guard...")
+
+        # 1. 敏感凭据正则扫描（排除测试与 mock 目录）
+        secret_patterns = [
+            (re.compile(r'-----BEGIN\s+(?:RSA|OPENSSH|DSA|EC)\s+PRIVATE\s+KEY-----'), "Private Key"),
+            (re.compile(r'(?i)\b(?:ghp|gho|ghu|ghs|ghr)_[0-9a-zA-Z]{36}\b'), "GitHub Personal Access Token"),
+            (re.compile(r'\bsk-(?:proj-)?[a-zA-Z0-9_-]{20,80}\b'), "OpenAI API Secret Key"),
+            (re.compile(r'\bAKIA[0-9A-Z]{16}\b'), "AWS Access Key ID"),
+        ]
+
+        code_scan_dirs = [
+            self.root / "backend",
+            self.root / "frontend",
+            self.root / "apps",
+            self.root / "packages",
+            self.root / "src",
+            self.root / "config",
+        ]
+        if (self.root / "demo_project" / "backend").exists():
+            code_scan_dirs.append(self.root / "demo_project" / "backend")
+
+        for sdir in code_scan_dirs:
+            if not sdir.exists():
+                continue
+            for fpath in sdir.rglob("*"):
+                if not fpath.is_file() or fpath.suffix not in [
+                    ".py", ".ts", ".js", ".go", ".rs", ".java", ".json", ".yaml", ".yml", ".env"
+                ]:
+                    continue
+                p_str = str(fpath).replace("\\", "/")
+                if "/tests/" in p_str or "/test/" in p_str or "/mock/" in p_str or "test_" in fpath.name:
+                    continue
+                try:
+                    content = fpath.read_text(encoding="utf-8", errors="ignore")
+                except Exception:
+                    continue
+
+                for pat, label in secret_patterns:
+                    if pat.search(content):
+                        try:
+                            rel_p = fpath.relative_to(self.root)
+                        except ValueError:
+                            rel_p = fpath.name
+                        self.errors.append(
+                            f"[SECRET LEAK ERROR] Potential hardcoded {label} detected in {rel_p}! "
+                            f"Secrets must be provided via environment variables or secret managers."
+                        )
+
+        # 2. 依赖锁文件检查（如果有 package.json，必须有 lockfile）
+        for pkg_json in self.root.rglob("package.json"):
+            if "node_modules" in pkg_json.parts or ".hs_cache" in pkg_json.parts:
+                continue
+            pkg_dir = pkg_json.parent
+            has_lock = any(
+                (pkg_dir / lock_name).exists()
+                for lock_name in ["package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lockb"]
+            )
+            if not has_lock:
+                try:
+                    rel_p = pkg_json.relative_to(self.root)
+                except ValueError:
+                    rel_p = pkg_json.name
+                self.warnings.append(
+                    f"[SUPPLY CHAIN WARNING] {rel_p} found but missing immutable lockfile "
+                    f"(package-lock.json / pnpm-lock.yaml / yarn.lock). Lockfile is mandatory for deterministic builds."
+                )
 
     def _print_results(self) -> bool:
         print("\n" + "=" * 60)

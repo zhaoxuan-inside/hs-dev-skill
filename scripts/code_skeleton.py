@@ -33,7 +33,7 @@ class CodeSkeletonExtractor:
             skeleton_text, symbols_count = self._extract_python_ast(content)
         elif ext in (".ts", ".js", ".tsx", ".jsx"):
             skeleton_text, symbols_count = self._extract_c_like_signatures(content, "ts")
-        elif ext in (".go", ".rs", ".java", ".cpp", ".c", ".h"):
+        elif ext in (".go", ".rs", ".java", ".kt", ".cpp", ".c", ".h", ".hpp", ".cc", ".dart", ".swift"):
             skeleton_text, symbols_count = self._extract_c_like_signatures(content, ext.lstrip("."))
         else:
             # 默认行首符号扫描
@@ -130,13 +130,17 @@ class CodeSkeletonExtractor:
         return symbols
 
     def extract_dependencies(self, file_path: Path) -> List[Dict[str, Any]]:
-        """提取代码中的方法/函数间调用依赖"""
+        """提取代码中的方法/函数/包间调用与导入依赖（多语言支持）"""
         if not file_path.is_file():
             return []
         ext = file_path.suffix.lower()
         content = file_path.read_text(encoding="utf-8", errors="ignore")
-        if ext != ".py":
-            return []
+
+        if ext == ".py":
+            return self._extract_python_dependencies(content, file_path)
+        return self._extract_c_like_dependencies(content, file_path, ext)
+
+    def _extract_python_dependencies(self, content: str, file_path: Path) -> List[Dict[str, Any]]:
         try:
             tree = ast.parse(content)
         except Exception:
@@ -149,6 +153,27 @@ class CodeSkeletonExtractor:
             "zip", "super", "open", "type", "hasattr", "issubclass", "round", "abs", "sorted",
         }
 
+        # 1. 抓取 import 依赖
+        for node in tree.body:
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    deps.append({
+                        "source_symbol": Path(file_path).stem,
+                        "target_symbol": alias.name,
+                        "dep_type": "IMPORT",
+                        "source_file": str(file_path),
+                    })
+            elif isinstance(node, ast.ImportFrom):
+                mod = node.module or ""
+                for alias in node.names:
+                    deps.append({
+                        "source_symbol": Path(file_path).stem,
+                        "target_symbol": f"{mod}.{alias.name}" if mod else alias.name,
+                        "dep_type": "IMPORT",
+                        "source_file": str(file_path),
+                    })
+
+        # 2. 抓取方法调用依赖
         for node in tree.body:
             if isinstance(node, ast.ClassDef):
                 cls_name = node.name
@@ -179,6 +204,57 @@ class CodeSkeletonExtractor:
                             })
         return deps
 
+    def _extract_c_like_dependencies(self, content: str, file_path: Path, ext: str) -> List[Dict[str, Any]]:
+        deps: List[Dict[str, Any]] = []
+        base_name = Path(file_path).stem
+
+        # 1. 通用导入扫描 (import / #include / require)
+        import_patterns = [
+            # TS/JS/Dart: import ... from '...' or import '...'
+            re.compile(r"""(?:import\s+.*?from\s+['"]([^'"]+)['"]|import\s+['"]([^'"]+)['"])"""),
+            # JS: require('...')
+            re.compile(r"""require\(['"]([^'"]+)['"]\)"""),
+            # Java/Kotlin: import com.foo.bar.Baz;
+            re.compile(r"""^\s*import\s+(?:static\s+)?([A-Za-z0-9_.*]+);"""),
+            # Go: import "..." or import ( ... )
+            re.compile(r"""^\s*(?:import\s+)?['"]([A-Za-z0-9_/.-]+)['"]"""),
+            # C/C++: #include <...> or #include "..."
+            re.compile(r"""#include\s+[<"]([^>"]+)[>"]"""),
+        ]
+        for line in content.splitlines():
+            s = line.strip()
+            if not s or s.startswith(("//", "/*", "*")):
+                continue
+            for pat in import_patterns:
+                m = pat.search(s)
+                if m:
+                    target = next((g for g in m.groups() if g), "")
+                    if target and not target.startswith("."):
+                        deps.append({
+                            "source_symbol": base_name,
+                            "target_symbol": target,
+                            "dep_type": "IMPORT",
+                            "source_file": str(file_path),
+                        })
+                    break
+
+        # 2. 调用扫描: Method.call() or identifier(...)
+        call_pattern = re.compile(r"""\b([A-Za-z0-9_]{3,})\.([A-Za-z0-9_]{3,})\s*\(""")
+        for line in content.splitlines():
+            s = line.strip()
+            if not s or s.startswith(("//", "/*", "*", "#", "import", "package")):
+                continue
+            for m in call_pattern.finditer(s):
+                caller_obj, called_method = m.group(1), m.group(2)
+                if caller_obj.lower() not in ("console", "math", "system", "log", "logger", "string", "json", "assert"):
+                    deps.append({
+                        "source_symbol": base_name,
+                        "target_symbol": f"{caller_obj}.{called_method}",
+                        "dep_type": "CALL",
+                        "source_file": str(file_path),
+                    })
+        return deps
+
     def _resolve_call_target(self, call_node: ast.Call) -> Optional[str]:
         if isinstance(call_node.func, ast.Name):
             return call_node.func.id
@@ -193,12 +269,30 @@ class CodeSkeletonExtractor:
         lines = content.splitlines()
         symbols = []
         patterns = [
-            (re.compile(r"^\s*(export\s+)?(class|interface|type)\s+([A-Za-z0-9_]+)"), "type"),
-            (re.compile(r"^\s*(export\s+)?(async\s+)?function\s+([A-Za-z0-9_]+)"), "function"),
-            (re.compile(r"^\s*(export\s+)?const\s+([A-Za-z0-9_]+)\s*=\s*(async\s*)?\("), "function"),
-            (re.compile(r"^\s*func\s+(\([^\)]+\)\s+)?([A-Za-z0-9_]+)"), "function"),
-            (re.compile(r"^\s*type\s+([A-Za-z0-9_]+)\s+(struct|interface)"), "type"),
-            (re.compile(r"^\s*(pub\s+)?(fn|struct|enum|trait)\s+([A-Za-z0-9_]+)"), "type"),
+            # Dart / Flutter: class X extends Y, Widget build, mixin, extension
+            (re.compile(r"^\s*class\s+([A-Za-z0-9_]+)"), "class"),
+            (re.compile(r"^\s*(?:@override\s+)?(?:Widget|Future<[^>]+>|void|[A-Za-z0-9_<>]+)\s+([A-Za-z0-9_]+)\s*\("), "method"),
+            (re.compile(r"^\s*mixin\s+([A-Za-z0-9_]+)"), "type"),
+            (re.compile(r"^\s*extension\s+([A-Za-z0-9_]+)"), "type"),
+            # TS/JS: export class / interface / type / function / const fn = () =>
+            (re.compile(r"^\s*(?:export\s+)?(?:default\s+)?(?:class|interface|type|enum)\s+([A-Za-z0-9_]+)"), "type"),
+            (re.compile(r"^\s*(?:export\s+)?(?:async\s+)?function\s+([A-Za-z0-9_]+)"), "function"),
+            (re.compile(r"^\s*(?:export\s+)?(?:const|let)\s+([A-Za-z0-9_]+)\s*=\s*(?:async\s*)?\("), "function"),
+            # Go: func (r *Recv) Method(...) / func Func(...) / type Struct
+            (re.compile(r"^\s*func\s+\((?:[^\)]+)\)\s+([A-Za-z0-9_]+)\s*\("), "method"),
+            (re.compile(r"^\s*func\s+([A-Za-z0-9_]+)\s*\("), "function"),
+            (re.compile(r"^\s*type\s+([A-Za-z0-9_]+)\s+(?:struct|interface)"), "type"),
+            # Java / Kotlin: public/protected/private class/interface/enum/record
+            (re.compile(r"^\s*(?:public|protected|private)?\s*(?:static\s+)?(?:abstract\s+)?(?:class|interface|enum|record)\s+([A-Za-z0-9_]+)"), "type"),
+            (re.compile(r"^\s*(?:@\w+\s+)*(?:public|protected|private)?\s*(?:static\s+)?(?:final\s+)?(?:[A-Za-z0-9_<>\[\]]+\s+)+([A-Za-z0-9_]+)\s*\([^;]*\)\s*(?:throws\s+[\w,\s]+)?\s*\{?"), "method"),
+            (re.compile(r"^\s*fun\s+([A-Za-z0-9_]+)\s*\("), "function"),
+            # C / C++: namespace / template class / class / struct / return_type Func(...)
+            (re.compile(r"^\s*namespace\s+([A-Za-z0-9_:]+)"), "namespace"),
+            (re.compile(r"^\s*(?:template\s*<[^>]*>\s*)?(?:class|struct)\s+([A-Za-z0-9_]+)"), "type"),
+            (re.compile(r"^\s*(?:virtual\s+)?(?:static\s+)?(?:inline\s+)?(?:[A-Za-z0-9_:*&<>]+\s+)+([A-Za-z0-9_:]+)\s*\([^;]*\)\s*(?:const)?\s*(?:override)?\s*\{?"), "function"),
+            # Rust: pub fn / pub struct / enum / trait / impl
+            (re.compile(r"^\s*(?:pub\s+)?(?:async\s+)?fn\s+([A-Za-z0-9_]+)"), "function"),
+            (re.compile(r"^\s*(?:pub\s+)?(?:struct|enum|trait|impl)\s+([A-Za-z0-9_]+)"), "type"),
         ]
         for i, line in enumerate(lines, start=1):
             stripped = line.strip()
@@ -207,7 +301,10 @@ class CodeSkeletonExtractor:
             for pat, kind in patterns:
                 m = pat.search(line)
                 if m:
-                    name = m.groups()[-1]
+                    # 第一捕获组即为符号名称
+                    name = m.group(1).strip()
+                    if not name or name.lower() in ("if", "for", "while", "switch", "catch", "return"):
+                        continue
                     clean_sig = re.sub(r"\{.*$", "", stripped).strip()
                     symbols.append({
                         "name": name,
@@ -292,26 +389,52 @@ class CodeSkeletonExtractor:
         return "\n".join(lines).strip(), symbols_count
 
     def _extract_c_like_signatures(self, content: str, lang: str) -> tuple[str, int]:
-        """针对 TS/JS/Go/Java/Rust 使用启发式正则提取"""
+        """针对 TS/JS/Go/Java/C/C++/Rust/Flutter 使用高级正则提取"""
         lines = content.splitlines()
         skeleton_lines = []
         symbols_count = 0
 
-        # 正则特征：类、接口、函数、方法、结构体
         patterns = [
-            # export / class / interface / type (TS/JS)
-            re.compile(r"^\s*(export\s+)?(class|interface|type|enum)\s+([A-Za-z0-9_]+)"),
-            # function / async function / const func = (TS/JS)
-            re.compile(r"^\s*(export\s+)?(async\s+)?function\s+([A-Za-z0-9_]+)\s*\("),
-            re.compile(r"^\s*(export\s+)?const\s+([A-Za-z0-9_]+)\s*=\s*(async\s*)?\("),
-            # Go: func / type Struct
-            re.compile(r"^\s*func\s+(\([^\)]+\)\s+)?([A-Za-z0-9_]+)\s*\("),
+            # Dart / Flutter
+            re.compile(r"^\s*class\s+([A-Za-z0-9_]+)(?:\s+extends\s+[A-Za-z0-9_<>]+)?"),
+            re.compile(r"^\s*(?:@override\s+)?(?:Widget|Future<[^>]+>|void|[A-Za-z0-9_<>]+)\s+([A-Za-z0-9_]+)\s*\("),
+            re.compile(r"^\s*(?:mixin|extension)\s+([A-Za-z0-9_]+)"),
+            # TS/JS
+            re.compile(r"^\s*(?:export\s+)?(?:default\s+)?(class|interface|type|enum)\s+([A-Za-z0-9_]+)"),
+            re.compile(r"^\s*(?:export\s+)?(?:async\s+)?function\s+([A-Za-z0-9_]+)\s*\("),
+            re.compile(r"^\s*(?:export\s+)?(?:const|let)\s+([A-Za-z0-9_]+)\s*=\s*(?:async\s*)?\("),
+            # Go
+            re.compile(r"^\s*func\s+\((?:[^\)]+)\)\s+([A-Za-z0-9_]+)\s*\("),
+            re.compile(r"^\s*func\s+([A-Za-z0-9_]+)\s*\("),
             re.compile(r"^\s*type\s+([A-Za-z0-9_]+)\s+(struct|interface)"),
-            # Rust: pub fn / pub struct / impl
-            re.compile(r"^\s*(pub\s+)?(fn|struct|enum|trait|impl)\s+([A-Za-z0-9_]+)"),
-            # Java: public/protected/private void/Type methodName(...)
-            re.compile(r"^\s*(public|protected|private)?\s*(static\s+)?([A-Za-z0-9_<>]+\s+)+([A-Za-z0-9_]+)\s*\("),
+            # Java / Kotlin
+            re.compile(r"^\s*(?:public|protected|private)?\s*(?:static\s+)?(?:abstract\s+)?(class|interface|enum|record)\s+([A-Za-z0-9_]+)"),
+            re.compile(r"^\s*(?:@\w+\s+)*(?:public|protected|private)?\s*(?:static\s+)?(?:final\s+)?(?:[A-Za-z0-9_<>\[\]]+\s+)+([A-Za-z0-9_]+)\s*\("),
+            re.compile(r"^\s*fun\s+([A-Za-z0-9_]+)\s*\("),
+            # C / C++
+            re.compile(r"^\s*namespace\s+([A-Za-z0-9_:]+)"),
+            re.compile(r"^\s*(?:template\s*<[^>]*>\s*)?(?:class|struct)\s+([A-Za-z0-9_]+)"),
+            re.compile(r"^\s*(?:virtual\s+)?(?:static\s+)?(?:[A-Za-z0-9_:*&<>]+\s+)+([A-Za-z0-9_:]+)\s*\("),
+            # Rust
+            re.compile(r"^\s*(?:pub\s+)?(?:async\s+)?fn\s+([A-Za-z0-9_]+)"),
+            re.compile(r"^\s*(?:pub\s+)?(struct|enum|trait|impl)\s+([A-Za-z0-9_]+)"),
         ]
+
+        for i, line in enumerate(lines, start=1):
+            stripped = line.strip()
+            if not stripped or stripped.startswith(("//", "/*", "*", "#")):
+                continue
+
+            for pat in patterns:
+                if pat.search(line):
+                    symbols_count += 1
+                    clean_sig = re.sub(r"\{.*$", "{ ... }", stripped)
+                    if not clean_sig.endswith(("{ ... }", ";", ":")):
+                        clean_sig += " { ... }"
+                    skeleton_lines.append(f"[L{i}] {clean_sig}")
+                    break
+
+        return "\n".join(skeleton_lines), symbols_count
 
         for i, line in enumerate(lines, start=1):
             stripped = line.strip()

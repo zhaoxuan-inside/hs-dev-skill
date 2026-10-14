@@ -3,11 +3,11 @@
 > **质量优先 + 审讯式对齐 + 测试一等公民 + 深模块词汇 + 文档驱动 + S/M/L 分级**
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
-[![Spec Version](https://img.shields.io/badge/skill-v2.40-blue.svg)](SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v2.41.0.0-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS），**替代已废弃的 `hs-project-skill`**。目标：**质量大于一切**——全场景意图路由（BUILD 从零构建 / REVERSE 存量反向重建 / FIX 调试修复 / REFACTOR 重构 / EXPLORE 只读理解 / RESUME 续做）、审讯式 DESIGN（跳过收紧）、一源双视图（人类产品设计书 + VibeCoding 执行契约）、双轨原型必产（Mermaid 拓扑 + ASCII 比例线框）、垂直领域能力融合（OpenPencil / Generative UI 原型、Modern Web Guidance 规范、Chrome DevTools 运行时/a11y/CWV 门禁）、全局统一术语与词态矩阵（Ubiquitous Language 单一事实源 · Command动词原形/Event过去分词/Attribute时间戳严格解耦 · Search-Before-Name · 零裸字符串）、多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）、选型架构顶置契约切片（隔离废案）、GoF 23 种设计模式选型决策树与模式协同集群档案、方法类型七分类与七维契约画像（精准测试矩阵 + patternCluster 关联指针毫秒级局部命中 · 抗方法爆炸门禁与写前意图检索选型 `doc_index_db method-search`）、分步正确（seam + 垂直 TDD）。续做靠 `plan_log`/`change_log`（语义「继续」）；回退靠快照而非 git。入口 [`SKILL.md`](SKILL.md)；先写 `intent`+`change_size`+`work_mode`，过装载门闩后再干活。
+`hs-dev-skill` 是可安装到 Cursor / Claude Code 等 Agent 的**单体**产品开发技能包（Windows / Linux / macOS），**替代已废弃的 `hs-project-skill`**。目标：**质量大于一切**——全场景意图路由（BUILD 从零构建 / REVERSE 存量反向重建 / FIX 调试修复 / REFACTOR 重构 / EXPLORE 只读理解 / RESUME 续做）、审讯式 DESIGN（跳过收紧）、一源双视图（人类产品设计书 + VibeCoding 执行契约）、双轨原型必产（Mermaid 拓扑 + ASCII 比例线框）、垂直领域能力融合（OpenPencil / Generative UI 原型、Modern Web Guidance 规范、Chrome DevTools 运行时/a11y/CWV 门禁）、全局统一术语与词态矩阵（Ubiquitous Language 单一事实源 · Command动词原形/Event过去分词/Attribute时间戳严格解耦 · Search-Before-Name · 零裸字符串）、多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）、四段式多级版本控制（`v[主版本].[需求版本].[修复版本].[打包版本]` · 多级子版本号精确包区分）、工程附属机制全景治理支撑（环境配置与机密隔离 · 软件供应链与 CVE 阻断 · CI/CD 流水线与制品防伪 SBOM · 可观测性与三态健康探针 · 数据韧性与双向容灾回滚 · 安全防御与 PII 隐私脱敏 · Agent 执行安全沙箱护栏）、选型架构顶置契约切片（隔离废案）、GoF 23 种设计模式选型决策树与模式协同集群档案、方法类型七分类与七维契约画像（精准测试矩阵 + patternCluster 关联指针毫秒级局部命中 · 抗方法爆炸门禁与写前意图检索选型 `doc_index_db method-search`）、分步正确（seam + 垂直 TDD）。续做靠 `plan_log`/`change_log`（语义「继续」）；回退靠快照而非 git。入口 [`SKILL.md`](SKILL.md)；先写 `intent`+`change_size`+`work_mode`，过装载门闩后再干活。
 
 ---
 
