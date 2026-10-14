@@ -6,6 +6,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from init_hs_dev_docs import init_full_workspace
+from task_manager import TaskManager
 from verify_consistency import ConsistencyVerifier
 
 
@@ -213,6 +214,58 @@ class TestVerifyConsistency(unittest.TestCase):
         verifier_clean = ConsistencyVerifier(str(self.root), strict=False)
         self.assertTrue(verifier_clean.check_all())
         self.assertFalse(any("[SUPPLY CHAIN WARNING]" in w for w in verifier_clean.warnings))
+
+    def test_detect_unverified_requirements_on_completed_task(self):
+        tm = TaskManager(str(self.root))
+        res = tm.create_task(
+            task_id="req_gate_test",
+            title="测试需求覆盖门禁",
+            owner="developer",
+            priority="P1",
+            goal="验证 100% 需求覆盖率门禁",
+            criteria="所有 REQ 必须 verified 才能 COMPLETED",
+            change_size="M",
+        )
+        detail_path = Path(res["detail_path"])
+
+        # 追加包含未验证需求的需求追踪矩阵
+        req_table = (
+            "\n### 2b. 需求追踪与覆盖矩阵 (Requirement Traceability Matrix)\n\n"
+            "| 需求 ID | 需求描述 | 对应模块/步骤 | 验收证据 (测试用例 / 报告) | 状态 |\n"
+            "| :--- | :--- | :--- | :--- | :--- |\n"
+            "| `REQ-001` | 用户身份合法性校验 | Step 1 | `tests/test_auth.py::test_valid_user` | `verified` |\n"
+            "| `REQ-002` | 余额扣减及防重试防超扣 | Step 2 | `tests/test_balance.py::test_deduct` | `pending` |\n"
+        )
+        detail_path.write_text(detail_path.read_text(encoding="utf-8") + req_table, encoding="utf-8")
+
+        # 任务处于 IN_PROGRESS 时，未完成需求不阻断
+        tm.set_status("req_gate_test", "IN_PROGRESS")
+        self.assertTrue(self.verifier.check_all())
+
+        # 任务推进到 VERIFYING
+        tm.set_status("req_gate_test", "VERIFYING")
+        self.assertTrue(self.verifier.check_all())
+
+        # 任务推进到 COMPLETED 时，由于 REQ-002 处于 pending，必须拦截报错
+        tm.set_status("req_gate_test", "COMPLETED")
+        self.assertFalse(self.verifier.check_all())
+        self.assertTrue(any("[REQUIREMENT COVERAGE ERROR]" in e for e in self.verifier.errors))
+        self.assertTrue(any("REQ-002" in e for e in self.verifier.errors))
+
+        # 修复 REQ-002 为 verified
+        repaired_content = detail_path.read_text(encoding="utf-8").replace("`pending`", "`verified`")
+        detail_path.write_text(repaired_content, encoding="utf-8")
+
+        # 同步更新 task_archive 与 task_detail 索引中的文件摘要 (digest)
+        from idx_manager import IdxManager
+        arch_idx = IdxManager(str(self.root / "hs_dev_docs/_05_task_orchestration/_00_task_archive.idx"))
+        arch_idx.update_digest()
+        detail_idx = IdxManager(str(self.root / "hs_dev_docs/_05_task_orchestration/_02_task_detail/_00_task_detail.idx"))
+        detail_idx.update_digest()
+
+        # 重新验证，此时覆盖率为 100%，应当通过
+        verifier_clean = ConsistencyVerifier(str(self.root))
+        self.assertTrue(verifier_clean.check_all())
 
 
 if __name__ == "__main__":

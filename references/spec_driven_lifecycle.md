@@ -209,7 +209,8 @@ L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范�
 1. **产品与 UI 契约**：优先装入阶段 0 的 **`{feature}_vibe_spec.md` 机器契约切片**（Design Tokens、组件树 DOM 骨架、状态机、Gherkin DoD），严禁整篇灌入人类版故事与讨论；
 2. **选型与架构契约**：仅装入阶段 1/2 文档顶部的 **`[VIBE_CONTRACT]` 置顶切片**（仅占前几十行），跳过下半部废案讨论；
 3. **实现四要素契约**：装入阶段 3 相关的局部表结构 SQL、API 契约或六元组方法签名切片；
-4. 改代码/设计文件前：`python scripts/process_log.py checkpoint --id {task_id} --step … --summary "…" --paths …`（见 [`process_continuity.md`](process_continuity.md)）。
+4. **需求追踪链条装配 (Traceability Matrix)**：在 `task_detail.md` 中建立 `REQ-001..n` 到具体方法 Seam、自动化测试用例与验收证据的 100% 覆盖闭环，并在步骤清单标注执行策略（`[idempotent: true]`, `[retry: N]`, `[side_effect: local]`）；
+5. 改代码/设计文件前：`python scripts/process_log.py checkpoint --id {task_id} --step … --summary "…" --paths …`（见 [`process_continuity.md`](process_continuity.md)）。
 
 ---
 
@@ -243,7 +244,7 @@ L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范�
    确保各子域 `.idx`、SQLite 倒排索引及根目录全局导航阅读说明 `hs_dev_docs/README.md` 处于最新状态且哈希一致。
 3. **运行全量测试与运行态走查（测试零报错绝对阻断门禁）**：`make test` 确保 **100% PASS**，**无任何失败、报错或异常用例**；若有任何报错，**绝对禁止将任务置为 COMPLETED，绝对禁止 Git Commit，绝对禁止向用户汇报交付或完工**！严禁出现“代码已交付但有测试报错稍后修”的严重违规，必须就地 Debug 修复直至全绿。前端工程结合 Chrome DevTools CDP 自动化排查，确保无未捕获 Console 报错与网络死锁，满足 WCAG a11y 对比度与 LCP/内存泄漏安全线。
 4. **运行代码静态检测（零告警零错误门禁）**：语言对应 Linter（ESLint/Ruff/Flake8 等）与类型检查（TSC/Mypy）**必须达到 0 警告（0 Warning）且 0 错误（0 Error）**；任何 Warning 均视为阻断性质量缺陷必须就地消除，严禁带 Warning 提交代码。
-5. **运行一致性门禁检查**：`python3 scripts/verify_consistency.py --root . --strict` 确保三文件、索引、V/U 脚本原子配对与目录卫生 100% 合规。
+5. **运行一致性与需求覆盖率门禁检查**：`python3 scripts/verify_consistency.py --root . --strict` 确保三文件、索引、V/U 脚本原子配对、目录卫生以及原子需求清单（`REQ-*`）100% 达成 `verified`（覆盖率硬阻断，严禁遗留未解决项交付）。
 6. **运行死代码与孤儿方法扫描**：`python3 scripts/dead_code_scanner.py --root .`。
 7. **流转任务状态并归档**：**仅当上述测试全绿、静态检测零告警零错误、一致性验证全部通过后**，方可执行 `python3 scripts/task_manager.py status --id {task_id} --set COMPLETED`（自动归档至 `_00_task_archive.idx`）。
 8. **Git 规范提交**：按照 `<type>(<scope>): <subject>` 规范生成本地 Commit。**默认不** `git push`；**仅当用户明确要求推送**时代为执行并回报结果。

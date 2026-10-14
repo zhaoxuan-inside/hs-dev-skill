@@ -141,7 +141,16 @@ class ConsistencyVerifier:
         for bf in brief_dir.glob("*.md"):
             brief_contents += bf.read_text(encoding="utf-8") + "\n"
 
-        for entry in mgr.entries:
+        active_entries = list(mgr.entries)
+        arch_entries = []
+        arch_idx_file = task_root_dir / "_00_task_archive.idx"
+        if arch_idx_file.exists():
+            arch_mgr = IdxManager(str(arch_idx_file))
+            arch_entries = list(arch_mgr.entries)
+
+        all_tasks = [(entry, True) for entry in active_entries] + [(entry, False) for entry in arch_entries]
+
+        for entry, is_active in all_tasks:
             task_id = entry.get("id")
             title = entry.get("title")
             status = entry.get("status")
@@ -151,14 +160,12 @@ class ConsistencyVerifier:
                 self.errors.append(f"[TASK CONSISTENCY] Task '{task_id}' missing in _01_task_brief/*.md")
             else:
                 # 检查简述中的状态
-                if f"### 任务简述：{task_id}" in brief_contents:
-                    # 匹配该任务块中的状态
-                    pattern = rf"### 任务简述：{task_id}[\s\S]*?- \*\*状态\*\*：`([^`]+)`"
-                    m = re.search(pattern, brief_contents)
-                    if m:
-                        b_status = m.group(1)
-                        if b_status != status:
-                            self.errors.append(f"[TASK MISMATCH] Task '{task_id}' status mismatch: .idx has '{status}', but brief has '{b_status}'")
+                pattern = rf"### 任务简述：{task_id}[\s\S]*?- \*\*状态\*\*：`([^`]+)`"
+                m = re.search(pattern, brief_contents)
+                if m:
+                    b_status = m.group(1)
+                    if b_status != status:
+                        self.errors.append(f"[TASK MISMATCH] Task '{task_id}' status mismatch: .idx has '{status}', but brief has '{b_status}'")
 
             # 2. 检查 task_detail
             rel_path = entry.get("path")
@@ -173,29 +180,51 @@ class ConsistencyVerifier:
                     if d_status != status:
                         self.errors.append(f"[TASK MISMATCH] Task '{task_id}' status mismatch: .idx has '{status}', but detail has '{d_status}'")
 
-                # change_size：缺失仅 warning（兼容旧任务）
-                if not re.search(r"- \*\*(?:变更分级|change_size)\*\*：`([SML])`", d_content):
+                # change_size：仅活跃任务且缺失时 warning（兼容旧任务）
+                if is_active and not re.search(r"- \*\*(?:变更分级|change_size)\*\*：`([SML])`", d_content):
                     self.warnings.append(
                         f"[RIGHT-SIZING] Active task '{task_id}' missing change_size=S|M|L in detail "
                         f"(set via task_manager create --change-size; see references/right_sizing.md)"
                     )
 
-            # context_pack 同步检查 change_size
-            cp_path = (
-                task_root_dir
-                / f"_03_task_context_pack/_01_{task_id}/_00_context_pack.md"
-            )
-            if not cp_path.exists():
+                # 3. 需求追踪矩阵与 100% 覆盖率硬校验 (Requirement Traceability & Coverage Gate)
+                req_lines = [l.strip() for l in d_content.splitlines() if l.strip().startswith("|")]
+                req_items = []
+                for l in req_lines:
+                    cols = [c.strip() for c in l.split("|")[1:-1]]
+                    if cols and re.match(r"^`?REQ-[A-Za-z0-9_-]+`?$", cols[0]):
+                        req_id = cols[0].strip("`")
+                        r_status = cols[-1].strip("`").lower()
+                        req_items.append((req_id, r_status))
+
+                if req_items:
+                    total_reqs = len(req_items)
+                    unverified = [r for r in req_items if r[1] not in ["verified", "passed", "done"]]
+                    if status and status.upper() in ["COMPLETED", "SUCCEEDED"] and unverified:
+                        uv_str = ", ".join([f"{rid} (status: {st})" for rid, st in unverified])
+                        self.errors.append(
+                            f"[REQUIREMENT COVERAGE ERROR] Task '{task_id}' is marked {status} but has unverified requirement(s): {uv_str}. "
+                            f"Requirement Coverage must be 100% ({total_reqs - len(unverified)}/{total_reqs} verified). "
+                            f"See references/quality_gates.md §2 (Gate 0d)."
+                        )
+
+            # context_pack 同步检查 change_size（仅活跃任务）
+            if is_active:
                 cp_path = (
                     task_root_dir
-                    / f"_03_task_context_pack/{task_id}_context_pack.md"
+                    / f"_03_task_context_pack/_01_{task_id}/_00_context_pack.md"
                 )
-            if cp_path.exists():
-                cp_text = cp_path.read_text(encoding="utf-8")
-                if not re.search(r"- \*\*change_size\*\*：`([SML])`", cp_text):
-                    self.warnings.append(
-                        f"[RIGHT-SIZING] Active task '{task_id}' context_pack missing change_size=S|M|L"
+                if not cp_path.exists():
+                    cp_path = (
+                        task_root_dir
+                        / f"_03_task_context_pack/{task_id}_context_pack.md"
                     )
+                if cp_path.exists():
+                    cp_text = cp_path.read_text(encoding="utf-8")
+                    if not re.search(r"- \*\*change_size\*\*：`([SML])`", cp_text):
+                        self.warnings.append(
+                            f"[RIGHT-SIZING] Active task '{task_id}' context_pack missing change_size=S|M|L"
+                        )
 
     def _check_database_migrations(self):
         """检查 DB 迁移 V/U 脚本原子配对与 SQL 规范"""

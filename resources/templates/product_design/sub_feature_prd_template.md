@@ -46,19 +46,27 @@
 
 ---
 
-## 4. 行为驱动产品验收标准 (Functional DoD)
+## 4. 需求原子分解与行为驱动验收标准 (Requirements & Functional DoD)
+
+### 4.1 核心需求原子分解清单 (Atomic Requirements Matrix)
+| 需求编号 | 需求名称与规则简述 | 关联字段/动作 | 验收物理证据 | 优先级 |
+|---|---|---|---|---|
+| `REQ-001` | 主成功流触发与即时反馈 | 填入有效参数并点击主按钮 | 界面 200ms 内状态流转并展示成功反馈 | P0 |
+| `REQ-002` | 参数边界与非法输入原位校验拦截 | 输入超出边界的非法值 | 原位红框高亮错误字段，显示精确提示并保留用户草稿 | P0 |
+
+### 4.2 行为驱动产品验收场景 (Gherkin Scenarios)
 
 采用 Gherkin 语法，覆盖主成功流、校验拦截流与异常恢复流：
 
 ```gherkin
 Feature: {feature_name}
 
-  Scenario: 正常触发并完成核心动作 (Happy Path)
+  Scenario: REQ-001 正常触发并完成核心动作 (Happy Path)
     Given 用户已完成前置鉴权且处于正常状态
     When 用户在界面填入有效参数并点击具象主按钮
     Then 界面在 200ms 内展示即时反馈，并流转至目标状态
 
-  Scenario: 参数校验失败原位拦截 (Validation)
+  Scenario: REQ-002 参数校验失败原位拦截 (Validation)
     Given 用户输入了超出边界的无效参数
     When 用户触发提交
     Then 界面原位红框高亮错误字段，显示具体修复提示，且保留用户已填内容
