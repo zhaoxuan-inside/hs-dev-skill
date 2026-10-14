@@ -44,6 +44,15 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
     if not env_example.exists():
         env_example.write_text("# Global Environment Variables Template\n# PORT=8080\n# DATABASE_URL=\n", encoding="utf-8")
 
+    # 默认创建治理功能模式开关配置 (CI/CD、可观测性、数据韧性默认不启用)
+    gov_cfg = root / "config" / "governance.yaml"
+    if not gov_cfg.exists():
+        try:
+            from governance_toggle import save_governance_config, DEFAULT_GOVERNANCE_CONFIG
+            save_governance_config(root, DEFAULT_GOVERNANCE_CONFIG)
+        except Exception:
+            pass
+
     # 2. hs_dev_docs 目录层级（一级功能 + 二级子功能严格按 _01_ 序号组织）
     doc_dirs = [
         # _00_project_foundation (基座)

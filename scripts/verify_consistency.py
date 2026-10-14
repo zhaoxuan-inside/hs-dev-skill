@@ -471,77 +471,114 @@ class ConsistencyVerifier:
 
     def _check_auxiliary_governance(self):
         """
-        检查工程附属机制与治理支撑：
+        检查工程附属机制与治理支撑（受 governance_toggle 控制）：
         1. 敏感凭据/密钥硬编码防泄漏扫描 (Zero-Secrets Policy)；
         2. 依赖锁文件存在性检查 (Lockfile Hygiene)；
         3. 环境变量模板契约 (.env.example)；
+        4. 受控跳过未启用的机制 (CI/CD, Observability, Data Resilience 默认不启用)。
         """
-        print("  -> Checking Auxiliary Governance & Secret Leaks Guard...")
+        try:
+            from governance_toggle import is_feature_enabled
+        except ImportError:
+            is_feature_enabled = lambda root, feat: True
+
+        check_secrets = is_feature_enabled(self.root, "env_and_secrets")
+        check_lockfile = is_feature_enabled(self.root, "supply_chain_security")
+        check_cicd = is_feature_enabled(self.root, "cicd_and_artifacts")
+        check_obs = is_feature_enabled(self.root, "observability_telemetry")
+        check_dr = is_feature_enabled(self.root, "data_resilience_dr")
+
+        status_notes = []
+        if not check_cicd:
+            status_notes.append("cicd=OFF")
+        if not check_obs:
+            status_notes.append("observability=OFF")
+        if not check_dr:
+            status_notes.append("data_resilience=OFF")
+
+        note_str = f" [Toggles: {', '.join(status_notes)}]" if status_notes else ""
+        print(f"  -> Checking Auxiliary Governance & Secret Leaks Guard{note_str}...")
 
         # 1. 敏感凭据正则扫描（排除测试与 mock 目录）
-        secret_patterns = [
-            (re.compile(r'-----BEGIN\s+(?:RSA|OPENSSH|DSA|EC)\s+PRIVATE\s+KEY-----'), "Private Key"),
-            (re.compile(r'(?i)\b(?:ghp|gho|ghu|ghs|ghr)_[0-9a-zA-Z]{36}\b'), "GitHub Personal Access Token"),
-            (re.compile(r'\bsk-(?:proj-)?[a-zA-Z0-9_-]{20,80}\b'), "OpenAI API Secret Key"),
-            (re.compile(r'\bAKIA[0-9A-Z]{16}\b'), "AWS Access Key ID"),
-        ]
+        if check_secrets:
+            secret_patterns = [
+                (re.compile(r'-----BEGIN\s+(?:RSA|OPENSSH|DSA|EC)\s+PRIVATE\s+KEY-----'), "Private Key"),
+                (re.compile(r'(?i)\b(?:ghp|gho|ghu|ghs|ghr)_[0-9a-zA-Z]{36}\b'), "GitHub Personal Access Token"),
+                (re.compile(r'\bsk-(?:proj-)?[a-zA-Z0-9_-]{20,80}\b'), "OpenAI API Secret Key"),
+                (re.compile(r'\bAKIA[0-9A-Z]{16}\b'), "AWS Access Key ID"),
+            ]
 
-        code_scan_dirs = [
-            self.root / "backend",
-            self.root / "frontend",
-            self.root / "apps",
-            self.root / "packages",
-            self.root / "src",
-            self.root / "config",
-        ]
-        if (self.root / "demo_project" / "backend").exists():
-            code_scan_dirs.append(self.root / "demo_project" / "backend")
+            code_scan_dirs = [
+                self.root / "backend",
+                self.root / "frontend",
+                self.root / "apps",
+                self.root / "packages",
+                self.root / "src",
+                self.root / "config",
+            ]
+            if (self.root / "demo_project" / "backend").exists():
+                code_scan_dirs.append(self.root / "demo_project" / "backend")
 
-        for sdir in code_scan_dirs:
-            if not sdir.exists():
-                continue
-            for fpath in sdir.rglob("*"):
-                if not fpath.is_file() or fpath.suffix not in [
-                    ".py", ".ts", ".js", ".go", ".rs", ".java", ".json", ".yaml", ".yml", ".env"
-                ]:
+            for sdir in code_scan_dirs:
+                if not sdir.exists():
                     continue
-                p_str = str(fpath).replace("\\", "/")
-                if "/tests/" in p_str or "/test/" in p_str or "/mock/" in p_str or "test_" in fpath.name:
-                    continue
-                try:
-                    content = fpath.read_text(encoding="utf-8", errors="ignore")
-                except Exception:
-                    continue
+                for fpath in sdir.rglob("*"):
+                    if not fpath.is_file() or fpath.suffix not in [
+                        ".py", ".ts", ".js", ".go", ".rs", ".java", ".json", ".yaml", ".yml", ".env"
+                    ]:
+                        continue
+                    p_str = str(fpath).replace("\\", "/")
+                    if "/tests/" in p_str or "/test/" in p_str or "/mock/" in p_str or "test_" in fpath.name:
+                        continue
+                    try:
+                        content = fpath.read_text(encoding="utf-8", errors="ignore")
+                    except Exception:
+                        continue
 
-                for pat, label in secret_patterns:
-                    if pat.search(content):
-                        try:
-                            rel_p = fpath.relative_to(self.root)
-                        except ValueError:
-                            rel_p = fpath.name
-                        self.errors.append(
-                            f"[SECRET LEAK ERROR] Potential hardcoded {label} detected in {rel_p}! "
-                            f"Secrets must be provided via environment variables or secret managers."
-                        )
+                    for pat, label in secret_patterns:
+                        if pat.search(content):
+                            try:
+                                rel_p = fpath.relative_to(self.root)
+                            except ValueError:
+                                rel_p = fpath.name
+                            self.errors.append(
+                                f"[SECRET LEAK ERROR] Potential hardcoded {label} detected in {rel_p}! "
+                                f"Secrets must be provided via environment variables or secret managers."
+                            )
 
         # 2. 依赖锁文件检查（如果有 package.json，必须有 lockfile）
-        for pkg_json in self.root.rglob("package.json"):
-            if "node_modules" in pkg_json.parts or ".hs_cache" in pkg_json.parts:
-                continue
-            pkg_dir = pkg_json.parent
-            has_lock = any(
-                (pkg_dir / lock_name).exists()
-                for lock_name in ["package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lockb"]
-            )
-            if not has_lock:
-                try:
-                    rel_p = pkg_json.relative_to(self.root)
-                except ValueError:
-                    rel_p = pkg_json.name
-                self.warnings.append(
-                    f"[SUPPLY CHAIN WARNING] {rel_p} found but missing immutable lockfile "
-                    f"(package-lock.json / pnpm-lock.yaml / yarn.lock). Lockfile is mandatory for deterministic builds."
+        if check_lockfile:
+            for pkg_json in self.root.rglob("package.json"):
+                if "node_modules" in pkg_json.parts or ".hs_cache" in pkg_json.parts:
+                    continue
+                pkg_dir = pkg_json.parent
+                has_lock = any(
+                    (pkg_dir / lock_name).exists()
+                    for lock_name in ["package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lockb"]
                 )
+                if not has_lock:
+                    try:
+                        rel_p = pkg_json.relative_to(self.root)
+                    except ValueError:
+                        rel_p = pkg_json.name
+                    self.warnings.append(
+                        f"[SUPPLY CHAIN WARNING] {rel_p} found but missing immutable lockfile "
+                        f"(package-lock.json / pnpm-lock.yaml / yarn.lock). Lockfile is mandatory for deterministic builds."
+                    )
+
+        # 3. 可选机制：CI/CD 交付物与 SBOM（当启用时）
+        if check_cicd:
+            sbom_file = self.root / "output" / "sbom.json"
+            if not sbom_file.exists():
+                self.warnings.append("[CICD WARNING] Feature 'cicd_and_artifacts' enabled but output/sbom.json missing.")
+
+        # 4. 可选机制：可观测性探针（当启用时）
+        if check_obs:
+            pass
+
+        # 5. 可选机制：数据韧性（当启用时）
+        if check_dr:
+            pass
 
     def _print_results(self) -> bool:
         print("\n" + "=" * 60)

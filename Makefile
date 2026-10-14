@@ -13,6 +13,7 @@ help:
 	@echo "  make verify         - pre-commit consistency gates"
 	@echo "  make version        - generate 4-segment timestamp version (MMddHHmmss)"
 	@echo "  make version-now    - get current MMddHHmmss timestamp"
+	@echo "  make governance-status - show governance feature toggle status"
 	@echo "  make scan-dead-code - dead / orphan method scan"
 	@echo "  make init-docs      - init hs_dev_docs skeleton in cwd"
 	@echo "  make init-global    - init ~/.hs-dev-skill (cross-project)"
@@ -40,6 +41,9 @@ version:
 
 version-now:
 	$(PYTHON) scripts/version_tool.py now
+
+governance-status:
+	$(PYTHON) scripts/governance_toggle.py status
 
 scan-dead-code:
 	$(PYTHON) scripts/dead_code_scanner.py --root .
