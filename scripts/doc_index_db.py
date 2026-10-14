@@ -377,6 +377,142 @@ def _parse_pages(text: str, doc_rel_path: str) -> List[Dict[str, Any]]:
     return results
 
 
+def _parse_pattern_clusters(text: str, doc_rel_path: str) -> List[Dict[str, Any]]:
+    """
+    解析设计模式协同集群档案，提取集群名称、模式类型、关联特性、参与者矩阵与防破坏红线
+    """
+    results: List[Dict[str, Any]] = []
+    cluster_m = re.search(r"^#\s*.*?(?:模式协同集群|模式集群|集群档案)?[:：]\s*([^\r\n]+)", text, re.MULTILINE)
+    cluster_name = cluster_m.group(1).strip() if cluster_m else Path(doc_rel_path).stem
+
+    pattern_m = re.search(r"-\s*\*\*.*?(?:设计模式|Design Pattern).*?\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+    pattern_name = pattern_m.group(1).strip() if pattern_m else ""
+
+    mod_m = re.search(r"-\s*\*\*.*?(?:所属业务域与模块|所属模块).*?\*\*[:：]\s*`?([^\r\n`]+)`?", text)
+    module = mod_m.group(1).strip() if mod_m else ""
+
+    feat_m = re.search(r"-\s*\*\*.*?(?:关联特性|Feature ID).*?\*\*[:：]\s*`?([A-Za-z0-9_-]+)`?", text, re.IGNORECASE)
+    feat_id = feat_m.group(1).strip() if feat_m else module
+
+    # 提取参与者矩阵
+    symbols = []
+    row_pattern = re.compile(
+        r"\|\s*\*\*?([A-Za-z0-9_ /()]+?)\*\*?\s*\|\s*`?([^\r\n`|]+?)`?\s*\|\s*`?([A-Za-z0-9_]+)?`?\s*\|"
+    )
+    for m in row_pattern.finditer(text):
+        role = m.group(1).strip()
+        loc = m.group(2).strip()
+        if role.lower() in ("模式角色", "pattern role", "---"):
+            continue
+        symbols.append(f"{role}:{loc}")
+
+    guard_m = re.search(r"##\s*(?:4\.\s*)?VibeCoding\s*防破坏红线[^\n]*\n+([\s\S]{1,500})", text)
+    guardrails = guard_m.group(1).strip() if guard_m else ""
+
+    results.append({
+        "cluster_key": f"cluster:{cluster_name}@{doc_rel_path}",
+        "feature_id": feat_id,
+        "pattern_name": pattern_name,
+        "cluster_name": cluster_name,
+        "participating_symbols": "; ".join(symbols),
+        "guardrails": re.sub(r"[\r\n]+", " ", guardrails)[:400],
+        "doc_path": doc_rel_path,
+    })
+    return results
+
+
+def _parse_data_schemas(text: str, doc_rel_path: str) -> List[Dict[str, Any]]:
+    """
+    解析 Markdown 数据表设计文档，提取表名、字段定义摘要、模块与关联迁移脚本
+    """
+    results: List[Dict[str, Any]] = []
+    table_m = re.search(r"-\s*\*\*.*?表名.*?\*\*[:：]\s*`?([A-Za-z0-9_]+)`?", text)
+    if not table_m:
+        table_m = re.search(r"^#\s*.*?(?:数据表设计|表设计)?[:：]\s*`?([A-Za-z0-9_]+)`?", text, re.MULTILINE)
+    if not table_m:
+        return results
+
+    table_name = table_m.group(1).strip()
+    desc_m = re.search(r"-\s*\*\*.*?(?:说明|描述).*?\*\*[:：]\s*([^\r\n]+)", text)
+    desc = desc_m.group(1).strip() if desc_m else ""
+    mod_m = re.search(r"-\s*\*\*.*?(?:所属模块).*?\*\*[:：]\s*`?([A-Za-z0-9_]+)`?", text)
+    mod = mod_m.group(1).strip() if mod_m else ""
+    feat_m = re.search(r"-\s*\*\*.*?(?:关联特性|Feature ID).*?\*\*[:：]\s*`?([A-Za-z0-9_-]+)`?", text, re.IGNORECASE)
+    feat_id = feat_m.group(1).strip() if feat_m else ""
+
+    cols = []
+    table_pattern = re.compile(r"\|\s*`?([A-Za-z0-9_]+)`?\s*\|\s*`?([A-Za-z0-9_() ]+?)`?\s*\|")
+    for m in table_pattern.finditer(text):
+        c_name = m.group(1).strip()
+        c_type = m.group(2).strip()
+        if c_name.lower() in ("字段名", "field", "---", ":---"):
+            continue
+        cols.append(f"{c_name}({c_type})")
+
+    ddl_m = re.search(r"`(migrations/V[^\r\n`]+\.sql)`", text)
+    ddl_path = ddl_m.group(1) if ddl_m else ""
+
+    results.append({
+        "schema_key": f"schema:{table_name}@{doc_rel_path}",
+        "feature_id": feat_id,
+        "table_name": table_name,
+        "layer": "db",
+        "module": mod,
+        "description": desc,
+        "ddl_path": ddl_path,
+        "fields_summary": ", ".join(cols[:15]),
+    })
+    return results
+
+
+def _parse_ddl_schemas(text: str, doc_rel_path: str) -> List[Dict[str, Any]]:
+    """
+    解析原始物理 SQL DDL 迁移文件 (V*.sql)
+    """
+    results: List[Dict[str, Any]] = []
+    table_m = re.search(
+        r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([`\"']?)([A-Za-z0-9_]+)\1\s*\(([\s\S]+?)\);",
+        text,
+        re.IGNORECASE,
+    )
+    if table_m:
+        table_name = table_m.group(2).strip()
+        body = table_m.group(3)
+        cols = []
+        for line in body.splitlines():
+            line = line.strip().rstrip(",")
+            if not line or line.upper().startswith(("PRIMARY KEY", "KEY", "INDEX", "CONSTRAINT", "UNIQUE")):
+                continue
+            col_match = re.match(r"^[`\"']?([A-Za-z0-9_]+)[`\"']?\s+([A-Za-z0-9_]+(?:\([0-9, ]+\))?)", line)
+            if col_match:
+                c_name, c_type = col_match.group(1), col_match.group(2)
+                cols.append(f"{c_name}({c_type})")
+
+        desc_m = re.search(r"--\s*(?:Description|说明|备注)[:：]\s*([^\r\n]+)", text)
+        desc = desc_m.group(1).strip() if desc_m else f"Table {table_name}"
+        feat_m = re.search(r"--\s*(?:Feature|特性|关联特性)[:：]\s*`?([A-Za-z0-9_-]+)`?", text)
+        feat_id = feat_m.group(1).strip() if feat_m else ""
+
+        parts = doc_rel_path.split("/")
+        mod = ""
+        for i, p in enumerate(parts):
+            if p == "_04_db_schema" and i + 1 < len(parts):
+                mod = parts[i + 1]
+                break
+
+        results.append({
+            "schema_key": f"schema:{table_name}@{doc_rel_path}",
+            "feature_id": feat_id,
+            "table_name": table_name,
+            "layer": "db",
+            "module": mod,
+            "description": desc,
+            "ddl_path": doc_rel_path,
+            "fields_summary": ", ".join(cols[:15]),
+        })
+    return results
+
+
 class DocIndexDB:
     def __init__(self, workspace_root: str | Path):
         self.root = Path(workspace_root).resolve()
@@ -641,6 +777,33 @@ class DocIndexDB:
             )
             conn.execute(
                 """
+                CREATE VIRTUAL TABLE IF NOT EXISTS pattern_clusters_fts USING fts5(
+                    cluster_key UNINDEXED,
+                    feature_id,
+                    pattern_name,
+                    cluster_name,
+                    participating_symbols,
+                    guardrails,
+                    tokenize='unicode61'
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE VIRTUAL TABLE IF NOT EXISTS data_schemas_fts USING fts5(
+                    schema_key UNINDEXED,
+                    feature_id,
+                    table_name,
+                    layer,
+                    module,
+                    description,
+                    fields_summary,
+                    tokenize='unicode61'
+                )
+                """
+            )
+            conn.execute(
+                """
                 CREATE VIRTUAL TABLE IF NOT EXISTS test_cases_fts USING fts5(
                     case_key UNINDEXED,
                     case_id,
@@ -687,6 +850,8 @@ class DocIndexDB:
                 conn.execute("DELETE FROM symbols_fts")
                 conn.execute("DELETE FROM features_fts")
                 conn.execute("DELETE FROM pages_fts")
+                conn.execute("DELETE FROM pattern_clusters_fts")
+                conn.execute("DELETE FROM data_schemas_fts")
                 conn.execute("DELETE FROM test_cases_fts")
                 conn.execute("DELETE FROM audit_changes_fts")
             except sqlite3.Error:
@@ -725,6 +890,10 @@ class DocIndexDB:
         features_inserted = self._index_features(conn)
         pages_inserted = self._index_pages(conn)
 
+        # 索引架构模式协同集群 (Pattern Clusters) 与数据存储模式 (Data Schemas)
+        patterns_inserted = self._index_pattern_clusters(conn)
+        schemas_inserted = self._index_data_schemas(conn)
+
         # 索引业务代码与脚本中的符号（类、函数、签名与行号）
         symbols_inserted = self._index_code_symbols(conn)
 
@@ -748,6 +917,8 @@ class DocIndexDB:
             "inserted": inserted,
             "features_inserted": features_inserted,
             "pages_inserted": pages_inserted,
+            "pattern_clusters_inserted": patterns_inserted,
+            "data_schemas_inserted": schemas_inserted,
             "symbols_inserted": symbols_inserted,
             "fts": self.fts_available,
             "rebuilt_at": _utc_now(),
@@ -858,6 +1029,191 @@ class DocIndexDB:
                                     p["name"],
                                     p.get("route", ""),
                                     p.get("summary", ""),
+                                ),
+                            )
+                        except sqlite3.Error:
+                            pass
+                    count += 1
+        return count
+
+    def _index_pattern_clusters(self, conn: sqlite3.Connection) -> int:
+        arch_dir = self.docs_root / "_03_architecture_design"
+        candidate_dirs = (
+            [arch_dir]
+            if arch_dir.exists()
+            else ([self.docs_root] if self.docs_root.exists() else [])
+        )
+        count = 0
+        for cdir in candidate_dirs:
+            for fpath in cdir.rglob("*.md"):
+                rel_p = _posix_rel(fpath, self.root)
+                if not ("pattern" in rel_p.lower() or "cluster" in rel_p.lower()):
+                    continue
+                text = _read_text(fpath)
+                if not text:
+                    continue
+                clusters = _parse_pattern_clusters(text, rel_p)
+                for c in clusters:
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO pattern_clusters (
+                            cluster_key, feature_id, pattern_name, cluster_name, participating_symbols, guardrails, doc_path, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            c["cluster_key"],
+                            c["feature_id"],
+                            c["pattern_name"],
+                            c["cluster_name"],
+                            c.get("participating_symbols", ""),
+                            c.get("guardrails", ""),
+                            c["doc_path"],
+                            _utc_now(),
+                        ),
+                    )
+                    if self.fts_available:
+                        try:
+                            conn.execute(
+                                "DELETE FROM pattern_clusters_fts WHERE cluster_key = ?",
+                                (c["cluster_key"],),
+                            )
+                            conn.execute(
+                                """
+                                INSERT INTO pattern_clusters_fts (cluster_key, feature_id, pattern_name, cluster_name, participating_symbols, guardrails)
+                                VALUES (?, ?, ?, ?, ?, ?)
+                                """,
+                                (
+                                    c["cluster_key"],
+                                    c["feature_id"],
+                                    c["pattern_name"],
+                                    c["cluster_name"],
+                                    c.get("participating_symbols", ""),
+                                    c.get("guardrails", ""),
+                                ),
+                            )
+                        except sqlite3.Error:
+                            pass
+                    count += 1
+        return count
+
+    def _index_data_schemas(self, conn: sqlite3.Connection) -> int:
+        schema_dir = self.docs_root / "_04_db_schema"
+        candidate_dirs = (
+            [schema_dir]
+            if schema_dir.exists()
+            else ([self.docs_root] if self.docs_root.exists() else [])
+        )
+        count = 0
+        seen_tables = set()
+        for cdir in candidate_dirs:
+            for fpath in cdir.rglob("*.md"):
+                rel_p = _posix_rel(fpath, self.root)
+                if not (
+                    "_04_db_schema" in rel_p
+                    or "schema" in rel_p.lower()
+                    or "table" in rel_p.lower()
+                ):
+                    continue
+                text = _read_text(fpath)
+                if not text:
+                    continue
+                schemas = _parse_data_schemas(text, rel_p)
+                for s in schemas:
+                    seen_tables.add(s["table_name"])
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO data_schemas (
+                            schema_key, feature_id, table_name, layer, module, description, ddl_path, fields_summary, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            s["schema_key"],
+                            s.get("feature_id", ""),
+                            s["table_name"],
+                            s.get("layer", "db"),
+                            s.get("module", ""),
+                            s.get("description", ""),
+                            s.get("ddl_path", ""),
+                            s.get("fields_summary", ""),
+                            _utc_now(),
+                        ),
+                    )
+                    if self.fts_available:
+                        try:
+                            conn.execute(
+                                "DELETE FROM data_schemas_fts WHERE schema_key = ?",
+                                (s["schema_key"],),
+                            )
+                            conn.execute(
+                                """
+                                INSERT INTO data_schemas_fts (schema_key, feature_id, table_name, layer, module, description, fields_summary)
+                                VALUES (?, ?, ?, ?, ?, ?, ?)
+                                """,
+                                (
+                                    s["schema_key"],
+                                    s.get("feature_id", ""),
+                                    s["table_name"],
+                                    s.get("layer", "db"),
+                                    s.get("module", ""),
+                                    s.get("description", ""),
+                                    s.get("fields_summary", ""),
+                                ),
+                            )
+                        except sqlite3.Error:
+                            pass
+                    count += 1
+
+            for fpath in cdir.rglob("V*.sql"):
+                rel_p = _posix_rel(fpath, self.root)
+                text = _read_text(fpath)
+                if not text:
+                    continue
+                sql_schemas = _parse_ddl_schemas(text, rel_p)
+                for s in sql_schemas:
+                    if s["table_name"] in seen_tables:
+                        conn.execute(
+                            "UPDATE data_schemas SET ddl_path = ? WHERE table_name = ? AND (ddl_path IS NULL OR ddl_path = '')",
+                            (rel_p, s["table_name"]),
+                        )
+                        continue
+                    seen_tables.add(s["table_name"])
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO data_schemas (
+                            schema_key, feature_id, table_name, layer, module, description, ddl_path, fields_summary, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            s["schema_key"],
+                            s.get("feature_id", ""),
+                            s["table_name"],
+                            s.get("layer", "db"),
+                            s.get("module", ""),
+                            s.get("description", ""),
+                            s.get("ddl_path", ""),
+                            s.get("fields_summary", ""),
+                            _utc_now(),
+                        ),
+                    )
+                    if self.fts_available:
+                        try:
+                            conn.execute(
+                                "DELETE FROM data_schemas_fts WHERE schema_key = ?",
+                                (s["schema_key"],),
+                            )
+                            conn.execute(
+                                """
+                                INSERT INTO data_schemas_fts (schema_key, feature_id, table_name, layer, module, description, fields_summary)
+                                VALUES (?, ?, ?, ?, ?, ?, ?)
+                                """,
+                                (
+                                    s["schema_key"],
+                                    s.get("feature_id", ""),
+                                    s["table_name"],
+                                    s.get("layer", "db"),
+                                    s.get("module", ""),
+                                    s.get("description", ""),
+                                    s.get("fields_summary", ""),
                                 ),
                             )
                         except sqlite3.Error:
@@ -1708,6 +2064,156 @@ class DocIndexDB:
             "hint": "View wireframe & layout topology via db.slice(page.doc_path).",
         }
 
+    def pattern_search(
+        self,
+        query: str,
+        *,
+        feature: str = "",
+        pattern: str = "",
+        limit: int = 5,
+    ) -> Dict[str, Any]:
+        conn = self.connect()
+        q = (query or "").strip()
+        if not q:
+            return {
+                "ok": False,
+                "error": "empty query",
+                "count": 0,
+                "patterns": [],
+                "hint": "Provide --q with pattern name (Strategy/State), cluster name, or method name.",
+            }
+
+        ranked: Dict[str, Dict[str, Any]] = {}
+        use_fts = self.fts_available and not _has_cjk(q)
+        if use_fts:
+            fts_q = self._fts_query(q)
+            try:
+                sql = """
+                    SELECT p.cluster_key, p.feature_id, p.pattern_name, p.cluster_name,
+                           p.participating_symbols, p.guardrails, p.doc_path,
+                           bm25(pattern_clusters_fts) AS score
+                    FROM pattern_clusters_fts
+                    JOIN pattern_clusters p ON p.cluster_key = pattern_clusters_fts.cluster_key
+                    WHERE pattern_clusters_fts MATCH ?
+                """
+                params: List[Any] = [fts_q]
+                if feature:
+                    sql += " AND p.feature_id = ?"
+                    params.append(feature)
+                if pattern:
+                    sql += " AND p.pattern_name LIKE ?"
+                    params.append(f"%{pattern}%")
+                sql += " ORDER BY score LIMIT ?"
+                params.append(limit * 2)
+                for r in conn.execute(sql, params):
+                    ranked[r["cluster_key"]] = dict(r)
+            except sqlite3.Error:
+                use_fts = False
+
+        like = f"%{q}%"
+        sql = """
+            SELECT cluster_key, feature_id, pattern_name, cluster_name,
+                   participating_symbols, guardrails, doc_path, 0.0 AS score
+            FROM pattern_clusters
+            WHERE (cluster_name LIKE ? OR pattern_name LIKE ? OR feature_id LIKE ? OR participating_symbols LIKE ? OR guardrails LIKE ?)
+        """
+        params = [like, like, like, like, like]
+        if feature:
+            sql += " AND feature_id = ?"
+            params.append(feature)
+        if pattern:
+            sql += " AND pattern_name LIKE ?"
+            params.append(f"%{pattern}%")
+        sql += " LIMIT ?"
+        params.append(limit * 2)
+        for r in conn.execute(sql, params):
+            if r["cluster_key"] not in ranked:
+                ranked[r["cluster_key"]] = dict(r)
+
+        results = list(ranked.values())[:limit]
+        return {
+            "ok": True,
+            "query": q,
+            "count": len(results),
+            "patterns": results,
+            "hint": "Adhere to cluster guardrails before modifying participating methods.",
+        }
+
+    def schema_search(
+        self,
+        query: str,
+        *,
+        module: str = "",
+        feature: str = "",
+        limit: int = 5,
+    ) -> Dict[str, Any]:
+        conn = self.connect()
+        q = (query or "").strip()
+        if not q:
+            return {
+                "ok": False,
+                "error": "empty query",
+                "count": 0,
+                "schemas": [],
+                "hint": "Provide --q with table name, field name, or business description.",
+            }
+
+        ranked: Dict[str, Dict[str, Any]] = {}
+        use_fts = self.fts_available and not _has_cjk(q)
+        if use_fts:
+            fts_q = self._fts_query(q)
+            try:
+                sql = """
+                    SELECT s.schema_key, s.feature_id, s.table_name, s.layer, s.module,
+                           s.description, s.ddl_path, s.fields_summary,
+                           bm25(data_schemas_fts) AS score
+                    FROM data_schemas_fts
+                    JOIN data_schemas s ON s.schema_key = data_schemas_fts.schema_key
+                    WHERE data_schemas_fts MATCH ?
+                """
+                params: List[Any] = [fts_q]
+                if module:
+                    sql += " AND s.module = ?"
+                    params.append(module)
+                if feature:
+                    sql += " AND s.feature_id = ?"
+                    params.append(feature)
+                sql += " ORDER BY score LIMIT ?"
+                params.append(limit * 2)
+                for r in conn.execute(sql, params):
+                    ranked[r["schema_key"]] = dict(r)
+            except sqlite3.Error:
+                use_fts = False
+
+        like = f"%{q}%"
+        sql = """
+            SELECT schema_key, feature_id, table_name, layer, module,
+                   description, ddl_path, fields_summary, 0.0 AS score
+            FROM data_schemas
+            WHERE (table_name LIKE ? OR description LIKE ? OR fields_summary LIKE ? OR feature_id LIKE ? OR module LIKE ?)
+        """
+        params = [like, like, like, like, like]
+        if module:
+            sql += " AND module = ?"
+            params.append(module)
+        if feature:
+            sql += " AND feature_id = ?"
+            params.append(feature)
+        sql += " LIMIT ?"
+        params.append(limit * 2)
+        for r in conn.execute(sql, params):
+            if r["schema_key"] not in ranked:
+                ranked[r["schema_key"]] = dict(r)
+
+        results = list(ranked.values())[:limit]
+        return {
+            "ok": True,
+            "query": q,
+            "count": len(results),
+            "schemas": results,
+            "hint": "Check V/U migrations or db_table_design via db.slice(schema.ddl_path).",
+        }
+
 
 def _print_json(payload: Dict[str, Any]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -1743,6 +2249,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     p_page.add_argument("--q", required=True, help="Page name, route or layout keyword")
     p_page.add_argument("--route", default="", help="Filter by route path")
     p_page.add_argument("--limit", type=int, default=5)
+
+    p_pattern = sub.add_parser("pattern-search", help="Search design pattern clusters and guardrails")
+    p_pattern.add_argument("--q", required=True, help="Pattern name, cluster name or symbol")
+    p_pattern.add_argument("--feature", default="", help="Filter by feature ID")
+    p_pattern.add_argument("--pattern", default="", help="Filter by pattern type")
+    p_pattern.add_argument("--limit", type=int, default=5)
+
+    p_schema = sub.add_parser("schema-search", help="Search data schemas, tables and DDL mappings")
+    p_schema.add_argument("--q", required=True, help="Table name, field name or description")
+    p_schema.add_argument("--module", default="", help="Filter by module")
+    p_schema.add_argument("--feature", default="", help="Filter by feature ID")
+    p_schema.add_argument("--limit", type=int, default=5)
 
     p_method = sub.add_parser(
         "method-search",
@@ -1808,6 +2326,30 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 db.page_search(
                     args.q,
                     route=args.route,
+                    limit=args.limit,
+                )
+            )
+            return 0
+        if args.command == "pattern-search":
+            if not db.db_path.exists():
+                db.rebuild()
+            _print_json(
+                db.pattern_search(
+                    args.q,
+                    feature=args.feature,
+                    pattern=args.pattern,
+                    limit=args.limit,
+                )
+            )
+            return 0
+        if args.command == "schema-search":
+            if not db.db_path.exists():
+                db.rebuild()
+            _print_json(
+                db.schema_search(
+                    args.q,
+                    module=args.module,
+                    feature=args.feature,
                     limit=args.limit,
                 )
             )

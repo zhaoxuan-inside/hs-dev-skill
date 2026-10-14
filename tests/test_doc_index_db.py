@@ -259,6 +259,86 @@ class TestDocIndexDB(unittest.TestCase):
         finally:
             db.close()
 
+    def test_pattern_cluster_and_data_schema_indexing_and_search(self):
+        # 1. 准备设计模式集群档案
+        cluster_dir = self.root / "hs_dev_docs" / "_03_architecture_design" / "_02_pattern_clusters"
+        cluster_dir.mkdir(parents=True, exist_ok=True)
+        cluster_file = cluster_dir / "payment_strategy_cluster.md"
+        cluster_file.write_text(
+            "# 设计模式协同集群档案：payment_strategy_cluster\n\n"
+            "## 1. 模式元数据 (Pattern Metadata)\n"
+            "- **设计模式 (Design Pattern)**：`Strategy`\n"
+            "- **所属业务域与模块**：`payment / checkout`\n"
+            "- **关联特性 (Feature ID)**：`FEAT-101`\n\n"
+            "## 2. 参与者矩阵与物理定位 (Participant Matrix)\n"
+            "| 模式角色 (Pattern Role) | 承载类 / 方法物理定位 | 方法原型 | 核心职责 |\n"
+            "|---|---|---|---|\n"
+            "| **Context** | `backend/payment/pay_context.py#10-35` | `ORCHESTRATE` | 调度支付策略执行 |\n"
+            "| **Contract** | `backend/payment/iprecise_strategy.py#5-15` | `CONTRACT` | 支付标准抽象接口 |\n\n"
+            "## 4. VibeCoding 防破坏红线\n"
+            "严禁在 Context 中通过 if-else 穿透破坏策略多态！\n",
+            encoding="utf-8",
+        )
+
+        # 2. 准备数据表规格文档与 SQL 迁移
+        schema_dir = self.root / "hs_dev_docs" / "_04_db_schema" / "_01_order"
+        schema_dir.mkdir(parents=True, exist_ok=True)
+        tbl_file = schema_dir / "order_tbl_design.md"
+        tbl_file.write_text(
+            "# 数据表设计文档：t_order\n\n"
+            "## 1. 表基础信息\n"
+            "- **表名**：`t_order`\n"
+            "- **说明**：交易订单主表\n"
+            "- **所属模块**：`order`\n"
+            "- **关联特性 (Feature ID)**：`FEAT-101`\n\n"
+            "## 2. 字段定义\n"
+            "| 字段名 | 类型 | 长度/精度 | 允许空 |\n"
+            "|---|---|---|---|\n"
+            "| `id` | BIGINT | 64 | 否 |\n"
+            "| `order_no` | VARCHAR | 64 | 否 |\n"
+            "| `amount` | DECIMAL | 10,2 | 否 |\n",
+            encoding="utf-8",
+        )
+
+        mig_dir = schema_dir / "migrations"
+        mig_dir.mkdir(parents=True, exist_ok=True)
+        sql_file = mig_dir / "V1.0.0__create_order.sql"
+        sql_file.write_text(
+            "-- Description: 交易订单主表物理定义\n"
+            "-- Feature: FEAT-101\n"
+            "CREATE TABLE IF NOT EXISTS t_order (\n"
+            "    id BIGINT PRIMARY KEY,\n"
+            "    order_no VARCHAR(64) NOT NULL,\n"
+            "    amount DECIMAL(10,2) NOT NULL\n"
+            ");\n",
+            encoding="utf-8",
+        )
+
+        db = DocIndexDB(self.root)
+        try:
+            info = db.rebuild()
+            self.assertGreaterEqual(info["pattern_clusters_inserted"], 1)
+            self.assertGreaterEqual(info["data_schemas_inserted"], 1)
+
+            # Pattern Search 测试
+            pat_res = db.pattern_search("Strategy")
+            self.assertTrue(pat_res["ok"])
+            self.assertGreaterEqual(pat_res["count"], 1)
+            pat_item = pat_res["patterns"][0]
+            self.assertEqual(pat_item["cluster_name"], "payment_strategy_cluster")
+            self.assertIn("Context", pat_item["participating_symbols"])
+
+            # Schema Search 测试
+            sch_res = db.schema_search("t_order")
+            self.assertTrue(sch_res["ok"])
+            self.assertGreaterEqual(sch_res["count"], 1)
+            sch_item = sch_res["schemas"][0]
+            self.assertEqual(sch_item["table_name"], "t_order")
+            self.assertEqual(sch_item["feature_id"], "FEAT-101")
+            self.assertIn("order_no", sch_item["fields_summary"])
+        finally:
+            db.close()
+
 
 if __name__ == "__main__":
     unittest.main()
