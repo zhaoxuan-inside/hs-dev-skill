@@ -191,6 +191,8 @@ class TestProductDesignCapability(unittest.TestCase):
         self.assertIn("MoSCoW", content)
         self.assertIn("产品开发分阶段规划书", content)
         self.assertIn("砍半法则", content)
+        self.assertIn("质疑", content)
+        self.assertIn("开发者最终", content)
         self.assertIn("No Admin in MVP", content)
         self.assertIn("Appetite", content)
         self.assertIn("Tracer Bullet", content)
@@ -203,6 +205,8 @@ class TestProductDesignCapability(unittest.TestCase):
         self.assertIn("阶段一：MVP", tpl_content)
         self.assertIn("Appetite", tpl_content)
         self.assertIn("CEO 砍半提案", tpl_content)
+        self.assertIn("质疑", tpl_content)
+        self.assertIn("开发者最终", tpl_content)
         self.assertIn("垂直曳光弹切片", tpl_content)
 
 

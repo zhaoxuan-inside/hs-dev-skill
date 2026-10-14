@@ -72,7 +72,7 @@
 - **规划指南驱动**：深度遵循 [`product_roadmap.md`](product_roadmap.md)，严禁直接对全量功能进行大包大揽式开发；
 - **强制人机交互对齐机制 (Human-in-the-Loop Alignment & CEO Cut)**：Agent 主动发起针对性问询，向人类决策者提问并确认：
   1. *Q1 单一核心假设 (Single Risky Assumption)*：MVP 最关键要验证的核心闭环与痛点是什么？
-  2. *Q2 CEO 视角激进砍半提案 (The Radical Cut)*：Agent 主动提案砍掉 50% 次级特性（高级筛选/批量导出/站内通知/权限管理），严格落实 **No Admin in MVP**；
+  2. *Q2 CEO 视角功能质疑与砍半建议 (The Radical Cut · 质疑式裁剪)*：Agent 不擅自直接砍半，而是主动对辅助特性（高级筛选/批量导出/站内通知/多角色权限）发起必要性质疑，提出裁剪建议清单，由开发者最终拍板裁定（严守开发者确认的 No Admin in MVP 倡议）；
   3. *Q3 团队胃口与时间箱 (Appetite & Circuit Breaker)*：本次 MVP 设定的胃口周期（1~3天/1~2周），触发断路器坚决砍功能保上线；
   4. *Q4 Day 1 垂直曳光弹切片与验收 (Tracer Bullet & DoD)*：端到端纵向贯通 UI+API+DB 的首日冒烟切片与 Gherkin 验收断言；
 - **编制分阶段规划书**：形成各阶段功能映射表、阶段依赖路线图与准出条件。
