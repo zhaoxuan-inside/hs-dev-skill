@@ -94,22 +94,36 @@ python scripts/doc_index_db.py --root . slice --path hs_dev_docs/_05_interface_d
 [顶层 L2: 索引大脑]  doc_index.sqlite (FTS5 / 关键词倒排索引)
         │            ▲
         ▼            │ 【第 1 次收口：意图检索】
-[中层 L1: 业务总结]  hs_dev_docs/ (PRD 规格 / 接口契约 / 方法七维画像)
-        │            ▲ 过滤 90% 语法噪音，记录业务契约与符号锚点 (Symbol Anchor)
+[中层 L1: 业务总结]  hs_dev_docs/ (接口参数契约 / 方法七维画像 / 调用链路)
+        │            ▲ 高信噪比派生视图，记录业务意图与符号锚点 (Symbol Anchor)
         ▼            │ 【第 2 次收口：契约锁定与符号定位】
-[底层 L0: 物理真理]  源码 (backend/apps) + DDL (migrations/*.sql) + 测试 (test/)
+[底层 L0: 物理真理]  7 大最底层数据资产 (产品原型 + 架构决策 + 源码 + DDL + 测试 + 配置 + 变更历史)
                      ▲ 【第 3 次收口：精准行段切片 (10~30 行)】
 ```
 
-1. **底层物理真实数据 (Level 0 - Ground Truth)**：
-   - 业务源代码（执行态唯一真理）；
-   - 数据库迁移脚本 `migrations/*.sql`（数据骨架约束）；
-   - 测试用例与断言 `test/`（行为合法性真理）；
-   - 环境变量与配置 `config/.env.example`。
-2. **中层业务契约与总结 (Level 1 - High-Density Summaries)**：
-   - 对底层代码的高度抽象，记录业务语义、改动敏感度（`CRITICAL`）、模式护栏及符号锚点；
-3. **顶层轻量索引 (Level 2 - Index of Summaries)**：
-   - 建立在文档总结之上，体积小（几十 KB），毫秒级召回。
+### 5.1 七大最底层物理数据资产矩阵 (The 7 Ground-Truth Pillars)
+
+在系统工程中，代码不是凭空产生的，**产品设计是“业务意图的第一因”，架构设计是“工程结构的第一因”**。以下 7 类构成了软件系统绝不说谎的不可替代底层资产：
+
+1. **产品设计与交互原型真理 (`DESIGN.md` / `{feature}_prototype.html` / PRD)**：
+   - 业务意图与人机体验的第一事实源。包含宏观品味宪章、Design Tokens、单文件零依赖可交互 HTML 原型以及面向机器的 `vibe_spec.md`。
+2. **系统架构与技术选型真理 (`ADR` / 深模块 / `[VIBE_CONTRACT]`)**：
+   - 工程结构与非功能约束的第一事实源。包含架构决策记录（不可逆约束）、系统深模块词汇、设计模式协同集群与顶置机器执行契约。
+3. **业务源码实现真理 (`backend/` / `frontend/` / `apps/` / `packages/` / `src/`)**：
+   - 机器运行态物理执行与控制流的唯一实现体。
+4. **数据模式与持久层真理 (`migrations/V*.sql` / `U*.sql`)**：
+   - 物理存储骨架、表结构、字段类型、索引与主外键完整性约束。
+5. **自动化测试与行为验证真理 (`test/` / `_08_test_data/` / Mock Profiles)**：
+   - 系统可执行行为正确性的物理裁决者。代码对不对，以测试断言（Assert）能否通过为硬指标。
+6. **运行环境与构建配置真理 (`config/` / `.env.example` / `Makefile` / `package.json`)**：
+   - 声明底层系统依赖、编译器工具链、网络拓扑与密钥隔离规约。
+7. **版本控制与过程审计真理 (`.git/` / `_01_plan_log/` / `_02_change_log/*.jsonl`)**：
+   - 记录每一行物理代码的增删改历史、任务状态机断点与无损物理回滚镜像。
+
+### 5.2 派生总结与索引层定位
+
+- **中层总结 (L1 - Derived Summaries)**：如 `_06_method_design`（方法七维画像）、`_05_interface_design`（接口契约）、`_07_call_chain`（调用拓扑）。它们是从上述 L0 物理真理中提炼出来的高密度业务契约视图。
+- **顶层索引 (L2 - Index of Summaries)**：`doc_index.sqlite`（FTS5 / JSONL），对 L1 总结建立的毫秒级倒排索引。
 
 **抗脆弱铁律**：严禁在文档中硬编码绝对行号。改用**符号锚点 (Symbol Anchor)**，由底层 AST 动态求值物理行号，消除代码格式化或修改造成的行号漂移。
 
