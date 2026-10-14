@@ -48,9 +48,13 @@ python scripts/rule_fetch.py resolve --id vercel.react-rules --rule async-parall
 
 ---
 
-## 3. 组件、状态与文案
+## 3. 组件、状态与文案（解耦与方法类型分治）
 
-- 组合优于超大配置 props；展示与数据容器分离。
+- **展示与领域计算严格分离**（遵循 [`method_archetypes.md`](method_archetypes.md)）：
+  - 纯展示组件（`PRESENT`）只消费 props，**禁止混入复杂金额折算、状态推演与网络 I/O**；
+  - 复杂本地算式与表单校验下沉为纯函数（`ALGO`），放入独立文件，实现 **0 DOM 依赖毫秒级单测**；
+  - 业务流程与副作用通过 Custom Hook（`ORCHESTRATE`）调度，让 AI 修改业务逻辑时无需加载几百行 JSX/Tailwind 模板。
+- 组合优于超大配置 props；展示容器与数据编排分离。
 - 状态由简到繁：`useState` → 上提 → Context（读多写少）→ URL（筛选/页签/分页可分享）→ 服务端缓存（Query/SWR）→ 全局 store。
 - 必备状态：loading（骨架优先于转圈）、empty（邀请下一步）、error（含修复方式）、success；权限不足单独处理。
 - 交互用真正的 `button`/`a`；图标按钮补 `aria-label`；dialog 打开时焦点管理；破坏性操作需确认或可撤销。
