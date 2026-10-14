@@ -55,7 +55,7 @@ metadata:
 13. **学习/偏好**：`~/.hs-dev-skill/`；`global_index_db.py search`，禁止整目录通读。
 14. **模糊新技术/UI/架构**：GitHub 高星对标 ≥2；范式见 `dev_paradigm`；深模块见 `deep_modules`；前端结构见 `frontend_arch`；后端见 `backend_arch`；复杂域才读 `ddd_design`（远程按需）。
 15. **三端**：`pathlib` + `python3`/`python`/`py -3`（[`cross_platform.md`](references/cross_platform.md)）。
-16. **Token**：门闩 + `doc_index_db` / `skill_ref_index` / `rule_fetch` → 切片 → context_pack；禁止整树/`spec_v2_4`/远程规则包开局通读（[`token_budget.md`](references/token_budget.md)）。
+16. **Token 与降噪**：门闩 + `doc_index_db` / `skill_ref_index` / `rule_fetch` → 切片 → context_pack；代码探索严禁全读大文件，优先 `code_skeleton.py` AST 骨架化；命令行与测试使用 `log_filter.py` 降噪；禁止整树/`spec_v2_4`/远程规则包开局通读（[`token_budget.md`](references/token_budget.md)）。
 17. **默认 Commit；明确要求才 push**。
 18. **版本号双轨控制与防漂移**：遵循 SemVer（`vX.Y.Z`）；Skill 自身三处元数据（metadata/正文/README）强一致；项目交付 S/M/L 映射 PATCH/MINOR/MAJOR；API/DB 严格按版本演进（[`version_control.md`](references/version_control.md)）。
 19. **多端架构与产出收敛控制**：应用代码收敛于 `apps/<client>/`，跨端共享收敛于 `packages/`，配置收敛于 `config/`（强制提供 `.env.example`，敏感变量绝不上库）；Web、桌面端（Desktop）、移动端（Mobile）打包产物必须通过脚手架配置重定向至根目录 `output/` 对应子目录，移动端发布包强制配对混淆符号表（Mapping/dSYM），严禁散落破坏工程整洁度。
@@ -89,6 +89,8 @@ metadata:
 | `doc_index_db.py` | 项目文档 search/slice/方法查重 | `python scripts/doc_index_db.py --root . search --q kw`<br/>`python scripts/doc_index_db.py --root . method-search --q "扣款"` |
 | `global_index_db.py` | 全局偏好/学习标签 | `python scripts/global_index_db.py search --tag 反向代理` |
 | `task_manager.py` | 任务三文件+合法状态机+看板渲染 | `python scripts/task_manager.py create --id x --title "…" --change-size M`<br/>`python scripts/task_manager.py dashboard --phase 3` |
+| `code_skeleton.py` | AST/多语言代码骨架提取 (省 90% Token) | `python scripts/code_skeleton.py --path backend/` |
+| `log_filter.py` | 测试与构建日志降噪过滤 | `python scripts/log_filter.py --cmd "make test"` |
 | `process_log.py` | plan/change 续做与非 git 回退 | `python scripts/process_log.py resume-scan` / `checkpoint` / `rollback` |
 | `verify_consistency.py` | 提交前门禁 | `python scripts/verify_consistency.py --root .` |
 | `init_hs_dev_docs.py` / `init_hs_global.py` | 初始化项目文档 (支持 `--from-existing`) / 全局区 | `python scripts/init_hs_dev_docs.py --from-existing` |

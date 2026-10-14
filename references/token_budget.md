@@ -125,3 +125,19 @@ py -3 scripts/global_index_db.py search --q nginx --kind note
 统一写法：`python scripts/...`，并按 [`cross_platform.md`](cross_platform.md) 选择启动器。  
 Skill 索引缓存：`<skill_root>/.hs_cache/skill_ref.sqlite`（可重建，默认不提交）。  
 远程规则缓存：`~/.hs-dev-skill/rule_cache/`（可重建）。
+
+---
+
+## 6. AST 符号骨架与命令行日志降噪（进阶省 Token）
+
+1. **代码探索优先骨架化**：探索未知代码库或定位函数时，严禁直接 `view_file` 整读数百行大文件。必须先执行：
+   ```bash
+   python scripts/code_skeleton.py --path <file_or_dir>
+   ```
+   借助 AST 提取模块签名、类、方法及精确行号范围（实现 85%~95% Token 压缩），仅根据命中的精确行段按需切片查看。
+2. **测试与命令日志降噪截断**：避免 `make test` 或构建工具打印数百行无关控制台输出污染上下文：
+   ```bash
+   python scripts/log_filter.py --cmd "make test"
+   ```
+   成功用例自动提炼为单行状态，失败用例仅提取核心错误帧与断言，消除 90%+ 噪音。
+
