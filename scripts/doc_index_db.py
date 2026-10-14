@@ -268,6 +268,112 @@ class DocIndexDB:
             );
             CREATE INDEX IF NOT EXISTS idx_symbols_name ON code_symbols(name);
             CREATE INDEX IF NOT EXISTS idx_symbols_file ON code_symbols(file_path);
+
+            -- 1 & 3: 产品功能与子规格详情表
+            CREATE TABLE IF NOT EXISTS features (
+                feature_key TEXT PRIMARY KEY,
+                feature_id TEXT NOT NULL,
+                name TEXT NOT NULL,
+                domain TEXT,
+                module TEXT,
+                summary TEXT,
+                prd_path TEXT,
+                priority TEXT DEFAULT 'P1',
+                status TEXT DEFAULT 'active',
+                updated_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_features_id ON features(feature_id);
+            CREATE INDEX IF NOT EXISTS idx_features_domain ON features(domain);
+
+            -- 2: 页面名称与具体布局拓扑表
+            CREATE TABLE IF NOT EXISTS pages (
+                page_key TEXT PRIMARY KEY,
+                page_id TEXT NOT NULL,
+                name TEXT NOT NULL,
+                route TEXT,
+                module TEXT,
+                prototype_html TEXT,
+                layout_type TEXT,
+                summary TEXT,
+                doc_path TEXT,
+                updated_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_pages_id ON pages(page_id);
+            CREATE INDEX IF NOT EXISTS idx_pages_route ON pages(route);
+
+            -- 4 & 9: 架构模式协同集群表
+            CREATE TABLE IF NOT EXISTS pattern_clusters (
+                cluster_key TEXT PRIMARY KEY,
+                feature_id TEXT NOT NULL,
+                pattern_name TEXT NOT NULL,
+                cluster_name TEXT NOT NULL,
+                participating_symbols TEXT,
+                guardrails TEXT,
+                doc_path TEXT,
+                updated_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_patterns_feature ON pattern_clusters(feature_id);
+            CREATE INDEX IF NOT EXISTS idx_patterns_name ON pattern_clusters(pattern_name);
+
+            -- 10 & 11: 数据模式与存储结构功能映射表
+            CREATE TABLE IF NOT EXISTS data_schemas (
+                schema_key TEXT PRIMARY KEY,
+                feature_id TEXT,
+                table_name TEXT NOT NULL,
+                layer TEXT,
+                module TEXT,
+                description TEXT,
+                ddl_path TEXT,
+                fields_summary TEXT,
+                updated_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_schemas_table ON data_schemas(table_name);
+            CREATE INDEX IF NOT EXISTS idx_schemas_feature ON data_schemas(feature_id);
+
+            -- 12, 13 & 14: 测试用例与执行说明表
+            CREATE TABLE IF NOT EXISTS test_cases (
+                case_key TEXT PRIMARY KEY,
+                case_id TEXT NOT NULL,
+                feature_id TEXT,
+                target_symbol TEXT,
+                layer TEXT,
+                module TEXT,
+                description TEXT,
+                test_file TEXT,
+                test_command TEXT,
+                ddt_dataset TEXT,
+                updated_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_tests_case_id ON test_cases(case_id);
+            CREATE INDEX IF NOT EXISTS idx_tests_target ON test_cases(target_symbol);
+
+            -- 7 & 8: 方法全局与局部微依赖拓扑表
+            CREATE TABLE IF NOT EXISTS method_dependencies (
+                dep_key TEXT PRIMARY KEY,
+                source_symbol TEXT NOT NULL,
+                target_symbol TEXT NOT NULL,
+                dep_type TEXT,
+                source_file TEXT,
+                target_file TEXT,
+                updated_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_deps_source ON method_dependencies(source_symbol);
+            CREATE INDEX IF NOT EXISTS idx_deps_target ON method_dependencies(target_symbol);
+
+            -- 16: 物理审计变更历史表 (时间与简述双索引)
+            CREATE TABLE IF NOT EXISTS audit_changes (
+                audit_key TEXT PRIMARY KEY,
+                checkpoint_id TEXT NOT NULL,
+                task_id TEXT,
+                timestamp TEXT NOT NULL,
+                summary TEXT,
+                affected_files TEXT,
+                affected_symbols TEXT,
+                raw_log_path TEXT,
+                updated_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_audit_checkpoint ON audit_changes(checkpoint_id);
+            CREATE INDEX IF NOT EXISTS idx_audit_time ON audit_changes(timestamp);
             """
         )
         self.fts_available = self._try_init_fts(conn)
@@ -311,6 +417,55 @@ class DocIndexDB:
                 )
                 """
             )
+            conn.execute(
+                """
+                CREATE VIRTUAL TABLE IF NOT EXISTS features_fts USING fts5(
+                    feature_key UNINDEXED,
+                    feature_id,
+                    name,
+                    summary,
+                    domain,
+                    module,
+                    tokenize='unicode61'
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE VIRTUAL TABLE IF NOT EXISTS pages_fts USING fts5(
+                    page_key UNINDEXED,
+                    page_id,
+                    name,
+                    route,
+                    summary,
+                    tokenize='unicode61'
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE VIRTUAL TABLE IF NOT EXISTS test_cases_fts USING fts5(
+                    case_key UNINDEXED,
+                    case_id,
+                    description,
+                    target_symbol,
+                    test_command,
+                    tokenize='unicode61'
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE VIRTUAL TABLE IF NOT EXISTS audit_changes_fts USING fts5(
+                    audit_key UNINDEXED,
+                    checkpoint_id,
+                    summary,
+                    affected_files,
+                    affected_symbols,
+                    tokenize='unicode61'
+                )
+                """
+            )
             conn.commit()
             return True
         except sqlite3.Error:
@@ -321,13 +476,22 @@ class DocIndexDB:
         conn.execute("DELETE FROM docs")
         conn.execute("DELETE FROM methods")
         conn.execute("DELETE FROM code_symbols")
+        conn.execute("DELETE FROM features")
+        conn.execute("DELETE FROM pages")
+        conn.execute("DELETE FROM pattern_clusters")
+        conn.execute("DELETE FROM data_schemas")
+        conn.execute("DELETE FROM test_cases")
+        conn.execute("DELETE FROM method_dependencies")
+        conn.execute("DELETE FROM audit_changes")
         if self.fts_available:
             try:
                 conn.execute("DELETE FROM docs_fts")
                 conn.execute("DELETE FROM methods_fts")
                 conn.execute("DELETE FROM symbols_fts")
-            except sqlite3.Error:
-                self.fts_available = False
+                conn.execute("DELETE FROM features_fts")
+                conn.execute("DELETE FROM pages_fts")
+                conn.execute("DELETE FROM test_cases_fts")
+                conn.execute("DELETE FROM audit_changes_fts")
             except sqlite3.Error:
                 self.fts_available = False
 
@@ -878,6 +1042,13 @@ class DocIndexDB:
         count = conn.execute("SELECT COUNT(*) AS c FROM docs").fetchone()["c"]
         m_count = conn.execute("SELECT COUNT(*) AS c FROM methods").fetchone()["c"]
         s_count = conn.execute("SELECT COUNT(*) AS c FROM code_symbols").fetchone()["c"]
+        f_count = conn.execute("SELECT COUNT(*) AS c FROM features").fetchone()["c"]
+        p_count = conn.execute("SELECT COUNT(*) AS c FROM pages").fetchone()["c"]
+        pat_count = conn.execute("SELECT COUNT(*) AS c FROM pattern_clusters").fetchone()["c"]
+        sch_count = conn.execute("SELECT COUNT(*) AS c FROM data_schemas").fetchone()["c"]
+        t_count = conn.execute("SELECT COUNT(*) AS c FROM test_cases").fetchone()["c"]
+        dep_count = conn.execute("SELECT COUNT(*) AS c FROM method_dependencies").fetchone()["c"]
+        aud_count = conn.execute("SELECT COUNT(*) AS c FROM audit_changes").fetchone()["c"]
         meta = {r["key"]: r["value"] for r in conn.execute("SELECT key, value FROM meta")}
         return {
             "ok": True,
@@ -885,6 +1056,13 @@ class DocIndexDB:
             "docs": count,
             "methods": m_count,
             "code_symbols": s_count,
+            "features": f_count,
+            "pages": p_count,
+            "pattern_clusters": pat_count,
+            "data_schemas": sch_count,
+            "test_cases": t_count,
+            "method_dependencies": dep_count,
+            "audit_changes": aud_count,
             "fts": self.fts_available or meta.get("fts") == "1",
             "meta": meta,
         }

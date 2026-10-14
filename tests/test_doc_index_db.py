@@ -184,6 +184,22 @@ class TestDocIndexDB(unittest.TestCase):
         finally:
             db.close()
 
+    def test_hierarchical_schema_tables(self):
+        db = DocIndexDB(self.root)
+        try:
+            db.rebuild()
+            stats = db.stats()
+            self.assertIn("features", stats)
+            self.assertIn("pages", stats)
+            self.assertIn("pattern_clusters", stats)
+            self.assertIn("data_schemas", stats)
+            self.assertIn("test_cases", stats)
+            self.assertIn("method_dependencies", stats)
+            self.assertIn("audit_changes", stats)
+            self.assertEqual(stats["features"], 0)
+        finally:
+            db.close()
+
 
 if __name__ == "__main__":
     unittest.main()
