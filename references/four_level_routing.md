@@ -83,3 +83,48 @@ python scripts/doc_index_db.py --root . slice --path hs_dev_docs/_05_interface_d
 * 当文档发生修改时，提交工具自动更新 `digest`。
 * 启动时校验引擎可快速比对 `digest`，立即感知哪些设计文档被外部篡改或发生漂移。
 * 批量变更后执行：`python scripts/doc_index_db.py --root . rebuild`，保持 SQLite 缓存与 `.idx` 对齐（三端同一命令）。
+
+---
+
+## 5. 三层收口漏斗与底层数据真理源 (The Three-Tier Convergence Funnel)
+
+为解决大型工程中直接扫代码导致的 Token 爆炸与盲目性，本体系构建了清晰的**三层数据收敛漏斗**：
+
+```text
+[顶层 L2: 索引大脑]  doc_index.sqlite (FTS5 / 关键词倒排索引)
+        │            ▲
+        ▼            │ 【第 1 次收口：意图检索】
+[中层 L1: 业务总结]  hs_dev_docs/ (PRD 规格 / 接口契约 / 方法七维画像)
+        │            ▲ 过滤 90% 语法噪音，记录业务契约与符号锚点 (Symbol Anchor)
+        ▼            │ 【第 2 次收口：契约锁定与符号定位】
+[底层 L0: 物理真理]  源码 (backend/apps) + DDL (migrations/*.sql) + 测试 (test/)
+                     ▲ 【第 3 次收口：精准行段切片 (10~30 行)】
+```
+
+1. **底层物理真实数据 (Level 0 - Ground Truth)**：
+   - 业务源代码（执行态唯一真理）；
+   - 数据库迁移脚本 `migrations/*.sql`（数据骨架约束）；
+   - 测试用例与断言 `test/`（行为合法性真理）；
+   - 环境变量与配置 `config/.env.example`。
+2. **中层业务契约与总结 (Level 1 - High-Density Summaries)**：
+   - 对底层代码的高度抽象，记录业务语义、改动敏感度（`CRITICAL`）、模式护栏及符号锚点；
+3. **顶层轻量索引 (Level 2 - Index of Summaries)**：
+   - 建立在文档总结之上，体积小（几十 KB），毫秒级召回。
+
+**抗脆弱铁律**：严禁在文档中硬编码绝对行号。改用**符号锚点 (Symbol Anchor)**，由底层 AST 动态求值物理行号，消除代码格式化或修改造成的行号漂移。
+
+---
+
+## 6. 多端工程目录收敛规约 (Multi-Client Codebase Taxonomy)
+
+针对项目各端源码的存放边界，强制执行收敛隔离：
+
+| 目录 | 适用场景 | 职责与内容 |
+|---|---|---|
+| **`backend/`** | 单工程 / Web 分离架构 | 服务端 API、领域逻辑、DB 持久化、中间件集成 |
+| **`frontend/`** | 单工程 / Web 分离架构 | **特指 Web 网页前端**（React/Vue/Svelte），不包含原生移动与桌面客户端 |
+| **`src/`** | 单体工程 / 纯库开发 | 单一语言/职责的主源码目录 |
+| **`apps/<client>/`** | **多端与客户端架构（强制）** | 包含移动端（`apps/mobile`）、桌面端（`apps/desktop`）、Web端（`apps/web`）与服务端（`apps/server`）入口 |
+| **`packages/`** | **多端跨端共享库（强制）** | 跨端统一数据模型（DTO/Types）、API 客户端 SDK、设计规范 Tokens |
+| **`output/<client>/`** | **构建产物隔离区（强制）** | 安装包（`.apk`, `.ipa`, `.exe`, `.dmg`）必须重定向输出至此，移动端强制成对归档符号表（`mapping.txt` / `dSYM.zip`） |
+

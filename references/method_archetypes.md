@@ -42,8 +42,11 @@
 在 `hs_dev_docs/_06_method_design/` 中，每个登记的方法均具备以下标准化属性：
 
 1. **所属层次与模块**：自上而下的定位锚点（如 `领域核心层 / billing 模块`）。
-2. **代码精准定位（物理坐标）**：标明文件相对路径、起始行号与代码行长。
-   > **VibeCoding 收益**：AI 借助 `view_file(StartLine, EndLine)` 毫秒级单屏命中，无需全文扫描，Token 节省达 90%。
+2. **代码精准定位与符号锚点（Symbol Anchor 抗脆弱）**：
+   - 标明文件相对路径与目标符号名称（如 `ClassName.method_name`）；
+   - **动态求值行号（抗脆弱机制）**：严禁硬依赖脆弱的死行号。系统借助 AST（通过 `doc_index_db symbol-slice --name <symbol>`）动态解析当前最新物理行段（如 `L45-L62`），格式化、增加注释、调整 import 绝不失效；
+   - 物理行号仅作为辅助快照缓存，在代码演进时由 AST 自动对齐自愈。
+   > **VibeCoding 收益**：AI 借助符号锚点与动态行号毫秒级单屏命中目标代码，无需全量通读，Token 节省达 90%。
 3. **方法类型 (`archetype`)**：7 大标准类型之一。
 4. **模式协同集群关联 (`patternCluster`)**：【核心防破坏与精准指针】
    - 标明所选设计模式（`Strategy` / `Chain of Resp.` / `State` / `Builder` / `Adapter` / `Facade` 等）；
