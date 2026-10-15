@@ -10,7 +10,7 @@
 
 ```text
 1) 读 SKILL.md 铁律（每会话最多一次）
-2) 装载门闩 load_latch L0～L2：change_size+work_mode → skill_ref_index search 或 _index 一行 → 恰好 1 份详规
+2) 装载门闩 load_latch L0～L2：开场确认（新需求）→ change_size+work_mode → skill_ref_index search 或 _index 一行 → 核心 1 份详规 + 阶段满配链附属（合计 ≤5 份）
 3) 读 right_sizing.md（若尚未作为那 1 份打开）并写入分级（S 路径此后少读 lifecycle）
 4) 按「路径/阶段 → references」表按需再开（已读不重复；仍遵守「同时打开详规宜少」）
 5) UI/API 深化：rule_fetch search/resolve（每任务 ≤2 source id；github_tree 必须 --rule）
@@ -41,7 +41,7 @@
 | M/L 阶段 0 | lifecycle 阶段 0 节 | `learn_and_prefer`（模糊 UI） |
 | L 阶段 1 | lifecycle 阶段 1 | `learn_and_prefer` |
 | L 阶段 2 | lifecycle 阶段 2 | — |
-| M/L 阶段 3 | lifecycle 阶段 3；改方法时 `six_tuple_runtime` | 本地 craft；深化用 `rule_library` + `rule_fetch` |
+| M/L 阶段 3 | lifecycle 阶段 3；改方法时 `six_tuple_runtime` / `method_archetypes` | 本地 craft；深化用 `rule_library` + `rule_fetch` |
 | 阶段 4 | 本文 + 必要时 `four_level_routing` | `task_state_machine` |
 | 阶段 5 | （已读过的不重复） | craft / `rule_fetch resolve --rule …`（按触达） |
 | 阶段 6 | `quality_gates.md` | — |
@@ -52,19 +52,29 @@
 
 ---
 
-## 3. SQLite 文档索引（`doc_index_db.py`）
+## 3. SQLite 底层真理与全维度索引（`doc_index_db.py`）
 
 | 项 | 约定 |
 |---|---|
-| 路径 | `hs_dev_docs/_00_project/_18_doc_index/doc_index.sqlite`（`pathlib`，三端） |
+| 路径 | `hs_dev_docs/_00_project_foundation/_05_doc_index/doc_index.sqlite`（`pathlib`，三端） |
 | 依赖 | 仅标准库 `sqlite3`；FTS5 优先，失败或中文查询回退 `LIKE` |
 | 重建 | `python scripts/doc_index_db.py --root . rebuild` |
-| 检索 | `... search --q <kw> [--domain ...] [--limit 8]` → JSON（path + summary） |
-| 切片 | `... slice --path <rel> --start N --end M` → 行级 JSON |
+| 功能搜索 | `... feature-search --q <特性关键词>` → 定位 PRD 与功能 ID（免读 PRD 全文） |
+| 原型搜索 | `... page-search --q <页面关键词>` → 定位线框图与路由（免读 UI 全文） |
+| 模式搜索 | `... pattern-search --q <设计模式>` → 定位协同群与安全护栏（防破坏） |
+| 数据搜索 | `... schema-search --q <表名>` → 定位字段摘要与迁移 DDL 脚本 |
+| 依赖拓扑 | `... dep-graph --symbol <方法名>` → 输出局部微依赖图与爆炸半径 |
+| 方法查重 | `... method-search --q <业务意图>` → 意图重合 ≥80% 强制复用（防方法爆炸） |
+| 符号切片 | `... symbol-slice --name <方法/类名>` → 精准提取代码片段（省 90% Token） |
+| 用例检索 | `... test-search --q <关键词>` → 瞬间返回单跑命令（如 `pytest ...`） |
+| 审计检索 | `... audit-search --since <时间>` → 时间线与影响文件精准检索（免读 JSONL） |
+| 文档检索 | `... search --q <kw> [--domain ...] [--limit 8]` → JSON（path + summary） |
+| 切片阅读 | `... slice --path <rel> --start N --end M` → 行级 JSON |
 | 同步 | 批量改文档/索引后 rebuild；`init_hs_dev_docs` 结束时自动 rebuild |
 | Git | `*.sqlite` 默认不提交（可重建）；门禁缺失仅 warning |
 
 语义检索（embedding / SemanticGrip 类）为**可选二级召回**：候选必须回落到 `path` + `digest`，不得替代结构化索引。
+
 
 ---
 
@@ -118,10 +128,26 @@ python3 scripts/global_index_db.py search --tag 反向代理
 # Windows
 py -3 scripts/skill_ref_index.py search --scenario UI
 py -3 scripts/rule_fetch.py resolve --id local.api.core
-py -3 scripts/doc_index_db.py --root . slice --path hs_dev_docs/_01_product_design/_02_product_design/xxx_prd.md --start 1 --end 40
+py -3 scripts/doc_index_db.py --root . slice --path hs_dev_docs/_02_feature_spec/_01_human_prd/xxx_prd.md --start 1 --end 40
 py -3 scripts/global_index_db.py search --q nginx --kind note
 ```
 
 统一写法：`python scripts/...`，并按 [`cross_platform.md`](cross_platform.md) 选择启动器。  
 Skill 索引缓存：`<skill_root>/.hs_cache/skill_ref.sqlite`（可重建，默认不提交）。  
 远程规则缓存：`~/.hs-dev-skill/rule_cache/`（可重建）。
+
+---
+
+## 6. AST 符号骨架与命令行日志降噪（进阶省 Token）
+
+1. **代码探索优先骨架化**：探索未知代码库或定位函数时，严禁直接 `view_file` 整读数百行大文件。必须先执行：
+   ```bash
+   python scripts/code_skeleton.py --path <file_or_dir>
+   ```
+   借助 AST 提取模块签名、类、方法及精确行号范围（实现 85%~95% Token 压缩），仅根据命中的精确行段按需切片查看。
+2. **测试与命令日志降噪截断**：避免 `make test` 或构建工具打印数百行无关控制台输出污染上下文：
+   ```bash
+   python scripts/log_filter.py --cmd "make test"
+   ```
+   成功用例自动提炼为单行状态，失败用例仅提取核心错误帧与断言，消除 90%+ 噪音。
+

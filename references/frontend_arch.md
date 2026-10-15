@@ -36,22 +36,33 @@ python scripts/rule_fetch.py resolve --id local.dev.paradigm
 
 ---
 
-## 3. 方案 A：按 BC 的 Feature 模块（默认）
+## 3. 方案 A：按 BC 的 Feature 模块（默认）与七大方法映射
+
+遵循 [`method_archetypes.md`](method_archetypes.md) 规范，将前端逻辑细分收敛至 7 类方法，杜绝大组件与逻辑耦合：
 
 ```text
 src/
   app/                 # 壳：路由、provider、鉴权门闩
   features/
-    order/             # ← 订单上下文
-      api/             # 仅本域请求与 DTO
-      model/           # UI 状态、用例 hooks
-      ui/              # 本域页面与组件
+    order/             # ← 业务特征域
+      api/             # ADAPTER: 外部 API Client 请求与网络封装
+      model/
+        calc.ts        # ALGO: 纯前端折算、运费计算（0 DOM 依赖纯函数）
+        mappers.ts     # TRANSFORM: DTO ↔ ViewModel 互转、Payload 组装
+        policy.ts      # GUARD: 权限策略、按钮/操作可执行性判定
+        state.ts       # STATE: 本地状态机跃迁、Reducer
+      hooks/
+        useOrder.ts    # ORCHESTRATE: 业务流程编排 Hook（调度上述纯函数与 API）
+      ui/
+        OrderCard.tsx  # PRESENT: Dumb 组件、纯展示、Tailwind 样式
     payment/
-  shared/              # 真共享 UI kit / 工具（无业务规则）
+  shared/              # 真共享 UI kit (PRESENT) / 通用工具 (ALGO)（无具体业务规则）
 ```
 
 | 禁令 | 改为 |
 |------|------|
+| 在 JSX 组件内部写复杂折算/计费/校验算式 | 抽离至 `model/calc.ts` (`ALGO`)，单测 100% 覆盖 |
+| 在 UI 组件内直接 `fetch` / `axios` | 经 `api/` (`ADAPTER`) 请求，组件或 Hook 仅消费返回值 |
 | `features/order` import `features/payment` 内部 model | 经 API/事件或 `shared` 的纯展示类型 |
 | 全局 store 塞所有域 | 域内状态 + 服务端缓存（Query/SWR） |
 | shared 塞业务 if/else | 下沉到对应 feature |

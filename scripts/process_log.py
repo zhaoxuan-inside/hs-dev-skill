@@ -31,7 +31,11 @@ def _stamp() -> str:
 
 
 def docs_root(root: Path) -> Path:
-    return root / "hs_dev_docs" / "_08_dev_process"
+    p_new = root / "hs_dev_docs" / "_06_dev_process"
+    p_old = root / "hs_dev_docs" / "_08_dev_process"
+    if p_new.exists() or not p_old.exists():
+        return p_new
+    return p_old
 
 
 def plan_path(root: Path, task_id: str) -> Path:
@@ -313,7 +317,9 @@ def rollback(root: Path, task_id: str, to_checkpoint: str) -> Dict[str, Any]:
 
 
 def _active_tasks(root: Path) -> List[Dict[str, Any]]:
-    idx = root / "hs_dev_docs/_08_dev_process/_09_task/_00_task.idx"
+    idx = root / "hs_dev_docs/_05_task_orchestration/_00_task.idx"
+    if not idx.exists():
+        idx = root / "hs_dev_docs/_05_task_orchestration/_00_task.idx"
     if not idx.exists():
         return []
     mgr = IdxManager(str(idx))

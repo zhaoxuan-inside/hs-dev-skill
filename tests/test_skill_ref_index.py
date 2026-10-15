@@ -37,6 +37,7 @@ class TestSkillRefIndex(unittest.TestCase):
             "process_continuity.md",
             "product_prototype.md",
             "confidence_decision.md",
+            "version_control.md",
         ):
             src = ref_src / name
             if src.is_file():
@@ -107,6 +108,11 @@ class TestSkillRefIndex(unittest.TestCase):
         self.assertTrue(
             any("confidence_decision" in h["path"] for h in skip["hits"]),
             msg=json.dumps(skip, ensure_ascii=False),
+        )
+        ver = db.search(q="semver", limit=8)
+        self.assertTrue(
+            any("version_control" in h["path"] for h in ver["hits"]),
+            msg=json.dumps(ver, ensure_ascii=False),
         )
 
         stats = db.stats()

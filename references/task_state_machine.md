@@ -47,6 +47,20 @@ python scripts/task_manager.py status --id {id} --set IN_PROGRESS --force
 
 解除后**立即继续**至路径终点，禁止无确认事项时空等「请继续」。
 
+### COMPLETED 前置流转条件（硬阻断门禁）
+
+任务从 `VERIFYING` 流转至 `COMPLETED` 必须满足三大物理铁律：
+1. **全量自动化测试 100% 绿灯**（`make test` 0 失败、0 挂起）；
+2. **严格质量门禁 0 错误 0 警告**（`verify_consistency.py --strict` PASS）；
+3. **需求覆盖率 100%**：`task_detail` 中声明的所有原子需求（`REQ-*`）必须处于 `verified` 状态，严禁带未解决需求宣告成功。
+
+### 步骤策略与副作用治理 (Step Policy & Side-Effect Strategy)
+
+在 `task_detail.md` 的步骤 Checklist 中，为每一步标注执行属性：
+- **`[idempotent: true|false]`**：标记操作是否具备幂等安全性。有副作用（写库/调用第三方付款）必须配对业务操作 ID 或幂等键；遇超时不可盲目重试，先查后断。
+- **`[side_effect: none|local|external]`**：区分无副作用纯函数测试、本地文件生成与跨服务网络调用。
+- **`[retry: N, backoff: exp]`**：瞬态网络异常按有限次数指数退避重试；格式或逻辑错误坚决就地修补，禁止机械重试。
+
 ---
 
 ## 2. 三文件强一致性 + plan_log
@@ -83,3 +97,14 @@ python scripts/task_manager.py status --id {task_id} --set IN_PROGRESS --force  
 ```
 
 按快照恢复文件；git 可选附赠，不是引擎。
+
+---
+
+## 5. 实时执行看板 (Live Dashboard)
+
+通过 CLI 一键渲染包含当前阶段流转图 (Mermaid)、任务矩阵与门禁状态的 Markdown 看板，可直接输出为会话 Artifact：
+
+```bash
+python scripts/task_manager.py dashboard --intent BUILD --phase 3 --change-size M --output <artifact_path>
+```
+

@@ -1,6 +1,6 @@
 # 变更分级（Right-Sizing）与快路径
 
-**何时读**：任意需求的第一步（写 PRD/编码前）；每会话最多一次。
+**何时读**：任意需求的第一步（写 PRD/编码前）；每会话最多一次（先于本文件，新需求须先跑 [`opening_alignment.md`](opening_alignment.md) 开场确认）。
 
 **问题不是「单体 Skill」**，而是编排把一切需求默认当成「新产品切片」：铁律要求无条件走阶段 0 全量对齐 + 1/2/3 齐套后才允许编码，导致文案微调、单测修复、局部 bugfix 也被迫重建选型/架构/四要素，Token 与耗时陡增。
 
@@ -8,24 +8,40 @@
 
 ---
 
-## 1. 分级判定（会话第一步，≤10 行落盘）
+## 1. 意图与分级判定（会话第一步，≤10 行落盘）
 
-在阶段 0 写 PRD 之前，先判定 `change_size` 与 `work_mode`，写入任务 brief / context_pack 首行或 PRD 元数据：
+> **前置**：新需求先跑 [`opening_alignment.md`](opening_alignment.md) O1～O4（需求复述 + 假设/空白 + 约束/干系人 + 分级建议），**分级建议经开发者确认后**，再在此落盘 `intent`、`change_size` 与 `work_mode`，写入任务 brief / context_pack 首行或 PRD 元数据：
+
+### 1.1 场景意图判定（Intent）
+
+| 场景意图 `intent` | 核心目标 | 专属指南 | 核心原则 |
+|---|---|---|---|
+| **BUILD** | 从零构建项目或全新独立功能域 | [`spec_driven_lifecycle.md`](spec_driven_lifecycle.md) | 满配 0→6 推进；两层解耦；MVP 激进裁剪 |
+| **REVERSE** | 已有项目反向重建、Schema/API 提取与规范接入 | [`reverse_engineering.md`](reverse_engineering.md) | 代码即事实；非侵入式分析；生成四级索引 |
+| **FIX** | 已有代码缺陷修复、排查偶发异常 | [`systematic_debugging.md`](systematic_debugging.md) | 科学假设驱动；先红后绿（必须先写失败测试） |
+| **REFACTOR** | 消除坏味道、提炼深模块、模式落地 | [`code_refactoring.md`](code_refactoring.md) | 保护网先决（快照/不变量）；零可观测行为漂移 |
+| **EXPLORE** | 纯只读理解代码、梳理时序、架构答疑 | [`code_exploration.md`](code_exploration.md) | 纯只读；免任务文件/免PRD/免Commit/免门禁 |
+| **RESUME** | 任务续做、恢复断点或快照回退 | [`process_continuity.md`](process_continuity.md) | 沿用既有 plan_log，不当新需求重开 |
+
+### 1.2 规模与模式判定（S / M / L & Work Mode）
 
 | 级别 | 判定（满足即取该级；冲突取更高） | 典型例子 |
 |------|----------------------------------|----------|
-| **S（快路径）** | 不改产品语义/对外契约/DB schema/限界上下文；局部代码或文案/样式/测试/配置 | 修空指针、改文案、补单测、调 CSS、修正日志 |
-| **M（补丁路径）** | 改已有功能行为或内部接口，但**不**新开限界上下文、不换技术栈、不新增表族 | 加可选字段、改校验规则、补一个端点、修补偿逻辑 |
-| **L（满配路径）** | 新功能/新域、换栈、新表或破坏性 API、架构边界变化、模糊 UI/新技术需对标 | 新支付域、换 ORM、公开 API 破坏性变更 |
+| **S（快路径）** | 不改产品语义/对外契约/DB schema/限界上下文；局部代码或文案/样式/测试/配置 | 修空指针、改文案、补单测、调 CSS、局部重构 |
+| **M（补丁/增量路径）** | 改已有功能行为或内部接口，但**不**新开限界上下文、不换技术栈、不新增表族 | 加可选字段、改校验规则、单模块反向重建、模块级重构 |
+| **L（满配路径）** | 新功能/新域、换栈、新表或破坏性 API、架构边界变化、模糊 UI/新技术需对标 | 新支付域、全工程逆向治理、换 ORM、公开 API 破坏性变更 |
 
 **同时写 `work_mode`**（详见 [`confidence_decision.md`](confidence_decision.md)）：
 
 | `work_mode` | 默认何时 |
 |---|---|
+| **READONLY** | `intent=EXPLORE` 时强制锁定；只读检索解答，禁止写任务/代码/Commit |
 | **DESIGN** | M/L 冻结未过；需求模糊；写/改 PRD·ADR·架构·契约；不确定 |
 | **IMPLEMENT** | S 且 DoD 已清；或冻结已过、按已定设计编码/修测 |
 
-**不确定时**：`change_size=M`，`work_mode=DESIGN`（不要默认 L；不要默认少问）。用户口头说「随便改一下」若触及契约/表结构 → 升为 M/L。用户说「跳过澄清 / 直接做」→ 按 [`confidence_decision.md`](confidence_decision.md) §1.5 收紧处理（禁止项不可跳过）。
+**DB 变更硬规则**：**新增业务/新功能需要改动数据库设计（新增表、改表结构、破坏性迁移、不可逆字段）→ 至少 M；新表族/破坏性迁移/公开契约变更 → L**，且 DB 设计必须经开发者决策（见 [`confidence_decision.md`](confidence_decision.md) §1.5），禁止用 S 掩盖。
+
+**不确定时**：`intent=BUILD`，`change_size=M`，`work_mode=DESIGN`。用户口头说「随便改一下」若触及契约/表结构 → 升为 M/L。用户说「跳过澄清 / 直接做」→ 按 [`confidence_decision.md`](confidence_decision.md) §1.5 收紧处理（禁止项不可跳过）。
 
 ---
 
@@ -69,6 +85,8 @@
 ## 3. 禁止事项（防「假快路径」）
 
 - 用 S 掩盖产品语义未决或破坏性 API/表变更。
+- **新增业务触达数据库设计却未经开发者决策**（DB 设计必须开发者裁定，见 §1 硬规则）。
+- 冻结后需求变更不走《变更请求单》而静默修改/静默砍功能（见 [`requirement_change.md`](requirement_change.md)）。
 - S/M 路径下仍整读 `spec_v2_4.md` 或整树 `hs_dev_docs`。
 - 为走过场复制空 ADR/空四要素文件。
 - 分级后不写 `change_size`，导致后续会话又按 L 重做。
@@ -77,6 +95,6 @@
 
 ## 4. 与置信度、门闩、Token 的关系
 
-- 分级本身**不询问**（工程编排）；产品语义空白走 `DESIGN` 多问，不走「实现期四条件」偷懒跳过。
+- 分级**判定规则**不逐条询问（工程编排），但**分级建议须经开场确认 O4 由开发者确认**（至少 M/L）；产品语义空白走 `DESIGN` 多问，不走「实现期四条件」偷懒跳过。
 - 动手前过 [`load_latch.md`](load_latch.md) L0～L2。
 - Token：S 应明显少于 M，M 少于 L；若 S 会话仍加载 lifecycle 全文 + 多份 references / 远程规则包，视为违规，改回本文件 + `token_budget.md` 挂载表。

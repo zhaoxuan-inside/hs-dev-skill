@@ -54,7 +54,9 @@ class TestTaskManager(unittest.TestCase):
         self.tm.set_status("order_create_test", "COMPLETED")
         self.assertTrue(verifier.check_all())
 
-        plan = self.root / "hs_dev_docs/_08_dev_process/_01_plan_log/order_create_test_plan.md"
+        plan = self.root / "hs_dev_docs/_06_dev_process/_01_plan_log/order_create_test_plan.md"
+        if not plan.exists():
+            plan = self.root / "hs_dev_docs/_06_dev_process/_01_plan_log/order_create_test_plan.md"
         self.assertTrue(plan.exists())
 
     def test_illegal_transition_rejected(self):
@@ -70,7 +72,9 @@ class TestTaskManager(unittest.TestCase):
     def test_create_defaults_change_size_m(self):
         res = self.tm.create_task("task_size_default", "默认分级")
         self.assertEqual(res["change_size"], "M")
-        brief_dir = self.root / "hs_dev_docs/_08_dev_process/_09_task/_01_task_brief"
+        brief_dir = self.root / "hs_dev_docs/_05_task_orchestration/_01_task_brief"
+        if not brief_dir.exists():
+            brief_dir = self.root / "hs_dev_docs/_05_task_orchestration/_01_task_brief"
         brief_text = "\n".join(p.read_text(encoding="utf-8") for p in brief_dir.glob("*.md"))
         self.assertIn("**change_size**：`M`", brief_text)
 
@@ -87,7 +91,9 @@ class TestTaskManager(unittest.TestCase):
         # 模拟「旧任务缺分级」时内容已改过：同步 digest，门禁应仅 warning 不 fail
         from idx_manager import IdxManager
 
-        idx_path = self.root / "hs_dev_docs/_08_dev_process/_09_task/_00_task.idx"
+        idx_path = self.root / "hs_dev_docs/_05_task_orchestration/_00_task.idx"
+        if not idx_path.exists():
+            idx_path = self.root / "hs_dev_docs/_05_task_orchestration/_00_task.idx"
         IdxManager(str(idx_path)).update_digest()
         verifier = ConsistencyVerifier(str(self.root))
         self.assertTrue(verifier.check_all())
@@ -102,6 +108,20 @@ class TestTaskManager(unittest.TestCase):
             remaining_steps=["执行 DB 迁移", "编写单元测试"]
         )
         self.assertTrue(os.path.exists(handoff_path))
+
+    def test_render_dashboard(self):
+        self.tm.create_task("task_dash_1", "看板测试任务", change_size="M")
+        dash_md = self.tm.render_dashboard(intent="BUILD", phase="3", change_size="M")
+        self.assertIn("实时执行看板", dash_md)
+        self.assertIn("```mermaid", dash_md)
+        self.assertIn("task_dash_1", dash_md)
+        self.assertIn("Phase 3: 阶段 3: 契约六元组", dash_md)
+
+        # Output to file test
+        out_file = self.root / "dashboard.md"
+        self.tm.render_dashboard(intent="BUILD", phase="2", output_path=str(out_file))
+        self.assertTrue(out_file.exists())
+        self.assertIn("Phase 2", out_file.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

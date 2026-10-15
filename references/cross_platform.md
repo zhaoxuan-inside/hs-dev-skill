@@ -97,7 +97,7 @@ python scripts/<name>.py ...
 |---|---|
 | 引擎 | 标准库 `sqlite3`（勿依赖仅 Linux 的扩展二进制） |
 | FTS | 优先 FTS5；不可用或中文查询时 `LIKE` 回退，保证三端可搜 |
-| 路径 | `Path(workspace) / "hs_dev_docs/_00_project/_18_doc_index/doc_index.sqlite"` |
+| 路径 | `Path(workspace) / "hs_dev_docs/_00_project_foundation/_05_doc_index/doc_index.sqlite"` |
 | 输出 | CLI 打印 JSON；内部 path 使用 POSIX 相对路径（`as_posix()`），避免 `\` 污染提示词 |
 | 编码 | UTF-8；Windows 控制台经 `hs_paths.ensure_utf8_stdout()` 尽量不乱码 |
 

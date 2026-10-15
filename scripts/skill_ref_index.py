@@ -32,9 +32,33 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
     "_index.md": ["index", "路由", "目录", "入口"],
     "load_latch.md": ["门闩", "装载", "反合理化", "latch", "跳过", "强制"],
     "right_sizing.md": ["分级", "S", "M", "L", "快路径", "小改动", "right-sizing", "change_size"],
-    "token_budget.md": ["token", "预算", "context_pack", "装载", "SQLite"],
+    "token_budget.md": [
+        "token", "预算", "context_pack", "装载", "SQLite", "doc_index_db", "切片", "免通读", "免扫描",
+    ],
+    "reverse_engineering.md": [
+        "反向工程", "反向重建", "逆向", "reverse", "已有项目", "存量项目", "brownfield", "遗留代码", "规范接入", "架构还原",
+    ],
+    "systematic_debugging.md": [
+        "调试", "bug", "修复", "fix", "排查", "先红后绿", "复现", "回归", "异常", "崩溃", "debugging", "根因分析", "RCA",
+    ],
+    "code_refactoring.md": [
+        "重构", "refactor", "refactoring", "坏味道", "消除坏味道", "等价演进", "特征测试", "保护网", "行为等价", "深模块演进",
+    ],
+    "code_exploration.md": [
+        "代码理解", "探索", "只读", "explore", "时序图", "调用链", "架构理解", "答疑", "咨询", "只读理解", "comprehension",
+    ],
+    "coding_standards.md": [
+        "编码规范", "规范", "linter", "命名", "静态检测", "词态矩阵", "单一事实源", "零裸字符串", "coding_standards", "规范门禁",
+    ],
+    "method_archetypes.md": [
+        "方法设计", "方法画像", "七分类", "archetype", "契约画像", "写前检索", "抗方法爆炸", "影子函数", "单一天理源",
+    ],
+    "auxiliary_governance.md": [
+        "工程治理", "治理", "governance", "机密隔离", "供应链", "安全", "容灾", "cicd", "可观测性", "探针", "功能开关", "governance_toggle",
+    ],
     "grill_orchestration.md": [
         "grill", "grilling", "审讯", "对齐", "澄清", "设计树", "多问", "DESIGN",
+        "office-hours", "方案比选", "trade-offs",
     ],
     "testing.md": [
         "测试", "TDD", "seam", "质量", "单测", "红绿", "契约测", "test", "coverage",
@@ -76,6 +100,7 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
         "规则库", "rule_fetch", "远程规则", "Vercel", "Anthropic", "Addy",
         "anti-slop", "Lottie", "ui-craft", "web-interface", "DESIGN.md",
         "awesome-design-md", "wshobson", "Clean Architecture", "DDD", "FSD",
+        "gstack", "pm-skills", "ui-ux-pro-max",
     ],
     "confidence_decision.md": [
         "置信度", "询问", "闸门", "决策", "DESIGN", "IMPLEMENT",
@@ -85,18 +110,43 @@ FILE_SCENARIOS: Dict[str, List[str]] = {
         "继续", "续做", "继续任务", "resume", "plan_log", "change_log",
         "回退", "rollback", "checkpoint", "中断", "过程日志",
     ],
+    "product_design.md": [
+        "产品设计", "设计语言", "产品功能", "PRD", "功能规格", "design tokens",
+        "UI规范", "功能架构", "用户旅程", "四态", "产品设计规范", "tokens",
+        "JTBD", "Gherkin", "渐进式披露", "微文案", "冷启动", "FTUE", "Aha Moment",
+        "Status Quo", "痛点", "产品探索", "体验评审",
+    ],
     "product_prototype.md": [
         "原型", "线框", "mermaid", "figma", "布局", "prototype",
-        "商业计划", "无图",
+        "商业计划", "无图", "多态", "ASCII", "ASCII线框", "双轨原型", "wireframe",
+    ],
+    "product_roadmap.md": [
+        "MVP", "分阶段规划", "分阶段实施", "产品开发分阶段规划书", "roadmap",
+        "规划书", "功能裁剪", "MoSCoW", "人机交互", "演进路线", "里程碑",
     ],
     "learn_and_prefer.md": ["学习", "偏好", "GitHub", "对标", "标签"],
     "spec_driven_lifecycle.md": ["生命周期", "阶段", "门禁", "PRD", "冻结", "原型"],
     "six_tuple_runtime.md": ["六元组", "compensate", "fallback", "metrics", "recall"],
-    "four_level_routing.md": ["四级索引", "JSONL", "路由"],
+    "four_level_routing.md": [
+        "四级索引", "JSONL", "路由", "底层真理", "检索", "调用图", "依赖图", "代码切片", "索引路由",
+    ],
     "task_state_machine.md": ["任务", "状态机", "handoff", "迁移", "ABORTED"],
     "mock_contract_guide.md": ["Mock", "Profile", "契约测试"],
     "quality_gates.md": ["门禁", "verify", "提交前", "覆盖率", "九级"],
+    "version_control.md": [
+        "版本", "版本号", "version", "semver", "发布", "release", "tag", "升级",
+        "防漂移", "单源", "变更分级", "补丁", "major", "minor", "patch",
+    ],
+    "design_patterns.md": [
+        "设计模式", "模式", "策略模式", "责任链", "状态模式", "建造者", "适配器",
+        "门面", "外观", "发布订阅", "观察者", "模板方法", "模式集群", "pattern",
+        "cluster", "防破坏", "vibecoding", "深模块", "反过度设计",
+    ],
     "cross_platform.md": ["跨平台", "Windows", "Linux", "macOS", "pathlib"],
+    "doc_reading_guide.md": [
+        "文档阅读说明", "阅读说明", "文档体系", "索引导航", "doc_reading_guide",
+        "reading_guide", "跨Agent", "Agent协同", "全局索引", "README.md",
+    ],
     "spec_v2_4.md": ["规格", "百科", "争议"],
 }
 

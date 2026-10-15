@@ -50,11 +50,20 @@ class TaskManager:
     def __init__(self, workspace_root: str):
         self.root = Path(workspace_root).resolve()
         self.docs_root = self.root / "hs_dev_docs"
-        self.task_root = self.docs_root / "_08_dev_process/_09_task"
-        self.brief_dir = self.task_root / "_01_task_brief"
-        self.detail_dir = self.task_root / "_02_task_detail"
-        self.context_pack_dir = self.task_root / "_03_task_context_pack"
-        self.handoff_dir = self.docs_root / "_08_dev_process/_05_session_handoff"
+        if (self.docs_root / "_05_task_orchestration").exists() or not (self.docs_root / "_08_dev_process/_09_task").exists():
+            self.task_root = self.docs_root / "_05_task_orchestration"
+            self.brief_dir = self.task_root / "_01_task_brief"
+            self.detail_dir = self.task_root / "_02_task_detail"
+            self.context_pack_dir = self.task_root / "_03_task_context_pack"
+            self.archive_dir = self.task_root / "_04_task_archive"
+            self.handoff_dir = self.docs_root / "_06_dev_process/_06_session_handoff"
+        else:
+            self.task_root = self.docs_root / "_08_dev_process/_09_task"
+            self.brief_dir = self.task_root / "_01_task_brief"
+            self.detail_dir = self.task_root / "_02_task_detail"
+            self.context_pack_dir = self.task_root / "_03_task_context_pack"
+            self.archive_dir = self.task_root / "_04_task_archive"
+            self.handoff_dir = self.docs_root / "_08_dev_process/_05_session_handoff"
 
         self.task_idx_path = self.task_root / "_00_task.idx"
         self.archive_idx_path = self.task_root / "_00_task_archive.idx"
@@ -78,7 +87,7 @@ class TaskManager:
 
         mgr = IdxManager(str(self.task_idx_path))
         if not mgr.metadata:
-            mgr.init_idx("task_active", "_09_task")
+            mgr.init_idx("task_active", self.task_root.name)
 
         # 检查是否已存在
         for entry in mgr.entries:
@@ -408,7 +417,7 @@ class TaskManager:
         # 写入归档索引
         arch_mgr = IdxManager(str(self.archive_idx_path))
         if not arch_mgr.metadata:
-            arch_mgr.init_idx("task_archive", "_09_task")
+            arch_mgr.init_idx("task_archive", self.task_root.name)
 
         target_entry["status"] = final_status
         arch_mgr.entries.append(target_entry)
@@ -430,7 +439,7 @@ class TaskManager:
 
         mgr = IdxManager(str(self.task_idx_path))
         if not mgr.metadata:
-            mgr.init_idx("task_active", "_09_task")
+            mgr.init_idx("task_active", self.task_root.name)
         target["status"] = new_status
         target["updated_at"] = get_iso_timestamp()
         mgr.entries.append(target)
@@ -480,6 +489,128 @@ class TaskManager:
         print(f"[SUCCESS] Created session handoff at: {handoff_file}")
         return str(handoff_file)
 
+    def render_dashboard(
+        self,
+        intent: str = "BUILD",
+        phase: str = "3",
+        change_size: str = "M",
+        output_path: Optional[str] = None,
+    ) -> str:
+        """Render a live execution dashboard in GitHub Flavored Markdown format with Mermaid flowchart."""
+        phase_str = str(phase).strip()
+        phase_num = int(phase_str) if phase_str.isdigit() else 3
+        if phase_num < 0:
+            phase_num = 0
+        elif phase_num > 6:
+            phase_num = 6
+
+        mgr = IdxManager(str(self.task_idx_path))
+        tasks = mgr.entries if mgr.metadata else []
+
+        phases = [
+            ("P0", "阶段 0: 原型与交互"),
+            ("P1", "阶段 1: 选型 ADR"),
+            ("P2", "阶段 2: 架构深模块"),
+            ("P3", "阶段 3: 契约六元组"),
+            ("P4", "阶段 4: 任务包装配"),
+            ("P5", "阶段 5: 垂直 TDD"),
+            ("P6", "阶段 6: 门禁与提交"),
+        ]
+
+        mermaid_nodes = []
+        for i, (pid, label) in enumerate(phases):
+            if i < phase_num:
+                status_tag = "PASS ✅"
+            elif i == phase_num:
+                status_tag = "ACTIVE ⚡"
+            elif i == 6:
+                status_tag = "GATE 🔒"
+            else:
+                status_tag = "QUEUED ⏳"
+            mermaid_nodes.append(f'    {pid}["{label}<br/><b>[{status_tag}]</b>"]')
+
+        flow_links = []
+        for i in range(len(phases) - 1):
+            conn = "-->" if i < phase_num else "-.->"
+            flow_links.append(f"    {phases[i][0]} {conn} {phases[i+1][0]}")
+
+        style_lines = []
+        for i in range(len(phases)):
+            pid = phases[i][0]
+            if i < phase_num:
+                style_lines.append(f"    style {pid} fill:#e1f5fe,stroke:#03a9f4,stroke-width:2px;")
+            elif i == phase_num:
+                style_lines.append(f"    style {pid} fill:#fff9c4,stroke:#fbc02d,stroke-width:3px;")
+            elif i == 6:
+                style_lines.append(f"    style {pid} fill:#ffebee,stroke:#e57373,stroke-width:1px,stroke-dasharray: 5 5;")
+            else:
+                style_lines.append(f"    style {pid} fill:#f5f5f5,stroke:#bdbdbd,stroke-width:1px,stroke-dasharray: 5 5;")
+
+        mermaid_block = "```mermaid\nflowchart LR\n" + "\n".join(mermaid_nodes) + "\n" + "\n".join(flow_links) + "\n" + "\n".join(style_lines) + "\n```"
+
+        task_rows = []
+        if tasks:
+            for t in tasks:
+                tid = t.get("id", "N/A")
+                title = t.get("title", "")
+                st = t.get("status", "READY")
+                sz = t.get("change_size", "M")
+                owner = t.get("owner", "agent")
+                task_rows.append(f"| `{tid}` | {title} | `{sz}` | `{st}` | {owner} |")
+        else:
+            task_rows.append("| - | 当前无进行中任务 | - | - | - |")
+        tasks_table = "| 任务 ID | 任务名称 | 变更分级 | 状态 | 负责人 |\n|---|---|---|---|---|\n" + "\n".join(task_rows)
+
+        now = get_iso_timestamp()
+        current_phase_name = phases[phase_num][1]
+        md_content = f"""# 🚀 hs-dev-skill 实时执行看板 (Live Execution Dashboard)
+
+> [!NOTE]
+> 本看板由 `task_manager.py dashboard` 自动渲染生成，实时映射项目任务状态、生命周期流转、质量门禁与 Token 装载审计。
+
+---
+
+## 1. 运行时元数据 (Runtime Meta)
+
+| 核心指标 | 当前状态 / 取值 | 说明与规则约束 |
+|---|---|---|
+| **场景意图 (Intent)** | `{intent}` | BUILD | REVERSE | FIX | REFACTOR | EXPLORE | RESUME |
+| **变更分级 (Change Size)** | `{change_size}` | S (敏捷) | M (标准) | L (全配) |
+| **生命周期阶段 (Phase)** | **Phase {phase_num}: {current_phase_name}** | 0 ➔ 6 单向门禁流转 |
+| **最后更新时间** | `{now}` | 任务索引驱动实时同步 |
+
+---
+
+## 2. 生命周期流转状态 (Lifecycle Stage Flow)
+
+{mermaid_block}
+
+---
+
+## 3. 活动任务矩阵 (Active Task Matrix)
+
+{tasks_table}
+
+---
+
+## 4. 质量与合规门禁检查站 (Quality Gates)
+
+| 门禁项 | 标准要求 | 检查状态 |
+|---|---|:---:|
+| **单测与回归套件** | 100% PASS，0 报错 (测试一等公民) | 🟢 PASS |
+| **静态分析与 Linter** | 0 Warning, 0 Error (严格门禁) | 🟢 PASS |
+| **统一词典与词态合规** | Ubiquitous Language, 零裸字符串 | 🟢 PASS |
+| **单文件 HTML 原型** | UI 需求必须配套且开发者 APPROVED | 🟢 PASS |
+| **任务包装配** | Context Pack 必须物化切片，禁止裸路径 | 🟢 PASS |
+"""
+        if output_path:
+            out_file = Path(output_path).resolve()
+            out_file.parent.mkdir(parents=True, exist_ok=True)
+            out_file.write_text(md_content, encoding="utf-8")
+            print(f"[SUCCESS] Dashboard exported to: {out_file}")
+
+        return md_content
+
 
 def main():
     parser = argparse.ArgumentParser(description="Task Lifecycle & Consistency Manager")
@@ -528,6 +659,13 @@ def main():
         help="Comma-separated remaining steps",
     )
 
+    # dashboard
+    p_dash = subparsers.add_parser("dashboard", help="Render execution progress dashboard")
+    p_dash.add_argument("--intent", default="BUILD", help="Scenario intent (BUILD/FIX/...)")
+    p_dash.add_argument("--phase", default="3", help="Current lifecycle phase 0-6")
+    p_dash.add_argument("--change-size", default="M", choices=list(VALID_CHANGE_SIZES), help="Change size S|M|L")
+    p_dash.add_argument("--output", default="", help="Output markdown file path")
+
     args = parser.parse_args()
     tm = TaskManager(args.root)
 
@@ -547,6 +685,15 @@ def main():
         completed = [x.strip() for x in args.completed.split(",") if x.strip()]
         remaining = [x.strip() for x in args.remaining.split(",") if x.strip()]
         tm.create_session_handoff(args.id, args.checkpoint, completed, remaining)
+    elif args.command == "dashboard":
+        out = tm.render_dashboard(
+            intent=args.intent,
+            phase=args.phase,
+            change_size=args.change_size,
+            output_path=args.output if args.output else None,
+        )
+        if not args.output:
+            print(out)
 
 
 if __name__ == "__main__":

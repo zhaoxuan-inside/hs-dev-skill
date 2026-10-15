@@ -16,26 +16,84 @@ sources:
   - id: local.frontend.core
     kind: local
     path: references/frontend_craft.md
-    tags: [UI, frontend, a11y, design, React, anti-slop, motion]
-    when: 改 UI/组件/页面手艺 — 本地高频（先 aesthetic / DESIGN.md）
+    tags: [UI, frontend, a11y, design, React, anti-slop, motion, modern-web-guidance]
+    when: 改 UI/组件/页面手艺与现代 Web 规范（融合 Modern Web Guidance）— 本地高频（先 aesthetic / DESIGN.md）
 
   - id: local.testing
     kind: local
     path: references/testing.md
-    tags: [test, TDD, seam, quality, 测试, 质量]
-    when: 实现/门禁 — 测试方法一等公民
+    tags: [test, TDD, seam, quality, 测试, 质量, devtools, chrome-devtools, a11y, memory-leak, lcp]
+    when: 实现/门禁 — 测试方法一等公民与运行态 DevTools/CWV 审计
 
   - id: local.deep.modules
     kind: local
     path: references/deep_modules.md
-    tags: [module, seam, adapter, depth, architecture, 深模块, 重构]
-    when: 模块接口 / 可测性 / 日常重构对话
+    tags: [module, seam, adapter, depth, architecture, 深模块, 重构, SDK防腐]
+    when: 模块接口 / 可测性 / 外部 SDK 防腐 Adapter / 日常重构对话
 
   - id: local.grill
     kind: local
     path: references/grill_orchestration.md
-    tags: [grill, DESIGN, 审讯, 对齐, 澄清]
-    when: DESIGN 审讯式对齐
+    tags: [grill, DESIGN, 审讯, 对齐, 澄清, office-hours, trade-offs]
+    when: DESIGN 审讯式对齐与产品方案博弈
+
+  - id: local.product.design
+    kind: local
+    path: references/product_design.md
+    tags: [产品设计, 设计语言, 产品功能, PRD, JTBD, Gherkin, 渐进式披露, FTUE, Aha Moment]
+    when: 阶段 0 产品探索、设计语言、UX 四定律与产品功能规格 — 本地高频必守
+
+  - id: local.product.prototype
+    kind: local
+    path: references/product_prototype.md
+    tags: [原型, 线框, ASCII, Mermaid, 四态, prototype, wireframe, UX, openpencil, generative-ui]
+    when: 阶段 0 双轨高表现力原型（Mermaid 拓扑 + ASCII 比例线框 + OpenPencil / Generative UI 页面四态）
+
+  - id: local.product.roadmap
+    kind: local
+    path: references/product_roadmap.md
+    tags: [MVP, 分阶段规划, MoSCoW, 路线图, roadmap, 人机交互]
+    when: 阶段 0 MVP 裁剪与《产品开发分阶段规划书》
+
+  - id: gstack.office-hours
+    kind: github_raw
+    repo: garrytan/gstack
+    ref: main
+    file: office-hours/SKILL.md
+    tags: [product, discovery, JTBD, status-quo, wedge, office-hours, YC, 痛点, 产品探索]
+    when: 产品探索深化 — 痛点真伪、现状替代方案 (Status Quo) 与最窄切入点追问
+
+  - id: gstack.plan-ceo-review
+    kind: github_raw
+    repo: garrytan/gstack
+    ref: main
+    file: plan-ceo-review/SKILL.md
+    tags: [product, strategy, 10-star, scope, MVP, Aha-Moment, 产品策略, 评审]
+    when: 产品策略与 10 星体验评审（Scope Expansion 惊喜体验 vs Scope Reduction 砍伪需求）
+
+  - id: gstack.plan-design-review
+    kind: github_raw
+    repo: garrytan/gstack
+    ref: main
+    file: plan-design-review/SKILL.md
+    tags: [UX, UI, design-review, hierarchy, empty-state, interaction, 设计评审, 体验走查]
+    when: 交互与设计体验深度评审（信息架构、空状态、交互边缘路径评分）
+
+  - id: deanpeters.pm-prd
+    kind: github_raw
+    repo: deanpeters/Product-Manager-Skills
+    ref: main
+    file: skills/prd-development/SKILL.md
+    tags: [PRD, JTBD, Gherkin, user-stories, product-manager, 需求规格, 验收标准]
+    when: 结构化 PRD、JTBD 问题界定与 Gherkin Given-When-Then 验收标准深化
+
+  - id: uipro.ux-design
+    kind: github_raw
+    repo: nextlevelbuilder/ui-ux-pro-max-skill
+    ref: main
+    file: .claude/skills/ui-ux-pro-max/SKILL.md
+    tags: [UX, UI, usability, Fitts, Hick, progressive-disclosure, palette, 行业UX, 可用性]
+    when: 行业 UX 布局范式、可用性心理学法则与色彩排版配对深化
 
   - id: local.api.core
     kind: local
@@ -336,3 +394,58 @@ sources:
     file: README.md
     tags: [DDD, modular-monolith, backend, architecture]
     when: 模块化单体+DDD 实践对照 — 仅 search-cache，禁止整读
+
+  - id: local.coding.standards
+    kind: local
+    path: references/coding_standards.md
+    tags: [规范, 开发规范, 语言规范, Linter, static-check, Go, Java, Python, Rust, TypeScript, Vue, coding-standards]
+    when: 多语言代码开发规范、静态检测门禁与跨语言六元组实现 — 本地必守
+
+  - id: uber.go-guide
+    kind: github_raw
+    repo: uber-go/guide
+    ref: master
+    file: style.md
+    tags: [Go, Golang, style, concurrency, error-handling, uber, 后端]
+    when: Go 语言开发规范、并发安全、错误处理与工程实践（Uber Go Style Guide）
+
+  - id: alibaba.java-guide
+    kind: github_raw
+    repo: alibaba/p3c
+    ref: master
+    file: p3c-formatter/README.md
+    tags: [Java, Alibaba, p3c, 规约, 阿里巴巴, OOP, 异常, 并发, 后端]
+    when: Java 语言开发规范、阿里巴巴 Java 规约与常见避坑点
+
+  - id: google.python-style
+    kind: github_raw
+    repo: google/styleguide
+    ref: gh-pages
+    file: pyguide.md
+    tags: [Python, style, Google, type-annotations, PEP8, 后端]
+    when: Python 编程规范、Type Annotations 与 Google Python 风格指南
+
+  - id: rust-lang.api-guidelines
+    kind: github_raw
+    repo: rust-lang/api-guidelines
+    ref: master
+    file: README.md
+    tags: [Rust, API, guidelines, ownership, safety, error-handling, 系统编程]
+    when: Rust API 设计规范、所有权生命周期与错误处理
+
+  - id: vuejs.style-guide
+    kind: github_raw
+    repo: vuejs/docs
+    ref: main
+    file: src/style-guide/rules-essential.md
+    tags: [Vue, Vue3, style-guide, components, reactivity, 前端]
+    when: Vue.js 3 官方组件与风格指南（必须规则与强烈推荐）
+
+  - id: google.typescript-style
+    kind: github_raw
+    repo: google/gts
+    ref: main
+    file: README.md
+    tags: [TypeScript, TS, Google, gts, linter, 前端, 后端]
+    when: TypeScript 强类型编码规范与 Google Style
+

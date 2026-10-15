@@ -1,6 +1,6 @@
 # 过程连续性（plan_log / change_log / 续做 / 回退）
 
-**何时读**：用户说「继续 / 继续任务 / 接着做 / resume」；中断后续做；任务或阶段回退；写计划步骤或登记变更；每会话最多一次。  
+**何时读**：用户说「继续 / 继续任务 / 接着做 / resume」；中断后续做；任务或阶段回退；写计划步骤或登记变更；每会话最多一次（**「每会话最多一次」仅约束本详规只读一次**）。**需求变更治理 → [`requirement_change.md`](requirement_change.md)**。  
 **分工**：状态合法迁移 → [`task_state_machine.md`](task_state_machine.md)；冻结/阶段链 → [`spec_driven_lifecycle.md`](spec_driven_lifecycle.md)。
 
 ---
@@ -12,12 +12,13 @@
 3. **语义入口**：用户意图含「继续 / 接着 / 续做 / resume / 继续任务」等 → 先走 §2，禁止当新需求重开满配。  
 4. **最小集**：过程目录只强制维护 `plan_log`、`change_log`、以及回退用的 `error_recovery/snapshots`；其余 `_06_todo` 等可选。
 
-路径根：`hs_dev_docs/_08_dev_process/`。
+路径根：`hs_dev_docs/_06_dev_process/`。
 
 | 目录 | 用途 |
 |------|------|
 | `_01_plan_log/` | 每任务一份计划：有序步骤 + 状态 + 当前断点 |
 | `_02_change_log/` | 每任务 JSONL：每步变更的文件/文档清单 + 快照引用 |
+| `_03_qa_log/` | **Q&A 决策日志**（审讯/开场确认/变更裁定问答与拍板，跨会话可追溯；模板见 `resources/templates/process/qa_log.md`） |
 | `_04_error_recovery/snapshots/{checkpoint_id}/` | 变更前文件副本（回退原料） |
 | `_05_session_handoff/` | 可选补充；**续做不依赖它**，以 plan/change 为准 |
 
@@ -77,7 +78,7 @@ R4  从断点下一步推进；禁止重做已 done 步骤，禁止忽略 BLOCKE
   "summary": "实现 create_order 主路径",
   "paths": [
     {"path": "backend/order_service.py", "snapshot": "_04_error_recovery/snapshots/cp_…/backend__order_service.py"},
-    {"path": "hs_dev_docs/_06_method_design/.../….md", "snapshot": "…"}
+    {"path": "hs_dev_docs/_04_engineering_contract/_04_method_design/.../….md", "snapshot": "…"}
   ],
   "status_before": "IN_PROGRESS",
   "plan_step_before": "S3"
@@ -127,3 +128,8 @@ B4  向用户报告：恢复了哪些文件、当前断点、下一步
 - 状态迁移合法表见 [`task_state_machine.md`](task_state_machine.md)。  
 - 续做时 load_latch：L0 仍写/确认 `change_size`+`work_mode`（可从 plan 读取）；L1/L2 优先本详规。  
 - 回退若暴露产品语义被撤掉 → 回切 `DESIGN` 并检查冻结门禁。
+
+## 6. 与需求变更通道的分工
+
+- **执行层**（本文）：断点、续做、快照回退；**需求层**（[`requirement_change.md`](requirement_change.md)）：冻结后需求变更治理（《变更请求单》+ 影响评估 + 开发者裁定）。  
+- 变更确认后：先 `process_log.py checkpoint` 记录变更前状态，再落变更，保证可回退。

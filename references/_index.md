@@ -12,15 +12,20 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 
 | 场景 | 打开 |
 |------|------|
+| **新需求第一步：开场确认（复述/假设/约束/分级建议）** | `opening_alignment.md` |
 | **动手前：装载门闩（反合理化 × Token）** | `load_latch.md` |
-| **任何需求第一步：变更分级 S/M/L** | `right_sizing.md` |
-| **审讯式 DESIGN 对齐 / grilling** | `grill_orchestration.md` |
+| **任何需求第一步：变更分级 S/M/L（触 DB 变更 → 至少 M）** | `right_sizing.md` |
+| **审讯式 DESIGN 对齐 / grilling（轮询不限次）** | `grill_orchestration.md` |
 | 设计多问 / 实现少问 / 跳过收紧 / work_mode | `confidence_decision.md` |
 | **继续任务 / plan_log / change_log / 非 git 回退** | `process_continuity.md` |
-| **产品原型 / Mermaid 线框（无位图）** | `product_prototype.md` |
+| **冻结后需求变更 / 变更请求单** | `requirement_change.md` |
+| **产品设计规范（设计语言 + 产品功能 + 冻结签收）** | `product_design.md` |
+| **产品原型 / 多态线框（无位图）** | `product_prototype.md` |
+| **MVP 范围裁定（并入产品设计沟通）与分阶段规划** | `product_roadmap.md` |
 | 任务状态合法迁移 | `task_state_machine.md` |
 | **测试方法（一等公民）/ TDD / seam** | `testing.md` |
 | 提交前门禁 / 九级测试分层 | `quality_gates.md` |
+| **多语言开发规范 / Linter 门禁矩阵 / 跨语言六元组** | `coding_standards.md` |
 | **深模块 / seam / Adapter / 删除测试** | `deep_modules.md` |
 | 满配阶段细则 0～6 | `spec_driven_lifecycle.md`（可只读当前阶段节） |
 | **UI 默认审美（本地 Anthropic 蒸馏）** | `frontend_aesthetic.md` |
@@ -33,8 +38,17 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | API 本地高频 | `api_engineering.md` |
 | 领域规则远程按需（书规则 / FSD / wshobson…） | `rule_library.md` |
 | 六元组签名与衍生方法 | `six_tuple_runtime.md` |
+| **方法类型分类 / 契约画像 / 精准测试矩阵** | `method_archetypes.md` |
+| **设计模式选型决策树 / 模式集群 / VibeCoding 防破坏** | `design_patterns.md` |
 | Token / SQLite / context_pack | `token_budget.md` |
 | 四级 JSONL 路由 | `four_level_routing.md` |
 | Mock Profile | `mock_contract_guide.md` |
+| **四段式版本控制 / 多级包区分 / 发布 Tag** | `version_control.md` |
+| **工程附属机制与治理支撑 / 环境机密 / 供应链 / CI/CD / 探针 / 容灾 / 隐私** | `auxiliary_governance.md` |
+| **反向重建：已有项目接入规范与知识库逆向** | `reverse_engineering.md` |
+| **Bug 修复：系统化调试与测试驱动修补** | `systematic_debugging.md` |
+| **代码重构：行为等价保护网与深模块演进** | `code_refactoring.md` |
+| **代码理解：只读免交付检索与架构探查** | `code_exploration.md` |
+| **项目文档阅读说明与跨 Agent 索引机制规范** | `doc_reading_guide.md` |
 | 学习笔记 / 偏好 / GitHub 对标 | `learn_and_prefer.md` |
 | Win/Linux/macOS 路径与解释器 | `cross_platform.md` |
