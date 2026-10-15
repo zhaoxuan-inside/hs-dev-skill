@@ -252,7 +252,7 @@ L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范�
    python3 scripts/doc_index_db.py --root . rebuild
    python3 scripts/doc_index_db.py --root . generate-guide
    ```
-   确保各子域 `.idx`、SQLite 倒排索引及根目录全局导航阅读说明 `hs_dev_docs/README.md` 处于最新状态且哈希一致。
+   确保各子域 `.idx`、SQLite 倒排索引及根目录全局导航阅读说明 `hs_dev_docs/_00_docs_compass.md` 处于最新状态且哈希一致。
 3. **运行全量测试与运行态走查（测试零报错绝对阻断门禁）**：`make test` 确保 **100% PASS**，**无任何失败、报错或异常用例**；若有任何报错，**绝对禁止将任务置为 COMPLETED，绝对禁止 Git Commit，绝对禁止向用户汇报交付或完工**！严禁出现“代码已交付但有测试报错稍后修”的严重违规，必须就地 Debug 修复直至全绿。前端工程结合 Chrome DevTools CDP 自动化排查，确保无未捕获 Console 报错与网络死锁，满足 WCAG a11y 对比度与 LCP/内存泄漏安全线。
 4. **运行代码静态检测（零告警零错误门禁）**：语言对应 Linter（ESLint/Ruff/Flake8 等）与类型检查（TSC/Mypy）**必须达到 0 警告（0 Warning）且 0 错误（0 Error）**；任何 Warning 均视为阻断性质量缺陷必须就地消除，严禁带 Warning 提交代码。
 5. **运行一致性与需求覆盖率门禁检查**：`python3 scripts/verify_consistency.py --root . --strict` 确保三文件、索引、V/U 脚本原子配对、目录卫生以及原子需求清单（`REQ-*`）100% 达成 `verified`（覆盖率硬阻断，严禁遗留未解决项交付）。

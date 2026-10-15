@@ -45,7 +45,7 @@ def init_hs_global(*, sync_protocol: bool = True) -> Path:
     (root / "tech_learning").mkdir(parents=True, exist_ok=True)
 
     actions = [
-        ensure_file_from_template(root / "README.md", templates / "README.md"),
+        ensure_file_from_template(root / "_00_global_area_guide.md", templates / "_00_global_area_guide.md"),
         ensure_file_from_template(root / "preferences.yaml", templates / "preferences.yaml"),
         ensure_file_from_template(
             root / "tag_synonyms.yaml",

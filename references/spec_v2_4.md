@@ -74,7 +74,7 @@
 │   ├── scripts/
 │   │
 │   └── hs_dev_docs/
-│       ├── README.md                                 # [全局罗盘] 项目文档阅读说明与直接索引导航（置顶 [VIBE_CONTRACT]）
+│       ├── _00_docs_compass.md                        # [全局罗盘] 项目文档阅读说明与直接索引导航（置顶 [VIBE_CONTRACT]）
 │       ├── _00_hs_dev_docs.idx                       # 全局根索引（一级路由）
 │       ├── _00_project_foundation/                   # [00 基座与全局规范]
 │       │   ├── _00_project_foundation.idx

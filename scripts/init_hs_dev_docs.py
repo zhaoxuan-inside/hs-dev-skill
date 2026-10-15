@@ -209,7 +209,7 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
             adr_file.write_text(adr_content, encoding="utf-8")
             print(f"[*] Generated reverse engineering baseline ADR: {adr_file.name}")
 
-    # 4.2 生成项目文档阅读说明与直接索引导航 (hs_dev_docs/README.md)
+    # 4.2 生成项目文档阅读说明与直接索引导航 (hs_dev_docs/_00_docs_compass.md)
     generate_doc_reading_guide(root)
 
     # 5. 重建跨平台 SQLite 文档索引（FTS5 + LIKE，可重复执行）
@@ -240,7 +240,7 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
 
 def generate_doc_reading_guide(workspace_root: str, project_name: str = None, verbose: bool = True) -> Path:
     """
-    生成或刷新 hs_dev_docs/README.md（项目文档阅读说明与直接索引导航），
+    生成或刷新 hs_dev_docs/_00_docs_compass.md（项目文档阅读说明与直接索引导航），
     同时在 _00_hs_dev_docs.idx 中注册并自愈摘要哈希，方便人类与协同 Agent 快速导航与索引。
     """
     root = Path(workspace_root).resolve()
@@ -385,7 +385,7 @@ guardrails:
         base_content = base_content + "\n" + "\n".join(dyn_lines)
 
     # 写入主文档
-    guide_file = docs_root / "README.md"
+    guide_file = docs_root / "_00_docs_compass.md"
     guide_file.write_text(base_content, encoding="utf-8")
     if verbose:
         print(f"[*] Generated project documentation reading guide: {guide_file}")
@@ -393,12 +393,12 @@ guardrails:
     # 如果存在 _05_doc_index 目录，也写入索引说明
     doc_index_dir = docs_root / "_00_project_foundation" / "_05_doc_index"
     if doc_index_dir.exists():
-        sub_readme = doc_index_dir / "README.md"
+        sub_readme = doc_index_dir / "_00_doc_index_guide.md"
         sub_readme_content = """# 文档倒排索引数据库与查询说明 (Doc Index Database)
 
 本目录存放基于 SQLite (FTS5 + LIKE) 构建的高速文档索引缓存：
 - **索引数据库**：`doc_index.sqlite`
-- **全局文档阅读与导航说明**：请查阅根目录 [hs_dev_docs/README.md](../../README.md)
+- **全局文档阅读与导航说明**：请查阅根目录 [hs_dev_docs/_00_docs_compass.md](../../_00_docs_compass.md)
 - **常用查询命令**：
   - `python scripts/doc_index_db.py --root . search --q "<关键词>"`
   - `python scripts/doc_index_db.py --root . feature-search --q "<特性名>"`
@@ -411,7 +411,7 @@ guardrails:
     root_idx = docs_root / "_00_hs_dev_docs.idx"
     if root_idx.exists():
         r_mgr = IdxManager(str(root_idx))
-        r_mgr.add_entry("doc_reading_guide", "项目文档阅读说明与全局索引导航", "README.md", auto_digest=True)
+        r_mgr.add_entry("doc_reading_guide", "项目文档阅读说明与全局索引导航", "_00_docs_compass.md", auto_digest=True)
         r_mgr.update_digest()
 
     return guide_file

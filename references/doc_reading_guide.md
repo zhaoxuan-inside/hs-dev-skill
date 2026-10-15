@@ -10,7 +10,7 @@
 1. **盲目全量通读引发 Token 爆炸与失忆**：Agent 介入项目时，直接递归通读 `hs_dev_docs/` 或扫描源码，导致上下文窗口迅速耗尽、信噪比骤降、注意力被无关背景冲淡。
 2. **缺乏全景索引导致割裂与重复实现**：不同 Agent 无法快速定位既有业务 PRD、数据表 Schema、RESTful 接口或通用工具方法，极易导致方案漂移、影子函数（Shadow Functions）暴增与架构坏味道。
 
-为此，本体系在 `hs_dev_docs/` 根目录下强制生成**《项目文档阅读说明与全局索引导航》（`hs_dev_docs/README.md`）**。该文件充当人机双重视角下的**统一文档索引中枢与全局导航罗盘**。
+为此，本体系在 `hs_dev_docs/` 根目录下强制生成**《项目文档阅读说明与全局索引导航》（`hs_dev_docs/_00_docs_compass.md`）**。该文件充当人机双重视角下的**统一文档索引中枢与全局导航罗盘**。
 
 ---
 
@@ -36,7 +36,7 @@
 
 ## 3. 《项目文档阅读说明》规范要素
 
-生成的 `hs_dev_docs/README.md` 必须包含以下六大核心区块：
+生成的 `hs_dev_docs/_00_docs_compass.md` 必须包含以下六大核心区块：
 
 ### 3.1 [VIBE_CONTRACT] 机器极速索引契约 (行 1～45)
 置顶于文档顶部，供 LLM / Agent 切片读取。包含：
@@ -82,7 +82,7 @@
    ```bash
    python scripts/init_hs_dev_docs.py --root .
    ```
-   在初始化目录与索引时，自动根据项目特征生成 `hs_dev_docs/README.md`，并在全局根索引 `_00_hs_dev_docs.idx` 中完成注册与摘要校验。
+   在初始化目录与索引时，自动根据项目特征生成 `hs_dev_docs/_00_docs_compass.md`，并在全局根索引 `_00_hs_dev_docs.idx` 中完成注册与摘要校验。
 
 2. **独立生成或刷新指令**：
    ```bash
@@ -97,4 +97,4 @@
    ```
 
 3. **双层索引同步**：
-   生成器在产出 `hs_dev_docs/README.md` 后，会自动向 `_00_hs_dev_docs.idx` 写入 `doc_reading_guide` 条目并计算 SHA-256 前 8 位 Digest，确保在 `make verify` 时通过哈希防漂移门禁。
+   生成器在产出 `hs_dev_docs/_00_docs_compass.md` 后，会自动向 `_00_hs_dev_docs.idx` 写入 `doc_reading_guide` 条目并计算 SHA-256 前 8 位 Digest，确保在 `make verify` 时通过哈希防漂移门禁。

@@ -91,7 +91,7 @@
    python scripts/doc_index_db.py --root . generate-guide
    # 或运行 make doc-guide
    ```
-   自动生成置顶 `[VIBE_CONTRACT]` 机器索引契约与 7 大域直接索引相对链接表的 `hs_dev_docs/README.md`。
+   自动生成置顶 `[VIBE_CONTRACT]` 机器索引契约与 7 大域直接索引相对链接表的 `hs_dev_docs/_00_docs_compass.md`。
 4. **一致性门禁严格核验**：
    ```bash
    python scripts/verify_consistency.py --root . --strict

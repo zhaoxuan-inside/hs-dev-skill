@@ -3214,7 +3214,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     p_guide = sub.add_parser(
         "generate-guide",
-        help="Generate or refresh hs_dev_docs/README.md reading guide and rebuild SQLite index",
+        help="Generate or refresh hs_dev_docs/_00_docs_compass.md reading guide and rebuild SQLite index",
     )
     p_guide.add_argument("--project-name", default=None, help="Optional project name")
 

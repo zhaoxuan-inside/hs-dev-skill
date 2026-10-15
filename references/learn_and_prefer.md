@@ -26,7 +26,7 @@
 
 ```text
 ~/.hs-dev-skill/
-├── README.md
+├── _00_global_area_guide.md
 ├── learn_and_prefer.md
 ├── preferences.yaml
 ├── tag_synonyms.yaml          # 技术 → 特性标签同义词（可扩展）

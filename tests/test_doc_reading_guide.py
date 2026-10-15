@@ -54,8 +54,8 @@ class TestDocReadingGuide(unittest.TestCase):
 
     def test_generate_in_initialized_workspace(self):
         init_full_workspace(str(self.root))
-        guide_file = self.root / "hs_dev_docs" / "README.md"
-        self.assertTrue(guide_file.exists(), "hs_dev_docs/README.md must be generated")
+        guide_file = self.root / "hs_dev_docs" / "_00_docs_compass.md"
+        self.assertTrue(guide_file.exists(), "hs_dev_docs/_00_docs_compass.md must be generated")
 
         text = guide_file.read_text(encoding="utf-8")
         self.assertIn("项目文档阅读说明与全局索引导航", text)
@@ -72,7 +72,7 @@ class TestDocReadingGuide(unittest.TestCase):
         self.assertTrue(valid, f"Index verification failed: {errs}")
 
         # 校验子目录说明
-        sub_readme = self.root / "hs_dev_docs" / "_00_project_foundation" / "_05_doc_index" / "README.md"
+        sub_readme = self.root / "hs_dev_docs" / "_00_project_foundation" / "_05_doc_index" / "_00_doc_index_guide.md"
         self.assertTrue(sub_readme.exists())
 
         # 校验 ConsistencyVerifier 通过
@@ -91,7 +91,7 @@ class TestDocReadingGuide(unittest.TestCase):
 
         # 重新生成阅读说明
         generate_doc_reading_guide(str(self.root), project_name="my_test_app")
-        guide_file = self.root / "hs_dev_docs" / "README.md"
+        guide_file = self.root / "hs_dev_docs" / "_00_docs_compass.md"
         text = guide_file.read_text(encoding="utf-8")
 
         self.assertIn("my_test_app", text)
@@ -127,7 +127,7 @@ class TestDocReadingGuide(unittest.TestCase):
             self.assertTrue(results.get("ok"))
             self.assertGreaterEqual(results.get("count", 0), 1)
             paths = [r["path"] for r in results.get("results", [])]
-            self.assertTrue(any("README.md" in p for p in paths))
+            self.assertTrue(any("_00_docs_compass.md" in p for p in paths))
         finally:
             db2.close()
 
