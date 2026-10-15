@@ -13,6 +13,7 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | 场景 | 打开 |
 |------|------|
 | **新需求第一步：开场确认（复述/假设/约束/分级建议）** | `opening_alignment.md` |
+| **流程全景：意图路由 + 阶段门禁 + 回环（从各需求入口）** | `intent_routing_and_gates.md` |
 | **动手前：装载门闩（反合理化 × Token）** | `load_latch.md` |
 | **任何需求第一步：变更分级 S/M/L（触 DB 变更 → 至少 M）** | `right_sizing.md` |
 | **审讯式 DESIGN 对齐 / grilling（轮询不限次）** | `grill_orchestration.md` |

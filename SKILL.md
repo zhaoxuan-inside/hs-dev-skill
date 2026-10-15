@@ -105,7 +105,7 @@ metadata:
 
 ## 手册指针
 
-- [`_index.md`](references/_index.md) · [`load_latch.md`](references/load_latch.md) · [`right_sizing.md`](references/right_sizing.md) · [`token_budget.md`](references/token_budget.md) · [`opening_alignment.md`](references/opening_alignment.md)（新需求开场确认：复述/假设/约束/分级建议）· [`requirement_change.md`](references/requirement_change.md)（冻结后需求变更通道）
+- [`_index.md`](references/_index.md) · [`load_latch.md`](references/load_latch.md) · [`right_sizing.md`](references/right_sizing.md) · [`token_budget.md`](references/token_budget.md) · [`opening_alignment.md`](references/opening_alignment.md)（新需求开场确认：复述/假设/约束/分级建议）· [`requirement_change.md`](references/requirement_change.md)（冻结后需求变更通道）· [`intent_routing_and_gates.md`](references/intent_routing_and_gates.md)（流程全景：意图路由 + 阶段门禁 + 回环）
 - [`reverse_engineering.md`](references/reverse_engineering.md)（已有项目反向重建 · Schema/API 逆向与四级索引）
 - [`systematic_debugging.md`](references/systematic_debugging.md)（系统化调试 · 科学假设 · 先红后绿 · 防退化门禁）
 - [`code_refactoring.md`](references/code_refactoring.md)（代码重构 · 特征测试保护网 · 深模块演进 · 零行为漂移）
