@@ -1,2 +1,0 @@
-{"version": "1.0", "category": "payment_db_schema", "root": "_01_payment"}
-{"id": "table_payment_record", "title": "支付流水表设计", "path": "_01_payment_record_design.md", "status": "active", "digest": "624dce12"}

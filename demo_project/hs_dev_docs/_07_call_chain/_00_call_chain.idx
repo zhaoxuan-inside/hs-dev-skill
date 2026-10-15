@@ -1,2 +1,0 @@
-{"version": "1.0", "category": "call_chain", "root": "_07_call_chain"}
-{"id": "cc_payment_process", "title": "支付处理调用链", "path": "_01_payment/_01_payment_process_call_chain.md", "status": "active", "digest": "e875f104"}

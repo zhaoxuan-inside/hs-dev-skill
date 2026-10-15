@@ -1,6 +1,0 @@
-# 统一项目术语词典
-terms:
-  - term: "示例实体"
-    en_name: "example_entity"
-    abbr: "ex_ent"
-    scope: "domain_model"
