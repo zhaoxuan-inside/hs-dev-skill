@@ -76,17 +76,20 @@ $$\mathbf{v[\text{主版本}].[\text{需求版本}].[\text{修复版本}].[\text
 
 ### 3.1 轨 A：Skill 自身版本控制规则 (Skill Package)
 保障 `hs-dev-skill` 作为研发基础设施的单源一致性与兼容性：
-- 采用四段式多级版本号：`v{MAJOR}.{FEATURE}.{PATCH}.{BUILD}`（当前为 `v2.41.0.0`）。
+- 采用四段式多级版本号：`v{MAJOR}.{FEATURE}.{PATCH}.{BUILD}`。Skill 当前版本以 `SKILL.md` 元数据、正文版本行、`README.md` badge 与路由包版本四处一致值为准；本文不重复维护当前值。
   - **MAJOR (主版本)**：发生方法论与架构破裂（如状态机破坏性重构、核心目录结构废弃、硬门禁逻辑变更）；
   - **FEATURE (需求版本)**：新增大规约文档、新增全套生命周期机制（如本期的工程附属机制矩阵）；
   - **PATCH (修复版本)**：规约细化、Bugfix、单测补充、文档格式修正；
   - **BUILD (打包版本)**：Skill 发行构建序列、发布打包流水线批次。
 
-#### 三处元数据单源一致性铁律 (Single Source of Truth)
-Skill 自身发布时，以下三处版本号必须**绝对一致**，由 `verify_consistency.py` 自动化检查阻断：
-1. `SKILL.md` frontmatter 的 `metadata.version`（例如 `"2.41.0.0"`）；
-2. `SKILL.md` 正文首部的 `版本：v2.41.0.0`；
-3. `README.md` 的 Shields badge（例如 `[![Spec Version](https://img.shields.io/badge/skill-v2.41.0.0-blue.svg)](SKILL.md)`）。
+#### 版本元数据单源一致性铁律 (Single Source of Truth)
+Skill 自身发布时，以下四处版本号必须**绝对一致**：
+1. `SKILL.md` frontmatter 的 `metadata.version`；
+2. `SKILL.md` 正文首部的版本行；
+3. `README.md` 的 Shields badge；
+4. `resources/skill_routes.json` 的 `bundle_version`。
+
+更新 Skill 版本时同步修改以上四处，并运行 `make verify`；验证脚本检查前三处，`skill_router.py check` 检查路由包版本。不要复制历史版本号作为当前版本。
 
 ---
 

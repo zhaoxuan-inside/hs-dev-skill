@@ -10,6 +10,7 @@ from __future__ import annotations
 import os
 import sys
 import json
+import re
 import argparse
 from datetime import datetime, timezone
 from pathlib import Path
@@ -297,6 +298,7 @@ class TaskManager:
         new_status: str,
         note: str = "",
         force: bool = False,
+        acceptance_record: Optional[str] = None,
     ):
         """流转任务状态并原子同步三文件；默认校验合法迁移。"""
         if new_status not in VALID_STATUSES:
@@ -332,6 +334,16 @@ class TaskManager:
                 f"Allowed from {old_status}: {sorted(allowed) or '∅ (terminal)'}. "
                 f"Use --force only for process_log rollback reopen."
             )
+
+        if new_status == "COMPLETED":
+            if force:
+                raise ValueError("--force cannot bypass the COMPLETED acceptance gate")
+            if old_status != "VERIFYING":
+                raise ValueError("COMPLETED requires the task to be in VERIFYING")
+            detail_path = self.task_root / target_entry["path"]
+            self._validate_completion_gate(task_id, detail_path, acceptance_record)
+        elif acceptance_record:
+            raise ValueError("--acceptance-record is only valid with --set COMPLETED")
 
         now = get_iso_timestamp()
         target_entry["status"] = new_status
@@ -398,6 +410,124 @@ class TaskManager:
             f"{old_status} → '{new_status}'"
             + (" (force)" if force else "")
         )
+
+    def _validate_completion_gate(
+        self,
+        task_id: str,
+        detail_path: Path,
+        acceptance_record: Optional[str],
+    ) -> None:
+        """Require current, structured acceptance evidence before archiving a task."""
+        if not acceptance_record:
+            raise ValueError(
+                "COMPLETED requires --acceptance-record with a current accepted record"
+            )
+
+        record_path = Path(acceptance_record)
+        if not record_path.is_absolute():
+            record_path = self.root / record_path
+        record_path = record_path.resolve()
+        try:
+            record_path.relative_to(self.root)
+        except ValueError:
+            raise ValueError("Acceptance record must be inside the workspace root")
+        if not record_path.is_file():
+            raise ValueError(f"Acceptance record does not exist: {record_path}")
+
+        content = record_path.read_text(encoding="utf-8")
+        match = re.search(
+            r"<!--\s*HS_ACCEPTANCE_GATE_V1\s*(.*?)\s*HS_ACCEPTANCE_GATE_V1\s*-->",
+            content,
+            flags=re.DOTALL,
+        )
+        if not match:
+            raise ValueError("Acceptance record is missing the HS_ACCEPTANCE_GATE_V1 JSON block")
+        try:
+            record = json.loads(match.group(1))
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Acceptance gate JSON is invalid: {exc}")
+        if not isinstance(record, dict):
+            raise ValueError("Acceptance gate JSON must be an object")
+
+        if record.get("schema_version") != 1 or record.get("task_id") != task_id:
+            raise ValueError("Acceptance record schema or task_id does not match")
+        if record.get("acceptance_status") != "ACCEPTED":
+            raise ValueError("Acceptance record must have acceptance_status ACCEPTED")
+
+        verification = record.get("verification")
+        test_runs = verification.get("tests") if isinstance(verification, dict) else None
+        if not isinstance(test_runs, list) or not test_runs:
+            raise ValueError("Acceptance record must include at least one test execution result")
+        for index, run in enumerate(test_runs, start=1):
+            if (not isinstance(run, dict)
+                    or not str(run.get("command", "")).strip()
+                    or run.get("exit_code") != 0
+                    or not str(run.get("evidence", "")).strip()):
+                raise ValueError(
+                    f"Test execution {index} must record a command, exit_code 0, and evidence"
+                )
+
+        confirmation = record.get("developer_confirmation")
+        if not isinstance(confirmation, dict):
+            raise ValueError("Acceptance record is missing developer_confirmation")
+        required_confirmation = ("reviewer", "confirmed_at", "source", "excerpt")
+        if confirmation.get("decision") != "ACCEPTED" or any(
+            not str(confirmation.get(key, "")).strip() for key in required_confirmation
+        ):
+            raise ValueError("Developer confirmation must record decision, reviewer, time, source, and excerpt")
+
+        checklist = record.get("checks")
+        if not isinstance(checklist, list) or not checklist:
+            raise ValueError("Acceptance record must contain at least one checklist item")
+        seen_ids = set()
+        for item in checklist:
+            if not isinstance(item, dict):
+                raise ValueError("Acceptance checklist items must be JSON objects")
+            item_id = str(item.get("rule_id", "")).strip()
+            result = item.get("result")
+            if not item_id or item_id in seen_ids:
+                raise ValueError("Acceptance checklist rule_id values must be present and unique")
+            seen_ids.add(item_id)
+            if result == "PASS" and not str(item.get("evidence", "")).strip():
+                raise ValueError(f"Acceptance item {item_id} is PASS without evidence")
+            if result == "NA" and not str(item.get("reason", "")).strip():
+                raise ValueError(f"Acceptance item {item_id} is NA without a reason")
+            if result not in ("PASS", "NA"):
+                raise ValueError(f"Acceptance item {item_id} is not closed: {result}")
+
+        dod_items = record.get("dod")
+        if not isinstance(dod_items, list) or not dod_items:
+            raise ValueError("Acceptance record must contain at least one DoD item")
+        for index, item in enumerate(dod_items, start=1):
+            if not isinstance(item, dict):
+                raise ValueError("DoD items must be JSON objects")
+            if (not str(item.get("criterion", "")).strip()
+                    or item.get("result") != "PASS"
+                    or not str(item.get("evidence", "")).strip()):
+                raise ValueError(f"DoD item {index} must have a criterion, PASS result, and evidence")
+
+        if record.get("unimplemented") != []:
+            raise ValueError("Acceptance record must explicitly set unimplemented to an empty list")
+
+        if not detail_path.is_file():
+            raise ValueError(f"Task detail is missing: {detail_path}")
+        detail = detail_path.read_text(encoding="utf-8")
+        req_rows = []
+        for line in detail.splitlines():
+            if not line.strip().startswith("|"):
+                continue
+            columns = [column.strip() for column in line.strip().split("|")[1:-1]]
+            if columns and re.match(r"^`?REQ-[A-Za-z0-9_-]+`?$", columns[0]):
+                req_rows.append((columns[0].strip("`"), columns[-1].strip("`").lower()))
+        unresolved = [req_id for req_id, status in req_rows if status not in ("verified", "passed", "done")]
+        if unresolved:
+            raise ValueError("Unverified task requirements block completion: " + ", ".join(unresolved))
+
+        from verify_consistency import ConsistencyVerifier
+
+        verifier = ConsistencyVerifier(str(self.root), strict=True)
+        if not verifier.check_all():
+            raise ValueError("Strict consistency gate failed; task remains in VERIFYING")
 
     def _archive_task(self, task_id: str, final_status: str):
         """将完成或废弃的任务归档移入 _00_task_archive.idx"""
@@ -643,6 +773,11 @@ def main():
         action="store_true",
         help="Bypass transition table (process_log rollback reopen only)",
     )
+    p_status.add_argument(
+        "--acceptance-record",
+        default="",
+        help="Workspace-relative accepted record required for COMPLETED",
+    )
 
     # handoff
     p_handoff = subparsers.add_parser("handoff", help="Create a session handoff")
@@ -680,7 +815,16 @@ def main():
             args.change_size,
         )
     elif args.command == "status":
-        tm.set_status(args.id, args.set, args.note, force=args.force)
+        try:
+            tm.set_status(
+                args.id,
+                args.set,
+                args.note,
+                force=args.force,
+                acceptance_record=args.acceptance_record or None,
+            )
+        except (ValueError, OSError, UnicodeError) as exc:
+            parser.error(str(exc))
     elif args.command == "handoff":
         completed = [x.strip() for x in args.completed.split(",") if x.strip()]
         remaining = [x.strip() for x in args.remaining.split(",") if x.strip()]

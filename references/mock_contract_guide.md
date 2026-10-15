@@ -29,6 +29,8 @@
 
 ## 2. Test Profile 示例
 
+创建契约和 Profile 时可分别从 [`mock_contract.json`](../resources/templates/mock/mock_contract.json) 与 [`test_profile.yaml`](../resources/templates/mock/test_profile.yaml) 起草，再按实际协议和测试框架补齐字段。
+
 ```yaml
 profile: order_create_timeout_profile
 description: 模拟下游库存服务超时场景

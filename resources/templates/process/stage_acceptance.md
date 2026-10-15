@@ -61,3 +61,34 @@
 | 变更来源及版本差异 | 受影响规则/需求 | 受影响下游文档/Pack | INVALIDATED 时间 | 重验范围与新确认记录 |
 |---|---|---|---|---|
 | {change} | {ids} | {paths} | {time} | 待重验 |
+
+## 8. CLI 完成门禁记录
+
+将以下 JSON 更新为真实记录。验收未通过时保持 `SUBMITTED` 或 `REJECTED`；开发者确认后才填写 `ACCEPTED`。提交任务为 `COMPLETED` 时将本文件路径传给 `task_manager.py --acceptance-record`。
+
+<!-- HS_ACCEPTANCE_GATE_V1
+{
+  "schema_version": 1,
+  "task_id": "{task_id}",
+  "acceptance_status": "SUBMITTED",
+  "developer_confirmation": {
+    "decision": "PENDING",
+    "reviewer": "",
+    "confirmed_at": "",
+    "source": "",
+    "excerpt": ""
+  },
+  "verification": {
+    "tests": [
+      {"command": "{实际测试命令}", "exit_code": null, "evidence": "{运行报告或可复核输出位置}"}
+    ]
+  },
+  "checks": [
+    {"rule_id": "{rule_id}", "result": "PENDING", "evidence": "", "reason": ""}
+  ],
+  "dod": [
+    {"criterion": "{验收标准}", "result": "PENDING", "evidence": ""}
+  ],
+  "unimplemented": []
+}
+HS_ACCEPTANCE_GATE_V1 -->

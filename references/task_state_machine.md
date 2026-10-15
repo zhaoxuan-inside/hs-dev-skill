@@ -1,6 +1,6 @@
 # 任务生命周期与状态机规范指南
 
-**状态与验收分离**：以下为任务工作状态。阶段验收状态按 [`stage_acceptance.md`](stage_acceptance.md) 独立记录；CLI 校验合法迁移不代表验收已通过，COMPLETED 前须核对有效的阶段 6 验收及开发者确认。
+**状态与验收分离**：以下为任务工作状态。阶段验收状态按 [`stage_acceptance.md`](stage_acceptance.md) 独立记录；`COMPLETED` 迁移必须提供有效结构化验收记录、DoD 证据、开发者确认记录和已闭合的 REQ 项。CLI 校验这些字段，但不能鉴别签收记录是否真实来自开发者。
 
 **何时读**：建任务、改状态、回退重开、续做涉及任务态；每会话最多一次。  
 **续做/回退账本** → [`process_continuity.md`](process_continuity.md)。
@@ -51,10 +51,16 @@ python scripts/task_manager.py status --id {id} --set IN_PROGRESS --force
 
 ### COMPLETED 前置流转条件（硬阻断门禁）
 
-任务从 `VERIFYING` 流转至 `COMPLETED` 必须满足三大物理铁律：
+任务从 `VERIFYING` 流转至 `COMPLETED` 必须满足以下门禁：
 1. **全量自动化测试 100% 绿灯**（`make test` 0 失败、0 挂起）；
 2. **严格质量门禁 0 错误 0 警告**（`verify_consistency.py --strict` PASS）；
 3. **需求覆盖率 100%**：`task_detail` 中声明的所有原子需求（`REQ-*`）必须处于 `verified` 状态，严禁带未解决需求宣告成功。
+
+此外，命令必须传 `--acceptance-record <workspace-relative-path>`。记录须包含已接受状态、开发者确认字段、测试命令/退出码/证据、逐项闭合的验收 checklist、带证据的 DoD 项，以及明确为空的未实现清单。CLI 会在归档前执行严格一致性校验；项目测试仍由项目自己的测试命令执行并记录。REQ 未闭合或 `--force` 都不能绕过完成门禁。示例：
+
+```bash
+python3 scripts/task_manager.py status --id {task_id} --set COMPLETED --acceptance-record <workspace-relative-acceptance-record.md>
+```
 
 ### 步骤策略与副作用治理 (Step Policy & Side-Effect Strategy)
 
@@ -72,6 +78,8 @@ python scripts/task_manager.py status --id {id} --set IN_PROGRESS --force
 1. `_00_task.idx`
 2. `_01_task_brief/`
 3. `_02_task_detail/`
+
+任务简述与详情可分别参考 [`task_brief.md`](../resources/templates/task/task_brief.md) 和 [`task_detail.md`](../resources/templates/task/task_detail.md)。
 
 并维护过程最小集（见 [`process_continuity.md`](process_continuity.md)）：
 

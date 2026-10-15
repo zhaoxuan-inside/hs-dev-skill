@@ -59,7 +59,26 @@ class TestProcessLog(unittest.TestCase):
         created.parent.mkdir(parents=True, exist_ok=True)
         created.write_text("new\n", encoding="utf-8")
         self.tm.set_status("pay_new", "VERIFYING")
-        self.tm.set_status("pay_new", "COMPLETED")
+        acceptance_path = self.root / "hs_dev_docs/_06_dev_process/pay_new_acceptance.md"
+        acceptance_path.parent.mkdir(parents=True, exist_ok=True)
+        acceptance = {
+            "schema_version": 1, "task_id": "pay_new", "acceptance_status": "ACCEPTED",
+            "developer_confirmation": {"decision": "ACCEPTED", "reviewer": "developer",
+                "confirmed_at": "2026-10-15T12:00:00Z", "source": "test conversation",
+                "excerpt": "Confirmed acceptance for this task"},
+            "verification": {"tests": [{"command": "make test", "exit_code": 0, "evidence": "test output"}]},
+            "checks": [{"rule_id": "DELIV-01", "result": "PASS", "evidence": "test report"}],
+            "dod": [{"criterion": "Task acceptance criterion", "result": "PASS", "evidence": "test report"}],
+            "unimplemented": [],
+        }
+        acceptance_path.write_text(
+            "<!-- HS_ACCEPTANCE_GATE_V1\n" + json.dumps(acceptance) + "\nHS_ACCEPTANCE_GATE_V1 -->\n",
+            encoding="utf-8",
+        )
+        self.tm.set_status(
+            "pay_new", "COMPLETED",
+            acceptance_record=str(acceptance_path.relative_to(self.root)),
+        )
 
         result = rollback(self.root, "pay_new", cp["checkpoint_id"])
         self.assertTrue(result["ok"])

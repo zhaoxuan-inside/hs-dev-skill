@@ -92,3 +92,5 @@ python scripts/rule_fetch.py search-cache --q Idempotency
 | 六元组 + 单测 | 校验失败、冲突、幂等重放、降级路径有覆盖 |
 
 实现期命名/内部拆分细节：**少问**；公开契约与业务字段未决：**回切 DESIGN**。
+
+接口文档可从 [`interface_design.md`](../resources/templates/hs_dev_docs/interface_design.md) 起草；Mock Schema 与 Profile 模板见 [`mock_contract_guide.md`](mock_contract_guide.md)。

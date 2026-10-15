@@ -45,7 +45,7 @@ python3 /path/to/hs-dev-skill/scripts/doc_index_db.py --root /path/to/project se
 
 功能 Skill 接收同一上下文与具体专业问题，只返回本领域结果、证据及需要主路由裁决的问题。过程 Skill 返回：产出路径与版本、变更/测试证据、checklist 候选结果、有效/失效验收、未决项、建议下一阶段及实际加载的 Skill 名称。
 
-验收状态遵循 [阶段验收协议](stage_acceptance.md)。调用成功和工作 todolist 完成不等于 ACCEPTED；模型不得代签。
+验收状态遵循 [阶段验收协议](stage_acceptance.md)。调用成功和工作 todolist 完成不等于 ACCEPTED；模型不得代签。`task_manager.py` 归档任务时会要求结构化验收记录和当前 REQ/DoD 证据，并运行严格一致性检查；项目测试仍由对应测试命令执行，确认来源仍需人工可追溯记录。
 
 ## 4. 路由优先级与停点
 

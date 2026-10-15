@@ -18,9 +18,9 @@
 |------|------|
 | `_01_plan_log/` | 每任务一份计划：有序步骤 + 状态 + 当前断点 |
 | `_02_change_log/` | 每任务 JSONL：每步变更的文件/文档清单 + 快照引用 |
-| `_03_qa_log/` | **Q&A 决策日志**（审讯/开场确认/变更裁定问答与拍板，跨会话可追溯；模板见 `resources/templates/process/qa_log.md`） |
+| `_03_qa_log/` | **Q&A 决策日志**（审讯/开场确认/变更裁定问答与拍板，跨会话可追溯；使用 [`qa_log.md`](../resources/templates/process/qa_log.md)） |
 | `_04_error_recovery/snapshots/{checkpoint_id}/` | 变更前文件副本（回退原料） |
-| `_05_session_handoff/` | 可选补充；**续做不依赖它**，以 plan/change 为准 |
+| `_05_session_handoff/` | 可选补充；**续做不依赖它**，以 plan/change 为准；中断时可用 [`session_handoff.md`](../resources/templates/task/session_handoff.md) 整理交接 |
 
 ---
 

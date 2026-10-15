@@ -4,6 +4,8 @@
 
 **分工**：分级规则 → [`right_sizing.md`](right_sizing.md)；阶段细则 → [`spec_driven_lifecycle.md`](spec_driven_lifecycle.md)；意图专属路径 → [`reverse_engineering.md`](reverse_engineering.md) / [`systematic_debugging.md`](systematic_debugging.md) / [`code_refactoring.md`](code_refactoring.md) / [`code_exploration.md`](code_exploration.md) / [`process_continuity.md`](process_continuity.md)；状态迁移 → [`task_state_machine.md`](task_state_machine.md)；开场确认 → [`opening_alignment.md`](opening_alignment.md)。
 
+> **路由权威性**：当前子 Skill 入口和参考文档归属以 [`skill_routes.json`](../resources/skill_routes.json) 为准；各入口的计划、执行、验收与交接顺序见 [`entry_workflows.md`](entry_workflows.md)。本文流程图用于说明 L 规模生命周期和历史门禁细节；S/M 剪枝及入口职责不得覆盖主 Skill 路由和当前验收清单。
+
 ---
 
 ## 0. 顺序性结论（先读）

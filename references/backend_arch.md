@@ -37,7 +37,7 @@ python scripts/rule_fetch.py resolve --id wshobson.saga-orchestration
 | 3. 依赖方向 | **只向内**：Domain ← Application ← Adapters ← Frameworks；内层不知外层 |
 | 4. 外部封装 | 业务代码禁止直接 import 第三方 SDK/DB 驱动；经 infra **Adapter** 落在明确 **seam**（见 `deep_modules`；真有 ≥2 实现再抽端口） |
 | 4b. 深度自检 | 用例/域模块做**删除测试**：删掉后复杂度是否散到 N 处调用方？浅透传则合并或加深 |
-| 5. 文档落盘 | L：`hs_dev_docs/_03_architecture_design/`；模板见 [`arch_design_template.md`](../resources/templates/architecture_design/arch_design_template.md) |
+| 5. 文档落盘 | L：`hs_dev_docs/_03_architecture_design/`；模板见 [`arch_design_template.md`](../resources/templates/architecture_design/arch_design_template.md)。DB 详设使用 [`db_table_design.md`](../resources/templates/hs_dev_docs/db_table_design.md) |
 
 模糊新技术栈：GitHub 高星对标 ≥2（框架官方样例 / 同域开源）再写 ADR。
 

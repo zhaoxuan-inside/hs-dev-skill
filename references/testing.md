@@ -3,6 +3,8 @@
 **何时读**：进入 IMPLEMENT / 阶段 5；写或改业务逻辑、API、六元组；定 seam 与验收；门禁失败；每会话最多一次。  
 **分工**：本文 = **测什么、怎么测、与分级挂钩**；层级目录与覆盖率表 → [`quality_gates.md`](quality_gates.md)；可测形状 → [`deep_modules.md`](deep_modules.md)；契约夹具 → [`mock_contract_guide.md`](mock_contract_guide.md)。
 
+测试用例规格可使用 [`test_case_spec_template.md`](../resources/templates/hs_dev_docs/test_case_spec_template.md)；根据项目的实际测试框架调整模板中的路径和单跑命令。
+
 ---
 
 ## 0. 质量铁律（高于速度与「看起来做完」）

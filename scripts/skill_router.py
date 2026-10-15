@@ -32,6 +32,10 @@ def _local_file(root: Path, relative: str) -> Path:
 def validate_registry(root: Path, registry: Dict[str, Any]) -> None:
     if registry.get("schema_version") != 1:
         raise ValueError("Unsupported skill route schema")
+    root_skill = (root / "SKILL.md").read_text(encoding="utf-8")
+    version_match = re.search(r"(?m)^  version:\s*[\"']?([^\"'\s]+)", root_skill)
+    if not version_match or registry.get("bundle_version") != version_match.group(1):
+        raise ValueError("Bundle version does not match SKILL.md metadata.version")
     entries = registry.get("skills", [])
     ids = set()
     owners: Dict[str, str] = {}

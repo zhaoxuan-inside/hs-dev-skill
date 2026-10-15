@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "bundle_version": "3.0.0.0",
+  "bundle_version": "4.0.0.0",
   "skills": [
     {
       "id": "hs-dev-discovery",
@@ -228,6 +228,7 @@
     "references/intent_routing_and_gates.md",
     "references/spec_v2_4.md",
     "references/cross_platform.md",
-    "references/subskill_contract.md"
+    "references/subskill_contract.md",
+    "references/entry_workflows.md"
   ]
 }

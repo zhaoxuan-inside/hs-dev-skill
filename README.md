@@ -5,7 +5,7 @@
 > **质量优先 + 审讯式对齐 + 测试一等公民 + 深模块词汇 + 文档驱动 + S/M/L 分级**
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
-[![Spec Version](https://img.shields.io/badge/skill-v3.0.0.0-blue.svg)](SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v4.0.0.0-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -53,7 +53,7 @@ python scripts/skill_ref_index.py rebuild # Skill 详规场景索引
 
 ## 横向功能与纵向过程拆分
 
-主入口见 [SKILL.md](SKILL.md)，完整职责、依赖及交接见 [子 Skill 协议](references/subskill_contract.md)。
+主入口见 [SKILL.md](SKILL.md)，[各入口执行流程](references/entry_workflows.md)展示了过程入口与功能入口的完整文档闭环；职责、依赖及交接见 [子 Skill 协议](references/subskill_contract.md)。
 
 | 轴 | 子 Skill |
 |---|---|

@@ -72,7 +72,7 @@ class TestSkillRouter(unittest.TestCase):
                 route(self.root, self.registry, **kwargs)
 
     def test_broken_and_duplicate_registry_entries_fail(self):
-        for mutation in ("missing", "duplicate", "escape", "wrong_axis", "unregistered", "default_domain"):
+        for mutation in ("missing", "duplicate", "escape", "wrong_axis", "unregistered", "default_domain", "bundle_version"):
             registry = copy.deepcopy(self.registry)
             if mutation == "missing":
                 registry["skills"][0]["path"] = "skills/missing/SKILL.md"
@@ -82,6 +82,8 @@ class TestSkillRouter(unittest.TestCase):
                 registry["skills"][0]["path"] = "../SKILL.md"
             elif mutation == "wrong_axis":
                 registry["phases"]["0"] = registry["domains"]["backend"]
+            elif mutation == "bundle_version":
+                registry["bundle_version"] = "0.0.0.0"
             elif mutation == "unregistered":
                 registry["skills"].pop()
             else:

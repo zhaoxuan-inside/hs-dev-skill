@@ -33,6 +33,7 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | **MVP 范围裁定（并入产品设计沟通）与分阶段规划** | `product_roadmap.md` |
 | 任务状态合法迁移 | `task_state_machine.md` |
 | **测试方法（一等公民）/ TDD / seam** | `testing.md` |
+| **交付完成审计 / 需求与证据回收** | `completion_audit.md` |
 | 提交前门禁 / 九级测试分层 | `quality_gates.md` |
 | **多语言开发规范 / Linter 门禁矩阵 / 跨语言六元组** | `coding_standards.md` |
 | **深模块 / seam / Adapter / 删除测试** | `deep_modules.md` |
@@ -61,3 +62,4 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | **项目文档阅读说明与跨 Agent 索引机制规范** | `doc_reading_guide.md` |
 | 学习笔记 / 偏好 / GitHub 对标 | `learn_and_prefer.md` |
 | Win/Linux/macOS 路径与解释器 | `cross_platform.md` |
+| **各入口执行流程 / 计划-执行-证据-验收-交接** | `entry_workflows.md` |

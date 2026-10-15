@@ -1,4 +1,5 @@
 import os
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -19,6 +20,22 @@ class TestTaskManager(unittest.TestCase):
 
     def tearDown(self):
         self.temp_dir.cleanup()
+
+    def write_acceptance_record(self, task_id):
+        path = self.root / "hs_dev_docs/_06_dev_process" / f"{task_id}_acceptance.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        record = {
+            "schema_version": 1, "task_id": task_id, "acceptance_status": "ACCEPTED",
+            "developer_confirmation": {"decision": "ACCEPTED", "reviewer": "developer",
+                "confirmed_at": "2026-10-15T12:00:00Z", "source": "test conversation",
+                "excerpt": "Confirmed acceptance for this task"},
+            "verification": {"tests": [{"command": "make test", "exit_code": 0, "evidence": "test output"}]},
+            "checks": [{"rule_id": "DELIV-01", "result": "PASS", "evidence": "test report"}],
+            "dod": [{"criterion": "Task acceptance criterion", "result": "PASS", "evidence": "test report"}],
+            "unimplemented": [],
+        }
+        path.write_text("<!-- HS_ACCEPTANCE_GATE_V1\n" + json.dumps(record) + "\nHS_ACCEPTANCE_GATE_V1 -->\n", encoding="utf-8")
+        return str(path.relative_to(self.root))
 
     def test_task_lifecycle_and_triple_file_consistency(self):
         # 1. 创建任务
@@ -51,7 +68,8 @@ class TestTaskManager(unittest.TestCase):
         self.tm.set_status("order_create_test", "IN_PROGRESS")
         self.assertTrue(verifier.check_all())
         self.tm.set_status("order_create_test", "VERIFYING")
-        self.tm.set_status("order_create_test", "COMPLETED")
+        record = self.write_acceptance_record("order_create_test")
+        self.tm.set_status("order_create_test", "COMPLETED", acceptance_record=record)
         self.assertTrue(verifier.check_all())
 
         plan = self.root / "hs_dev_docs/_06_dev_process/_01_plan_log/order_create_test_plan.md"
@@ -66,8 +84,33 @@ class TestTaskManager(unittest.TestCase):
         # 日常禁止 force 跳步以外：force 仅用于终态重开
         self.tm.set_status("t_illegal", "IN_PROGRESS")
         self.tm.set_status("t_illegal", "VERIFYING")
-        self.tm.set_status("t_illegal", "COMPLETED")
+        with self.assertRaisesRegex(ValueError, "force cannot bypass"):
+            self.tm.set_status("t_illegal", "COMPLETED", force=True)
+        record = self.write_acceptance_record("t_illegal")
+        self.tm.set_status("t_illegal", "COMPLETED", acceptance_record=record)
         self.tm.set_status("t_illegal", "IN_PROGRESS", force=True)
+
+    def test_completed_requires_closed_acceptance_record(self):
+        self.tm.create_task("t_gate", "完成门禁")
+        self.tm.set_status("t_gate", "IN_PROGRESS")
+        self.tm.set_status("t_gate", "VERIFYING")
+        with self.assertRaisesRegex(ValueError, "acceptance-record"):
+            self.tm.set_status("t_gate", "COMPLETED")
+
+        record = self.write_acceptance_record("t_gate")
+        record_path = self.root / record
+        record_path.write_text(
+            record_path.read_text(encoding="utf-8").replace('"result": "PASS"', '"result": "PENDING"', 1),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(ValueError, "not closed"):
+            self.tm.set_status("t_gate", "COMPLETED", acceptance_record=record)
+
+        record_path.write_text(
+            record_path.read_text(encoding="utf-8").replace('"result": "PENDING"', '"result": "PASS"', 1),
+            encoding="utf-8",
+        )
+        self.tm.set_status("t_gate", "COMPLETED", acceptance_record=record)
 
     def test_create_defaults_change_size_m(self):
         res = self.tm.create_task("task_size_default", "默认分级")

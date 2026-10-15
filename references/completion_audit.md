@@ -32,15 +32,15 @@
 
 ## 2. DoD 逐条回收（映射表）
 
-M/L：COMPLETED 前在 task detail「完成度审计」节落盘（`task_manager create` 已生成骨架）：
+所有分级：COMPLETED 前在阶段验收记录或 task detail 中填写结构化 `HS_ACCEPTANCE_GATE_V1` 区块；M/L 另在 task detail「完成度审计」节落盘 DoD 映射。模板见 [`stage_acceptance.md`](../resources/templates/process/stage_acceptance.md)：
 
 | DoD 项 | seam / 测试 | 证据（命令 + 结果） | 状态 |
 |---|---|---|---|
 | 逐条抄自验收标准 | 对应测试文件/用例 | `make test` → PASS 等 | ✅ |
 
-- 全 ✅ 才可 `status --set COMPLETED --dod-audited`。
+- 全 ✅、REQ 覆盖通过且开发者确认已记录后，若任务当前为 `IN_PROGRESS`，先执行 `python3 scripts/task_manager.py status --id {task_id} --set VERIFYING`；再执行 `python3 scripts/task_manager.py status --id {task_id} --set COMPLETED --acceptance-record <workspace-relative-acceptance-record.md>`。CLI 会在归档前检查结构化记录、测试运行证据、所有 DoD 证据、开发者确认字段和 task detail 中的 REQ 状态，并运行严格一致性门禁。项目专属测试命令需先运行并如实记录。S 级也需结构化记录，可内联在 task detail；DoD 摘要可按本节要求保持精简。
 - 任何一条做不了 → 走 §3 范围裁剪；**不允许**标 ❌ 后照常 COMPLETED。
-- **S**：不落盘，交付报告里 3 行核对（DoD 摘要 + 测试证据 + 扫描结果）。
+- **S**：结构化验收记录可内联 task detail；交付报告里另附 3 行核对（DoD 摘要 + 测试证据 + 扫描结果）。
 - **L / 有 UI**：另做**功能覆盖对账**——PRD 功能点 ↔ 原型页 ↔ 实现文件/路由 ↔ 测试，逐行对账；缺一行即未完成。
 
 ---
@@ -79,4 +79,4 @@ M/L：COMPLETED 前在 task detail「完成度审计」节落盘（`task_manager
 ## 6. 与其他文件
 
 - 提交前清单：[`quality_gates.md`](quality_gates.md) §2；测试方法：[`testing.md`](testing.md)；Mock 隔离：[`mock_contract_guide.md`](mock_contract_guide.md)；阶段 6 细则：[`spec_driven_lifecycle.md`](spec_driven_lifecycle.md)。
-- 任务流转：`COMPLETED` 必须带 `--dod-audited`（[`task_state_machine.md`](task_state_machine.md)）；未过审计 → 回 `IN_PROGRESS` 或转 `BLOCKED`。
+- 任务流转：先完成本文件审计，再通过 [`task_state_machine.md`](task_state_machine.md) 的 `VERIFYING → COMPLETED` 门禁。CLI 校验记录字段与证据是否齐全，但不能鉴别确认来源是否真实；Agent 必须引用实际开发者确认，不能自行编造签收记录。未过审计 → 回 `IN_PROGRESS` 或转 `BLOCKED`。

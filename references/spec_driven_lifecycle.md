@@ -259,6 +259,6 @@ L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范�
 4. **运行代码静态检测（零告警零错误门禁）**：语言对应 Linter（ESLint/Ruff/Flake8 等）与类型检查（TSC/Mypy）**必须达到 0 警告（0 Warning）且 0 错误（0 Error）**；任何 Warning 均视为阻断性质量缺陷必须就地消除，严禁带 Warning 提交代码。
 5. **运行一致性与需求覆盖率门禁检查**：`python3 scripts/verify_consistency.py --root . --strict` 确保三文件、索引、V/U 脚本原子配对、目录卫生以及原子需求清单（`REQ-*`）100% 达成 `verified`（覆盖率硬阻断，严禁遗留未解决项交付）。
 6. **运行死代码与孤儿方法扫描**：`python3 scripts/dead_code_scanner.py --root .`。
-7. **流转任务状态并归档**：**仅当上述测试全绿、静态检测零告警零错误、一致性验证全部通过后**，方可执行 `python3 scripts/task_manager.py status --id {task_id} --set COMPLETED`（自动归档至 `_00_task_archive.idx`）。
+7. **流转任务状态并归档**：**仅当上述测试全绿、静态检测零告警零错误、一致性验证全部通过，且结构化验收记录已由开发者确认后**，方可执行 `python3 scripts/task_manager.py status --id {task_id} --set COMPLETED --acceptance-record <验收记录路径>`（命令检查记录、REQ 与严格一致性门禁后自动归档至 `_00_task_archive.idx`）。
 8. **Git 规范提交**：按照 `<type>(<scope>): <subject>` 规范生成本地 Commit。**默认不** `git push`；**仅当用户明确要求推送**时代为执行并回报结果。
 

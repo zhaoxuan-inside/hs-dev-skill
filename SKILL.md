@@ -9,12 +9,12 @@ license: MIT
 compatibility: Requires Python >= 3.8; install the complete bundle including skills, scripts, references, resources
 metadata:
   author: hardstone
-  version: "3.0.0.0"
+  version: "4.0.0.0"
 ---
 
 # 产品开发主路由 Skill
 
-版本：v3.0.0.0
+版本：v4.0.0.0
 
 Agent 驱动文档，已验收的文档驱动代码。本入口只负责分派与共享边界；具体过程和专业规则由真实的子 Skill 执行。完整包含 **10 个过程 Skill + 6 个功能 Skill**，详规和工具保持单份共享。
 
@@ -23,7 +23,7 @@ Agent 驱动文档，已验收的文档驱动代码。本入口只负责分派�
 1. 识别当前任务的 `intent`、`change_size=S/M/L`、`work_mode=DESIGN/IMPLEMENT/READONLY`、实际阶段及触达领域。沿用已有明确确认；模糊业务预期交 discovery，不靠工程假设补齐。
 2. 只读分析走 exploration；“继续”走 continuity 先恢复；变更和验收事件优先进入对应子过程。FIX/REFACTOR/REVERSE 不套 BUILD 全链。
 3. 从下表读取 **一个过程子 Skill**，再按任务触达面读取功能子 Skill；未触达领域不加载。每次只推进当前切片，不能开局通读所有子 Skill。
-4. 用检索/切片加载该子 Skill 指定的详规和项目输入，遵循 [装载规则](references/load_latch.md)。输入、输出与返回约定见 [子 Skill 协议](references/subskill_contract.md)。
+4. 按[各入口执行流程](references/entry_workflows.md)读取指导文档、建立/更新计划、执行、提交证据并形成工作文档；用检索/切片加载子 Skill 指定详规和项目输入，遵循[装载规则](references/load_latch.md)。输入、输出与返回约定见[子 Skill 协议](references/subskill_contract.md)。
 5. 子 Skill 返回当前产物、证据、验收状态及下一动作后，主路由继续分派；不得将调用成功解释成阶段完成。
 
 路由唯一机器清单：[`resources/skill_routes.json`](resources/skill_routes.json)。工具不猜阶段、不执行任务、不代签：

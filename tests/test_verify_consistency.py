@@ -1,4 +1,5 @@
 import os
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -19,6 +20,26 @@ class TestVerifyConsistency(unittest.TestCase):
 
     def tearDown(self):
         self.temp_dir.cleanup()
+
+    def write_acceptance_record(self, task_id):
+        env_example = self.root / "config/.env.example"
+        env_example.parent.mkdir(parents=True, exist_ok=True)
+        if not env_example.exists():
+            env_example.write_text("# test environment template\n", encoding="utf-8")
+        path = self.root / "hs_dev_docs/_06_dev_process" / f"{task_id}_acceptance.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        record = {
+            "schema_version": 1, "task_id": task_id, "acceptance_status": "ACCEPTED",
+            "developer_confirmation": {"decision": "ACCEPTED", "reviewer": "developer",
+                "confirmed_at": "2026-10-15T12:00:00Z", "source": "test conversation",
+                "excerpt": "Confirmed acceptance for this task"},
+            "verification": {"tests": [{"command": "make test", "exit_code": 0, "evidence": "test output"}]},
+            "checks": [{"rule_id": "DELIV-01", "result": "PASS", "evidence": "test report"}],
+            "dod": [{"criterion": "All task REQ items verified", "result": "PASS", "evidence": "task detail matrix"}],
+            "unimplemented": [],
+        }
+        path.write_text("<!-- HS_ACCEPTANCE_GATE_V1\n" + json.dumps(record) + "\nHS_ACCEPTANCE_GATE_V1 -->\n", encoding="utf-8")
+        return str(path.relative_to(self.root))
 
     def test_clean_workspace_passes(self):
         self.assertTrue(self.verifier.check_all())
@@ -246,24 +267,19 @@ class TestVerifyConsistency(unittest.TestCase):
         tm.set_status("req_gate_test", "VERIFYING")
         self.assertTrue(self.verifier.check_all())
 
-        # 任务推进到 COMPLETED 时，由于 REQ-002 处于 pending，必须拦截报错
-        tm.set_status("req_gate_test", "COMPLETED")
-        self.assertFalse(self.verifier.check_all())
-        self.assertTrue(any("[REQUIREMENT COVERAGE ERROR]" in e for e in self.verifier.errors))
-        self.assertTrue(any("REQ-002" in e for e in self.verifier.errors))
+        # 任务推进到 COMPLETED 时，由于 REQ-002 处于 pending，归档前必须拦截
+        acceptance_record = self.write_acceptance_record("req_gate_test")
+        with self.assertRaisesRegex(ValueError, "REQ-002"):
+            tm.set_status("req_gate_test", "COMPLETED", acceptance_record=acceptance_record)
+        self.assertTrue(self.verifier.check_all())
 
         # 修复 REQ-002 为 verified
         repaired_content = detail_path.read_text(encoding="utf-8").replace("`pending`", "`verified`")
         detail_path.write_text(repaired_content, encoding="utf-8")
-
-        # 同步更新 task_archive 与 task_detail 索引中的文件摘要 (digest)
         from idx_manager import IdxManager
-        arch_idx = IdxManager(str(self.root / "hs_dev_docs/_05_task_orchestration/_00_task_archive.idx"))
-        arch_idx.update_digest()
-        detail_idx = IdxManager(str(self.root / "hs_dev_docs/_05_task_orchestration/_02_task_detail/_00_task_detail.idx"))
-        detail_idx.update_digest()
-
-        # 重新验证，此时覆盖率为 100%，应当通过
+        IdxManager(str(self.root / "hs_dev_docs/_05_task_orchestration/_00_task.idx")).update_digest()
+        IdxManager(str(self.root / "hs_dev_docs/_05_task_orchestration/_02_task_detail/_00_task_detail.idx")).update_digest()
+        tm.set_status("req_gate_test", "COMPLETED", acceptance_record=acceptance_record)
         verifier_clean = ConsistencyVerifier(str(self.root))
         self.assertTrue(verifier_clean.check_all())
 
