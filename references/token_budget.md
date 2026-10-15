@@ -9,7 +9,7 @@
 ## 1. 合法装载顺序（强制）
 
 ```text
-1) 读 SKILL.md 铁律（每会话最多一次）
+1) 读主 SKILL.md 路由，选择一个过程子 Skill 与触达功能子 Skill；不加载无关入口
 2) 装载门闩 load_latch L0～L2：开场确认（新需求）→ change_size+work_mode → skill_ref_index search 或 _index 一行 → 核心 1 份详规 + 阶段满配链附属（合计 ≤5 份）
 3) 读 right_sizing.md（若尚未作为那 1 份打开）并写入分级（S 路径此后少读 lifecycle）
 4) 按「路径/阶段 → references」表按需再开（已读不重复；仍遵守「同时打开详规宜少」）
@@ -32,6 +32,8 @@
 ---
 
 ## 2. 路径/阶段 → references 挂载表（按需，勿一次全读）
+
+本表是子 Skill 内的详规路由，不是要求主 Skill 同时加载所有文件。入口与归属以 resources/skill_routes.json 为准。
 
 | 当前 | 必读（每会话一次） | 可选 |
 |---|---|---|

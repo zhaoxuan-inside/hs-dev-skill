@@ -1,5 +1,7 @@
 # references 索引（禁止整目录通读）
 
+先由主 Skill 选择过程/功能子 Skill；本表只用于命中详规，不替代子 Skill 路由。
+
 用本表按需打开**一份**文件；已读过的本会话不重复读。争议百科才查 `spec_v2_4.md` 对应节。
 
 不确定场景时先检索（勿通读目录）：
@@ -12,6 +14,7 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 
 | 场景 | 打开 |
 |------|------|
+| **子 Skill / 双轴分割 / 运行包 / 交接 / 独立调用** | `subskill_contract.md` |
 | **阶段验收 / checklist / 通过证据 / 验收权限与失效** | `stage_acceptance.md` |
 | **需求理解 / 预期对账 / 产品设计验收 DISC / PROD** | `product_acceptance.md` |
 | **选型到交付验收 / TECH ARCH DETAIL TASK IMPL DELIV / Java P3C** | `engineering_acceptance.md` |

@@ -2,7 +2,7 @@
 """
 Skill references 场景索引（Windows / Linux / macOS）。
 
-权威源：skill 包内 references/*.md
+权威源：skill 包内 references/*.md 与 skills/*/SKILL.md
 SQLite 缓存：<skill_root>/.hs_cache/skill_ref.sqlite（可重建，勿手改）
 
 用途：不确定读哪份详规时先 search，禁止通读 references/。
@@ -338,13 +338,20 @@ class SkillRefIndex:
             index_scenarios = _parse_index_scenarios(_read_text(index_path))
 
         inserted = 0
-        for path in sorted(self.ref_dir.glob("*.md")):
+        sources = sorted(self.ref_dir.glob("*.md"))
+        sources.extend(sorted((self.skill_root / "skills").glob("*/SKILL.md")))
+        for path in sources:
             text = _read_text(path)
             title_m = re.search(r"(?m)^#\s+(.+)$", text)
             title = title_m.group(1).strip() if title_m else path.stem
             when = _when_to_read(text)
             tags = list(FILE_SCENARIOS.get(path.name, []))
             tags.extend(index_scenarios.get(path.name, []))
+            if path.name == "SKILL.md":
+                tags.extend([path.parent.name, "子Skill", "subskill"])
+                description = re.search(r"(?m)^description:\s*(.+)$", text)
+                if description:
+                    tags.append(description.group(1).strip())
             if when:
                 tags.append(when)
             tags = _unique_tags(tags)
@@ -356,7 +363,7 @@ class SkillRefIndex:
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
-                    f"references/{path.name}",
+                    path.relative_to(self.skill_root).as_posix(),
                     title,
                     summary,
                     text[:BODY_MAX],
@@ -372,7 +379,7 @@ class SkillRefIndex:
                     VALUES (?, ?, ?, ?, ?, ?)
                     """,
                     (
-                        f"references/{path.name}",
+                        path.relative_to(self.skill_root).as_posix(),
                         title,
                         summary,
                         text[:BODY_MAX],

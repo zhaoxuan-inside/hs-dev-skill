@@ -1,4 +1,4 @@
-.PHONY: test verify scan-dead-code init-docs doc-guide init-global paths index-rebuild index-search global-index-rebuild global-index-search skill-ref-rebuild skill-ref-search rule-list rule-search rule-resolve version version-now help
+.PHONY: test verify skill-check skill-list scan-dead-code init-docs doc-guide init-global paths index-rebuild index-search global-index-rebuild global-index-search skill-ref-rebuild skill-ref-search rule-list rule-search rule-resolve version version-now help
 
 # 跨平台：Linux/macOS 默认 python3；Windows 可 make PYTHON="py -3" 或 PYTHON=python
 ifeq ($(OS),Windows_NT)
@@ -11,6 +11,8 @@ help:
 	@echo "hs-dev-skill commands (Windows / Linux / macOS):"
 	@echo "  make test           - run unit tests"
 	@echo "  make verify         - pre-commit consistency gates"
+	@echo "  make skill-check    - validate process and functional sub-skills"
+	@echo "  make skill-list     - list process and functional sub-skills"
 	@echo "  make version        - generate 4-segment timestamp version (MMddHHmmss)"
 	@echo "  make version-now    - get current MMddHHmmss timestamp"
 	@echo "  make governance-status - show governance feature toggle status"
@@ -34,7 +36,13 @@ test:
 	$(PYTHON) -m unittest discover -s tests -p "test_*.py"
 	$(PYTHON) -m unittest discover -s examples/order_service/test/_01_method_test -p "test_*.py"
 
-verify:
+skill-check:
+	$(PYTHON) scripts/skill_router.py check
+
+skill-list:
+	$(PYTHON) scripts/skill_router.py list
+
+verify: skill-check
 	$(PYTHON) scripts/verify_consistency.py --root . --strict
 
 version:

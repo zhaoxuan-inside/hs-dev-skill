@@ -473,3 +473,99 @@ sources:
     path: references/standards_basis.md
     tags: [规范依据, ISO, IEEE, NASA, arc42, P3C, OpenAPI, OWASP]
     when: 追溯规范版本、阅读范围及项目转化边界
+
+  - id: local.subskill.discovery
+    kind: local
+    path: skills/hs-dev-discovery/SKILL.md
+    tags: [hs-dev-discovery, 子Skill, process, 需求理解与产品阶段编排]
+    when: 需求理解与产品阶段编排；过程与功能按主路由组合
+
+  - id: local.subskill.design
+    kind: local
+    path: skills/hs-dev-design/SKILL.md
+    tags: [hs-dev-design, 子Skill, process, 选型、架构与详细设计编排]
+    when: 选型、架构与详细设计编排；过程与功能按主路由组合
+
+  - id: local.subskill.planning
+    kind: local
+    path: skills/hs-dev-planning/SKILL.md
+    tags: [hs-dev-planning, 子Skill, process, 任务拆解与上下文装配]
+    when: 任务拆解与上下文装配；过程与功能按主路由组合
+
+  - id: local.subskill.implementation
+    kind: local
+    path: skills/hs-dev-implementation/SKILL.md
+    tags: [hs-dev-implementation, 子Skill, process, 按已验收契约实现切片]
+    when: 按已验收契约实现切片；过程与功能按主路由组合
+
+  - id: local.subskill.acceptance
+    kind: local
+    path: skills/hs-dev-acceptance/SKILL.md
+    tags: [hs-dev-acceptance, 子Skill, process, 阶段验收与交付判定]
+    when: 阶段验收与交付判定；过程与功能按主路由组合
+
+  - id: local.subskill.debugging
+    kind: local
+    path: skills/hs-dev-debugging/SKILL.md
+    tags: [hs-dev-debugging, 子Skill, process, 缺陷诊断与修复]
+    when: 缺陷诊断与修复；过程与功能按主路由组合
+
+  - id: local.subskill.refactoring
+    kind: local
+    path: skills/hs-dev-refactoring/SKILL.md
+    tags: [hs-dev-refactoring, 子Skill, process, 行为保持的结构重构]
+    when: 行为保持的结构重构；过程与功能按主路由组合
+
+  - id: local.subskill.reverse
+    kind: local
+    path: skills/hs-dev-reverse/SKILL.md
+    tags: [hs-dev-reverse, 子Skill, process, 存量工程逆向纳管]
+    when: 存量工程逆向纳管；过程与功能按主路由组合
+
+  - id: local.subskill.exploration
+    kind: local
+    path: skills/hs-dev-exploration/SKILL.md
+    tags: [hs-dev-exploration, 子Skill, process, 只读理解与分析]
+    when: 只读理解与分析；过程与功能按主路由组合
+
+  - id: local.subskill.continuity
+    kind: local
+    path: skills/hs-dev-continuity/SKILL.md
+    tags: [hs-dev-continuity, 子Skill, process, 续做、变更与回退]
+    when: 续做、变更与回退；过程与功能按主路由组合
+
+  - id: local.subskill.product
+    kind: local
+    path: skills/hs-dev-product/SKILL.md
+    tags: [hs-dev-product, 子Skill, functional, 产品功能、业务规则与原型]
+    when: 产品功能、业务规则与原型；过程与功能按主路由组合
+
+  - id: local.subskill.architecture
+    kind: local
+    path: skills/hs-dev-architecture/SKILL.md
+    tags: [hs-dev-architecture, 子Skill, functional, 技术选型、架构与模式]
+    when: 技术选型、架构与模式；过程与功能按主路由组合
+
+  - id: local.subskill.frontend
+    kind: local
+    path: skills/hs-dev-frontend/SKILL.md
+    tags: [hs-dev-frontend, 子Skill, functional, 界面、前端结构与交互实现]
+    when: 界面、前端结构与交互实现；过程与功能按主路由组合
+
+  - id: local.subskill.backend
+    kind: local
+    path: skills/hs-dev-backend/SKILL.md
+    tags: [hs-dev-backend, 子Skill, functional, 后端、数据与接口契约]
+    when: 后端、数据与接口契约；过程与功能按主路由组合
+
+  - id: local.subskill.testing
+    kind: local
+    path: skills/hs-dev-testing/SKILL.md
+    tags: [hs-dev-testing, 子Skill, functional, 测试策略、执行与质量证据]
+    when: 测试策略、执行与质量证据；过程与功能按主路由组合
+
+  - id: local.subskill.governance
+    kind: local
+    path: skills/hs-dev-governance/SKILL.md
+    tags: [hs-dev-governance, 子Skill, functional, 索引、版本、工程与运行治理]
+    when: 索引、版本、工程与运行治理；过程与功能按主路由组合
