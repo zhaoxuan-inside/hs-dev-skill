@@ -11,12 +11,12 @@ license: MIT
 compatibility: Requires Python >= 3.8 (stdlib sqlite3; Win/Linux/macOS)
 metadata:
   author: hardstone
-  version: "2.43.0.0"
+  version: "2.44.0.0"
 ---
 
 # 产品开发 Skill (hs-dev-skill)
 
-版本：v2.43.0.0  
+版本：v2.44.0.0
 核心定位：**全场景意图路由（BUILD 从零构建 · REVERSE 存量反向重建 · FIX 系统化调试 · REFACTOR 行为等价重构 · EXPLORE 只读代码理解 · RESUME 任务续做）+ 质量优先（分步正确 + 测试一等公民 · 测试零报错硬阻断交付 · 静态检测零告警零错误 · 数据驱动测试 DDT 与双轨制 E2E 规约 · 多语言编码规范与 Linter 门禁矩阵 · 全局统一术语与防歧义词典 Ubiquitous Language / 词态矩阵 Command/Event/Attribute / Search-Before-Name / 零裸字符串 Zero Magic Strings）+ 三层收口漏斗与抗脆弱机制（L0 物理代码真理 ➔ L1 文档业务契约 ➔ L2 顶层极速索引；符号锚点 Symbol Anchor 动态求值彻底消除静态行号漂移）+ 核心功能两级目录规约（一级功能 _01_ ~ _06_ + 二级子功能原子拆分，严格遵循 _01_xxx 顺序命名规则，彻底消除深层嵌套，实现 Domain+Category 二元高信噪比精准检索与极速切片装配）+ 全局文档阅读说明与直接索引罗盘（`hs_dev_docs/_00_docs_compass.md` 置顶 [VIBE_CONTRACT] 机器索引契约与 7 大域直接索引表 · 10 大专用 CLI 检索指令全景导航）+ 文档驱动（方法类型七分类 · 属性契约七维画像 · patternCluster 单向指针局部切片防破坏 · 物理行号实现后自动回填 · 精准测试分级矩阵 · 局部依赖拓扑 · 三段式修改原理 · 抗方法爆炸门禁与写前意图检索选型 `doc_index_db method-search`）+ 变更分级（S/M/L）+ 审讯式 DESIGN 对齐 + 强化产品设计（单文件可交互 HTML 原型预览 · 多端四态视口仿真 · 开发者签收门禁 · 宏观品味宪章与微观施工图两层解耦 · 一源双视图：面向人类《产品设计书》+ 面向 VibeCoding《机器执行契约》vibe_spec）+ 架构与模式设计（[VIBE_CONTRACT] 顶置切片 · GoF 23 种设计模式选型决策树 · 模式协同集群档案 · VibeCoding 防破坏三铁律）+ MVP 范围裁定（CEO 质疑式裁剪【开发者裁定】并入产品设计沟通审讯 · 团队胃口时间箱 · Day 1 垂直曳光弹切片）+ 垂直领域能力融合（OpenPencil 矢量规约 · Generative UI 动态交互仿真 · Modern Web Guidance 现代合规 · Chrome DevTools 运行态/CWV/a11y 质量门禁 · 专用 SDK 防腐 Adapter）+ 多端代码与构建产物强制收敛隔离（apps/ 与 output/ 强管控）+ 四段式多级版本控制（v[主版本].[需求版本].[修复版本].[打包版本] · 多级子版本号精确包区分）+ 工程附属机制全景治理支撑（环境配置与机密隔离 · 软件供应链与 CVE 阻断 · CI/CD 流水线与制品防伪 SBOM · 可观测性与三态健康探针 · 数据韧性与双向容灾回滚 · 安全防御与 PII 隐私脱敏 · Agent 执行安全沙箱护栏）+ 深模块词汇 + 本地默认审美 + 任务包编译装配 + 装载门闩 + 规则库远程按需 + 六元组；plan_log/change_log 续做与非 git 回退；默认本地 Commit**  
 **替代**：原 `hs-project-skill` 已废弃，统一用本 Skill。
 
@@ -29,7 +29,7 @@ metadata:
 0. **质量优先（测试零报错硬阻断 + 静态检测零告警 + 全局统一定义单一事实源）**：分步的正确最大可能保证最终的正确；测试是一等公民（[`testing.md`](references/testing.md)）。全量测试必须 100% PASS 且 0 报错；静态代码检测（Linter / TypeChecker / 死代码扫描 / 多语言规范矩阵，见 [`coding_standards.md`](references/coding_standards.md)）必须 0 Warning 且 0 Error；强制执行**单一事实源与词态矩阵**（Command 动词原形 / Event 过去分词如 `order.updated` / Attribute `_at` 时间戳，严禁使用 `update` 或 `updated_at` 当事件名；严禁硬编码裸字符串；严禁发明同义词别名，见 `_02_project_word.dict.yaml`）；未达标前**绝对禁止**流转 COMPLETED 交付或执行 Commit（严禁向用户汇报「已完成但有若干报错待修」）；可演示但无测试证明的行为不算完成（S 无逻辑变更除外）。
 1. **全场景意图路由与变更分级**：会话第一步判定 `intent=BUILD|REVERSE|FIX|REFACTOR|EXPLORE|RESUME`（[`right_sizing.md`](references/right_sizing.md)）。**新需求先跑 [`opening_alignment.md`](references/opening_alignment.md) 开场确认（需求复述 + 假设/空白 + 约束/干系人 + 分级建议，开发者确认）**，再写分级。交付型（BUILD/REVERSE/FIX/REFACTOR）写 `change_size=S|M|L` 与 `work_mode=DESIGN|IMPLEMENT`（[`confidence_decision.md`](references/confidence_decision.md)）；只读型（`EXPLORE`）自动锁定 `work_mode=READONLY`，仅检索切片回答，彻底豁免任务包、PRD、Commit 与门禁阻断（[`code_exploration.md`](references/code_exploration.md)）。禁止未分级按满配 0→6。不确定：`intent=BUILD`，`change_size=M`，`work_mode=DESIGN`。
 2. **装载门闩**：未过 L0～L2 禁止探代码开工或写 PRD 正文（[`load_latch.md`](references/load_latch.md)）。语义为「继续/继续任务」时 L2 优先 [`process_continuity.md`](references/process_continuity.md)。
-3. **持续推进**：除 DESIGN 前沿等待 / 实现期询问闸门 /（M/L）冻结未过 / `BLOCKED` 外禁止空转；确认后立刻继续至路径终点（测试全绿+静态零告警+门禁+归档+本地 Commit）。
+3. **持续推进**：除 DESIGN 前沿等待 / 阶段待验收 / 实现期询问闸门 /（M/L）冻结未过 / `BLOCKED` 外禁止空转；确认后立刻继续至路径终点（测试全绿+静态零告警+门禁+归档+本地 Commit）。
 4. **开场确认 + 审讯式对齐与方案比选后再编码**：新需求先走 [`opening_alignment.md`](references/opening_alignment.md)（需求复述 + 假设/空白 + 约束/干系人 + 分级建议，开发者确认）再进审讯；`DESIGN` 走 [`grill_orchestration.md`](references/grill_orchestration.md)（融合 `gstack /office-hours` 痛点拷问与 `superpowers` 多方案 Trade-offs 博弈）；**跳过澄清收紧**（不可逆/计费权限/对外契约/持久化/影响选型的产品空白 → 禁止跳过，见 confidence_decision）。**新增业务触达数据库设计必须经开发者决策**（不受置信度自决约束）。S 数行 DoD；M/L 阶段 0。
 5. **单文件 HTML 可交互原型与多端可视化确认（开发者签收门禁）**：专业级产品与 UX 设计能力（[`product_design.md`](references/product_design.md) / [`product_prototype.md`](references/product_prototype.md)）；
    - **宏观品味宪章**：项目根目录 `DESIGN.md`（[`design_md.md`](references/design_md.md)）作为永久记忆，确立具象物理隐喻、Design Tokens、Anti-Slop 审美红线与 10 星标准；
@@ -47,7 +47,7 @@ metadata:
 
 
 7. **按路径设计与顶置契约切片**：L 须 1→2→3；选型（阶段 1）与架构（阶段 2）强制在**文档顶部 1～35 行置顶 `[VIBE_CONTRACT]` 机器执行契约**，隔离下半部人类论证与落选废案；涉及垂直领域 SDK（如 Gemini 大模型 API/Live、Android、Chrome 扩展 MV3）时必须建立防腐层（Adapter）；阶段 3（DB/API/六元组/方法设计）保持**天然人机同构不拆分**，依据 [`design_patterns.md`](references/design_patterns.md) 决策树选用设计模式，复杂模式必须建立模式集群档案（`_02_pattern_clusters/`），参与方法通过 `patternCluster` 挂载单向指针直达护栏，严禁全局通读；阶段 4 `task_context_pack` 编译装配 Vibe Spec + `[VIBE_CONTRACT]` 置顶切片。范式选型见 [`dev_paradigm.md`](references/dev_paradigm.md)；深模块见 [`deep_modules.md`](references/deep_modules.md)；设计模式选型见 [`design_patterns.md`](references/design_patterns.md)；UI 默认审美见 [`frontend_aesthetic.md`](references/frontend_aesthetic.md)；UI 手艺见 [`frontend_craft.md`](references/frontend_craft.md)（融合 Modern Web Guidance 铁律）；API 见 [`api_engineering.md`](references/api_engineering.md)。
-8. **路径内单向门禁**：L=`0→1→2→3→4→5→6`；M/S 按 right_sizing。
+8. **阶段文档验收后流转**：L=`0→1→2→3→4→5→6`；M/S 按 right_sizing。每个实际阶段执行 [`stage_acceptance.md`](references/stage_acceptance.md)，以当前阶段 checklist 的通过标准、证据和验收记录决定流转；Agent 自检只能提交候选结论，不得代签开发者验收。需求/产品用 [`product_acceptance.md`](references/product_acceptance.md)，工程阶段用 [`engineering_acceptance.md`](references/engineering_acceptance.md)；既有明确确认按范围复用。
 9. **设计多问 / 实现少问 + 需求变更通道**：`DESIGN` = 开场确认（O1～O4）+ 审讯式澄清（跳过受 §4 收紧，**审讯轮询不受次数限制，问答落盘 `_03_qa_log/`**）；`IMPLEMENT` 仅四条件闸门才问（[`confidence_decision.md`](references/confidence_decision.md)）。实现中暴露产品空白 → 回切 DESIGN。冻结后需求变更 → 走《变更请求单》（[`requirement_change.md`](references/requirement_change.md)），**禁止静默改/静默砍**。
 10. **续做 = plan_log + change_log**：语义「继续」→ `process_log.py resume-scan`；**回退不依赖 git** → `process_log.py rollback`（[`process_continuity.md`](references/process_continuity.md)）。
 11. **状态机合法迁移**：禁止跳步；终态重开仅回退 `--force`（[`task_state_machine.md`](references/task_state_machine.md)）。
@@ -77,7 +77,7 @@ metadata:
 
 **L 满配（BUILD）**：0 产品设计（开场确认 → 审讯含 MVP 范围裁定 → 设计语言 + MVP 内功能规格 + 冻结签收）+ 分阶段规划 → 1 选型 ADR（按当前阶段范围，末附选型拍板单）→ 2 架构（深模块词汇）→ 3 四要素（API/UI：aesthetic→DESIGN.md→craft / rule_fetch；**触达 DB 必先开发者决策**）→ 4 任务+pack+seam → 5 三同步+垂直 TDD → 6 测试全绿（0 报错）+ 静态检测零告警零错误 + 门禁 + 归档 + Commit。
 
-**跃迁**：未分级/未过门闩禁止开工；L 的 0→1 须冻结门禁；M/S 禁止为空跑造空文档；`EXPLORE` 只读直通免门禁；`BLOCKED`→落盘→继续至终点。
+**跃迁**：未分级/未过门闩禁止开工；各实际阶段须有有效验收记录，L 的 0→1 须冻结门禁；M/S 禁止为空跑造空文档；`EXPLORE` 只读直通免门禁；`BLOCKED`→落盘→继续至终点。
 
 ---
 

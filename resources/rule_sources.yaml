@@ -413,9 +413,9 @@ sources:
     kind: github_raw
     repo: alibaba/p3c
     ref: master
-    file: p3c-formatter/README.md
+    file: README.md
     tags: [Java, Alibaba, p3c, 规约, 阿里巴巴, OOP, 异常, 并发, 后端]
-    when: Java 语言开发规范、阿里巴巴 Java 规约与常见避坑点
+    when: 阿里 P3C 官方版本入口（README 非手册全文）；本地检查先读 local.engineering.acceptance 的 Java 节
 
   - id: google.python-style
     kind: github_raw
@@ -449,3 +449,27 @@ sources:
     tags: [TypeScript, TS, Google, gts, linter, 前端, 后端]
     when: TypeScript 强类型编码规范与 Google Style
 
+
+  - id: local.stage.acceptance
+    kind: local
+    path: references/stage_acceptance.md
+    tags: [阶段验收, checklist, todolist, 验收证据, 签收, 失效]
+    when: 阶段流转前的文档验收、证据与权限判定
+
+  - id: local.product.acceptance
+    kind: local
+    path: references/product_acceptance.md
+    tags: [需求验收, 产品验收, 预期对账, DISC, PROD, NASA, GOV.UK]
+    when: 需求理解与产品冻结的逐项校验
+
+  - id: local.engineering.acceptance
+    kind: local
+    path: references/engineering_acceptance.md
+    tags: [工程验收, TECH, ARCH, DETAIL, TASK, IMPL, DELIV, Java, P3C]
+    when: 选型、架构、详细设计、任务、实现与交付的逐阶段校验
+
+  - id: local.standards.basis
+    kind: local
+    path: references/standards_basis.md
+    tags: [规范依据, ISO, IEEE, NASA, arc42, P3C, OpenAPI, OWASP]
+    when: 追溯规范版本、阅读范围及项目转化边界

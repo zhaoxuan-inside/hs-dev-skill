@@ -1,5 +1,7 @@
 # 领域规则库协议（本地高频 + 远程按需）
 
+**本地阶段验收规则**：需求/产品读 [`product_acceptance.md`](product_acceptance.md)，工程读 [`engineering_acceptance.md`](engineering_acceptance.md)，判定读 [`stage_acceptance.md`](stage_acceptance.md)；来源与实际阅读范围见 [`standards_basis.md`](standards_basis.md)。已转化为本地规则的内容无需每次联网加载原文。
+
 **何时读**：改 UI/API/架构且本地 craft 不够用、或要按社区规则名深挖时；每会话最多一次。
 
 目标：本地只保留**高频必守**；范式选型 + 按档架构（ciembor / wshobson / FSD）、品牌 DESIGN.md、Vercel / Anthropic / Addy / anti-slop 等**远程 resolve + 切片**，避免把全文灌进上下文。

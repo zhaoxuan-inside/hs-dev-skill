@@ -1,5 +1,7 @@
 # 开场确认协议（Opening Alignment）— 动手前与开发者对齐理解
 
+**内容验收补充**：O1～O4 是开场对齐，不等于需求已完整验收。详细设计前执行 [`product_acceptance.md`](product_acceptance.md) 的 DISC 项，保存真实案例、预期对账及 CONFIRMED/DERIVED/OPEN 区分；确认仅覆盖明确展示的范围。
+
 **何时读**：受理任何**新需求/新任务**的会话第一步（先于分级、先于审讯、先于装载门闩 L1）；`intent=BUILD|REVERSE|FIX|REFACTOR` 均适用。  
 **分工**：本文 = **需求理解 + 假设 + 约束 + 分级建议** 的先对齐；分级规则 → [`right_sizing.md`](right_sizing.md)；审讯编排 → [`grill_orchestration.md`](grill_orchestration.md)；装载门闩 → [`load_latch.md`](load_latch.md)。
 

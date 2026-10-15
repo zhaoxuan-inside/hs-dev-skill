@@ -12,6 +12,10 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 
 | 场景 | 打开 |
 |------|------|
+| **阶段验收 / checklist / 通过证据 / 验收权限与失效** | `stage_acceptance.md` |
+| **需求理解 / 预期对账 / 产品设计验收 DISC / PROD** | `product_acceptance.md` |
+| **选型到交付验收 / TECH ARCH DETAIL TASK IMPL DELIV / Java P3C** | `engineering_acceptance.md` |
+| **验收规范来源 / NASA / GOV.UK / arc42 / ISO 阅读范围** | `standards_basis.md` |
 | **新需求第一步：开场确认（复述/假设/约束/分级建议）** | `opening_alignment.md` |
 | **流程全景：意图路由 + 阶段门禁 + 回环（从各需求入口）** | `intent_routing_and_gates.md` |
 | **项目类型 P1~P6 判定 / 三件套清单组织规范（树状原子叶子）** | `project_types.md` |

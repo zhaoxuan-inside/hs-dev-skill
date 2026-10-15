@@ -1,9 +1,11 @@
 # hs-dev-skill: 产品开发 Skill
 
+阶段验收：从 [统一协议](references/stage_acceptance.md)进入，按 [需求与产品检查清单](references/product_acceptance.md)或[工程检查清单](references/engineering_acceptance.md)逐项提交证据，使用[验收记录模板](resources/templates/process/stage_acceptance.md)。[规范依据](references/standards_basis.md)记录来源及阅读范围；现有 CLI 尚不自动强制验收签收。
+
 > **质量优先 + 审讯式对齐 + 测试一等公民 + 深模块词汇 + 文档驱动 + S/M/L 分级**
 
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](tests/)
-[![Spec Version](https://img.shields.io/badge/skill-v2.43.0.0-blue.svg)](SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v2.44.0.0-blue.svg)](SKILL.md)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](references/cross_platform.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 

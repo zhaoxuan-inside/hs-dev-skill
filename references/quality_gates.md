@@ -1,5 +1,7 @@
 # 全层级测试与质量门禁指南
 
+**阶段 6 文档验收**：按 [`engineering_acceptance.md`](engineering_acceptance.md) 的 DELIV 项核对基线、断言、执行报告与交付确认，遵循 [`stage_acceptance.md`](stage_acceptance.md)。现有脚本不自动验证人类签收或测试证据真实性，退出成功不能代替验收。
+
 **何时读**：提交前 / 阶段 6；核对覆盖率与分层目录。  
 **方法与节奏（一等公民）**：先读 [`testing.md`](testing.md)（seam、垂直 TDD、分档义务）；本文 = **分层目录 + 覆盖率数字 + 提交清单**。
 

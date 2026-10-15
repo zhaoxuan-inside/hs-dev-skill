@@ -1,5 +1,10 @@
 # 任务详细设计与执行记录：{task_id}
 
+- **阶段验收记录**：{相关阶段记录路径或本文件内联节}
+- **验收基线与确认记录**：{文档版本/内容摘要、开发者确认范围与来源}
+
+> 所有验证状态默认 pending；引用真实测试及当前基线的执行证据后才可更新，遵循 Skill 的 references/stage_acceptance.md。
+
 - **任务名称**：`{task_title}`
 - **change_size**：`{S|M|L}`
 - **当前状态**：`{status}`
@@ -27,8 +32,8 @@
 
 | 需求ID | 对应功能/规则 | 对应方法/代码 Seam | 自动化测试用例 | 验收证据与断言 | 验证状态 |
 |---|---|---|---|---|---|
-| `REQ-001` | 主成功流处理 | `{method_name}` | `{test_file}::{test_case}` | 断言响应码 200 且数据行落盘 | `verified` |
-| `REQ-002` | 边界拦截与原位提示 | `{method_name}` | `{test_file}::{test_validation}` | 拦截非法参数并断言特定异常码 | `verified` |
+| `REQ-001` | 主成功流处理 | `{method_name}` | `{test_file}::{test_case}` | 断言响应码 200 且数据行落盘 | `pending` |
+| `REQ-002` | 边界拦截与原位提示 | `{method_name}` | `{test_file}::{test_validation}` | 拦截非法参数并断言特定异常码 | `pending` |
 
 ---
 
@@ -59,5 +64,5 @@ M test/_01_method_test/order_create_test.go
 
 ## 5. 验证与门禁记录
 - 单测覆盖率：`{coverage}%`
-- 契约比对结果：`PASS`
-- E2E 冒烟测试：`PASS`
+- 契约比对结果：`pending`（附命令、基线、退出码与报告位置）
+- E2E 冒烟测试：`pending`（附环境、基线与报告位置）

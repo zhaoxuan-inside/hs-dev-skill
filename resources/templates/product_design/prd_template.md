@@ -1,5 +1,11 @@
 # 产品需求与功能规格说明书 (PRD)：{feature_name}
 
+- **文档版本/内容摘要**：{revision}
+- **DISC / PROD 阶段验收记录**：{record_path_or_inline_section}
+- **确认范围及来源**：{明确确认的规则/场景、版本、消息位置；未确认保持待验收}
+
+> 先记录真实案例和预期对账，再展开设计；模板示例不是已确认需求。维护 CONFIRMED / DERIVED / OPEN 及其来源，按 Skill 的 references/product_acceptance.md 逐项验收。
+
 - **需求/功能名称**：{feature_name}
 - **创建时间**：{YYYY-MM-DD}
 - **状态**：DRAFT / REVIEWED / FROZEN

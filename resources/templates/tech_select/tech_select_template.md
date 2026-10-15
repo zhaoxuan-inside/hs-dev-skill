@@ -1,5 +1,11 @@
 # 技术选型与评估方案：{module_or_platform}
 
+- **输入与产出基线**：{路径、版本/内容摘要}
+- **TECH 验收记录**：{当前阶段记录路径、开发者确认范围及来源}
+- **验收状态**：DRAFT
+
+> 执行 Skill 的 references/engineering_acceptance.md 对应阶段；本文写完只代表可提交验收。
+
 - **评估领域**：后端服务 / 前端架构 / 移动端 / 存储 / 中间件
 - **评估日期**：{YYYY-MM-DD}
 - **负责人**：{evaluator}

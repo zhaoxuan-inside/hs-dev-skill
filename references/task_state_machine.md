@@ -1,5 +1,7 @@
 # 任务生命周期与状态机规范指南
 
+**状态与验收分离**：以下为任务工作状态。阶段验收状态按 [`stage_acceptance.md`](stage_acceptance.md) 独立记录；CLI 校验合法迁移不代表验收已通过，COMPLETED 前须核对有效的阶段 6 验收及开发者确认。
+
 **何时读**：建任务、改状态、回退重开、续做涉及任务态；每会话最多一次。  
 **续做/回退账本** → [`process_continuity.md`](process_continuity.md)。
 
