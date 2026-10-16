@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "bundle_version": "4.0.0.0",
+  "bundle_version": "4.0.1.0",
   "skills": [
     {
       "id": "hs-dev-discovery",

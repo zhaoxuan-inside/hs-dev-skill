@@ -9,12 +9,12 @@ license: MIT
 compatibility: Requires Python >= 3.8; install the complete bundle including skills, scripts, references, resources
 metadata:
   author: hardstone
-  version: "4.0.0.0"
+  version: "4.0.1.0"
 ---
 
 # 产品开发主路由 Skill
 
-版本：v4.0.0.0
+版本：v4.0.1.0
 
 Agent 驱动文档，已验收的文档驱动代码。本入口只负责分派与共享边界；具体过程和专业规则由真实的子 Skill 执行。完整包含 **10 个过程 Skill + 6 个功能 Skill**，详规和工具保持单份共享。
 

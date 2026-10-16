@@ -60,7 +60,7 @@ class IdxManager:
     def save(self):
         """保存索引回 JSONL 文件"""
         os.makedirs(self.dir_path, exist_ok=True)
-        with open(self.idx_file_path, "w", encoding="utf-8") as f:
+        with open(self.idx_file_path, "w", encoding="utf-8", newline="\n") as f:
             # 写入首行元数据
             f.write(json.dumps(self.metadata, ensure_ascii=False) + "\n")
             # 写入索引条目

@@ -34,6 +34,16 @@ class TestIdxManager(unittest.TestCase):
         self.assertEqual(len(mgr2.entries), 1)
         self.assertEqual(mgr2.entries[0]["id"], "item_1")
 
+    def test_index_writes_use_lf_on_every_platform(self):
+        mgr = IdxManager(str(self.idx_file))
+        mgr.init_idx("test_cat", "test_root")
+        target = self.dir_path / "item.md"
+        target.write_bytes(b"# Item\n")
+        mgr.add_entry("item", "Item", "item.md")
+        data = self.idx_file.read_bytes()
+        self.assertNotIn(b"\r\n", data)
+        self.assertEqual(data.count(b"\n"), 2)
+
     def test_verify_valid_and_drift(self):
         mgr = IdxManager(str(self.idx_file))
         mgr.init_idx("test_cat", "test_root")
