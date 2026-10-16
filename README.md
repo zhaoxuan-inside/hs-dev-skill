@@ -15,6 +15,8 @@
 
 ## 安装（生态分发）
 
+稳定版本与完整 ZIP：[GitHub Releases](https://github.com/zhaoxuan-inside/hs-dev-skill/releases)。发布者推送与包版本一致的 `vX.Y.Z.B` 标签后，发布工作流先运行测试与严格门禁，再生成 ZIP、SHA-256 校验和及 Release；未跟踪的本地文件不会进入发行包。
+
 根目录是完整主 Skill 包，包含 `SKILL.md`、`skills/`、`scripts/`、`references/`、`resources/`。子 Skill 当前依赖主包共享资源，不单独复制安装。若使用 skills CLI，选择主 Skill `hs-dev-skill`，并在安装后校验完整目录树：
 
 ```bash
