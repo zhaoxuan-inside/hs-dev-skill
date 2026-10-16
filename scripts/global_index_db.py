@@ -16,6 +16,7 @@ import json
 import re
 import sqlite3
 import sys
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
@@ -206,7 +207,7 @@ class GlobalIndexDB:
         try:
             conn.execute("PRAGMA journal_mode=DELETE")
         except sqlite3.Error:
-            pass
+            logging.debug("connect: optional operation failed; retaining fallback", exc_info=True)
         self._conn = conn
         self._ensure_schema(conn)
         return conn

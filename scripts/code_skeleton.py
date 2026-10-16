@@ -11,6 +11,7 @@ import ast
 import os
 import re
 import sys
+import logging
 import argparse
 from pathlib import Path
 from typing import Dict, List, Optional, Any
@@ -495,7 +496,7 @@ class CodeSkeletonExtractor:
                         res = self.extract_file(f_path)
                         results.append(res)
                     except Exception as e:
-                        pass
+                        logging.debug("scan_directory: optional operation failed; retaining fallback", exc_info=True)
 
         return results
 

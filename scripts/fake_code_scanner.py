@@ -13,7 +13,10 @@ import argparse
 import ast
 import re
 import sys
+import io
+import tokenize
 from pathlib import Path
+from hs_paths import ensure_utf8_stdout
 
 ALLOW_MARKER = "hs-allow"
 
@@ -21,7 +24,7 @@ ALLOW_MARKER = "hs-allow"
 DEFAULT_CODE_DIRS = [
     "backend", "frontend", "src", "app", "server", "api", "services",
     "web", "mobile", "desktop", "internal", "cmd", "pkg",
-    "scripts", "test", "tests", "e2e",
+    "scripts", "test", "tests", "e2e", "apps", "packages",
 ]
 
 # 目录名级排除：依赖产物、快照/夹具数据、合法的 mock 伪数据之家（mock_contract_guide.md）
@@ -225,6 +228,20 @@ class FakeCodeScanner:
             return results
         rel = str(file_path.relative_to(self.root)).replace("\\", "/")
         lines = text.splitlines()
+        rule_lines = list(lines)
+        if file_path.suffix == ".py":
+            # String literals are fixture data/docstrings, not executed code.
+            try:
+                for token in tokenize.generate_tokens(io.StringIO(text).readline):
+                    if token.type != tokenize.STRING:
+                        continue
+                    for row in range(token.start[0], token.end[0] + 1):
+                        start = token.start[1] if row == token.start[0] else 0
+                        end = token.end[1] if row == token.end[0] else len(rule_lines[row - 1])
+                        current = rule_lines[row - 1]
+                        rule_lines[row - 1] = current[:start] + " " * (end - start) + current[end:]
+            except (tokenize.TokenError, IndentationError):
+                rule_lines = lines
 
         for idx, line in enumerate(lines, 1):
             if ALLOW_MARKER in line:
@@ -233,7 +250,7 @@ class FakeCodeScanner:
             for category, rule in LINE_RULES:
                 if category in hit_categories:
                     continue
-                if rule.search(line):
+                if rule.search(rule_lines[idx - 1]):
                     hit_categories.add(category)
                     results.append(self._add(rel, idx, category, line.strip()))
 
@@ -253,6 +270,7 @@ def scan_root(workspace_root, code_dirs=None):
 
 
 def main():
+    ensure_utf8_stdout()
     parser = argparse.ArgumentParser(
         description="假代码 / 占位符扫描器（完成度闭环门禁，见 references/completion_audit.md）")
     parser.add_argument("--root", default=".", help="目标工作区根目录")

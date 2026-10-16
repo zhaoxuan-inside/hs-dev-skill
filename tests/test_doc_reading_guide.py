@@ -8,6 +8,7 @@ import json
 import os
 import subprocess
 import sys
+import logging
 import tempfile
 import unittest
 from pathlib import Path
@@ -30,7 +31,7 @@ class TestDocReadingGuide(unittest.TestCase):
         try:
             self.tmp.cleanup()
         except PermissionError:
-            pass
+            logging.debug("tearDown: optional operation failed; retaining fallback", exc_info=True)
 
     def test_template_structure_and_guardrails(self):
         tmpl_file = ROOT / "resources" / "templates" / "hs_dev_docs" / "doc_reading_guide_template.md"

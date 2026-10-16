@@ -79,7 +79,7 @@ graph TD
 
 ---
 
-## 7. 衍生方法规范 (Derivatives: Compensate / Fallback)
+## 7. 衍生方法规范 (Derivatives: Compensate / Fallback / Metrics / Recall)
 
 ### 7.1 事务补偿方法 (Compensate Method)
 - **方法名称**：`{method_name}_compensate`
@@ -93,6 +93,16 @@ graph TD
 - **签名**：`exception {method_name}_fallback(input, output, context, isolate, metrics, recall)`
 - **触发条件**：主方法熔断、下游不可用且不可重试。
 - **降级动作**：返回兜底缓存数据或降级提示。
+
+### 7.3 度量方法 (Metrics Method，按需)
+- **方法名称与签名**：`exception {method_name}_metrics(input, output, context, isolate, metrics, recall)`
+- **触发与证据**：{调用成功/失败/耗时记录点、指标名与维度、敏感字段排除及对应测试}
+- **失败语义**：{采集器不可用时的处理策略；不得改变业务结果}
+
+### 7.4 回调与唤醒方法 (Recall Method，按需)
+- **方法名称与签名**：`exception {method_name}_recall(input, output, context, isolate, metrics, recall)`
+- **触发与状态**：{挂起/回调/唤醒条件、允许的源状态与目标状态、权限重验}
+- **幂等与证据**：{重复/乱序回调处理、超时与有限重试策略、状态流转测试}
 
 ---
 

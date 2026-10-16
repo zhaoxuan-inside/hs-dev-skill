@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import shutil
 import sys
+import logging
 import tempfile
 import unittest
 from pathlib import Path
@@ -36,7 +37,7 @@ class TestGlobalIndexDB(unittest.TestCase):
         try:
             self.tmp.cleanup()
         except PermissionError:
-            pass
+            logging.debug("tearDown: optional operation failed; retaining fallback", exc_info=True)
 
     def test_tag_search_finds_nginx(self):
         db = GlobalIndexDB(self.root)

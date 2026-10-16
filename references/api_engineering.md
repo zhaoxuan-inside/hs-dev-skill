@@ -32,7 +32,7 @@ python scripts/rule_fetch.py search-cache --q Idempotency
 
 ## 2. 统一错误语义
 
-全项目一种错误信封，禁止混用 throw/null/`{error}`：
+HTTP 边界全项目一种错误信封；成功响应可用 `{code,msg,data}`，失败响应使用下列结构，由 Mock Schema 的成功/失败分支分别约束。内部六元组仍返回 `BizException` 或空成功值，由 Adapter 映射为 HTTP 状态和错误信封：
 
 ```text
 { "error": { "code": "MACHINE_CODE", "message": "人类可读", "details"?: ... } }

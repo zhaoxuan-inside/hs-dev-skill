@@ -52,14 +52,14 @@ python scripts/task_manager.py status --id {id} --set IN_PROGRESS --force
 ### COMPLETED 前置流转条件（硬阻断门禁）
 
 任务从 `VERIFYING` 流转至 `COMPLETED` 必须满足以下门禁：
-1. **全量自动化测试 100% 绿灯**（`make test` 0 失败、0 挂起）；
+1. **适用自动化测试 100% 绿灯**（S 为相关测试与风险边界，M/L 为适用全量测试；实际命令与范围记入验收证据，0 失败、0 挂起）；
 2. **严格质量门禁 0 错误 0 警告**（`verify_consistency.py --strict` PASS）；
 3. **需求覆盖率 100%**：`task_detail` 中声明的所有原子需求（`REQ-*`）必须处于 `verified` 状态，严禁带未解决需求宣告成功。
 
 此外，命令必须传 `--acceptance-record <workspace-relative-path>`。记录须包含已接受状态、开发者确认字段、测试命令/退出码/证据、逐项闭合的验收 checklist、带证据的 DoD 项，以及明确为空的未实现清单。CLI 会在归档前执行严格一致性校验；项目测试仍由项目自己的测试命令执行并记录。REQ 未闭合或 `--force` 都不能绕过完成门禁。示例：
 
 ```bash
-python3 scripts/task_manager.py status --id {task_id} --set COMPLETED --acceptance-record <workspace-relative-acceptance-record.md>
+python scripts/task_manager.py status --id {task_id} --set COMPLETED --acceptance-record <workspace-relative-acceptance-record.md>
 ```
 
 ### 步骤策略与副作用治理 (Step Policy & Side-Effect Strategy)
@@ -92,7 +92,7 @@ python3 scripts/task_manager.py status --id {task_id} --set COMPLETED --acceptan
 
 用户说「继续 / 继续任务 / 接着做 / resume」等 →：
 
-1. `python scripts/process_log.py resume-scan --root .`
+1. `python scripts/process_log.py --root . resume-scan`
 2. 按 plan_log 断点 + change_log 续做  
 
 handoff 仅为可选补充；**不以 handoff 为续做真理源**。

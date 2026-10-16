@@ -23,12 +23,33 @@
     },
     "response": {
       "type": "object",
-      "required": ["code", "msg"],
-      "properties": {
-        "code": { "type": "string" },
-        "msg": { "type": "string" },
-        "data": { "type": "object" }
-      }
+      "oneOf": [
+        {
+          "required": ["code", "msg"],
+          "properties": {
+            "code": { "type": "string" },
+            "msg": { "type": "string" },
+            "data": { "type": "object" }
+          },
+          "not": { "required": ["error"] }
+        },
+        {
+          "required": ["error"],
+          "properties": {
+            "error": {
+              "type": "object",
+              "required": ["code", "message"],
+              "properties": {
+                "code": { "type": "string" },
+                "message": { "type": "string" },
+                "details": {},
+                "retryable": { "type": "boolean" }
+              }
+            }
+          },
+          "not": { "anyOf": [{ "required": ["code"] }, { "required": ["msg"] }] }
+        }
+      ]
     }
   }
 }

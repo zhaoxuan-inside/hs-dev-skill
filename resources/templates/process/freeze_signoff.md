@@ -29,10 +29,13 @@
 - [ ] 页面四态无死角（Empty / Loading / Populated / Error）
 - [ ] 工程实现可映射（可直接转为组件树 + CSS Variables / Tailwind）
 
+无 UI 时 B 节及 DESIGN.md、原型、UI vibe_spec 标记 NA，写明项目类型、理由及 API/CLI/库契约与场景证据；业务签收不可豁免。
+
 ## C. 冻结确认
 
-- [ ] 一源双视图（PRD + vibe_spec）齐套且无语义冲突
+- [ ] 适用产物齐套：有 UI 为 PRD + vibe_spec；无 UI 为 PRD + API/CLI/库契约，UI 项已记 NA，且无语义冲突
 - [ ] 分阶段规划书落盘且源自审讯结论（MVP 范围已裁定）
+- [ ] 阶段 0C 详细功能与规模评估完成，change_size=S/M/L 及依据已记录
 - [ ] Q&A 决策日志（`_03_qa_log/`）已记录关键问答与拍板
 
 > **冻结结论**：APPROVED（可进入阶段 1 选型）/ REJECTED（回切 DESIGN）

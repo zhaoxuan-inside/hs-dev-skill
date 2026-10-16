@@ -16,6 +16,7 @@ nlp_embed_engine.py
 from __future__ import annotations
 
 import hashlib
+import logging
 import math
 import os
 import re
@@ -139,7 +140,7 @@ class BaseEmbeddingProvider:
     name: str = "base"
 
     def embed_text(self, text: str) -> List[float]:
-        raise NotImplementedError
+        raise NotImplementedError  # hs-allow: Embedding provider SPI; concrete providers implement embed_text.
 
     def embed_batch(self, texts: List[str]) -> List[List[float]]:
         return [self.embed_text(t) for t in texts]
@@ -221,7 +222,7 @@ def get_embedding_provider(prefer_fastembed: bool = True) -> BaseEmbeddingProvid
             _GLOBAL_EMBED_PROVIDER = FastEmbedProvider()
             return _GLOBAL_EMBED_PROVIDER
         except Exception:
-            pass
+            logging.debug("get_embedding_provider: optional operation failed; retaining fallback", exc_info=True)
 
     _GLOBAL_EMBED_PROVIDER = NativeHashingEmbeddingProvider(dim=128)
     return _GLOBAL_EMBED_PROVIDER

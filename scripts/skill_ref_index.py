@@ -15,6 +15,7 @@ import json
 import re
 import sqlite3
 import sys
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
@@ -315,7 +316,7 @@ class SkillRefIndex:
             try:
                 self._conn.close()
             except Exception:
-                pass
+                logging.debug("close: optional operation failed; retaining fallback", exc_info=True)
             self._conn = None
 
     def rebuild(self) -> Dict[str, Any]:

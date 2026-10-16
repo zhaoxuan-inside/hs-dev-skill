@@ -5,7 +5,7 @@
 - 阶段 3 详细设计中编写跨语言接口签名与异常体系；
 - 阶段 5 编码与测试实现（编写 Go、Python、Rust、Java/Kotlin、TypeScript/Vue/React 等多语言代码）；
 - 提交前排查消除 Linter 告警与代码坏味道；
-- 检索命令：`python3 scripts/skill_ref_index.py search --scenario 开发规范` 或 `search --q 语言规范`
+- 检索命令：`python scripts/skill_ref_index.py search --scenario 开发规范` 或 `search --q 语言规范`
 
 ---
 
@@ -103,14 +103,18 @@ AI 辅助编程（VibeCoding）最容易落入“只建不选、方法爆炸”�
 
 六元组签名：$$\text{Method}(Input, Output, Context, Isolate, Metrics, Recall) \to Exception$$
 
+以下示意业务方法的参数与异常边界；`MetricsCollector` 和 `RecallController` 在实际项目中使用已选运行时提供的接口。
+
 ### 4.1 Go 语言范式
 ```go
 package domain
 
 import (
 	"context"
-	"errors"
 )
+
+type MetricsCollector interface { Increment(name string) }
+type RecallController interface { Resume(operationID string) error }
 
 // InOrderCreate 入参结构体（只读契约）
 type InOrderCreate struct {
@@ -146,6 +150,8 @@ func CreateOrder(
 	in InOrderCreate,
 	out *OutOrderCreate,
 	iso SecurityIsolate,
+	metrics MetricsCollector,
+	recall RecallController,
 ) *BizError {
 	if in.Quantity <= 0 {
 		return &BizError{Code: "INVALID_QUANTITY", Msg: "购买数量必须大于0", Retryable: false}
@@ -160,7 +166,13 @@ func CreateOrder(
 ### 4.2 Python 语言范式
 ```python
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Protocol
+
+class MetricsCollector(Protocol):
+    def increment(self, name: str) -> None: ...
+
+class RecallController(Protocol):
+    def resume(self, operation_id: str) -> None: ...
 
 @dataclass(frozen=True)  # 严格只读入参
 class InOrderCreate:
@@ -188,7 +200,9 @@ def create_order(
     in_dto: InOrderCreate,
     out_dto: OutOrderCreate,
     isolate: SecurityIsolate,
-    context: Optional[dict] = None
+    context: dict,
+    metrics: MetricsCollector,
+    recall: RecallController,
 ) -> Optional[BizException]:
     if in_dto.quantity <= 0:
         return BizException("INVALID_QUANTITY", "购买数量必须大于0", retryable=False)
@@ -205,6 +219,10 @@ export interface InOrderCreate {
   readonly productId: string;
   readonly quantity: number;
 }
+
+export interface RequestContext { readonly traceId: string; }
+export interface MetricsCollector { increment(name: string): void; }
+export interface RecallController { resume(operationId: string): Promise<void>; }
 
 export interface OutOrderCreate {
   orderId?: string;
@@ -226,6 +244,9 @@ export function createOrder(
   input: InOrderCreate,
   output: OutOrderCreate,
   isolate: SecurityIsolate,
+  context: RequestContext,
+  metrics: MetricsCollector,
+  recall: RecallController,
 ): BizError | null {
   if (input.quantity <= 0) {
     return { code: "INVALID_QUANTITY", msg: "购买数量必须大于0", retryable: false };
@@ -244,22 +265,22 @@ export function createOrder(
 
 ```bash
 # 检索 Go 语言编码规范与并发安全
-python3 scripts/rule_fetch.py search --q Go
+python scripts/rule_fetch.py search --q Go
 
 # 检索 Java 阿里规约与并发规范
-python3 scripts/rule_fetch.py search --q Java
+python scripts/rule_fetch.py search --q Java
 
 # 检索 Python PEP8 与 Ruff 规范
-python3 scripts/rule_fetch.py search --q Python
+python scripts/rule_fetch.py search --q Python
 
 # 检索 Rust API 指南
-python3 scripts/rule_fetch.py search --q Rust
+python scripts/rule_fetch.py search --q Rust
 
 # 检索 Vue 3 风格指南
-python3 scripts/rule_fetch.py search --q Vue
+python scripts/rule_fetch.py search --q Vue
 
 # 检索 React / Next 性能最佳实践
-python3 scripts/rule_fetch.py search --q React
+python scripts/rule_fetch.py search --q React
 ```
 
 在获取切片后，遵循**“每任务加载规则源 ≤ 2 个”**的 Token 纪律，针对性吸收，杜绝全文搬运。

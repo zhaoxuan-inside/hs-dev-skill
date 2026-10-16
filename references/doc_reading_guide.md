@@ -38,7 +38,7 @@
 
 生成的 `hs_dev_docs/_00_docs_compass.md` 必须包含以下六大核心区块：
 
-### 3.1 [VIBE_CONTRACT] 机器极速索引契约 (行 1～45)
+### 3.1 [VIBE_CONTRACT] 机器极速索引契约 (顶部 [VIBE_CONTRACT] 至下一同级标题)
 置顶于文档顶部，供 LLM / Agent 切片读取。包含：
 - 文档根目录与索引数据库路径 (`doc_index.sqlite`)
 - 一级功能域与权威 JSONL `.idx` 映射表

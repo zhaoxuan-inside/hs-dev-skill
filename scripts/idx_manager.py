@@ -9,6 +9,7 @@ import sys
 import json
 import hashlib
 import argparse
+from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
 
@@ -163,6 +164,39 @@ class IdxManager:
         return len(errors) == 0, errors
 
 
+def rebuild_indices(workspace_root):
+    """Refresh indexed files before their parents; reject broken references/cycles."""
+    root = Path(workspace_root).resolve()
+    paths = {p.resolve() for name in ("hs_dev_docs", "mock") for p in (root / name).rglob("*.idx")}
+    if not paths:
+        raise ValueError(f"No .idx files found beneath {root}")
+    managers = {p: IdxManager(str(p)) for p in paths}
+    ordered, active, visited = [], set(), set()
+
+    def visit(path):
+        if path in active:
+            raise ValueError(f"Cyclic index reference: {path}")
+        if path in visited:
+            return
+        active.add(path)
+        manager = managers[path]
+        _, errors = manager.verify()
+        structural_errors = [e for e in errors if "digest mismatch" not in e]
+        if structural_errors:
+            raise ValueError(f"{path}: {'; '.join(structural_errors)}")
+        for entry in manager.entries:
+            target = (path.parent / entry["path"]).resolve()
+            if target in managers:
+                visit(target)
+        active.remove(path)
+        visited.add(path)
+        ordered.append(path)
+
+    for path in sorted(paths):
+        visit(path)
+    return sum(managers[path].update_digest() for path in ordered)
+
+
 def main():
     parser = argparse.ArgumentParser(description="JSONL .idx Index Manager")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -188,10 +222,20 @@ def main():
     # update-digest
     p_upd = subparsers.add_parser("update-digest", help="Update all digests in .idx file")
     p_upd.add_argument("idx_path", help="Path to .idx file")
+    p_rebuild = subparsers.add_parser("rebuild", help="Refresh project digests in dependency order; does not invent missing entries")
+    p_rebuild.add_argument("--root", default=".", help="Target workspace root")
 
     args = parser.parse_args()
 
-    if args.command == "init":
+    if args.command == "rebuild":
+        try:
+            count = rebuild_indices(args.root)
+        except (ValueError, OSError) as error:
+            print(f"[FAIL] {error}")
+            sys.exit(1)
+        print(f"[SUCCESS] Updated {count} digests beneath {args.root}")
+
+    elif args.command == "init":
         mgr = IdxManager(args.idx_path)
         mgr.init_idx(args.category, args.root)
         print(f"[SUCCESS] Initialized .idx at {args.idx_path}")

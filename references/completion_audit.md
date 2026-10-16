@@ -38,7 +38,7 @@
 |---|---|---|---|
 | 逐条抄自验收标准 | 对应测试文件/用例 | `make test` → PASS 等 | ✅ |
 
-- 全 ✅、REQ 覆盖通过且开发者确认已记录后，若任务当前为 `IN_PROGRESS`，先执行 `python3 scripts/task_manager.py status --id {task_id} --set VERIFYING`；再执行 `python3 scripts/task_manager.py status --id {task_id} --set COMPLETED --acceptance-record <workspace-relative-acceptance-record.md>`。CLI 会在归档前检查结构化记录、测试运行证据、所有 DoD 证据、开发者确认字段和 task detail 中的 REQ 状态，并运行严格一致性门禁。项目专属测试命令需先运行并如实记录。S 级也需结构化记录，可内联在 task detail；DoD 摘要可按本节要求保持精简。
+- 全 ✅、REQ 覆盖通过且开发者确认已记录后，若任务当前为 `IN_PROGRESS`，先执行 `python scripts/task_manager.py status --id {task_id} --set VERIFYING`；再执行 `python scripts/task_manager.py status --id {task_id} --set COMPLETED --acceptance-record <workspace-relative-acceptance-record.md>`。CLI 会在归档前检查结构化记录、测试运行证据、所有 DoD 证据、开发者确认字段和 task detail 中的 REQ 状态，并运行严格一致性门禁。项目专属测试命令需先运行并如实记录。S 级也需结构化记录，可内联在 task detail；DoD 摘要可按本节要求保持精简。
 - 任何一条做不了 → 走 §3 范围裁剪；**不允许**标 ❌ 后照常 COMPLETED。
 - **S**：结构化验收记录可内联 task detail；交付报告里另附 3 行核对（DoD 摘要 + 测试证据 + 扫描结果）。
 - **L / 有 UI**：另做**功能覆盖对账**——PRD 功能点 ↔ 原型页 ↔ 实现文件/路由 ↔ 测试，逐行对账；缺一行即未完成。

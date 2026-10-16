@@ -18,7 +18,7 @@ python scripts/rule_fetch.py resolve --id local.dev.paradigm
 | 档 | 信号 | 方案 |
 |----|------|------|
 | T0 | 单页/落地/营销站 | 按页面目录即可；跟 `DESIGN.md` + `frontend_craft` |
-| T1 | 中小型产品、上下文少 | **按限界上下文的 feature 模块**（推荐默认） |
+| T1 | 中小型产品、上下文少 | **按业务能力的 feature 模块**（推荐默认） |
 | T2 | 多团队/多域/长期演进 | **Feature-Sliced Design (FSD)** 或严格 Clean FE |
 
 不确定 → **T1**。禁止小项目上全套 FSD 仪式。

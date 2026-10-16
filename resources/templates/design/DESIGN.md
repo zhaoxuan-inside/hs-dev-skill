@@ -11,9 +11,9 @@ colors:
 typography:
   h1:
     fontFamily: <!-- Display / Sans -->
-    fontSize: 48px
+    fontSize: 24px
     fontWeight: 600
-    lineHeight: 1.1
+    lineHeight: 1.2
     letterSpacing: -0.02em
   body-md:
     fontFamily: <!-- Body -->
@@ -21,11 +21,12 @@ typography:
     fontWeight: 400
     lineHeight: 1.6
 spacing:
-  xs: 4px
-  sm: 8px
+  2xs: 4px
+  xs: 8px
+  sm: 12px
   md: 16px
-  lg: 32px
-  xl: 64px
+  lg: 24px
+  xl: 32px
 rounded:
   sm: 4px
   md: 8px
@@ -49,7 +50,7 @@ components:
 
 - **Audience**: 
 - **Primary job of the UI**: 
-- **Density**: <!-- airy | balanced | dense -->
+- **Density**: <!-- Airy | Balanced | Compact -->
 - **Mood**: 
 
 ## Colors

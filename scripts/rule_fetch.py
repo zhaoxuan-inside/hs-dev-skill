@@ -18,6 +18,7 @@ import json
 import re
 import ssl
 import sys
+import logging
 import time
 import urllib.error
 import urllib.request
@@ -71,7 +72,7 @@ def _parse_sources_yaml(text: str) -> Dict[str, Any]:
         if isinstance(data, dict) and isinstance(data.get("sources"), list):
             return data
     except Exception:
-        pass
+        logging.debug("_parse_sources_yaml: optional operation failed; retaining fallback", exc_info=True)
 
     policy: Dict[str, Any] = {}
     sources: List[Dict[str, Any]] = []

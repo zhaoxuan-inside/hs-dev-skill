@@ -52,7 +52,7 @@
 
 ```text
 R0  语义判定为「续做」→ 本详规可作 L2（勿当新需求）
-R1  process_log.py resume-scan --root .
+R1  process_log.py --root . resume-scan
     （列出 IN_PROGRESS/BLOCKED/VERIFYING 任务 + 各 plan 断点 + 最近 change 条）
 R2  用户指定了 task_id → 用它；否则取唯一活跃任务；多个则简短列出请用户选一个
 R3  读该任务 plan_log 断点 + 最近 ≤20 条 change_log；按需 slice 相关设计

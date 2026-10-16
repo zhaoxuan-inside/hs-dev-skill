@@ -12,7 +12,7 @@
 
 > [!NOTE]
 > **质量优先 · 跑测精准**：
-> 本规格书用于建立测试用例的物化索引，支持 `python3 scripts/doc_index_db.py test-search` 定向按需检索。
+> 本规格书用于建立测试用例的物化索引，支持 `python scripts/doc_index_db.py test-search` 定向按需检索。
 > 严禁无脑跑无关全量测试，依据精准单跑指令执行秒级闭环验证。
 
 ---

@@ -73,7 +73,7 @@
 | 文档检索 | `... search --q <kw> [--domain ...] [--limit 8]` → JSON（path + summary） |
 | 切片阅读 | `... slice --path <rel> --start N --end M` → 行级 JSON |
 | 同步 | 批量改文档/索引后 rebuild；`init_hs_dev_docs` 结束时自动 rebuild |
-| Git | `*.sqlite` 默认不提交（可重建）；门禁缺失仅 warning |
+| Git | `*.sqlite` 默认不提交（可重建）；缺失仅 INFO（strict 亦不阻断），已有缓存损坏或为空仍 warning |
 
 语义检索（embedding / SemanticGrip 类）为**可选二级召回**：候选必须回落到 `path` + `digest`，不得替代结构化索引。
 
@@ -112,20 +112,20 @@
 
 ```bash
 # Linux/macOS — Skill references 场景路由（勿通读 references/）
-python3 scripts/skill_ref_index.py rebuild
-python3 scripts/skill_ref_index.py search --q "幂等" --limit 5
+python scripts/skill_ref_index.py rebuild
+python scripts/skill_ref_index.py search --q "幂等" --limit 5
 
 # Linux/macOS — 领域规则（本地高频 + 远程单条）
-python3 scripts/rule_fetch.py search --q React
-python3 scripts/rule_fetch.py resolve --id vercel.react-rules --rule async-parallel
+python scripts/rule_fetch.py search --q React
+python scripts/rule_fetch.py resolve --id vercel.react-rules --rule async-parallel
 
 # Linux/macOS — 项目文档
-python3 scripts/doc_index_db.py --root . rebuild
-python3 scripts/doc_index_db.py --root . search --q "支付 补偿" --limit 8
+python scripts/doc_index_db.py --root . rebuild
+python scripts/doc_index_db.py --root . search --q "支付 补偿" --limit 8
 
 # Linux/macOS — 全局偏好/学习笔记（标签加速）
-python3 scripts/global_index_db.py rebuild
-python3 scripts/global_index_db.py search --tag 反向代理
+python scripts/global_index_db.py rebuild
+python scripts/global_index_db.py search --tag 反向代理
 
 # Windows
 py -3 scripts/skill_ref_index.py search --scenario UI

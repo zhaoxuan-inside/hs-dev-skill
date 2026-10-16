@@ -103,11 +103,15 @@ flowchart LR
 12. **范式与架构**：[dev_paradigm](references/dev_paradigm.md) → deep_modules / ddd / backend / frontend / API。
 13. **GoF 23 种设计模式选型决策树与协同集群档案**：依据代码异味定位模式；复杂协作落地 `_02_pattern_clusters/`，方法属性 `patternCluster` 挂载单向指针直达护栏，按需局部切片，避免全量通读。见 [design_patterns.md](references/design_patterns.md)。
 14. **六元组 + 合法状态机 + Mock + verify；默认本地 Commit**。
-15. **版本号双轨控制与防漂移**：遵循 SemVer；Skill 自身三处强一致；交付 S/M/L 映射 PATCH/MINOR/MAJOR；API 与 DB 迁移版本防破坏。见 [version_control.md](references/version_control.md)。
+15. **版本号双轨控制与防漂移**：遵循 SemVer；Skill 自身四处强一致；交付 S/M/L 映射 PATCH/MINOR/MAJOR；API 与 DB 迁移版本防破坏。见 [version_control.md](references/version_control.md)。
 
 ---
 
 ## 快速命令
+
+以下 `python` 表示 Python ≥ 3.8；Linux/macOS 可用 `python3`，Windows 可用 `py -3`。
+本仓库 `make verify` 显式校验 Skill 包与 `demo_project` 文档，等价于 `python scripts/verify_consistency.py --root . --demo --strict`。目标工程使用 `--root <工程根> --strict`，不会自动回退到示例。
+`.idx` 摘要刷新用 `python scripts/idx_manager.py rebuild --root <工程根>`（先审阅内容变化，不会补造丢失文件或条目）；单索引使用 `update-digest <idx_path>`。SQLite 缺失仅提示，不阻断 strict；已有缓存损坏或为空仍需修复。
 
 ```bash
 make paths          # 全局路径
@@ -131,7 +135,7 @@ python scripts/skill_ref_index.py search --q "幂等" --limit 5
 python scripts/rule_fetch.py resolve --id local.frontend.core
 python scripts/doc_index_db.py --root . search --q "订单 创建" --limit 8
 python scripts/task_manager.py create --id order_create --title "创建交易订单" --change-size L --priority P0
-python scripts/process_log.py resume-scan --root .
+python scripts/process_log.py --root . resume-scan
 python scripts/process_log.py checkpoint --id order_create --step S2 --summary "改支付主路径" --paths backend/payment_service.py
 python scripts/verify_consistency.py --root .
 ```

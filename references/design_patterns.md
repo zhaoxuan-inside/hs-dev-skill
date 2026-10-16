@@ -91,7 +91,7 @@
   - **集群档案**：`hs_dev_docs/_03_architecture_design/_02_pattern_clusters/billing_strategy_cluster.md`
   - **当前角色 (Role)**：`ConcreteStrategy`
   - **依从契约 (Contract)**：`IPricingStrategy.calculate`
-  - **必须遵守的护栏锚点**：`#3-vibecoding-防破坏红线`
+  - **必须遵守的护栏锚点**：`#4-vibecoding-防破坏红线`
 ```
 
 > **Token 节省优势**：AI 处理该方法时，通过单向指针只读取本方法定义与对应的 15 行护栏锚点，**严格禁止完整扫描或通读整个设计模式库**，将 Token 消耗控制在最低。

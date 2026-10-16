@@ -18,7 +18,7 @@ help:
 	@echo "  make governance-status - show governance feature toggle status"
 	@echo "  make scan-dead-code - dead / orphan method scan"
 	@echo "  make init-docs      - init hs_dev_docs skeleton in cwd"
-	@echo "  make doc-guide      - generate or refresh hs_dev_docs/README.md reading guide"
+	@echo "  make doc-guide      - generate or refresh hs_dev_docs/_00_docs_compass.md reading guide"
 	@echo "  make init-global    - init ~/.hs-dev-skill (cross-project)"
 	@echo "  make paths          - print resolved global paths for this OS"
 	@echo "  make index-rebuild  - rebuild SQLite doc index (token-saving query cache)"
@@ -43,7 +43,7 @@ skill-list:
 	$(PYTHON) scripts/skill_router.py list
 
 verify: skill-check
-	$(PYTHON) scripts/verify_consistency.py --root . --strict
+	$(PYTHON) scripts/verify_consistency.py --root . --demo --strict
 
 version:
 	$(PYTHON) scripts/version_tool.py generate

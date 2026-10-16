@@ -16,6 +16,7 @@ import os
 import re
 import sqlite3
 import sys
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
@@ -599,7 +600,7 @@ class DocIndexDB:
         try:
             conn.execute("PRAGMA journal_mode=DELETE")
         except sqlite3.Error:
-            pass
+            logging.debug("connect: optional operation failed; retaining fallback", exc_info=True)
         self._conn = conn
         self._ensure_schema(conn)
         return conn
@@ -1075,7 +1076,7 @@ class DocIndexDB:
                                 ),
                             )
                         except sqlite3.Error:
-                            pass
+                            logging.debug("_index_features: optional operation failed; retaining fallback", exc_info=True)
 
                     # 插入 feature 语义向量
                     try:
@@ -1091,7 +1092,7 @@ class DocIndexDB:
                                 (f["feature_key"], "feature", len(vec), pack_vector(vec), f_text[:200], _utc_now()),
                             )
                     except Exception:
-                        pass
+                        logging.debug("_index_features: optional operation failed; retaining fallback", exc_info=True)
                     count += 1
         return count
 
@@ -1159,7 +1160,7 @@ class DocIndexDB:
                                 ),
                             )
                         except sqlite3.Error:
-                            pass
+                            logging.debug("_index_pages: optional operation failed; retaining fallback", exc_info=True)
                     count += 1
         return count
 
@@ -1219,7 +1220,7 @@ class DocIndexDB:
                                 ),
                             )
                         except sqlite3.Error:
-                            pass
+                            logging.debug("_index_pattern_clusters: optional operation failed; retaining fallback", exc_info=True)
                     count += 1
         return count
 
@@ -1291,7 +1292,7 @@ class DocIndexDB:
                                 ),
                             )
                         except sqlite3.Error:
-                            pass
+                            logging.debug("_index_data_schemas: optional operation failed; retaining fallback", exc_info=True)
                     count += 1
 
             for fpath in cdir.rglob("V*.sql"):
@@ -1348,7 +1349,7 @@ class DocIndexDB:
                                 ),
                             )
                         except sqlite3.Error:
-                            pass
+                            logging.debug("_index_data_schemas: optional operation failed; retaining fallback", exc_info=True)
                     count += 1
         return count
 
@@ -1533,7 +1534,7 @@ class DocIndexDB:
                                 ),
                             )
                         except sqlite3.Error:
-                            pass
+                            logging.debug("_index_test_cases: optional operation failed; retaining fallback", exc_info=True)
                     count += 1
 
         # 扫描物理测试代码 (test/, tests/) 提取测试方法与单跑指令
@@ -1598,7 +1599,7 @@ class DocIndexDB:
                                     (ckey, case_id, tokenize_cjk_for_fts(first_line), target, test_cmd),
                                 )
                             except sqlite3.Error:
-                                pass
+                                logging.debug("_index_test_cases: optional operation failed; retaining fallback", exc_info=True)
                         count += 1
         return count
 
@@ -1684,7 +1685,7 @@ class DocIndexDB:
                                 ),
                             )
                         except sqlite3.Error:
-                            pass
+                            logging.debug("_index_audit_changes: optional operation failed; retaining fallback", exc_info=True)
                     count += 1
         return count
 
@@ -1736,7 +1737,7 @@ class DocIndexDB:
                                     (s_key, s["name"], s["signature"], rel_p, tokenize_cjk_for_fts(s["docstring"])),
                                 )
                             except sqlite3.Error:
-                                pass
+                                logging.debug("_index_code_symbols: optional operation failed; retaining fallback", exc_info=True)
 
                         # 插入关键代码符号的向量 Embedding
                         try:
@@ -1751,7 +1752,7 @@ class DocIndexDB:
                                     (s_key, "symbol", len(vec), pack_vector(vec), s_text[:200], _utc_now()),
                                 )
                         except Exception:
-                            pass
+                            logging.debug("_index_code_symbols: optional operation failed; retaining fallback", exc_info=True)
 
                         count += 1
         return count
@@ -1966,7 +1967,7 @@ class DocIndexDB:
                     (row["doc_key"], "doc", len(vec), pack_vector(vec), embed_text[:200], _utc_now()),
                 )
         except Exception:
-            pass
+            logging.debug("_upsert: optional operation failed; retaining fallback", exc_info=True)
 
         # 自动提取并注册方法契约画像（若属于方法设计文档）
         body = row.get("body") or ""
@@ -2019,7 +2020,7 @@ class DocIndexDB:
                     ),
                 )
             except sqlite3.Error:
-                pass
+                logging.debug("_upsert_method: optional operation failed; retaining fallback", exc_info=True)
 
         # 计算并保存方法向量 Embedding
         try:
@@ -2035,7 +2036,7 @@ class DocIndexDB:
                     (m["method_key"], "method", len(vec), pack_vector(vec), m_text[:200], _utc_now()),
                 )
         except Exception:
-            pass
+            logging.debug("_upsert_method: optional operation failed; retaining fallback", exc_info=True)
 
     def search(
         self,
@@ -2507,7 +2508,7 @@ class DocIndexDB:
                 )
                 rows = [dict(r) for r in cur.fetchall()]
             except sqlite3.Error:
-                pass
+                logging.debug("symbol_search: optional operation failed; retaining fallback", exc_info=True)
 
         if not rows:
             cur = conn.execute(

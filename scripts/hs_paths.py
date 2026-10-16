@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import sys
+import logging
 from pathlib import Path
 
 
@@ -74,7 +75,7 @@ def ensure_utf8_stdout() -> None:
         if hasattr(sys.stderr, "reconfigure"):
             sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     except Exception:
-        pass
+        logging.debug("ensure_utf8_stdout: optional operation failed; retaining fallback", exc_info=True)
 
 
 def which_python_hint() -> str:

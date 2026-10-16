@@ -43,7 +43,7 @@ python scripts/global_index_db.py rebuild   # 写/改笔记或偏好后
 
 ```bash
 python scripts/init_hs_global.py
-python3 scripts/init_hs_global.py
+python scripts/init_hs_global.py
 py -3 scripts/init_hs_global.py
 ```
 

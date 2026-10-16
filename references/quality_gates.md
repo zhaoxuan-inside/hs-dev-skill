@@ -5,7 +5,9 @@
 **何时读**：提交前 / 阶段 6；核对覆盖率与分层目录。  
 **方法与节奏（一等公民）**：先读 [`testing.md`](testing.md)（seam、垂直 TDD、分档义务）；本文 = **分层目录 + 覆盖率数字 + 提交清单**。
 
-**质量铁律**：全量测试 100% PASS 且 0 报错；静态检测 0 告警 0 错误；未达标前绝对禁止 Commit 与流转 COMPLETED 交付；分步红绿通过才算该切片完成。
+**适用性与分级**：按 `project_types.md` 与 `right_sizing.md` 选择门禁。S 跑相关测试和风险边界；M/L 跑适用全量测试。无浏览器时 CDP/CWV/a11y 记 NA，无 DB/外部服务时 Testcontainers/沙箱记 NA，须记录理由及 CLI/库/协议等替代验证。结构化验收与严格一致性检查适用于已建任务的所有分级。
+
+**质量铁律**：本次适用测试 100% PASS 且 0 报错；静态检测 0 告警 0 错误；未达标前绝对禁止 Commit 与流转 COMPLETED 交付；分步红绿通过才算该切片完成。
 
 ## 1. 九级质量保障分层（融合 DevTools / a11y / 性能审计）
 
@@ -26,12 +28,12 @@
 ## 2. 提交前门禁自检（Pre-Commit Checklist）
 
 在执行 Git 提交或合并前，必须通过以下自检项：
-0. **全量测试 100% PASS 与 0 报错（硬阻断门禁）**：`make test`（或项目等价命令）100% PASS，**无任何失败、报错或挂起用例**；若有任一报错，**绝对禁止流转 COMPLETED 与交付**，严禁向用户汇报“已完成但有报错待修”，必须就地排查修复直到全绿；触达 seam 的自动化测已存在；**前端页面无未捕获 Console 报错与网络死锁**（Chrome DevTools 审计通过）。
+0. **适用测试 100% PASS 与 0 报错（S 为相关测试，M/L 为全量）**：`make test`（S 可用相关测试命令，M/L 用项目等价全量命令）100% PASS，**无任何失败、报错或挂起用例**；若有任一报错，**绝对禁止流转 COMPLETED 与交付**，严禁向用户汇报“已完成但有报错待修”，必须就地排查修复直到全绿；触达 seam 的自动化测已存在；**前端页面无未捕获 Console 报错与网络死锁**（Chrome DevTools 审计通过）。
 0b. **代码静态检测零告警零错误（Zero Warnings, Zero Errors Gate）**：语言对应 Linter（Python: Ruff/Mypy, Go: golangci-lint, Rust: clippy, TS/JS/Vue: ESLint/TSC, Java: Checkstyle/SpotBugs 等，详见 [`coding_standards.md`](coding_standards.md)）、死代码扫描（`dead_code_scanner.py`）、规范检查（`verify_consistency.py`）**必须 0 警告（0 Warning）且 0 错误（0 Error）**；任何 Warning 均须当场清理修复，严禁带 Warning 提交或交付。
 0c. **术语防歧义与词态矩阵门禁（Zero Forbidden Synonyms & Lifecycle Grammar Gate）**：统一术语词典 `_00_project_foundation/_02_dictionary/_02_project_word.dict.yaml` 格式完备；`verify_consistency.py` 扫描无 `forbidden_alias` 违规命名，无事件动词原形（如 `order.update`）与时间戳（如 `updated_at`）混用，事件主题必须使用过去分词（如 `order.updated`），事件常量收敛导出无裸字符串。
 0d. **需求追踪与 100% 验证覆盖率门禁（Requirement Traceability & 100% Coverage Gate）**：任务卡片中若声明了原子需求清单（`REQ-*`），在流转至 `COMPLETED` 终态前必须达到 **100% 验证覆盖率**（$\text{Coverage} = \frac{\text{已验证需求数}}{\text{全部必需需求数}} = 100\%$）；每一项原子需求必须显式映射至自动化测试用例与断言证据；严禁任何必需需求在 `pending`、`failed` 或 `unverified` 状态下宣告任务成功交付（由 `verify_consistency.py` 自动硬阻断）。
-1. **死代码与孤儿方法扫描**：所有新增或修改的方法均在 `_04_engineering_contract/_05_call_chain` 中有合法引用路径，或具备白名单注解。
-2. **三同步完整性**：业务逻辑修改已同步更新方法设计文档、DB 迁移脚本（V/U）及单元/契约测试。
+1. **死代码与孤儿方法扫描**：M/L 触达的需建档方法均在 `_04_engineering_contract/_05_call_chain` 中有合法引用路径，或具备白名单注解。
+2. **三同步完整性**：仅同步实际触达的契约与测试；DB 变化才需 V/U。S 可跳过四要素文档与调用链建档，保留真实调用和测试证据。
 3. **索引完整性**：新增/重命名/删除的文件已同步更新对应的 `.idx` 索引文件。
 4. **三文件一致性**：`_05_task_orchestration/` 下的 `_00_task.idx`、`_01_task_brief/`、`_02_task_detail/` 任务状态与元数据完全吻合。
 5. **专项体验与性能合规**：满足 WCAG a11y 关键对比度与键盘访问；无突出的 LCP 阻塞与内存泄漏隐患。
@@ -43,7 +45,7 @@
 ## 3. 多端代码与产出目录控制门禁（Workspace & Output Isolation Gate）
 
 在执行提交、打包或发布前，必须确保各端代码与打包产物符合物理隔离标准：
-- **应用代码收敛**：各端代码存放于 `apps/<client_name>/`，跨端共享库与类型存放于 `packages/`；
+- **应用代码收敛**：目录遵循已选项目类型：P1 可用 `backend/`、P2 可用 `backend/` + `frontend/`；多端 Monorepo 使用 `apps/<client_name>/` 与共享 `packages/`；
 - **产出收敛铁律**：Web、桌面端（Desktop）、移动端（Mobile）所有打包产物（`.html`/`.js`, `.exe`/`.dmg`, `.apk`/`.ipa`）**必须通过构建配置强制重定向至根目录 `output/` 对应子目录**，严禁在子应用内堆积散落产物；
 - **符号表齐套门禁**：移动端 Android `mapping.txt` 与 iOS `dSYM.zip` 必须与安装包成对输出归档至 `output/app_mobile/`，缺失符号表禁止发版；
 - **配置与密钥安全**：环境配置收敛于 `config/`，敏感密钥绝不上库，必须提供 `config/.env.example` 声明变量契约。

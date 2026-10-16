@@ -6,6 +6,7 @@ init_hs_dev_docs.py
 
 import os
 import sys
+import logging
 import json
 import re
 import argparse
@@ -54,7 +55,7 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
             from governance_toggle import save_governance_config, DEFAULT_GOVERNANCE_CONFIG
             save_governance_config(root, DEFAULT_GOVERNANCE_CONFIG)
         except Exception:
-            pass
+            logging.debug("init_full_workspace: optional operation failed; retaining fallback", exc_info=True)
 
     # 2. hs_dev_docs 目录层级（一级功能 + 二级子功能严格按 _01_ 序号组织，排除全流程不消费的空置死目录）
     doc_dirs = [
@@ -95,6 +96,7 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
         # _06_dev_process (功能六：开发过程与治理记录)
         "_06_dev_process/_01_plan_log",
         "_06_dev_process/_02_change_log",
+        "_06_dev_process/_03_qa_log",
         "_06_dev_process/_04_error_recovery/snapshots",
     ]
     for d in doc_dirs:
@@ -257,21 +259,21 @@ def generate_doc_reading_guide(workspace_root: str, project_name: str = None, ve
                 data = json.loads(pkg_json.read_text(encoding="utf-8"))
                 project_name = data.get("name")
             except Exception:
-                pass
+                logging.debug("generate_doc_reading_guide: optional operation failed; retaining fallback", exc_info=True)
         if not project_name and pyproject.exists():
             try:
                 m = re.search(r'name\s*=\s*["\']([^"\']+)["\']', pyproject.read_text(encoding="utf-8"))
                 if m:
                     project_name = m.group(1)
             except Exception:
-                pass
+                logging.debug("generate_doc_reading_guide: optional operation failed; retaining fallback", exc_info=True)
         if not project_name and cargo.exists():
             try:
                 m = re.search(r'name\s*=\s*["\']([^"\']+)["\']', cargo.read_text(encoding="utf-8"))
                 if m:
                     project_name = m.group(1)
             except Exception:
-                pass
+                logging.debug("generate_doc_reading_guide: optional operation failed; retaining fallback", exc_info=True)
         if not project_name:
             project_name = root.name or "hs-dev-project"
 

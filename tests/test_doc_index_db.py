@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import sys
+import logging
 import tempfile
 import unittest
 from pathlib import Path
@@ -39,7 +40,7 @@ class TestDocIndexDB(unittest.TestCase):
             self.tmp.cleanup()
         except PermissionError:
             # Windows: 偶发句柄延迟释放
-            pass
+            logging.debug("tearDown: optional operation failed; retaining fallback", exc_info=True)
 
     def test_db_path_under_docs_index(self):
         p = db_path_for_root(self.root)

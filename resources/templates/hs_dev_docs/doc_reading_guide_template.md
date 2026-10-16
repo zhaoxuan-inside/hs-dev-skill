@@ -11,7 +11,7 @@
 
 ## [VIBE_CONTRACT] 机器极速索引契约 (Machine-Actionable Index Manifest)
 <!-- 
-  【专供 AI Agent / LLM 极速切片检索（行 1～45）】
+  【专供 AI Agent / LLM 极速切片检索（顶部 [VIBE_CONTRACT] 至下一同级标题）】
   说明：本区块为机器可解析的索引契约与快速检索指令集。外部 Agent 接入本系统时，
   优先执行以下专用检索子命令获取精准行段，绝对禁止对 hs_dev_docs 进行整目录扫描！
 -->
@@ -154,7 +154,7 @@ guardrails:
 2. **符号锚点防漂移 (Symbol Anchor)**：
    设计文档和任务包中绝对禁止硬编码绝对物理代码行号。必须使用 `Symbol Anchor`（如 `OrderService.createOrder#validation`），由底层的 AST 符号切片引擎动态求值行号。
 3. **机器契约优先 (Machine Contract First)**：
-   AI 编码与装配时，优先读取各文档顶部带有 `[VIBE_CONTRACT]` 标记的切片区块（行 1～35），杜绝下半部冗长的人类背景论证挤占 Token。
+   AI 编码与装配时，优先读取各文档顶部带有 `[VIBE_CONTRACT]` 标记的切片区块（顶部 [VIBE_CONTRACT] 至下一同级标题），杜绝下半部冗长的人类背景论证挤占 Token。
 4. **索引自动同步机制 (Self-Healing Index)**：
    批量新增或更新设计文档后，必须执行以下指令保证权威 `.idx` 与 SQLite 缓存同步：
    ```bash

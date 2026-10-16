@@ -1,5 +1,7 @@
 # 文档驱动开发（DDD）全生命周期驱动引擎指南
 
+**项目适用性**：视觉、DESIGN.md、原型与 UI vibe_spec 仅在有 UI 时必需；无 UI 按 `project_types.md` 与 `product_design.md` §5.2 标记 NA，保留 PRD、API/CLI/库契约、可执行场景和业务冻结确认。
+
 **阶段验收入口**：0A/0B 验收点见 [`product_acceptance.md`](product_acceptance.md)，阶段 1～6 只读 [`engineering_acceptance.md`](engineering_acceptance.md) 当前节；记录使用 [`stage_acceptance 模板`](../resources/templates/process/stage_acceptance.md)。通用判定以 [`stage_acceptance.md`](stage_acceptance.md) 为准。
 
 本指南定义 `hs-dev-skill` 的 **7 阶段满配链（L）**。  
@@ -54,7 +56,7 @@
 > **严禁底层技术细节反向侵入产品设计**：
 > 严禁在阶段 0 的 PRD、原型或规划文档中提前塞入底层技术选型（如 MySQL vs PG）、物理数据库 DDL、接口代码实现签名、分布式 Saga 补偿、代码单元测试覆盖率指标等工程实现细节！这些是阶段 1（选型）至阶段 3（四要素详设）的职责。产品设计阶段只对产品的设计语言与功能规格负责。
 
-### 2. 阶段执行四步法 (0.1 宏观品味宪章 → 0A 产品设计沟通含 MVP 范围裁定 → 0A' 微观特性设计（限 MVP）→ 0B 分阶段规划 → 0C 详细功能与规模评估（限 MVP）)
+### 2. 阶段执行流程 (0.1 宏观品味宪章 → 0A 产品设计沟通含 MVP 范围裁定 → 0A' 微观特性设计（限 MVP）→ 0B 分阶段规划 → 0C 详细功能与规模评估（限 MVP）)
 
 #### 阶段 0.1：确立项目级宏观品味宪章 (Project Design Charter, 仅项目启动或全局重构时)
 - 在项目根目录创建并固化 `DESIGN.md`（详见 [`design_md.md`](design_md.md) 与 [`product_design.md`](product_design.md) §0.1）；
@@ -136,7 +138,7 @@
 ### 1. 核心目标
 在**已冻结的 MVP 详细功能、整体交互逻辑与规模评估约束**下，针对多端（后端/前端/移动端/桌面端）、语言、存储引擎、中间件、网络协议进行多方案对比分析，输出明确的架构决策记录（ADR）。
 **单文件内联分层铁律 (Top-Contract Slice)**：
-选型文档与 ADR 必须强制在**文档顶部 1～35 行置顶 `## [VIBE_CONTRACT] 机器执行契约`**（记录锁定的唯一技术栈、明确版本号、硬性禁令）；下半部保留 `## [HUMAN_RATIONALE]` 供人类评审方案权衡。**严禁让 VibeCoding 工具读取落选方案的讨论，防止 AI 产生误导性技术混淆！**
+选型文档与 ADR 必须强制在**文档顶部置顶 `## [VIBE_CONTRACT] 机器执行契约`**（记录锁定的唯一技术栈、明确版本号、硬性禁令）；下半部保留 `## [HUMAN_RATIONALE]` 供人类评审方案权衡。**严禁让 VibeCoding 工具读取落选方案的讨论，防止 AI 产生误导性技术混淆！**
 
 ### 2. Agent 行为准则
 - **前置**：阶段 0 产品需求冻结门禁已通过；未通过则禁止锁定本阶段选型结论。阶段 0 为关闭关键能力未知项所做的有边界探查允许独立记录，不等同提前选型。
@@ -250,15 +252,15 @@ L：四维契约齐套后再编码。M：只更新触达维。S：跳过。范�
 1. **契约文档与过程账本闭环（Doc & Process Sync）**：核对阶段 5 编码中涉及的所有方法画像、接口契约、表结构变更已在 `_04_engineering_contract/` 中 100% 同步更新；在 `_06_dev_process/_01_plan_log` 标记所有步骤为 `done`，`_02_change_log` 记录最终快照 checkpoint。
 2. **双层索引自愈与全局罗盘刷新（Self-Healing & Guide Refresh）**：
    ```bash
-   python3 scripts/idx_manager.py rebuild
-   python3 scripts/doc_index_db.py --root . rebuild
-   python3 scripts/doc_index_db.py --root . generate-guide
+   python scripts/idx_manager.py rebuild
+   python scripts/doc_index_db.py --root . rebuild
+   python scripts/doc_index_db.py --root . generate-guide
    ```
    确保各子域 `.idx`、SQLite 倒排索引及根目录全局导航阅读说明 `hs_dev_docs/_00_docs_compass.md` 处于最新状态且哈希一致。
 3. **运行全量测试与运行态走查（测试零报错绝对阻断门禁）**：`make test` 确保 **100% PASS**，**无任何失败、报错或异常用例**；若有任何报错，**绝对禁止将任务置为 COMPLETED，绝对禁止 Git Commit，绝对禁止向用户汇报交付或完工**！严禁出现“代码已交付但有测试报错稍后修”的严重违规，必须就地 Debug 修复直至全绿。前端工程结合 Chrome DevTools CDP 自动化排查，确保无未捕获 Console 报错与网络死锁，满足 WCAG a11y 对比度与 LCP/内存泄漏安全线。
 4. **运行代码静态检测（零告警零错误门禁）**：语言对应 Linter（ESLint/Ruff/Flake8 等）与类型检查（TSC/Mypy）**必须达到 0 警告（0 Warning）且 0 错误（0 Error）**；任何 Warning 均视为阻断性质量缺陷必须就地消除，严禁带 Warning 提交代码。
-5. **运行一致性与需求覆盖率门禁检查**：`python3 scripts/verify_consistency.py --root . --strict` 确保三文件、索引、V/U 脚本原子配对、目录卫生以及原子需求清单（`REQ-*`）100% 达成 `verified`（覆盖率硬阻断，严禁遗留未解决项交付）。
-6. **运行死代码与孤儿方法扫描**：`python3 scripts/dead_code_scanner.py --root .`。
-7. **流转任务状态并归档**：**仅当上述测试全绿、静态检测零告警零错误、一致性验证全部通过，且结构化验收记录已由开发者确认后**，方可执行 `python3 scripts/task_manager.py status --id {task_id} --set COMPLETED --acceptance-record <验收记录路径>`（命令检查记录、REQ 与严格一致性门禁后自动归档至 `_00_task_archive.idx`）。
+5. **运行一致性与需求覆盖率门禁检查**：`python scripts/verify_consistency.py --root . --strict` 确保三文件、索引、V/U 脚本原子配对、目录卫生以及原子需求清单（`REQ-*`）100% 达成 `verified`（覆盖率硬阻断，严禁遗留未解决项交付）。
+6. **运行死代码与孤儿方法扫描**：`python scripts/dead_code_scanner.py --root .`。
+7. **流转任务状态并归档**：**仅当上述测试全绿、静态检测零告警零错误、一致性验证全部通过，且结构化验收记录已由开发者确认后**，方可执行 `python scripts/task_manager.py status --id {task_id} --set COMPLETED --acceptance-record <验收记录路径>`（命令检查记录、REQ 与严格一致性门禁后自动归档至 `_00_task_archive.idx`）。
 8. **Git 规范提交**：按照 `<type>(<scope>): <subject>` 规范生成本地 Commit。**默认不** `git push`；**仅当用户明确要求推送**时代为执行并回报结果。
 

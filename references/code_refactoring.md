@@ -35,7 +35,7 @@
   - 复杂分支与类型判断 $\to$ 查阅 [`design_patterns.md`](design_patterns.md)，引入策略模式（Strategy）或状态模式（State）；
 - **方法意图查重**：在提炼辅助方法前，强制运行：
   ```bash
-  python3 scripts/doc_index_db.py --root . method-search --q "<抽取意图>"
+  python scripts/doc_index_db.py --root . method-search --q "<抽取意图>"
   ```
   若重合度 $\ge 80\%$ 强制复用，严禁产生影子函数。
 
@@ -48,11 +48,11 @@
 - **过程账本与快照记录**：在 `_06_dev_process/_01_plan_log` 标记重构步骤为 `done`，`_02_change_log` 记录最终快照；
 - **双层索引自愈与罗盘刷新**：
   ```bash
-  python3 scripts/idx_manager.py rebuild
-  python3 scripts/doc_index_db.py --root . rebuild
-  python3 scripts/doc_index_db.py --root . generate-guide
+  python scripts/idx_manager.py rebuild
+  python scripts/doc_index_db.py --root . rebuild
+  python scripts/doc_index_db.py --root . generate-guide
   ```
-- **静态检测与门禁硬拦截**：静态分析工具（Linter / TypeChecker / Dead Code Scanner）必须 0 Warning 且 0 Error，运行 `python3 scripts/verify_consistency.py --root . --strict` 确保零漂移，方可执行本地 Commit。
+- **静态检测与门禁硬拦截**：静态分析工具（Linter / TypeChecker / Dead Code Scanner）必须 0 Warning 且 0 Error，运行 `python scripts/verify_consistency.py --root . --strict` 确保零漂移，方可执行本地 Commit。
 
 ---
 

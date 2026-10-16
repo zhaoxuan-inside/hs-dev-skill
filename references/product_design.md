@@ -1,5 +1,7 @@
 # 产品设计规范指南（宏观品味宪章 · 微观特性施工图 · 执行契约）
 
+**项目适用性**：视觉、DESIGN.md、原型与 UI vibe_spec 仅在有 UI 时必需；项目 DESIGN.md 的实际 Tokens 为唯一视觉基线，下文数值为按场景选择的示例；无 UI 按 `project_types.md` 与 `product_design.md` §5.2 标记 NA，保留 PRD、API/CLI/库契约、可执行场景和业务冻结确认。
+
 **验收规则**：设计工作按本文展开；每个实际验收点执行 [`product_acceptance.md`](product_acceptance.md) 的 DISC/PROD 清单，使用 [`stage_acceptance.md`](stage_acceptance.md) 的证据与权限规则。10 维自审和文档齐套只能支持提交，不能替代场景演练与开发者验收。
 
 **何时读**：阶段 0 / `work_mode=DESIGN` / 需求规划 / UI 与功能设计；每会话最多一次。  
@@ -30,7 +32,7 @@
                                     ▼ 全项目所有特性严格声明 Inherits: /DESIGN.md
 ┌────────────────────────────────────────────────────────────────────────┐
 │ 第二层：微观特性施工图 (Feature-Level Construction Specs & Contracts)   │
-│ · 载体：一源双视图 (Human PDD/PRD + Machine Vibe Spec)                 │
+│ · 载体：一源双视图 (Human PRD + Machine Vibe Spec)                     │
 │ · 频次：每个具体功能 (Feature) 迭代时高频输出                          │
 │ · 内容：当前任务 JTBD 痛点、方案 Trade-offs、首屏 20% 披露、ASCII 线框、│
 │         字段约束矩阵、状态机、Gherkin DoD，严禁重复定义全局哲学与色彩   │
@@ -66,7 +68,7 @@
 
 ### 1.1 设计哲学与视觉调性 (Philosophy & Mood)
 - **具象对标参照物**：禁止使用“大气、干净、现代、高级”等空洞形容词。必须给出具象对标或物理隐喻（如：“瑞士国际主义网格排版的高密度金融终端”、“复古温润纸张质感的沉浸式创作桌面”、“Linear 式克制深色高对比度工作台”）。
-- **内容密度 (Density)**：明确界面的信息密度取向（`Airy` 宽松通透 / `Balanced` 均衡标准 / `Dense` 紧凑专业）。
+- **内容密度 (Density)**：明确界面的信息密度取向（`Airy` 宽松通透 / `Balanced` 均衡标准 / `Compact` 紧凑专业）。
 - **受众与主职 (Audience & Primary Job)**：明确界面的核心受众是谁、首屏第一核心任务是什么。
 
 ### 1.2 全局 Design Tokens 规范基准
@@ -80,9 +82,9 @@
    - **对比度合规**：文本与背景对比度必须满足 WCAG AA 级以上（常规文本 ≥ 4.5:1，大文本 ≥ 3:1）。
 2. **排版字体层级 (Typography Scale)**：
    - **字体族**：Display / Sans（正文） / Mono（数据与代码），全站字体族 ≤ 2 种；数据的数字列强制启用 `tabular-nums`（等宽数字对齐）；
-   - **字阶梯次**：`Hero`: 40–56px；`H1`: 32–36px；`H2`: 24–28px；`H3`: 18–20px；`Body`: 14–16px（行宽约束 `60ch–75ch`）；`Caption`: 12–13px。
+   - **字阶梯次**：`Hero`: 40–56px；`H1`: 工作台 24px / 展示页 32–36px；`H2`: 工作台 20px / 展示页 24–28px；`H3`: 18–20px；`Body`: 14–16px（行宽约束 `60ch–75ch`）；`Caption`: 12–13px。
 3. **空间与网格 (Spacing & Grid Layout)**：
-   - 基于 4px / 8px 基础步进：`4px` (xs)、`8px` (sm)、`16px` (md)、`24px` (lg)、`32px` (xl)；容器最大宽度约束 `max-w-[1200px]` 或 `max-w-[1440px]`。
+   - 基于 4px / 8px 基础步进：`4px` (2xs)、`8px` (xs)、`12px` (sm)、`16px` (md)、`24px` (lg)、`32px` (xl)；容器最大宽度约束 `max-w-[1200px]` 或 `max-w-[1440px]`。
 4. **圆角与投影高程 (Radius & Elevation)**：
    - 圆角梯度：小圆角 4px（输入框/徽标）、中圆角 8px（常规按钮/卡片）、大圆角 12–16px（模态弹窗/抽屉）；
    - 投影高程：`Flat` (1px 描边) → `Raised` (微卡片投影) → `Overlay` (下拉抽屉投影) → `Modal` (遮罩弹窗深投影)。
@@ -184,10 +186,10 @@ hs_dev_docs/
 1. **L1 全景总览 (`overview_prd.md`)**：
    - 载体：`_02_feature_spec/_01_human_prd/overview_prd.md`（参照 [`overview_prd_template.md`](../resources/templates/product_design/overview_prd_template.md)）；
    - 职责：维护全局模块矩阵、特性索引导航表（含 `FEAT-ID`、特性名称、所属模块、优先级、PRD 相对路径）及 Mermaid 功能全景树。
-2. **L2 微观子特性施工图 (`features/{feature_key}_prd.md`)**：
-   - 载体：`_02_feature_spec/_01_human_prd/features/{feature_key}_prd.md`（参照 [`sub_feature_prd_template.md`](../resources/templates/product_design/sub_feature_prd_template.md)）；
+2. **L2 微观子特性施工图 (`{feature_key}_prd.md`)**：
+   - 载体：`_02_feature_spec/_01_human_prd/{feature_key}_prd.md`（参照 [`sub_feature_prd_template.md`](../resources/templates/product_design/sub_feature_prd_template.md)）；
    - 职责：单文档严格控制在 100~250 行，专精当前 `FEAT-ID` 的微观 JTBD、方案比选、字段约束矩阵与 Gherkin 验收标准；
-   - 自动化建库：由 `python3 scripts/doc_index_db.py rebuild` 自动化解析入库 `features` 表与 `features_fts`，支持 `feature-search` 毫秒级定向按需召回。
+   - 自动化建库：由 `python scripts/doc_index_db.py rebuild` 自动化解析入库 `features` 表与 `features_fts`，支持 `feature-search` 毫秒级定向按需召回。
 3. **L2 页面与空间布局原型 (`_04_prototype_wireframe/{feature_key}_prototype.md`)**：
    - 自动化建库：由 `doc_index_db.py` 自动化解析页面 ID、路由、布局形态与原型 HTML 入库 `pages` 表与 `pages_fts`，支持 `page-search` 检索页面拓扑。
 
@@ -219,6 +221,8 @@ MVP 范围裁定**前置到产品设计沟通（审讯）阶段**（详见 [`gri
 10. **绝对纯净无技术污染**：PRD 中是否 100% 剔除了数据库 DDL、代码签名、Saga 与单测指标？
 
 ### 5.2 阶段 0 冻结门禁表
+
+适用性先按 `project_types.md` 判定：无 UI 项目将 DESIGN.md、视觉继承、双轨原型、UI vibe_spec 与视觉签收记为 NA，并记录理由及替代证据（API/CLI/库契约与可执行场景）；PRD、业务语义、规模评估与开发者冻结确认仍必需。不得为通过门禁制造空 UI 文档。
 
 | 校验维度 | 通过条件 |
 |---|---|

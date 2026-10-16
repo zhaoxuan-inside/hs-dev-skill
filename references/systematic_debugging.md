@@ -27,13 +27,13 @@ Bug 修复绝非凭直觉“盲修乱试”，更禁止在未确认根因前胡�
 - **切片定位与依赖探查**：强制使用 `doc_index_db` 专属索引指令定位现场，杜绝暴力盲搜：
   ```bash
   # 1. 查找涉事类与方法切片 (免读大文件)
-  python3 scripts/doc_index_db.py symbol-slice --name "<涉事方法名>"
+  python scripts/doc_index_db.py symbol-slice --name "<涉事方法名>"
   # 2. 查局部微依赖图与爆炸半径 (分析 Callers 影响面与 Callees Mock 边界)
-  python3 scripts/doc_index_db.py dep-graph --symbol "<涉事类名.方法名>"
+  python scripts/doc_index_db.py dep-graph --symbol "<涉事类名.方法名>"
   # 3. 检索该方法已有的测试用例与精准单跑指令
-  python3 scripts/doc_index_db.py test-search --target "<涉事方法名>"
+  python scripts/doc_index_db.py test-search --target "<涉事方法名>"
   # 4. 追溯该文件/方法近期的改动审计历史
-  python3 scripts/doc_index_db.py audit-search --q "<涉事文件或方法>"
+  python scripts/doc_index_db.py audit-search --q "<涉事文件或方法>"
   ```
 - **提出根因假设**：明确形式化假设：“在输入 X 且状态为 Y 时，由于逻辑 Z 未处理，导致产生错误 E”。
 
@@ -44,15 +44,15 @@ Bug 修复绝非凭直觉“盲修乱试”，更禁止在未确认根因前胡�
 
 ### Step 3：精准切片修复（Make it GREEN）
 - 依据 [`method_archetypes.md`](method_archetypes.md) 识别涉事方法的七分类与七维契约；
-- 执行 `python3 scripts/doc_index_db.py method-search --q <业务意图>` 查重，严禁为了修 Bug 新增重复影子函数；
+- 执行 `python scripts/doc_index_db.py method-search --q <业务意图>` 查重，严禁为了修 Bug 新增重复影子函数；
 - 做最小必要改动，消除根因；
 - 再次运行复现测试，确保其转为通过（GREEN）。
 
 ### Step 4：契约同步、索引自愈与防退化门禁（Contract Sync & Self-Healing Gating）
 - **契约文档与方法画像同步**：若修复涉及方法内部逻辑、入参扩展或新增测试，同步更新 `_04_engineering_contract/_04_method_design/` 中的方法契约画像与精准单跑测试指令（若触及接口/表结构，同步更新对应契约）；
-- **过程账本与快照留存**：执行 `python3 scripts/process_log.py checkpoint` 记录修复日志与改动快照，在 `_06_dev_process/_01_plan_log` 标记对应断点步骤为 `done`；
-- **双层索引自愈与罗盘刷新**：运行 `python3 scripts/idx_manager.py rebuild` 与 `python3 scripts/doc_index_db.py --root . rebuild` 刷新 SQLite 索引与 SHA-256 Digest，并执行 `python3 scripts/doc_index_db.py --root . generate-guide` 保持 `hs_dev_docs/_00_docs_compass.md` 罗盘最新；
-- **全量测试与防退化门禁**：运行全量测试套件（`make test`，确保 100% PASS 且 0 报错），静态检测（Linter / TypeChecker）0 告警 0 错误，执行 `python3 scripts/verify_consistency.py --root . --strict` 严格门禁验证；
+- **过程账本与快照留存**：修改前执行 `python scripts/process_log.py --root . checkpoint --id {task_id} --step {step_id} --summary "修复前快照" --paths {relative_path_1},{relative_path_2}` 留存快照，修复后更新日志与证据，在 `_06_dev_process/_01_plan_log` 标记对应断点步骤为 `done`；
+- **双层索引自愈与罗盘刷新**：运行 `python scripts/idx_manager.py rebuild --root .` 与 `python scripts/doc_index_db.py --root . rebuild` 刷新 SQLite 索引与 SHA-256 Digest，并执行 `python scripts/doc_index_db.py --root . generate-guide` 保持 `hs_dev_docs/_00_docs_compass.md` 罗盘最新；
+- **全量测试与防退化门禁**：运行全量测试套件（`make test`，确保 100% PASS 且 0 报错），静态检测（Linter / TypeChecker）0 告警 0 错误，执行 `python scripts/verify_consistency.py --root . --strict` 严格门禁验证；
 - **本地归档提交**：门禁全绿后完成本地 Commit，严禁带病提交。
 
 ---

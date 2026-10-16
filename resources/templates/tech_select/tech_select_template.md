@@ -15,7 +15,7 @@
 
 ## [VIBE_CONTRACT] 机器执行契约 (Machine-Actionable Decision)
 <!-- 
-  【专供 VibeCoding / AI 编码切片读取（行 1～40）】
+  【专供 VibeCoding / AI 编码切片读取（顶部 [VIBE_CONTRACT] 至下一同级标题）】
   说明：本区块记录已锁定的唯一技术栈、明确版本号、依赖与硬性禁令。
   AI 编码切片（doc_index_db.py slice）优先读取本区块，禁止将下方落选方案写进代码！
 -->

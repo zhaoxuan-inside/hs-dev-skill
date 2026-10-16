@@ -1,6 +1,6 @@
 # 产品开发 Skill 规格定义书
 
-版本：v2.42.0.0  
+版本：随当前 Skill 包维护（版本以 SKILL.md 与 resources/skill_routes.json 为准；文件名为历史兼容路径）
 定位：文档驱动开发 + 六元组标准化运行时 + Agent 上下文引擎
 
 ---
@@ -85,7 +85,8 @@
 │       ├── _01_product_vision/                       # [01 产品愿景与定界]
 │       │   ├── _00_product_vision.idx
 │       │   ├── _01_design_charter/                   # DESIGN.md 宏观品味宪章
-│       │   └── _02_phased_roadmap/                   # MVP 范围裁定（审讯）与路线图
+│       │   ├── _02_phased_roadmap/                   # MVP 范围裁定（审讯）与路线图
+│       │   └── _03_business_plan/                    # 可选，按需创建的商业计划
 │       ├── _02_feature_spec/                         # [02 特性规格与原型契约]
 │       │   ├── _00_feature_spec.idx
 │       │   ├── _01_human_prd/                        # 人类 PRD
@@ -114,6 +115,7 @@
 │           ├── _00_dev_process.idx
 │           ├── _01_plan_log/                         # 有序计划与断点账本
 │           ├── _02_change_log/                       # 变更流水账本与快照 (非 Git 物理回滚依据)
+│           ├── _03_qa_log/                           # 关键问答、裁定与冻结证据
 │           └── _04_error_recovery/snapshots/         # 故障恢复物理快照
 ```
 
@@ -173,7 +175,7 @@ exception method_name_recall(input, output, context, isolate, metrics, recall);
 
 外键命名：`{table_name}_id`。
 
-表设计文档必须包含：当前表结构表格、按版本倒序的变更历史、对应 V/U 脚本路径。  
+表设计文档必须包含：当前表结构表格、按版本倒序的变更历史、对应 V/U 脚本路径。
 Design、V、U 三者原子同步。
 
 迁移脚本命名：

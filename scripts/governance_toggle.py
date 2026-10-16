@@ -12,6 +12,7 @@ import os
 import sys
 import argparse
 from pathlib import Path
+from hs_paths import ensure_utf8_stdout
 from typing import Dict, Any, Optional
 
 try:
@@ -147,6 +148,7 @@ def is_feature_enabled(workspace_root: Optional[Path], feature_name: str) -> boo
 
 
 def main():
+    ensure_utf8_stdout()
     parser = argparse.ArgumentParser(
         description="hs-dev-skill Governance Capabilities & Feature Toggle Controller"
     )

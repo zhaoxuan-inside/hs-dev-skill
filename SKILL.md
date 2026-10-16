@@ -29,12 +29,13 @@ Agent 驱动文档，已验收的文档驱动代码。本入口只负责分派�
 路由唯一机器清单：[`resources/skill_routes.json`](resources/skill_routes.json)。工具不猜阶段、不执行任务、不代签：
 
 ```bash
+# Linux/macOS 可用 python3，Windows 可用 py -3；以下 python 须为 Python >= 3.8
 # 路径相对安装包；在工程中使用时换成安装包脚本的绝对路径
-python3 scripts/skill_router.py check
-python3 scripts/skill_router.py list
-python3 scripts/skill_router.py route --intent BUILD --phase 3 --domains backend
-python3 scripts/skill_router.py route --intent FIX --domains frontend testing
-python3 scripts/skill_router.py route --intent RESUME
+python scripts/skill_router.py check
+python scripts/skill_router.py list
+python scripts/skill_router.py route --intent BUILD --phase 3 --domains backend
+python scripts/skill_router.py route --intent FIX --domains frontend testing
+python scripts/skill_router.py route --intent RESUME
 ```
 
 ## 纵向：过程分派

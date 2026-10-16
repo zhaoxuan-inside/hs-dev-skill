@@ -9,7 +9,7 @@
 
 > [!NOTE]
 > **分级拆分原则**：对于中大型项目，严禁将全量特性揉入单一万行 PRD 文档。
-> 本总览 PRD 仅承载全局商业愿景、模块划分矩阵与特性索引导航；具体微观特性施工图统一分拆收敛至 `features/{feature_key}_prd.md`。
+> 本总览 PRD 仅承载全局商业愿景、模块划分矩阵与特性索引导航；具体微观特性施工图统一分拆收敛至 `{feature_key}_prd.md`。
 
 ---
 
@@ -29,9 +29,9 @@
 
 | 特性ID | 特性名称 | 所属模块 | 优先级 | 状态 | 规格说明书路径 (PRD) | 界面原型路径 (Prototype) |
 |---|---|---|---|---|---|---|
-| `FEAT-001` | 用户注册与企业实名认证 | `auth` | `P0` | `active` | `features/auth_register_prd.md` | `_02_feature_spec/_04_prototype_wireframe/auth_register_prototype.md` |
-| `FEAT-010` | 极速收银台与聚合支付 | `order` | `P0` | `active` | `features/order_checkout_prd.md` | `_02_feature_spec/_04_prototype_wireframe/order_checkout_prototype.md` |
-| `FEAT-011` | 阶梯优惠券与积分核销 | `order` | `P1` | `active` | `features/order_coupon_prd.md` | `_02_feature_spec/_04_prototype_wireframe/order_coupon_prototype.md` |
+| `FEAT-001` | 用户注册与企业实名认证 | `auth` | `P0` | `active` | `auth_register_prd.md` | `_02_feature_spec/_04_prototype_wireframe/auth_register_prototype.md` |
+| `FEAT-010` | 极速收银台与聚合支付 | `order` | `P0` | `active` | `order_checkout_prd.md` | `_02_feature_spec/_04_prototype_wireframe/order_checkout_prototype.md` |
+| `FEAT-011` | 阶梯优惠券与积分核销 | `order` | `P1` | `active` | `order_coupon_prd.md` | `_02_feature_spec/_04_prototype_wireframe/order_coupon_prototype.md` |
 
 ---
 

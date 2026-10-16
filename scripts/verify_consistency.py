@@ -7,17 +7,24 @@ verify_consistency.py
 
 import os
 import sys
+import logging
 import re
 import argparse
+import subprocess
 from pathlib import Path
 from idx_manager import IdxManager
+from hs_paths import ensure_utf8_stdout
+from fake_code_scanner import scan_root
 
 
 class ConsistencyVerifier:
-    def __init__(self, workspace_root: str, strict: bool = False):
+    def __init__(self, workspace_root: str, strict: bool = False, demo: bool = False):
         self.root = Path(workspace_root).resolve()
         self.docs_root = self.root / "hs_dev_docs"
         self.mock_root = self.root / "mock"
+        if demo:
+            self.docs_root = self.root / "demo_project" / "hs_dev_docs"
+            self.mock_root = self.root / "demo_project" / "mock"
         self.strict = strict
         self.errors = []
         self.warnings = []
@@ -27,14 +34,10 @@ class ConsistencyVerifier:
         self.errors.clear()
         self.warnings.clear()
 
-        if not self.docs_root.exists() or not (self.docs_root / "_00_hs_dev_docs.idx").exists():
-            if (self.root / "demo_project" / "hs_dev_docs").exists():
-                self.docs_root = self.root / "demo_project" / "hs_dev_docs"
-                self.mock_root = self.root / "demo_project" / "mock"
-            elif not self.docs_root.exists():
-                self.errors.append("hs_dev_docs directory does not exist! Please run init_hs_dev_docs.py first.")
-                self._print_results()
-                return False
+        print(f"  -> Documentation target: {self.docs_root}")
+        if not (self.docs_root / "_00_hs_dev_docs.idx").is_file():
+            self.errors.append(f"Missing {self.docs_root / '_00_hs_dev_docs.idx'}; initialize the target project explicitly.")
+            return self._print_results()
 
         # 0. 检查 Skill 自身三处版本号单源一致性（当处于 Skill 根目录时）
         self._check_skill_version()
@@ -65,6 +68,13 @@ class ConsistencyVerifier:
 
         # 9. 检查废弃历史路径与两级 7 大功能域规范对齐 (Deprecated Legacy Paths Guard)
         self._check_deprecated_paths()
+
+        for target in {self.root, self.docs_root.parent}:
+            for finding in scan_root(target):
+                self.errors.append(
+                    f"[FAKE CODE] {target / finding['path']}:{finding['line']} "
+                    f"[{finding['category']}] {finding['snippet']}"
+                )
 
         return self._print_results()
 
@@ -272,7 +282,7 @@ class ConsistencyVerifier:
                         self.warnings.append(f"[MOCK PROFILE WARNING] {pf.name} contract_ref not found on disk: {ref_path}")
 
     def _check_doc_index_db(self):
-        """检查 SQLite 文档索引缓存；缺失则告警（不阻断，因可 rebuild）"""
+        """缺失的派生缓存仅提示；已有缓存损坏或为空仍告警。"""
         print("  -> Checking Doc Index DB (SQLite cache)...")
         db_file = self.docs_root / "_00_project_foundation" / "_05_doc_index" / "doc_index.sqlite"
         if not db_file.exists():
@@ -281,9 +291,7 @@ class ConsistencyVerifier:
         if not idx_files:
             return
         if not db_file.exists():
-            self.warnings.append(
-                "[DOC INDEX] Missing doc_index.sqlite — run: python scripts/doc_index_db.py --root . rebuild"
-            )
+            print(f"  [INFO] Missing optional SQLite cache; rebuild with: python scripts/doc_index_db.py --root \"{self.docs_root.parent}\" rebuild")
             return
         try:
             from doc_index_db import DocIndexDB
@@ -347,7 +355,7 @@ class ConsistencyVerifier:
             import yaml  # type: ignore
             data = yaml.safe_load(dict_text)
         except Exception:
-            pass
+            logging.debug("_check_project_dictionary: optional operation failed; retaining fallback", exc_info=True)
 
         # 解析 terms 与 lifecycle_terms
         terms_list = []
@@ -580,8 +588,25 @@ class ConsistencyVerifier:
 
         # 2. 依赖锁文件检查（如果有 package.json，必须有 lockfile）
         if check_lockfile:
-            for pkg_json in self.root.rglob("package.json"):
-                if "node_modules" in pkg_json.parts or ".hs_cache" in pkg_json.parts:
+            candidates = []
+            for directory, dirs, files in os.walk(self.root):
+                dirs[:] = [d for d in dirs if d not in {"node_modules", ".hs_cache", ".git"}]
+                if "package.json" in files:
+                    candidates.append(Path(directory) / "package.json")
+            ignored = set()
+            if candidates:
+                try:
+                    result = subprocess.run(
+                        ["git", "-C", str(self.root), "check-ignore", "--stdin", "-z"],
+                        input="\0".join(p.relative_to(self.root).as_posix() for p in candidates) + "\0",
+                        capture_output=True, text=True, check=False,
+                    )
+                    if result.returncode in (0, 1):
+                        ignored = set(result.stdout.split("\0"))
+                except OSError:
+                    ignored = set()  # Git unavailable: conservatively check every manifest.
+            for pkg_json in candidates:
+                if pkg_json.relative_to(self.root).as_posix() in ignored:
                     continue
                 pkg_dir = pkg_json.parent
                 has_lock = any(
@@ -604,17 +629,19 @@ class ConsistencyVerifier:
             if not sbom_file.exists():
                 self.warnings.append("[CICD WARNING] Feature 'cicd_and_artifacts' enabled but output/sbom.json missing.")
 
-        # 4. 可选机制：可观测性探针（当启用时）
-        if check_obs:
-            pass
-
-        # 5. 可选机制：数据韧性（当启用时）
-        if check_dr:
-            pass
+        # 可观测性与数据韧性需项目专属运行证据；此脚本不冒充已检查探针/恢复演练。
 
     def _check_deprecated_paths(self):
-        """检查文档与模板中是否存在废弃的旧路径（确保符合 v2.42 两级 7 大功能域规范）"""
-        target_dirs = [self.root / "references", self.root / "resources" / "templates"]
+        """检查文档、模板与实际文档树中的废弃路径。"""
+        doc_roots = {self.docs_root, self.root / "hs_dev_docs"}
+        target_dirs = [self.root / "references", self.root / "resources" / "templates", *sorted(doc_roots)]
+        legacy_names = ("_00_project", "_01_product_design", "_02_product_design", "_03_product_figma",
+                        "_04_db_schema", "_05_interface_design", "_06_method_design", "_06_mock_contract",
+                        "_07_call_chain", "_08_dev_process")
+        for docs_root in doc_roots:
+            for legacy in legacy_names:
+                if (docs_root / legacy).exists():
+                    self.errors.append(f"[DEPRECATED PATH ERROR] Legacy directory exists: {docs_root / legacy}")
         legacy_patterns = [
             (re.compile(r'hs_dev_docs/_00_project(?!_foundation)'), "hs_dev_docs/_00_project_foundation"),
             (re.compile(r'hs_dev_docs/_01_product_design'), "hs_dev_docs/_01_product_vision 或 _02_feature_spec"),
@@ -677,8 +704,10 @@ class ConsistencyVerifier:
 
 
 def main():
+    ensure_utf8_stdout()
     parser = argparse.ArgumentParser(description="Skill Quality Gate & Triple-File Consistency Verifier")
     parser.add_argument("--root", default=".", help="Target workspace root")
+    parser.add_argument("--demo", action="store_true", help="Explicitly check package plus demo_project documentation")
     parser.add_argument(
         "--strict",
         action="store_true",
@@ -686,7 +715,7 @@ def main():
     )
     args = parser.parse_args()
 
-    verifier = ConsistencyVerifier(args.root, strict=args.strict)
+    verifier = ConsistencyVerifier(args.root, strict=args.strict, demo=args.demo)
     success = verifier.check_all()
     sys.exit(0 if success else 1)
 

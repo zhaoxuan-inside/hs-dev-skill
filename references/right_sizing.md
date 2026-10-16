@@ -61,7 +61,7 @@
 | 选型/架构/四要素 | **跳过**新建；禁止为 S 新建 ADR/架构文/四要素全套 |
 | 装载 | `doc_index_db search|slice` 只取**被改文件相关**设计切片入 pack（可极短） |
 | 实现 | 直接改代码；UI 有 `DESIGN.md` 则跟它，手艺读 `frontend_craft.md`；视觉未定则先 `design_md.md`；不涉及 API 则不读 `api_engineering.md` |
-| 门禁 | 相关测试 + `verify_consistency`（若未动 docs/idx 可只跑测试）；有任务则归档 |
+| 门禁 | 相关测试与风险边界；未建任务且未动 docs/idx 可只跑测试。已建任务归档时仍需 `verify_consistency --strict` 与精简结构化验收记录，沿用真实开发者确认，不制造签收 |
 | 询问闸门 | 默认 `IMPLEMENT` 少问；触及产品语义未决 → 升 M/L 并切 `DESIGN` |
 
 ### M — 补丁路径

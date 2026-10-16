@@ -9,7 +9,7 @@
 
 ## [VIBE_CONTRACT] 架构决策契约 (Machine-Actionable Decision)
 <!-- 
-  【专供 VibeCoding / AI 编码切片读取（行 1～35）】
+  【专供 VibeCoding / AI 编码切片读取（顶部 [VIBE_CONTRACT] 至下一同级标题）】
   说明：本区块记录本 ADR 锁定的不可变决策、生效范围与硬编码禁令。
   AI 编码时只需装载本区块，绝不可使用下方已否决方案！
 -->
