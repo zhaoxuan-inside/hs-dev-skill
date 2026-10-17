@@ -57,6 +57,15 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
         except Exception:
             logging.debug("init_full_workspace: optional operation failed; retaining fallback", exc_info=True)
 
+    # 默认创建项目级 skill 执行配置 (Skill 执行轨迹默认关闭)
+    skill_cfg = root / "config" / "skill_execution.yaml"
+    if not skill_cfg.exists():
+        try:
+            from skill_trace import save_skill_execution_config, DEFAULT_SKILL_EXECUTION_CONFIG
+            save_skill_execution_config(root, DEFAULT_SKILL_EXECUTION_CONFIG)
+        except Exception:
+            logging.debug("init_full_workspace: optional operation failed; retaining fallback", exc_info=True)
+
     # 2. hs_dev_docs 目录层级（一级功能 + 二级子功能严格按 _01_ 序号组织，排除全流程不消费的空置死目录）
     doc_dirs = [
         # _00_project_foundation (基座)
@@ -98,6 +107,7 @@ def init_full_workspace(workspace_root: str, from_existing: bool = False):
         "_06_dev_process/_02_change_log",
         "_06_dev_process/_03_qa_log",
         "_06_dev_process/_04_error_recovery/snapshots",
+        "_06_dev_process/_05_skill_trace/sessions",
     ]
     for d in doc_dirs:
         (docs_root / d).mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,69 @@
+[*] Scanning fake code / placeholders at: E:\HardStone.iCodeing\GitHub\hs-dev-skill (dirs: scripts, tests)
+[FAIL] Fake code / placeholder scan found 33 issue(s):
+  [empty-catch] scripts/code_skeleton.py:497: except Exception as e:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:601: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:1077: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:1093: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:1161: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:1221: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:1293: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:1350: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:1535: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:1600: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:1686: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:1738: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:1753: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:1968: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:2021: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:2037: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/doc_index_db.py:2509: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/global_index_db.py:208: except sqlite3.Error:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/hs_paths.py:76: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/init_hs_dev_docs.py:56: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/init_hs_dev_docs.py:259: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/init_hs_dev_docs.py:266: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/init_hs_dev_docs.py:273: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [stub-not-implemented] scripts/nlp_embed_engine.py:142: raise NotImplementedError
+      -> NotImplemented 桩：补真实逻辑；真实 SPI/接口桩须行内 hs-allow: 理由
+  [stub-empty-body] scripts/nlp_embed_engine.py:141: def embed_text(self, text: str) -> List[float]:
+      -> 空桩函数体：补真实逻辑；真实 SPI/接口桩须行内 hs-allow: 理由
+  [empty-catch] scripts/nlp_embed_engine.py:223: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/rule_fetch.py:73: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/skill_ref_index.py:317: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] scripts/verify_consistency.py:349: except Exception:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [assert-true] tests/test_doc_index_db.py:406: "    assert True\n",
+      -> 空断言：写真实断言
+  [empty-catch] tests/test_doc_index_db.py:40: except PermissionError:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] tests/test_doc_reading_guide.py:32: except PermissionError:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  [empty-catch] tests/test_global_index_db.py:38: except PermissionError:
+      -> 空 catch 吞异常：处理、记日志或重抛
+  豁免纪律：行内 `hs-allow: <理由>` 仅限真实 SPI/接口桩；协议见 references/completion_audit.md

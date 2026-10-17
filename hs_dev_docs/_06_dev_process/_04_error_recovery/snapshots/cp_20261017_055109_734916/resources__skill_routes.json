@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "bundle_version": "4.0.1.0",
+  "skills": [
+    {
+      "id": "hs-dev-discovery",
+      "axis": "process",
+      "path": "skills/hs-dev-discovery/SKILL.md",
+      "scope": "需求理解与产品阶段编排",
+      "references": [
+        "references/opening_alignment.md",
+        "references/grill_orchestration.md",
+        "references/confidence_decision.md"
+      ]
+    },
+    {
+      "id": "hs-dev-design",
+      "axis": "process",
+      "path": "skills/hs-dev-design/SKILL.md",
+      "scope": "选型、架构与详细设计编排",
+      "references": []
+    },
+    {
+      "id": "hs-dev-planning",
+      "axis": "process",
+      "path": "skills/hs-dev-planning/SKILL.md",
+      "scope": "任务拆解与上下文装配",
+      "references": [
+        "references/task_state_machine.md"
+      ]
+    },
+    {
+      "id": "hs-dev-implementation",
+      "axis": "process",
+      "path": "skills/hs-dev-implementation/SKILL.md",
+      "scope": "按已验收契约实现切片",
+      "references": [
+        "references/coding_standards.md"
+      ]
+    },
+    {
+      "id": "hs-dev-acceptance",
+      "axis": "process",
+      "path": "skills/hs-dev-acceptance/SKILL.md",
+      "scope": "阶段验收与交付判定",
+      "references": [
+        "references/stage_acceptance.md",
+        "references/engineering_acceptance.md",
+        "references/standards_basis.md"
+      ]
+    },
+    {
+      "id": "hs-dev-debugging",
+      "axis": "process",
+      "path": "skills/hs-dev-debugging/SKILL.md",
+      "scope": "缺陷诊断与修复",
+      "references": [
+        "references/systematic_debugging.md"
+      ]
+    },
+    {
+      "id": "hs-dev-refactoring",
+      "axis": "process",
+      "path": "skills/hs-dev-refactoring/SKILL.md",
+      "scope": "行为保持的结构重构",
+      "references": [
+        "references/code_refactoring.md"
+      ]
+    },
+    {
+      "id": "hs-dev-reverse",
+      "axis": "process",
+      "path": "skills/hs-dev-reverse/SKILL.md",
+      "scope": "存量工程逆向纳管",
+      "references": [
+        "references/reverse_engineering.md"
+      ]
+    },
+    {
+      "id": "hs-dev-exploration",
+      "axis": "process",
+      "path": "skills/hs-dev-exploration/SKILL.md",
+      "scope": "只读理解与分析",
+      "references": [
+        "references/code_exploration.md"
+      ]
+    },
+    {
+      "id": "hs-dev-continuity",
+      "axis": "process",
+      "path": "skills/hs-dev-continuity/SKILL.md",
+      "scope": "续做、变更与回退",
+      "references": [
+        "references/process_continuity.md",
+        "references/requirement_change.md"
+      ]
+    },
+    {
+      "id": "hs-dev-product",
+      "axis": "functional",
+      "path": "skills/hs-dev-product/SKILL.md",
+      "scope": "产品功能、业务规则与原型",
+      "references": [
+        "references/product_design.md",
+        "references/product_prototype.md",
+        "references/product_roadmap.md",
+        "references/product_acceptance.md",
+        "references/project_types.md"
+      ]
+    },
+    {
+      "id": "hs-dev-architecture",
+      "axis": "functional",
+      "path": "skills/hs-dev-architecture/SKILL.md",
+      "scope": "技术选型、架构与模式",
+      "references": [
+        "references/dev_paradigm.md",
+        "references/deep_modules.md",
+        "references/ddd_design.md",
+        "references/design_patterns.md"
+      ]
+    },
+    {
+      "id": "hs-dev-frontend",
+      "axis": "functional",
+      "path": "skills/hs-dev-frontend/SKILL.md",
+      "scope": "界面、前端结构与交互实现",
+      "references": [
+        "references/frontend_arch.md",
+        "references/frontend_aesthetic.md",
+        "references/frontend_craft.md",
+        "references/design_md.md"
+      ]
+    },
+    {
+      "id": "hs-dev-backend",
+      "axis": "functional",
+      "path": "skills/hs-dev-backend/SKILL.md",
+      "scope": "后端、数据与接口契约",
+      "references": [
+        "references/backend_arch.md",
+        "references/api_engineering.md",
+        "references/method_archetypes.md",
+        "references/six_tuple_runtime.md",
+        "references/mock_contract_guide.md"
+      ]
+    },
+    {
+      "id": "hs-dev-testing",
+      "axis": "functional",
+      "path": "skills/hs-dev-testing/SKILL.md",
+      "scope": "测试策略、执行与质量证据",
+      "references": [
+        "references/testing.md",
+        "references/quality_gates.md",
+        "references/completion_audit.md"
+      ]
+    },
+    {
+      "id": "hs-dev-governance",
+      "axis": "functional",
+      "path": "skills/hs-dev-governance/SKILL.md",
+      "scope": "索引、版本、工程与运行治理",
+      "references": [
+        "references/auxiliary_governance.md",
+        "references/version_control.md",
+        "references/four_level_routing.md",
+        "references/doc_reading_guide.md",
+        "references/learn_and_prefer.md",
+        "references/rule_library.md"
+      ]
+    }
+  ],
+  "intents": {
+    "BUILD": "hs-dev-discovery",
+    "FIX": "hs-dev-debugging",
+    "REFACTOR": "hs-dev-refactoring",
+    "REVERSE": "hs-dev-reverse",
+    "EXPLORE": "hs-dev-exploration",
+    "RESUME": "hs-dev-continuity"
+  },
+  "phases": {
+    "0": "hs-dev-discovery",
+    "1": "hs-dev-design",
+    "2": "hs-dev-design",
+    "3": "hs-dev-design",
+    "4": "hs-dev-planning",
+    "5": "hs-dev-implementation",
+    "6": "hs-dev-acceptance"
+  },
+  "events": {
+    "change": "hs-dev-continuity",
+    "acceptance": "hs-dev-acceptance"
+  },
+  "domains": {
+    "product": "hs-dev-product",
+    "architecture": "hs-dev-architecture",
+    "frontend": "hs-dev-frontend",
+    "backend": "hs-dev-backend",
+    "testing": "hs-dev-testing",
+    "governance": "hs-dev-governance"
+  },
+  "default_domains": {
+    "0": [
+      "product"
+    ],
+    "1": [
+      "architecture"
+    ],
+    "2": [
+      "architecture"
+    ],
+    "3": [
+      "backend"
+    ],
+    "4": [],
+    "5": [],
+    "6": [
+      "testing"
+    ]
+  },
+  "shared_references": [
+    "references/_index.md",
+    "references/right_sizing.md",
+    "references/load_latch.md",
+    "references/token_budget.md",
+    "references/spec_driven_lifecycle.md",
+    "references/intent_routing_and_gates.md",
+    "references/spec_v2_4.md",
+    "references/cross_platform.md",
+    "references/subskill_contract.md",
+    "references/entry_workflows.md"
+  ]
+}

@@ -64,6 +64,10 @@
 
 目标是让后续改动有依据、任务中断后能恢复、交付结果能核对。文档量随任务规模和影响面调整。
 
+### 可选开启的执行轨迹（trace）
+
+工程开启 trace 后，Skill 会按会话把意图分级、装载、路由、阶段流转、任务关联、拍板、纠偏与错误重试记录为 JSONL 事件，便于复盘执行过程并改进工作流；开关与记录都按项目隔离，默认关闭。详见 [skill_trace 详规](https://github.com/zhaoxuan-inside/hs-dev-skill/blob/main/references/skill_trace.md)。
+
 ## 安装
 
 通过 skills CLI 安装到当前项目：
@@ -94,7 +98,7 @@ git clone https://github.com/zhaoxuan-inside/hs-dev-skill.git
 python scripts/skill_router.py check
 ```
 
-Linux/macOS 可使用 `python3`，Windows 可使用 `py -3`。命令应能找到全部 16 个子 Skill 和 51 份已登记详规。
+Linux/macOS 可使用 `python3`，Windows 可使用 `py -3`。命令应能找到全部 16 个子 Skill 和 52 份已登记详规。
 
 ## 可以这样开始
 

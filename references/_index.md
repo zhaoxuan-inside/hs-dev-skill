@@ -63,3 +63,4 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | 学习笔记 / 偏好 / GitHub 对标 | `learn_and_prefer.md` |
 | Win/Linux/macOS 路径与解释器 | `cross_platform.md` |
 | **各入口执行流程 / 计划-执行-证据-验收-交接** | `entry_workflows.md` |
+| **Skill 执行轨迹（trace）：开关隔离 / 事件自报 / 时序依赖 / 查询复盘** | `skill_trace.md` |

@@ -21,6 +21,8 @@ flowchart LR
 
 计划文档应包含目标、范围/非目标、基线版本、要做的步骤、对应指导文档、验收项、证据位置、阻断项和下一步。工作文档记录实际改动/发现、证据、偏差、未完成项、验收状态与交接。沿用项目已有 `plan_log`、`change_log`、任务、Pack 和验收记录，不为形式重复造文档；没有可复用载体时，由当前入口建立最小记录。
 
+**执行轨迹（按项目开关）**：工程开启 trace 时，沿上述闭环按 [skill_trace](skill_trace.md) §7 自报事件（会话开始/结束、分级、装载、路由、阶段流转、任务关联、关键动作、拍板、纠偏、错误重试、耗时），关闭时静默、不落盘。只读入口（EXPLORE）同样遵循项目开关——trace 日志属本地可观测副作用，不视为任务/产物状态变更；未开启时不记录。
+
 **结束条件**：适用验收项逐项有结论和证据；未通过项清零或按范围明确延期并获确认；需要开发者签收的决策已有当前版本确认；工作文档和交接状态已更新。Agent 的“完成”判断、目录齐全或命令成功不能代替这些条件。
 
 ## 纵向过程入口
@@ -37,7 +39,7 @@ flowchart LR
 | FIX / debugging | 复述现象与预期 → 计划复现及可证伪假设 → 获取失败证据 → 触达专业 Skill 最小修复 → testing 回归 → 记录根因和证据 | 缺陷计划、复现步骤、根因记录、修复报告 | `systematic_debugging.md` + 相关 IMPL/DELIV 项 | 通过后交当前过程或 acceptance |
 | REFACTOR / refactoring | 界定保持行为与结构目标 → 计划保护网和迁移步骤 → architecture/领域 Skill 逐步调整 → testing 验证等价 → 记录结构差异 | 重构计划、行为基线、等价证据、结果报告 | `code_refactoring.md` + 适用测试/IMPL 项 | 通过后归档或交付验收 |
 | REVERSE / reverse | 确定纳管范围 → 计划证据采集 → 读取代码/运行事实 → 专业 Skill 提取契约 → 区分事实/推导/未知 → 开发者核对 | 逆向计划、现状契约、词典/索引、差异清单 | `reverse_engineering.md` + 纳管验收项 | 完成纳管后由主路由决定后续 intent |
-| EXPLORE / exploration | 锁定只读问题 → 计划需查证的问题/路径 → 搜索代码和文档 → 调专业 Skill 解释 → 输出证据与未知 | 只读调查提纲、结论与证据 | `code_exploration.md`；不得触发写操作 | 直接答复，不创建任务或提交 |
+| EXPLORE / exploration | 锁定只读问题 → 计划需查证的问题/路径 → 搜索代码和文档 → 调专业 Skill 解释 → 输出证据与未知 | 只读调查提纲、结论与证据 | `code_exploration.md`；不得触发写操作（trace 日志按 [skill_trace](skill_trace.md) 项目开关处理） | 直接答复，不创建任务或提交 |
 | RESUME / continuity | 扫描日志与当前树 → 恢复目标/确认/阶段/断点 → 计划最小恢复动作 → 继续原过程 → 核查基线有效性 → 更新交接 | 恢复摘要、续做计划、有效/失效基线 | `process_continuity.md` + 当前阶段验收记录 | 恢复后路由到实际阶段，不默认重开 BUILD |
 | 需求变更 / continuity | 记录新表达 → 比较旧基线 → 计划影响分析 → 评估需求/设计/任务/代码/测试影响 → 请求必要裁决 → 更新源基线并使派生项失效 | 变更请求、影响矩阵、更新计划 | `requirement_change.md` + 受影响阶段验收 | 按影响回到 discovery/design/planning/implementation |
 | 任意阶段验收 / acceptance | 确认阶段和版本 → 计划验收项 → 收集证据 → 按 checklist 判适用/通过/失败/待确认 → 汇总签收候选 | 阶段验收记录、差异清单 | `stage_acceptance.md` 对应阶段清单 | 通过回主路由；否则返修原负责人 |

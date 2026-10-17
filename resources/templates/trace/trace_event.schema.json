@@ -1,0 +1,237 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "hs-dev-skill/resources/templates/trace/trace_event.schema.json",
+  "title": "hs-dev-skill Skill 执行轨迹事件",
+  "description": "按 references/skill_trace.md §2/§3 定义的单条 trace 事件（JSONL 一行）校验模板",
+  "type": "object",
+  "required": ["v", "event_id", "session_id", "ts", "event", "data"],
+  "properties": {
+    "v": {
+      "const": 1,
+      "description": "Schema 版本"
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^e_[0-9]{6}$",
+      "description": "会话内单调序号，由记录器生成"
+    },
+    "session_id": {
+      "type": "string",
+      "pattern": "^s_[0-9]{8}_[0-9]{6}_[0-9a-f]{4}$",
+      "description": "会话 ID，由 start 生成"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+      "description": "UTC ISO-8601 秒精度时间戳，由记录器生成"
+    },
+    "event": {
+      "type": "string",
+      "enum": [
+        "session_start",
+        "session_end",
+        "intent_sizing",
+        "skill_load",
+        "route_decision",
+        "phase_transition",
+        "task_link",
+        "key_action",
+        "decision",
+        "deviation",
+        "error_retry",
+        "timing"
+      ]
+    },
+    "ref": {
+      "type": "string",
+      "description": "关联引用；task_link/decision/deviation 必填"
+    },
+    "truncated": {
+      "type": "boolean",
+      "description": "载荷因超出体积上限被截断"
+    },
+    "data": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"event": {"const": "session_start"}}, "required": ["event"]},
+      "then": {
+        "properties": {
+          "data": {
+            "required": ["host", "cwd"],
+            "properties": {
+              "host": {"type": "string"},
+              "cwd": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"event": {"const": "session_end"}}, "required": ["event"]},
+      "then": {
+        "properties": {
+          "data": {
+            "required": ["reason"],
+            "properties": {
+              "reason": {"enum": ["completed", "aborted", "handoff", "unknown"]}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"event": {"const": "intent_sizing"}}, "required": ["event"]},
+      "then": {
+        "properties": {
+          "data": {
+            "required": ["intent", "change_size", "work_mode", "confirmed", "source"],
+            "properties": {
+              "intent": {"type": "string"},
+              "change_size": {"enum": ["S", "M", "L"]},
+              "work_mode": {"enum": ["DESIGN", "IMPLEMENT", "READONLY"]},
+              "confirmed": {"type": "boolean"},
+              "source": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"event": {"const": "skill_load"}}, "required": ["event"]},
+      "then": {
+        "properties": {
+          "data": {
+            "required": ["skill_id"],
+            "properties": {
+              "skill_id": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"event": {"const": "route_decision"}}, "required": ["event"]},
+      "then": {
+        "properties": {
+          "data": {
+            "required": ["intent", "phase", "process_skill", "functional_skills"],
+            "properties": {
+              "intent": {"type": "string"},
+              "phase": {"type": ["string", "integer"]},
+              "process_skill": {"type": "string"},
+              "functional_skills": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"event": {"const": "phase_transition"}}, "required": ["event"]},
+      "then": {
+        "properties": {
+          "data": {
+            "required": ["from", "to", "status"],
+            "properties": {
+              "from": {"type": ["string", "integer"]},
+              "to": {"type": ["string", "integer"]},
+              "status": {"enum": ["entered", "waiting_acceptance", "accepted", "blocked", "skipped"]}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"event": {"const": "task_link"}}, "required": ["event"]},
+      "then": {
+        "required": ["ref"],
+        "properties": {
+          "data": {
+            "required": ["task_id"],
+            "properties": {
+              "task_id": {"type": "string"},
+              "plan_path": {"type": "string"},
+              "checkpoint_id": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"event": {"const": "key_action"}}, "required": ["event"]},
+      "then": {
+        "properties": {
+          "data": {
+            "required": ["kind", "summary", "result"],
+            "properties": {
+              "kind": {"enum": ["command", "test", "file", "output", "other"]},
+              "summary": {"type": "string"},
+              "result": {"enum": ["ok", "fail", "partial", "unknown"]}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"event": {"const": "decision"}}, "required": ["event"]},
+      "then": {
+        "required": ["ref"],
+        "properties": {
+          "data": {
+            "required": ["question", "adopted"],
+            "properties": {
+              "question": {"type": "string"},
+              "adopted": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"event": {"const": "deviation"}}, "required": ["event"]},
+      "then": {
+        "required": ["ref"],
+        "properties": {
+          "data": {
+            "required": ["what_happened", "correction"],
+            "properties": {
+              "what_happened": {"type": "string"},
+              "correction": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"event": {"const": "error_retry"}}, "required": ["event"]},
+      "then": {
+        "properties": {
+          "data": {
+            "required": ["error", "action", "attempt"],
+            "properties": {
+              "error": {"type": "string"},
+              "action": {"enum": ["retry", "fallback", "abort", "ignored"]},
+              "attempt": {"type": "integer", "minimum": 1}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"event": {"const": "timing"}}, "required": ["event"]},
+      "then": {
+        "properties": {
+          "data": {
+            "required": ["scope", "duration_ms"],
+            "properties": {
+              "scope": {"type": "string"},
+              "duration_ms": {"type": "integer", "minimum": 0}
+            }
+          }
+        }
+      }
+    }
+  ]
+}

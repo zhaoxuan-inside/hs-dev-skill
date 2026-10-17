@@ -73,8 +73,9 @@ BUILD 的 L 路径为 `0→1→2→3→4→5→6`；M 仅补触达面，S 只做
 - **范围与确认**：保留开发者目标、范围和已确认决定。Agent 推导与真实确认分开；新增业务的 DB 设计、计费/权限/归属及关键契约按既有决策规则处理。
 - **验收驱动流转**：每个实际阶段按 [阶段验收协议](references/stage_acceptance.md) 的标准、证据和有效确认流转；模型自检只是候选结论。源语义变化使相关验收和派生 Pack 失效。
 - **测试与完成**：实现必有适用验证，测试全绿、静态检查零告警、严格一致性检查及需求/DoD 回收按 [testing](references/testing.md) 和 [quality_gates](references/quality_gates.md) 执行；不得假代码、伪造证据或静默砍功能。
-- **只读边界**：EXPLORE 不建任务/PRD、不改状态、不初始化、不提交；此约束传递到所有功能 Skill。
+- **只读边界**：EXPLORE 不建任务/PRD、不改状态、不初始化、不提交（trace 日志按 [skill_trace](references/skill_trace.md) 项目开关处理）；此约束传递到所有功能 Skill。
 - **持续与恢复**：有独立可推进工作就继续；阶段待验收、必要决策或外部条件阻断时记录交接。续做沿用 plan/change，不重开需求。
+- **执行轨迹（按项目开关）**：工程开启 trace 时，会话开始/结束、分级、装载、路由、阶段流转、任务关联、拍板、纠偏与错误重试按 [skill_trace](references/skill_trace.md) 自报事件；缺省关闭时静默、不落盘、不阻断。
 - **共享单源**：详规、模板、脚本维持既有路径；功能性细则只在对应子 Skill 按需加载。[规范来源](references/standards_basis.md)区分公开阅读、标准范围及项目自定规则。
 - **操作边界**：代码/设计修改前按既有 checkpoint 约定保留回退依据；默认本地 Commit，只有明确授权才 push/发布。不因选中治理 Skill 自动开启重型设施。
 

@@ -229,6 +229,7 @@
     "references/spec_v2_4.md",
     "references/cross_platform.md",
     "references/subskill_contract.md",
-    "references/entry_workflows.md"
+    "references/entry_workflows.md",
+    "references/skill_trace.md"
   ]
 }
