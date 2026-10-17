@@ -38,7 +38,9 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           mkdir release
-          git archive --format=zip --prefix=hs-dev-skill/ --output="release/hs-dev-skill-${RELEASE_TAG}.zip" HEAD
+          git archive --format=zip --prefix=hs-dev-skill/ --output="release/hs-dev-skill-${RELEASE_TAG}.zip" HEAD -- \
+            SKILL.md README.md LICENSE Makefile .gitignore .gitattributes \
+            skills scripts references resources examples tests
           cd release
           sha256sum ./*.zip > SHA256SUMS
 
