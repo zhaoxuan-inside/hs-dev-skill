@@ -2,7 +2,7 @@
 
 > 让开发过程看得见、留得住，让模型依据已确认的文档推进，而不是随意猜测。
 
-[![Spec Version](https://img.shields.io/badge/skill-v4.0.1.0-blue.svg)](https://github.com/zhaoxuan-inside/hs-dev-skill/blob/main/SKILL.md)
+[![Spec Version](https://img.shields.io/badge/skill-v4.2.0.0-blue.svg)](https://github.com/zhaoxuan-inside/hs-dev-skill/blob/main/SKILL.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/zhaoxuan-inside/hs-dev-skill/blob/main/LICENSE)
 
 **[GitHub 源码](https://github.com/zhaoxuan-inside/hs-dev-skill) · [skills.sh 安装入口](https://skills.sh/zhaoxuan-inside/hs-dev-skill/hs-dev-skill) · [完整下载](https://github.com/zhaoxuan-inside/hs-dev-skill/releases)**
@@ -98,11 +98,42 @@ git clone https://github.com/zhaoxuan-inside/hs-dev-skill.git
 python scripts/skill_router.py check
 ```
 
-Linux/macOS 可使用 `python3`，Windows 可使用 `py -3`。命令应能找到全部 16 个子 Skill 和 52 份已登记详规。
+Linux/macOS 可使用 `python3`，Windows 可使用 `py -3`。命令应能找到全部 16 个子 Skill 和 95 份已登记详规。
+
+## 更新
+
+每个会话首次加载 Skill 时检测最新正式 Release，发现新版提示用户；检测不自动安装，离线不阻断开发。
+
+```bash
+# 检测（不修改文件）
+python /path/to/installed/hs-dev-skill/scripts/skill_update.py check
+# 在线更新完整安装包（用户要求更新后执行）
+python /path/to/installed/hs-dev-skill/scripts/skill_update.py install
+# 使用本地完整包更新；适用于离线或尚未发布的开发版
+python scripts/skill_update.py install --source . --target /path/to/installed/hs-dev-skill
+```
+
+在线更新校验官方 ZIP、SHA256SUMS 和完整包结构，失败恢复原安装；同版本修复加 `--reinstall`。源码 Git 工作副本由 `git pull --ff-only` 更新，更新器保护源码与符号链接。详细状态、边界与用法见 [更新协议](references/skill_update.md)。
+
+## 开发闭环工具
+
+基线门禁使用 `scripts/baseline_gate.py` 登记需求全集、任务归属、源 SHA-256 和派生依赖；完成归档拒绝缺项、失效来源与无效证据。旧验收记录在再次完成流转前需显式补登记，不自动补签。
+
+`scripts/execution_observer.py` 执行验证并保留实际退出码/报告摘要，`scripts/workflow_report.py` 输出 JSON/Markdown 复盘。`scripts/skill_evolution.py` 按真实成对案例建议优化强度：致命问题立即修复，习惯性问题积累案例后渐进更新，其他问题仅提示，不自动改写规则。接口与边界见 [闭环详规](references/workflow_improvement.md)。
 
 ## 可以这样开始
 
 安装并加载主 Skill 后，可以用自然语言描述任务，也可以显式指定 `hs-dev-skill`。
+
+如果 Agent 偶尔绕过流程，先按[项目入口约定与触发验证](references/subskill_contract.md#7-项目入口约定与触发验证)将约定合并到目标项目实际生效的指令文件，并在新会话检查真实读取行为。仅在 Skill 正文中写“必须调用”无法保证首次触发；安装不会自动改写项目或全局指令。
+
+每个实际阶段提交验收时，回复必须完整列出待验收文档名、绝对路径、版本/摘要、审阅范围与状态，含验收记录。用 `python <安装根>/scripts/stage_review.py --root <工程根> --stage <阶段> --document <文档路径>`（重复 `--document`）可只读检查文件并生成路径/摘要表；文档集合是否齐全仍按[阶段验收协议](references/stage_acceptance.md#21-阶段完成时的完整文档清单)核对。
+
+文档采用[变化感知装载](references/load_latch.md#5-变化感知与装载缓存统一重读规则)：同内容同范围默认只加载一次，再次依赖时先查元数据，已知变更和阶段/恢复/实现验收边界核对摘要；未变则复用，变化才重读必要片段。`scripts/read_cache.py` 用独立会话状态支持 `load`/`check`，检测不会向模型重复输出正文；上下文丢失时只恢复必要片段，不轮询或扫描全包。
+
+大规则已按业务/阶段拆分为独立分册：生命周期、产品设计、项目类型、方法契约、原型、编码、治理、索引和规格。旧路径保留公共约束和导航，检索可直接命中分册；当前主题明确时只加载对应文件，分册独立检查变化。两组大模板通过本地 include 片段组装，生成器会完整渲染；不得把 include 索引当作已展开的成品。分组清单见 `resources/reference_sections.json`。
+
+需要完整原型模板时，用 `python <安装根>/scripts/template_parts.py --path <安装根>/resources/templates/product_design/prototype_template.md --output <新的目标文件>` 在工具侧组装，已有文件不会覆盖。阅读说明仍由原 `generate-guide` 入口生成，内容保持兼容。
 
 **从新需求开始：**
 

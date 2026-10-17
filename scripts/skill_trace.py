@@ -57,9 +57,11 @@ EVENT_REQUIRED_FIELDS: Dict[str, Tuple[str, ...]] = {
     "deviation": ("what_happened", "correction"),
     "error_retry": ("error", "action", "attempt"),
     "timing": ("scope", "duration_ms"),
+    "tool_result": ("producer", "action", "result", "facts", "source"),
 }
 
 EVENT_ENUM_FIELDS: Dict[str, Dict[str, Tuple[str, ...]]] = {
+    "tool_result": {"result": ("ok", "fail"), "source": ("tool",)},
     SESSION_END: {"reason": ("completed", "aborted", "handoff", "unknown")},
     "intent_sizing": {
         "change_size": ("S", "M", "L"),
@@ -215,6 +217,12 @@ def _validate_event_payload(event: str, data: Dict[str, Any], ref: Optional[str]
         errors.append("invalid_attempt")
     if event == "timing" and isinstance(data.get("duration_ms"), int) and data["duration_ms"] < 0:
         errors.append("invalid_duration_ms")
+    if event == "tool_result":
+        if not isinstance(data.get("facts"), dict):
+            errors.append("tool_facts_not_object")
+        for field in ("producer", "action"):
+            if not isinstance(data.get(field), str) or not data[field].strip():
+                errors.append("invalid_tool_field:" + field)
     return errors
 
 

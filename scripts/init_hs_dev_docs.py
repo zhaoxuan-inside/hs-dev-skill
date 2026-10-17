@@ -13,6 +13,7 @@ import argparse
 from datetime import datetime, timezone
 from pathlib import Path
 from idx_manager import IdxManager
+from template_parts import render_template
 
 
 def init_full_workspace(workspace_root: str, from_existing: bool = False):
@@ -292,7 +293,7 @@ def generate_doc_reading_guide(workspace_root: str, project_name: str = None, ve
     # 优先加载模板
     tmpl_file = Path(__file__).resolve().parent.parent / "resources" / "templates" / "hs_dev_docs" / "doc_reading_guide_template.md"
     if tmpl_file.exists():
-        base_content = tmpl_file.read_text(encoding="utf-8")
+        base_content = render_template(tmpl_file)
         base_content = base_content.replace("{PROJECT_NAME}", project_name).replace("{GENERATION_TIME}", gen_time)
     else:
         base_content = f"""# 项目文档阅读说明与全局索引导航 (Project Documentation Reading Guide & Index)

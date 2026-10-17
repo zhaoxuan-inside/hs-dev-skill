@@ -2,7 +2,7 @@
 
 先由主 Skill 选择过程/功能子 Skill；本表只用于命中详规，不替代子 Skill 路由。
 
-用本表按需打开**一份**文件；已读过的本会话不重复读。争议百科才查 `spec_v2_4.md` 对应节。
+用本表按需打开**一份业务分册**；旧主题入口保留公共约束和兼容导航，不按目录逐册阅读。已读内容按 `load_latch.md` 的变化感知协议复用。争议百科才查 `spec_v2_4.md` 的相应分册。
 
 不确定场景时先检索（勿通读目录）：
 
@@ -14,8 +14,22 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 
 | 场景 | 打开 |
 |------|------|
+| 当前阶段 0 产品流程 / 产品提交冻结 | `lifecycle/product_workflow.md` / `lifecycle/product_delivery.md` |
+| 当前阶段 1 选型 | `lifecycle/tech_selection.md` |
+| 当前阶段 2 架构 | `lifecycle/architecture.md` |
+| 当前阶段 3 详细设计 | `lifecycle/detailed_design.md` |
+| 当前阶段 4 任务与 Pack | `lifecycle/task_planning.md` |
+| 当前阶段 5 实现 | `lifecycle/implementation.md` |
+| 当前阶段 6 交付 | `lifecycle/delivery.md` |
+| 特性规格 / 产品冻结评审 | `product/feature_specification.md` / `product/review_freeze.md` |
+| P4 移动客户端 | `project_types/mobile.md` |
+| 方法查重与复用 | `methods/discovery_reuse.md` |
+| Python 方法实现范式 | `coding/python.md` |
+| 原型可视化签收 | `prototype/visual_acceptance.md` |
 | **子 Skill / 双轴分割 / 运行包 / 交接 / 独立调用** | `subskill_contract.md` |
 | **阶段验收 / checklist / 通过证据 / 验收权限与失效** | `stage_acceptance.md` |
+| **基线摘要 / 需求分母 / 派生失效 / 自动观测 / 复盘 / 致命修复 / 习惯渐进 / 规则评测** | `workflow_improvement.md` |
+| **Skill 更新 / 新版本检测 / 升级提示 / 离线更新 / 整包更新 / SHA256SUMS** | `skill_update.md` |
 | **需求理解 / 预期对账 / 产品设计验收 DISC / PROD** | `product_acceptance.md` |
 | **选型到交付验收 / TECH ARCH DETAIL TASK IMPL DELIV / Java P3C** | `engineering_acceptance.md` |
 | **验收规范来源 / NASA / GOV.UK / arc42 / ISO 阅读范围** | `standards_basis.md` |
@@ -37,7 +51,7 @@ python scripts/skill_ref_index.py search --scenario UI --limit 5
 | 提交前门禁 / 九级测试分层 | `quality_gates.md` |
 | **多语言开发规范 / Linter 门禁矩阵 / 跨语言六元组** | `coding_standards.md` |
 | **深模块 / seam / Adapter / 删除测试** | `deep_modules.md` |
-| 满配阶段细则 0～6 | `spec_driven_lifecycle.md`（可只读当前阶段节） |
+| 满配阶段导航 / 公共约束 | `spec_driven_lifecycle.md`（正文按上表直达当前阶段分册） |
 | **UI 默认审美（本地 Anthropic 蒸馏）** | `frontend_aesthetic.md` |
 | UI 视觉方向 / DESIGN.md / 品牌对标 | `design_md.md` |
 | UI 手艺高频（anti-slop / 动效 / a11y） | `frontend_craft.md` |

@@ -22,6 +22,7 @@ license: MIT
 2. 按范围更新文档索引/罗盘和版本/产物说明；不因安装本 Skill 改写其他 Agent 配置。
 3. 按 governance 开关应用机密、依赖和安全规则；CI/CD、遥测、数据韧性等默认不强加。
 4. 远程规则仅在本地不足时按需读取，标注版本与证据；提交治理检查结果给当前过程。
+5. 流程复盘与规则更新按 [分级优化闭环](../../references/workflow_improvement.md)：致命问题立即修复并验证，习惯性问题积累独立案例后小步更新，其他问题提示；评测只产生建议，不自动改写规则。
 
 ## 输出与验收
 
@@ -37,3 +38,4 @@ license: MIT
 - [doc_reading_guide](../../references/doc_reading_guide.md)
 - [learn_and_prefer](../../references/learn_and_prefer.md)
 - [rule_library](../../references/rule_library.md)
+- [skill_update](../../references/skill_update.md)：版本检查、更新提示与整包替换；检测不等于更新授权。

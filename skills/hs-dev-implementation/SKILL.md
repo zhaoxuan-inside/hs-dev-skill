@@ -19,6 +19,7 @@ license: MIT
 ## 执行
 
 1. 核对 Pack 来源版本与任务 DoD；发现业务空白交 continuity，不以实现方便改变预期。
+   编码前运行 `baseline_gate.py --root <工程根> check --artifact <当前PackID>`；按 [基线协议](../../references/workflow_improvement.md#2-需求基线与派生物) 拒绝缺失或失效 Pack；S 可登记既有任务内联契约，不造空文档。
 2. 改动前按既有 process_log checkpoint 保存可回退记录；通用方法先做意图查重。
 3. 由触达的 frontend/backend 执行专业实现；testing 提供适用红绿和集成验证，单次围绕一个行为。
 4. 同步代码、契约、迁移及测试；按风险演练真实业务切片，关闭差异后再扩展同类功能。

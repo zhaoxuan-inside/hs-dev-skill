@@ -8,7 +8,7 @@
 
 ## 0. 边界与开关
 
-- **自报式**：Agent 按本规范在关键节点调用 `scripts/skill_trace.py` 记录语义事件；框架不自动捕获工具调用级明细（宿主 Hook 适配器为后续迭代扩展点）。
+- **语义自报与工具事实**：Agent 按本规范记录语义事件；`execution_observer` 对已接入的任务、门禁、checkpoint 和验证执行自动记录 `tool_result`。未接入工具和宿主 Hook 不宣称已覆盖，详见 [闭环规范](workflow_improvement.md#3-自动事实与复盘)。
 - **项目隔离**：开关只读目标工程的 `config/skill_execution.yaml`；轨迹只写目标工程的 `hs_dev_docs/_06_dev_process/_05_skill_trace/sessions/`；不读、不写其他工程与全局目录（`~/.hs-dev-skill/`）。
 - **缺省关闭**：无配置文件即视为关闭；关闭时所有记录命令 no-op（R4）。
 - **只读入口**：EXPLORE/READONLY 期间工程已开启 trace 时仍照常记录——trace 属本地可观测副作用，不视为任务/产物状态变更；未开启则不落盘。
@@ -47,7 +47,7 @@ features:
 - `ts` 与 `event_id` 由记录器生成、调用方不可伪造 → 保证 R1 有序与可校验。
 - 未知附加字段忽略（前向兼容）；未知事件类型拒绝（exit 2）。
 
-## 3. 事件类型与载荷（11 类）
+## 3. 事件类型与载荷（原有 11 类 + 工具事实）
 
 | # | 类 | `event` | `data` 必填字段 | 取值约束 |
 |---|---|---|---|---|
@@ -63,6 +63,7 @@ features:
 | 9 | 纠偏 | `deviation` | `what_happened`、`correction` | `ref` 必填（触发事件 `event_id` 或文档路径） |
 | 10 | 错误 | `error_retry` | `error`、`action`、`attempt` | `action`∈{retry,fallback,abort,ignored}；`attempt`≥1 |
 | 11 | 耗时 | `timing` | `scope`、`duration_ms` | `duration_ms`≥0（scope 如 phase:3 / step:S3） |
+| 12 | 工具事实 | `tool_result` | `producer`、`action`、`result`、`facts`、`source` | `source=tool`；`result=ok/fail`；工具每次调用独立短会话 |
 
 > 记录克制原则：只记可观察事实与结构化摘要；不复制 process_log/qa_log 的正文（用 `ref` 引用）。
 
@@ -145,5 +146,5 @@ python3 scripts/skill_trace.py validate --session s_x
 ## 8. 扩展点与兼容
 
 - Hook 适配器（工具调用级自动采集）：后续迭代扩展点，须保持 §2 信封兼容；框架本体不依赖宿主事件。
-- 索引/门禁联动、聚合统计、可视化 UI、token 用量采集：MoSCoW 池，本期不实现。
-- Schema 演进：新增事件类型或必填字段必须提升 `v` 或保持旧字段兼容；查询与校验以 `v` 分派。
+- 工具联动与基础复盘已实现，接口见 [workflow_improvement](workflow_improvement.md)；可视化 UI、token 用量与完整返工率仍为扩展项。
+- Schema 演进：本版新增 `tool_result` 不改旧字段与信封 `v=1`；旧版本校验器不认识该事件，读取新增轨迹需使用 v4.1+ 校验器。其他变化应提升版本或保持兼容。

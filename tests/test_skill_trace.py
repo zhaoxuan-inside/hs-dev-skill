@@ -311,9 +311,10 @@ class TestSkillTrace(unittest.TestCase):
         payload = json.loads(check.stdout)
         self.assertTrue(payload["ok"])
         self.assertEqual(payload["skills"], 16)
-        self.assertEqual(payload["references"], 52)
+        expected_references = len(list((REPO_ROOT / "references").rglob("*.md")))
+        self.assertEqual(payload["references"], expected_references)
         readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
-        self.assertIn("52 份已登记详规", readme)
+        self.assertIn(f"{expected_references} 份已登记详规", readme)
 
     # T11 失败降级路径
     def test_t11_degrade_on_write_failure(self):

@@ -2,7 +2,7 @@
 """
 Skill references 场景索引（Windows / Linux / macOS）。
 
-权威源：skill 包内 references/*.md 与 skills/*/SKILL.md
+权威源：skill 包内 references/**/*.md 与 skills/*/SKILL.md
 SQLite 缓存：<skill_root>/.hs_cache/skill_ref.sqlite（可重建，勿手改）
 
 用途：不确定读哪份详规时先 search，禁止通读 references/。
@@ -30,6 +30,8 @@ DB_FILE_NAME = "skill_ref.sqlite"
 
 # 文件名 → 场景关键词（补充 _index 与文首「何时读」）
 FILE_SCENARIOS: Dict[str, List[str]] = {
+    "skill_update.md": ["更新", "升级", "版本检测", "新版本", "提示更新", "离线安装", "完整包", "checksum", "SHA256SUMS"],
+    "workflow_improvement.md": ["基线", "需求分母", "源摘要", "派生失效", "自动追踪", "复盘", "致命", "习惯", "渐进", "评测", "优化"],
     "_index.md": ["index", "路由", "目录", "入口"],
     "load_latch.md": ["门闩", "装载", "反合理化", "latch", "跳过", "强制"],
     "right_sizing.md": ["分级", "S", "M", "L", "快路径", "小改动", "right-sizing", "change_size"],
@@ -339,7 +341,7 @@ class SkillRefIndex:
             index_scenarios = _parse_index_scenarios(_read_text(index_path))
 
         inserted = 0
-        sources = sorted(self.ref_dir.glob("*.md"))
+        sources = sorted(self.ref_dir.rglob("*.md"))
         sources.extend(sorted((self.skill_root / "skills").glob("*/SKILL.md")))
         for path in sources:
             text = _read_text(path)
@@ -347,7 +349,8 @@ class SkillRefIndex:
             title = title_m.group(1).strip() if title_m else path.stem
             when = _when_to_read(text)
             tags = list(FILE_SCENARIOS.get(path.name, []))
-            tags.extend(index_scenarios.get(path.name, []))
+            tags.extend(index_scenarios.get(path.relative_to(self.ref_dir).as_posix(), [])
+                        if self.ref_dir in path.parents else [])
             if path.name == "SKILL.md":
                 tags.extend([path.parent.name, "子Skill", "subskill"])
                 description = re.search(r"(?m)^description:\s*(.+)$", text)
@@ -463,7 +466,9 @@ class SkillRefIndex:
                 sql += " AND (title LIKE ? OR summary LIKE ? OR tags LIKE ? OR when_to_read LIKE ? OR body LIKE ?)"
                 like_t = f"%{t}%"
                 params.extend([like_t, like_t, like_t, like_t, like_t])
-            sql += " ORDER BY path LIMIT ?"
+            # Prefer a matching business title/tag over incidental body mentions.
+            sql += " ORDER BY CASE WHEN title LIKE ? THEN 0 WHEN tags LIKE ? THEN 1 ELSE 2 END, path LIMIT ?"
+            params.extend([like, like])
             params.append(limit)
             rows = conn.execute(sql, params).fetchall()
             hits = [dict(r) for r in rows]

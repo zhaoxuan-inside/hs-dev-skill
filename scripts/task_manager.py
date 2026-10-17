@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Optional
 
 from idx_manager import IdxManager
+from execution_observer import emit
 
 VALID_STATUSES = ["DRAFT", "READY", "IN_PROGRESS", "BLOCKED", "VERIFYING", "COMPLETED", "ABORTED"]
 VALID_CHANGE_SIZES = ("S", "M", "L")
@@ -229,6 +230,8 @@ class TaskManager:
             print(f"[WARN] plan_log ensure failed: {e}")
 
         print(f"[SUCCESS] Created task '{task_id}' (Status: {status}, change_size: {change_size})")
+        emit(self.root, "task_manager", "task_created", task_id=task_id,
+             facts={"status": status, "change_size": change_size})
         return {
             "task_id": task_id,
             "status": status,
@@ -341,13 +344,21 @@ class TaskManager:
             if old_status != "VERIFYING":
                 raise ValueError("COMPLETED requires the task to be in VERIFYING")
             detail_path = self.task_root / target_entry["path"]
-            self._validate_completion_gate(task_id, detail_path, acceptance_record)
+            try:
+                self._validate_completion_gate(task_id, detail_path, acceptance_record)
+            except (ValueError, OSError) as exc:
+                emit(self.root, "task_manager", "completion_gate", "fail", task_id,
+                     {"error_type": type(exc).__name__})
+                raise
+            emit(self.root, "task_manager", "completion_gate", task_id=task_id)
         elif acceptance_record:
             raise ValueError("--acceptance-record is only valid with --set COMPLETED")
 
         now = get_iso_timestamp()
         target_entry["status"] = new_status
         target_entry["updated_at"] = now
+        if new_status == "COMPLETED":
+            target_entry["acceptance_record"] = acceptance_record
         if note:
             target_entry["last_note"] = note
 
@@ -405,6 +416,9 @@ class TaskManager:
         if new_status in ["COMPLETED", "ABORTED"]:
             self._archive_task(task_id, new_status)
 
+        emit(self.root, "task_manager", "task_transition", task_id=task_id,
+             facts={"from": old_status, "to": new_status, "force": force})
+
         print(
             f"[SUCCESS] Task '{task_id}' status transitioned "
             f"{old_status} → '{new_status}'"
@@ -454,6 +468,9 @@ class TaskManager:
         if record.get("acceptance_status") != "ACCEPTED":
             raise ValueError("Acceptance record must have acceptance_status ACCEPTED")
 
+        from baseline_gate import validate_coverage, digest
+        validate_coverage(self.root, record, task_id)
+
         verification = record.get("verification")
         test_runs = verification.get("tests") if isinstance(verification, dict) else None
         if not isinstance(test_runs, list) or not test_runs:
@@ -466,6 +483,8 @@ class TaskManager:
                 raise ValueError(
                     f"Test execution {index} must record a command, exit_code 0, and evidence"
                 )
+            if run.get("sha256") != digest(self.root, run["evidence"]):
+                raise ValueError(f"Test execution {index} evidence digest mismatch")
 
         confirmation = record.get("developer_confirmation")
         if not isinstance(confirmation, dict):

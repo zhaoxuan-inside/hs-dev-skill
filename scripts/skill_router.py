@@ -76,7 +76,7 @@ def validate_registry(root: Path, registry: Dict[str, Any]) -> None:
         if relative in owners:
             raise ValueError("Shared reference also has a skill owner: " + relative)
         owners[relative] = "shared"
-    expected = {p.relative_to(root).as_posix() for p in (root / "references").glob("*.md")}
+    expected = {p.relative_to(root).as_posix() for p in (root / "references").rglob("*.md")}
     if expected != set(owners):
         raise ValueError("Reference ownership mismatch: " + repr(sorted(expected ^ set(owners))))
 
@@ -148,6 +148,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     p_route.add_argument("--phase", type=int)
     p_route.add_argument("--domains", nargs="*", default=[])
     p_route.add_argument("--event", choices=["change", "acceptance"])
+    p_route.add_argument("--project-root", type=Path,
+                         help="Optionally record the route in this target project's enabled trace")
     args = parser.parse_args(argv)
     try:
         root = args.root.resolve()
@@ -162,6 +164,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                                                for e in registry["skills"]]}
         else:
             result = route(root, registry, args.intent, args.phase, args.domains, args.event)
+            if args.project_root is not None:
+                from execution_observer import emit
+                emit(args.project_root, "skill_router", "route_decision", facts={
+                    "intent": args.intent, "phase": args.phase,
+                    "process_skill": result["process_skill"]["id"],
+                    "functional_skills": [entry["id"] for entry in result["functional_skills"]],
+                })
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     except (OSError, ValueError, KeyError, TypeError) as exc:

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "bundle_version": "4.0.1.0",
+  "bundle_version": "4.2.0.0",
   "skills": [
     {
       "id": "hs-dev-discovery",
@@ -35,7 +35,11 @@
       "path": "skills/hs-dev-implementation/SKILL.md",
       "scope": "按已验收契约实现切片",
       "references": [
-        "references/coding_standards.md"
+        "references/coding_standards.md",
+        "references/coding/core_quality.md",
+        "references/coding/go.md",
+        "references/coding/python.md",
+        "references/coding/typescript_rules.md"
       ]
     },
     {
@@ -105,7 +109,22 @@
         "references/product_prototype.md",
         "references/product_roadmap.md",
         "references/product_acceptance.md",
-        "references/project_types.md"
+        "references/project_types.md",
+        "references/product/boundaries_discovery.md",
+        "references/product/design_language.md",
+        "references/product/feature_specification.md",
+        "references/product/documents_roadmap.md",
+        "references/product/review_freeze.md",
+        "references/project_types/backend.md",
+        "references/project_types/web.md",
+        "references/project_types/desktop.md",
+        "references/project_types/mobile.md",
+        "references/project_types/multi_platform.md",
+        "references/project_types/library_cli.md",
+        "references/project_types/stage_matrix.md",
+        "references/prototype/principles_artifacts.md",
+        "references/prototype/diagrams_platforms.md",
+        "references/prototype/visual_acceptance.md"
       ]
     },
     {
@@ -142,7 +161,10 @@
         "references/api_engineering.md",
         "references/method_archetypes.md",
         "references/six_tuple_runtime.md",
-        "references/mock_contract_guide.md"
+        "references/mock_contract_guide.md",
+        "references/methods/profiles_dependencies.md",
+        "references/methods/discovery_reuse.md",
+        "references/methods/execution_frontend.md"
       ]
     },
     {
@@ -167,7 +189,16 @@
         "references/four_level_routing.md",
         "references/doc_reading_guide.md",
         "references/learn_and_prefer.md",
-        "references/rule_library.md"
+        "references/skill_update.md",
+        "references/rule_library.md",
+        "references/governance/controls.md",
+        "references/governance/environment.md",
+        "references/governance/supply_build.md",
+        "references/governance/operations_resilience.md",
+        "references/governance/privacy_agent.md",
+        "references/indexing/levels_slices.md",
+        "references/indexing/digest_ground_truth.md",
+        "references/indexing/clients_queries.md"
       ]
     }
   ],
@@ -230,6 +261,18 @@
     "references/cross_platform.md",
     "references/subskill_contract.md",
     "references/entry_workflows.md",
-    "references/skill_trace.md"
+    "references/skill_trace.md",
+    "references/workflow_improvement.md",
+    "references/lifecycle/product_workflow.md",
+    "references/lifecycle/product_delivery.md",
+    "references/lifecycle/tech_selection.md",
+    "references/lifecycle/architecture.md",
+    "references/lifecycle/detailed_design.md",
+    "references/lifecycle/task_planning.md",
+    "references/lifecycle/implementation.md",
+    "references/lifecycle/delivery.md",
+    "references/specification/file_organization.md",
+    "references/specification/methods_database.md",
+    "references/specification/delivery_runtime.md"
   ]
 }

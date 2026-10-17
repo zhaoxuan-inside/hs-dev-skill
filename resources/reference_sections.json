@@ -1,0 +1,370 @@
+{
+  "schema_version": 1,
+  "references": [
+    {
+      "entry": "references/spec_driven_lifecycle.md",
+      "original_sha256": "28468d523db2cb81000484269d496a4bc19fcf9f407ebb91be9b316a49d19fed",
+      "intro_sha256": "36d27741d4025a038f35351fbaa2b9fe14a89a6152cb63cf4b570c1fe759fb1a",
+      "sections": [
+        {
+          "path": "references/lifecycle/product_workflow.md",
+          "original_sha256": "1c7cd4a008116726d2b4f3417d3e7d505a0d7c075449e9bc8ab0243e96bf5cb1",
+          "rebased_links": {
+            "../design_md.md": "design_md.md",
+            "../product_design.md": "product_design.md",
+            "../grill_orchestration.md": "grill_orchestration.md",
+            "../product_prototype.md": "product_prototype.md",
+            "../product_roadmap.md": "product_roadmap.md"
+          }
+        },
+        {
+          "path": "references/lifecycle/product_delivery.md",
+          "original_sha256": "1b683dfd1334398cc8c906a2c6065913dc6b789274853744e4d9f8683fc8bd33",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/lifecycle/tech_selection.md",
+          "original_sha256": "2e9a2a5e6d56a45c94c19a3fe56e36ee78ddc93d05e2541b7f7d17de18fb7c11",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/lifecycle/architecture.md",
+          "original_sha256": "548bd1fa34bca1e8da2ed2a10027b674fa4ed982ece5c94809f91318621003b6",
+          "rebased_links": {
+            "../dev_paradigm.md": "dev_paradigm.md",
+            "../ddd_design.md": "ddd_design.md",
+            "../backend_arch.md": "backend_arch.md",
+            "../frontend_arch.md": "frontend_arch.md"
+          }
+        },
+        {
+          "path": "references/lifecycle/detailed_design.md",
+          "original_sha256": "a313bd054a3810cc346ad046055f5ce8c30b9ddfccc03d4b21bf79bc35bd882b",
+          "rebased_links": {
+            "../confidence_decision.md": "confidence_decision.md",
+            "../method_archetypes.md": "method_archetypes.md"
+          }
+        },
+        {
+          "path": "references/lifecycle/task_planning.md",
+          "original_sha256": "e900c5f0de456facaa581606a0a783505123f583f951dcd555ebac0b984d0194",
+          "rebased_links": {
+            "../process_continuity.md": "process_continuity.md"
+          }
+        },
+        {
+          "path": "references/lifecycle/implementation.md",
+          "original_sha256": "c960161119e14a6133a31de33121c5713822f39dca6f4cab40274710e835a691",
+          "rebased_links": {
+            "../testing.md": "testing.md",
+            "../deep_modules.md": "deep_modules.md"
+          }
+        },
+        {
+          "path": "references/lifecycle/delivery.md",
+          "original_sha256": "9bd8e1a89e7ee7dabb08b96820893ad8ce14433e9cf314d5a18abcbd662203bc",
+          "rebased_links": {}
+        }
+      ]
+    },
+    {
+      "entry": "references/product_design.md",
+      "original_sha256": "51ec229348166aff476630e476a694498aa35383d8fb76bfc8c898263d82b6fd",
+      "intro_sha256": "99dbf2605bf5a800e2c1f370d3e019487eba06f4ed89d4d17a21527164142c40",
+      "sections": [
+        {
+          "path": "references/product/boundaries_discovery.md",
+          "original_sha256": "469472b71226ccc81db3ebbf8e6b60224b26e0dc5ca3cbe4b008aba0ccdafe0d",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/product/design_language.md",
+          "original_sha256": "cda24dc9f38a428ffea6e43b1fdd92be7211377b70091690cf187db6b151aacb",
+          "rebased_links": {
+            "../design_md.md": "design_md.md"
+          }
+        },
+        {
+          "path": "references/product/feature_specification.md",
+          "original_sha256": "2ceffa871c328235d438a0ffcfd0ab4376a4330f50d7c555724bb6943d02d8d0",
+          "rebased_links": {
+            "../product_prototype.md": "product_prototype.md"
+          }
+        },
+        {
+          "path": "references/product/documents_roadmap.md",
+          "original_sha256": "01c411c13fe0237bc41401896d33bb6e01ce251e40a64b0e007d4e0830a8144d",
+          "rebased_links": {
+            "../../resources/templates/product_design/overview_prd_template.md": "../resources/templates/product_design/overview_prd_template.md",
+            "../../resources/templates/product_design/sub_feature_prd_template.md": "../resources/templates/product_design/sub_feature_prd_template.md",
+            "../grill_orchestration.md": "grill_orchestration.md",
+            "../product_roadmap.md": "product_roadmap.md"
+          }
+        },
+        {
+          "path": "references/product/review_freeze.md",
+          "original_sha256": "deed4fa09b356f10cceb5646dbfc65f8b5fb3ebb69550e234fc0b610f9e43b5d",
+          "rebased_links": {}
+        }
+      ]
+    },
+    {
+      "entry": "references/project_types.md",
+      "original_sha256": "308403546dc4ecd5bccd9b80da96136917889ebb7badcd779895709721445b25",
+      "intro_sha256": "99cce725ce77dab197d09ee2811925fcb37a9abba09fe815ee378f481ff78b95",
+      "sections": [
+        {
+          "path": "references/project_types/backend.md",
+          "original_sha256": "1b4ea2f18e5a98594f813d6430c7da09f919bc2f1d90af1d77bf2d4be8b62c67",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/project_types/web.md",
+          "original_sha256": "434720049684601e96fd57a6ba0c7d7ff287b88bbdbf34c0840ed7d6ea101610",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/project_types/desktop.md",
+          "original_sha256": "f10a4e6db11181ff26701de08cd46db659bf3f765a1b87731679b48666d6df7e",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/project_types/mobile.md",
+          "original_sha256": "73a1b9af198f247ce879968a6378dcc8fdab02d51f1067e8fd8aab68a405ce38",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/project_types/multi_platform.md",
+          "original_sha256": "078a82e5f1047157d2865616b2c35a00222e60549bbb5ba980ca1b66e3993e24",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/project_types/library_cli.md",
+          "original_sha256": "b7662bd1c9a99820484ad49cd3e6d1ec1793645aecbe763db36f6226390c6738",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/project_types/stage_matrix.md",
+          "original_sha256": "76e4b4c21371145ccac5b6a159237d2c3f8e20861c99a4710aa343668fdbbc4e",
+          "rebased_links": {}
+        }
+      ]
+    },
+    {
+      "entry": "references/method_archetypes.md",
+      "original_sha256": "b916be4918d0967a7201d2e2cc8fdfea3078f0b60c2ddcc66da50a11a5afb131",
+      "intro_sha256": "c4945565206e8a722c3ffff9373003df2a18cc562897e5601d9659b6af1cfeb7",
+      "sections": [
+        {
+          "path": "references/methods/profiles_dependencies.md",
+          "original_sha256": "14da8008a09eecbbfe4ec9c856d5f9d792208da24374ea4a24ff70b0882405f2",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/methods/discovery_reuse.md",
+          "original_sha256": "f186a1cabf2bacaadc13f058009d3ac1cc303db489d2e498c0c3e080f183c38f",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/methods/execution_frontend.md",
+          "original_sha256": "10f0bddb22379073c20f4b1c53dcefd89cde2219487e80b9873d0eb5b2ea70e1",
+          "rebased_links": {
+            "../../resources/templates/hs_dev_docs/frontend_method_design.md": "../resources/templates/hs_dev_docs/frontend_method_design.md"
+          }
+        }
+      ]
+    },
+    {
+      "entry": "references/product_prototype.md",
+      "original_sha256": "b0084a7f1ab6ba5c2e150cf7e17f4e29ef275369fcea1d93f40f267e6fd2d054",
+      "intro_sha256": "7994cfa51a4cfc0acd652f89c426d4ba18e4f68c90778d0b2dead160b58bc499",
+      "sections": [
+        {
+          "path": "references/prototype/principles_artifacts.md",
+          "original_sha256": "85b38f6ae357556fc192c498ba23f2f3393762df2040dea53df5ae9230284cb3",
+          "rebased_links": {
+            "../product_design.md": "product_design.md"
+          }
+        },
+        {
+          "path": "references/prototype/diagrams_platforms.md",
+          "original_sha256": "9ae04bd8c07138dfd694eeddd1a8b1f086a06969c0fb0a263b11e9f52063423a",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/prototype/visual_acceptance.md",
+          "original_sha256": "e1425c71a69d5c4f8950f5f0e5ee96193e646a90a45932027160cb07cb27d119",
+          "rebased_links": {}
+        }
+      ]
+    },
+    {
+      "entry": "references/coding_standards.md",
+      "original_sha256": "b6530235bda29d5d2ea241d2159986241a775c8e957012a62e9199164df20ca1",
+      "intro_sha256": "5c5a241a91374ec9e80fee05cff3b3f55f3d6f28d91c3335462579b83b7d9089",
+      "sections": [
+        {
+          "path": "references/coding/core_quality.md",
+          "original_sha256": "db9c2ea22630095763c8970e0134b69a1881caa9e5174415cef5a11ace070219",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/coding/go.md",
+          "original_sha256": "620929df5b2b5140916c99e06555f2e7acd4aab63b31b5a29ddfd98a51577303",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/coding/python.md",
+          "original_sha256": "7157062b6a22413e7e1383c6421383759afe5887663a9d99f8735b6a3a7f6456",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/coding/typescript_rules.md",
+          "original_sha256": "bc64c4418b8685ee3f56497eab0b52cc5993f9c9c8925a81ca7ac6f7026df122",
+          "rebased_links": {}
+        }
+      ]
+    },
+    {
+      "entry": "references/auxiliary_governance.md",
+      "original_sha256": "5457182937e51e2c413faabe19593bdb954d76dda36d80968b24a2f8bd085698",
+      "intro_sha256": "fa66e7920557db710f238b5590e564ebabe70c57134c67301ba2eadfa5f1c341",
+      "sections": [
+        {
+          "path": "references/governance/controls.md",
+          "original_sha256": "97de322c89138035ef3440c3b3246be52fc906734bbdb81f0127a1d2ba774eed",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/governance/environment.md",
+          "original_sha256": "0c94426ae11ca1e809e6c94f8596985827b233b56c12215e70e71d1750b75900",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/governance/supply_build.md",
+          "original_sha256": "53666867f93e47171e10195998d33b3c062cf16f702fec877f46761f8c7ecdf5",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/governance/operations_resilience.md",
+          "original_sha256": "6352f248cc729e8c5403712f6795f1a8c90c17dcfa02fea72c91a8747d1a5ae6",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/governance/privacy_agent.md",
+          "original_sha256": "3360e20cd6ceb3beec4b0f8841ce504a38aa08a69ca989b70634b6b7d8a93a92",
+          "rebased_links": {}
+        }
+      ]
+    },
+    {
+      "entry": "references/four_level_routing.md",
+      "original_sha256": "fa17ccad3e87ae7e5c88088c92e794e44e0d3ff728dc6281dee8031191d2f746",
+      "intro_sha256": "06a30eb66e570b3e053f7e55b7c169f56d2ac6e3cc973a5a4d9e3f6a9731384a",
+      "sections": [
+        {
+          "path": "references/indexing/levels_slices.md",
+          "original_sha256": "a765796963709e760d9883f9f7b1d54463bab67e2e461b0ac67837219e1ba633",
+          "rebased_links": {
+            "../token_budget.md": "token_budget.md"
+          }
+        },
+        {
+          "path": "references/indexing/digest_ground_truth.md",
+          "original_sha256": "4b2e704741ca2c7f4f6488a13dedad49faece4fdf83dbcdedbb0c64d1bc649d2",
+          "rebased_links": {
+            "../doc_reading_guide.md": "doc_reading_guide.md"
+          }
+        },
+        {
+          "path": "references/indexing/clients_queries.md",
+          "original_sha256": "806df2b49d11292330d8e3b8e6219baf7736bde5ce972470355beee9a9c3ea86",
+          "rebased_links": {}
+        }
+      ]
+    },
+    {
+      "entry": "references/spec_v2_4.md",
+      "original_sha256": "2ff684109586942e509357f57c8ff1f37bd2372edc1b392aee71523ca08ff9a9",
+      "intro_sha256": "2bcf927e2fe156ab141a4601a70fad382c059e68ac38ea20a25d280f94927d37",
+      "sections": [
+        {
+          "path": "references/specification/file_organization.md",
+          "original_sha256": "ad3837a44dc8b362601c5a5dfe97e8d7ba48d110f25693e62ff22b4e3f03116f",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/specification/methods_database.md",
+          "original_sha256": "38b5f486e2f0c7591efa4e57f899ffd09c1c57398c0e2ca7980880355d9bd30c",
+          "rebased_links": {}
+        },
+        {
+          "path": "references/specification/delivery_runtime.md",
+          "original_sha256": "744a76317ad9ef58a2e968b40e7e2155154f49918ba315dc9159d20a0a1392df",
+          "rebased_links": {}
+        }
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "entry": "resources/templates/product_design/prototype_template.md",
+      "original_sha256": "9e2ebc447fad3f0b40fb15dac28461794021a7e4311929f411740562552488e4",
+      "intro_sha256": "2e355df317996a7f8d9c996dc7a0885d3541a7338804c60f6f9e8504712d7d6c",
+      "sections": [
+        {
+          "path": "resources/templates/product_design/prototype/visual_components.md",
+          "original_sha256": "e1b628e91636d96c1581c57bd37ec7d4dfe516155f1ce7b3199e4bf4505d1365",
+          "rebased_links": {}
+        },
+        {
+          "path": "resources/templates/product_design/prototype/page_topology.md",
+          "original_sha256": "c35c3f17202492c49b32e15ddbec635e2a87bc6aa2279ae7cf6b0cb72c409635",
+          "rebased_links": {}
+        },
+        {
+          "path": "resources/templates/product_design/prototype/populated.md",
+          "original_sha256": "7c381268189b2dcc6bc225fc1df0ea8ad34807f38c8210928689b9caa113c80c",
+          "rebased_links": {}
+        },
+        {
+          "path": "resources/templates/product_design/prototype/empty_loading_error.md",
+          "original_sha256": "7b068c36aefda975fa1a3484a0abcdf76dce3f47de5334bbef1129eb17a4e4a1",
+          "rebased_links": {}
+        },
+        {
+          "path": "resources/templates/product_design/prototype/mapping_signoff.md",
+          "original_sha256": "a165457199c4efee8273c7b54a94f936dbded394714d80a947bc14e4d022db0a",
+          "rebased_links": {}
+        }
+      ]
+    },
+    {
+      "entry": "resources/templates/hs_dev_docs/doc_reading_guide_template.md",
+      "original_sha256": "75ed48eec54a59ea604f8c80d204053df12510758768a3b87946cae2a6d6c1c5",
+      "intro_sha256": "97dc0796c8e968c5973fbdea80fe5915f56dc245c0baabcf8f5aede1d64a97cc",
+      "sections": [
+        {
+          "path": "resources/templates/hs_dev_docs/reading_guide/machine_contract.md",
+          "original_sha256": "2d48ef88e9ee3886dcc0130dd2b7388729df81a56561eb5e8c995c270f96afbc",
+          "rebased_links": {}
+        },
+        {
+          "path": "resources/templates/hs_dev_docs/reading_guide/structure_catalog.md",
+          "original_sha256": "b3668bb34d737db80d1901134e71460897ccb0ca2c86c7d59511b7b7b5ddc112",
+          "rebased_links": {}
+        },
+        {
+          "path": "resources/templates/hs_dev_docs/reading_guide/queries_scenarios.md",
+          "original_sha256": "323eeb2ad1a05d100d48b90e978fbd06667cc48dcf30364a0dd7521c51a3d800",
+          "rebased_links": {}
+        },
+        {
+          "path": "resources/templates/hs_dev_docs/reading_guide/guardrails.md",
+          "original_sha256": "840114d1112fe98a35e36c603245b4e19f45b2c71a6d9e1264eb1b8e57bec1b0",
+          "rebased_links": {}
+        }
+      ]
+    }
+  ]
+}

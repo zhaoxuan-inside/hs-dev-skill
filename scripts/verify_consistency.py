@@ -48,6 +48,15 @@ class ConsistencyVerifier:
         # 2. 检查任务三文件强一致性
         self._check_task_consistency()
 
+        # Requirement source/artifact drift is a fatal gate, independent of optional telemetry.
+        from baseline_gate import inspect_registry
+        try:
+            validity = inspect_registry(self.root)
+            for key, reason in validity["invalid"].items():
+                self.errors.append(f"[BASELINE INVALID] {key}: {reason}")
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            self.errors.append(f"[BASELINE INVALID] {exc}")
+
         # 3. 检查数据库迁移脚本原子性 (V & U Sync) 与 SQL 规范
         self._check_database_migrations()
 
@@ -164,6 +173,13 @@ class ConsistencyVerifier:
             task_id = entry.get("id")
             title = entry.get("title")
             status = entry.get("status")
+            if status == "COMPLETED" and entry.get("acceptance_record"):
+                from baseline_gate import validate_record_file
+                try:
+                    validate_record_file(self.root, entry["acceptance_record"], task_id,
+                                         allow_historical=not is_active)
+                except (OSError, ValueError, KeyError, TypeError) as exc:
+                    self.errors.append(f"[ACCEPTANCE INVALID] {task_id}: {exc}")
 
             # 1. 检查 task_brief 中是否存在该条目
             if f"### 任务简述：{task_id}" not in brief_contents:

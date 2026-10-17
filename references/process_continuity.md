@@ -1,6 +1,6 @@
 # 过程连续性（plan_log / change_log / 续做 / 回退）
 
-**何时读**：用户说「继续 / 继续任务 / 接着做 / resume」；中断后续做；任务或阶段回退；写计划步骤或登记变更；每会话最多一次（**「每会话最多一次」仅约束本详规只读一次**）。**需求变更治理 → [`requirement_change.md`](requirement_change.md)**。  
+**何时读**：用户说「继续 / 继续任务 / 接着做 / resume」；中断后续做；任务或阶段回退；写计划步骤或登记变更。按 [变化感知协议](load_latch.md#5-变化感知与装载缓存统一重读规则) 复用已读规则；恢复时核对当前依赖摘要，仅变更或必要上下文丢失时恢复对应片段。**需求变更治理 → [`requirement_change.md`](requirement_change.md)**。
 **分工**：状态合法迁移 → [`task_state_machine.md`](task_state_machine.md)；冻结/阶段链 → [`spec_driven_lifecycle.md`](spec_driven_lifecycle.md)。
 
 ---

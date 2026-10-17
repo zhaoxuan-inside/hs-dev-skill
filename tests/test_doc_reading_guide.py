@@ -20,6 +20,7 @@ from init_hs_dev_docs import init_full_workspace, generate_doc_reading_guide  # 
 from idx_manager import IdxManager  # noqa: E402
 from doc_index_db import DocIndexDB  # noqa: E402
 from verify_consistency import ConsistencyVerifier  # noqa: E402
+from template_parts import render_template
 
 
 class TestDocReadingGuide(unittest.TestCase):
@@ -36,7 +37,7 @@ class TestDocReadingGuide(unittest.TestCase):
     def test_template_structure_and_guardrails(self):
         tmpl_file = ROOT / "resources" / "templates" / "hs_dev_docs" / "doc_reading_guide_template.md"
         self.assertTrue(tmpl_file.exists(), "Template file must exist")
-        content = tmpl_file.read_text(encoding="utf-8")
+        content = render_template(tmpl_file)
 
         # 检查关键要素
         self.assertIn("[VIBE_CONTRACT]", content)

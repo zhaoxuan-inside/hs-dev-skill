@@ -34,6 +34,8 @@ class TestTaskManager(unittest.TestCase):
             "dod": [{"criterion": "Task acceptance criterion", "result": "PASS", "evidence": "test report"}],
             "unimplemented": [],
         }
+        from acceptance_fixture import bind_acceptance
+        bind_acceptance(self.root, task_id, record)
         path.write_text("<!-- HS_ACCEPTANCE_GATE_V1\n" + json.dumps(record) + "\nHS_ACCEPTANCE_GATE_V1 -->\n", encoding="utf-8")
         return str(path.relative_to(self.root))
 

@@ -17,6 +17,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from hs_paths import ensure_utf8_stdout
 from idx_manager import IdxManager
+from execution_observer import emit
 
 ACTIVE_STATUSES = ("READY", "IN_PROGRESS", "BLOCKED", "VERIFYING")
 
@@ -220,6 +221,8 @@ def checkpoint(
     }
     append_change(root, rec)
     set_plan_step(root, task_id, step_id, "doing", breakpoint=True)
+    emit(root, "process_log", "checkpoint", task_id=task_id,
+         facts={"checkpoint_id": cp_id, "step_id": step_id, "path_count": len(path_entries)})
     return rec
 
 
@@ -359,7 +362,9 @@ def resume_scan(root: Path) -> Dict[str, Any]:
                 ],
             }
         )
-    return {"ok": True, "count": len(items), "tasks": items}
+    from baseline_gate import inspect_registry
+    return {"ok": True, "count": len(items), "tasks": items,
+            "baseline_validity": inspect_registry(root)}
 
 
 def _print(obj: Any) -> None:

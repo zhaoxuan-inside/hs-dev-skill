@@ -19,6 +19,14 @@
 
 ## 2. 工作 todolist
 
+### 提交文档清单（阶段完成时也须完整展示在回复中）
+
+合并计划/DoD、当前 checklist、实际产出与证据引用，包含本验收记录；逐项核对，不用目录或“见报告”代替。沿用输入标记为已验收基线，应交未交项保留 MISSING。记录保留相对路径；提交回复展示经实际解析的绝对路径和最终摘要。
+
+| 文档名 | 工程相对路径/外部绝对路径 | 版本/摘要 | 审阅范围/规则 ID | 状态 |
+|---|---|---|---|---|
+| {文件名} | {path；内联时附标题锚点} | {revision；本记录自身摘要见最终工具输出} | {范围} | SUBMITTED |
+
 从当前阶段清单逐项生成，保留规则 ID；完成操作不代表验收通过。
 
 - [ ] {规则ID}：{需完成的工作及预期产物}
@@ -71,6 +79,11 @@
   "schema_version": 1,
   "task_id": "{task_id}",
   "acceptance_status": "SUBMITTED",
+  "baseline": {"id": "{reviewed_baseline_id}", "version": "{version}", "sha256": "{source_sha256}"},
+  "requirements": [
+    {"id": "{REQ-ID}", "result": "PENDING", "evidence": ""}
+  ],
+  "artifacts": ["{registered_artifact_id}"],
   "developer_confirmation": {
     "decision": "PENDING",
     "reviewer": "",
@@ -80,7 +93,7 @@
   },
   "verification": {
     "tests": [
-      {"command": "{实际测试命令}", "exit_code": null, "evidence": "{运行报告或可复核输出位置}"}
+      {"command": "{实际测试命令}", "exit_code": null, "evidence": "{工程内报告路径}", "sha256": "{报告摘要}"}
     ]
   },
   "checks": [

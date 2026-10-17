@@ -38,6 +38,8 @@ class TestVerifyConsistency(unittest.TestCase):
             "dod": [{"criterion": "All task REQ items verified", "result": "PASS", "evidence": "task detail matrix"}],
             "unimplemented": [],
         }
+        from acceptance_fixture import bind_acceptance
+        bind_acceptance(self.root, task_id, record, ["REQ-001", "REQ-002"])
         path.write_text("<!-- HS_ACCEPTANCE_GATE_V1\n" + json.dumps(record) + "\nHS_ACCEPTANCE_GATE_V1 -->\n", encoding="utf-8")
         return str(path.relative_to(self.root))
 

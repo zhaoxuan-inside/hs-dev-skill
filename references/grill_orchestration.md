@@ -1,6 +1,6 @@
 # 审讯式编排（Grill）— 设计对齐与产品探索纪律
 
-**何时读**：`work_mode=DESIGN`；需求/验收/边界模糊；用户说「对齐一下 / 帮我问清楚」；产品设计沟通（含 MVP 范围裁定）进行时。**注意：审讯轮询不受次数限制（前沿空才停）；「每会话最多一次」仅约束「同一份详规只读一次」。**  
+**何时读**：`work_mode=DESIGN`；需求/验收/边界模糊；用户说「对齐一下 / 帮我问清楚」；产品设计沟通（含 MVP 范围裁定）进行时。**注意：审讯轮询不受次数限制（前沿空才停）；详规按 [变化感知协议](load_latch.md#5-变化感知与装载缓存统一重读规则) 复用，未变且当前范围可用不重读。**
 **前置**：新需求先跑 [`opening_alignment.md`](opening_alignment.md) O1～O4（复述/假设/约束/分级建议，开发者确认）。  
 **分工**：本文 = **审讯式是什么 + 怎么跑产品探索、MVP 范围裁定与方案比选**；闸门与少问 → [`confidence_decision.md`](confidence_decision.md)；产品设计双支柱 → [`product_design.md`](product_design.md)；分级 → [`right_sizing.md`](right_sizing.md)。
 

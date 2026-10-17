@@ -71,6 +71,8 @@ class TestProcessLog(unittest.TestCase):
             "dod": [{"criterion": "Task acceptance criterion", "result": "PASS", "evidence": "test report"}],
             "unimplemented": [],
         }
+        from acceptance_fixture import bind_acceptance
+        bind_acceptance(self.root, "pay_new", acceptance)
         acceptance_path.write_text(
             "<!-- HS_ACCEPTANCE_GATE_V1\n" + json.dumps(acceptance) + "\nHS_ACCEPTANCE_GATE_V1 -->\n",
             encoding="utf-8",

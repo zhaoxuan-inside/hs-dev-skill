@@ -12,7 +12,7 @@
 1) 读主 SKILL.md 路由，选择一个过程子 Skill 与触达功能子 Skill；不加载无关入口
 2) 装载门闩 load_latch L0～L2：开场确认（新需求）→ change_size+work_mode → skill_ref_index search 或 _index 一行 → 核心 1 份详规 + 阶段满配链附属（合计 ≤5 份）
 3) 读 right_sizing.md（若尚未作为那 1 份打开）并写入分级（S 路径此后少读 lifecycle）
-4) 按「路径/阶段 → references」表按需再开（已读不重复；仍遵守「同时打开详规宜少」）
+4) 按「路径/阶段 → references」表按需再开（按 load_latch §5 感知变化，未变且上下文可用则复用；仍遵守「同时打开详规宜少」）
 5) UI/API 深化：rule_fetch search/resolve（每任务 ≤2 source id；github_tree 必须 --rule）
 6) python scripts/doc_index_db.py search/get/slice 定位项目文档 path
 7) 只 Read/slice 命中行段 → 物化 context_pack
@@ -25,7 +25,7 @@
 - 整读 `hs_dev_docs` 或某一功能域下全部 `.md`
 - 整读大型 `.idx` 后手写改回（改索引走 `idx_manager`）
 - context_pack 只写路径、实现时再打开全文设计
-- 本会话已读过的 `references/*.md` 再读一遍
+- 对未变化、范围已覆盖且上下文仍可用的 `references/*.md` 无依据重复读取；变化检测只返回状态，不把摘要计算当作向模型重新装载正文
 - 整目录通读 `references/`（用 `_index.md` 或 `skill_ref_index search`）
 - 预拉 / 整读远程规则包（Vercel AGENTS.md 等）；只 resolve 命中 id / 单条 rule
 
@@ -35,7 +35,7 @@
 
 本表是子 Skill 内的详规路由，不是要求主 Skill 同时加载所有文件。入口与归属以 resources/skill_routes.json 为准。
 
-| 当前 | 必读（每会话一次） | 可选 |
+| 当前 | 首次按需读（后续按变化感知复用） | 可选 |
 |---|---|---|
 | **任何需求开始** | `load_latch.md`（极短）+ `right_sizing.md` | `_index.md` 或 `skill_ref_index search` |
 | S 快路径 | （无需 lifecycle 全文） | `frontend_craft` / `api_engineering`（仅当改 UI/API） |
@@ -45,7 +45,7 @@
 | L 阶段 2 | lifecycle 阶段 2 | — |
 | M/L 阶段 3 | lifecycle 阶段 3；改方法时 `six_tuple_runtime` / `method_archetypes` | 本地 craft；深化用 `rule_library` + `rule_fetch` |
 | 阶段 4 | 本文 + 必要时 `four_level_routing` | `task_state_machine` |
-| 阶段 5 | （已读过的不重复） | craft / `rule_fetch resolve --rule …`（按触达） |
+| 阶段 5 | （核对当前依赖摘要，未变且可用则复用） | craft / `rule_fetch resolve --rule …`（按触达） |
 | 阶段 6 | `quality_gates.md` | — |
 | 路径/命令 | `cross_platform.md` | — |
 | 规格百科 | 仅争议时 `spec_v2_4.md` 对应节 | 禁止开局通读 |

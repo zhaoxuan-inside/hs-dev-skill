@@ -6,6 +6,17 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from skill_ref_index import SkillRefIndex
 from rule_fetch import load_catalog, search_catalog
+from template_parts import render_template
+import json
+
+
+def reference_content(root, name):
+    """Check the maintained business sections, not just the navigation shell."""
+    entry = "references/" + name
+    manifest = json.loads((root / "resources/reference_sections.json").read_text(encoding="utf-8"))
+    group = next(item for item in manifest["references"] if item["entry"] == entry)
+    return (root / entry).read_text(encoding="utf-8") + "\n" + "\n".join(
+        (root / section["path"]).read_text(encoding="utf-8") for section in group["sections"])
 
 
 class TestProductDesignCapability(unittest.TestCase):
@@ -15,7 +26,7 @@ class TestProductDesignCapability(unittest.TestCase):
     def test_product_design_guide_exists(self):
         guide = self.root / "references" / "product_design.md"
         self.assertTrue(guide.exists(), "references/product_design.md must exist")
-        content = guide.read_text(encoding="utf-8")
+        content = reference_content(self.root, "product_design.md")
         # 双支柱与纯净铁律
         self.assertIn("产品的设计语言", content)
         self.assertIn("产品的功能", content)
@@ -56,7 +67,7 @@ class TestProductDesignCapability(unittest.TestCase):
     def test_prototype_template_has_design_language_and_four_states(self):
         proto_tpl = self.root / "resources" / "templates" / "product_design" / "prototype_template.md"
         self.assertTrue(proto_tpl.exists(), "prototype_template.md must exist")
-        content = proto_tpl.read_text(encoding="utf-8")
+        content = render_template(proto_tpl)
         self.assertIn("Design Tokens 规范定义", content)
         self.assertIn("UX 认知心理学与可用性四定律", content)
         self.assertIn("渐进式披露", content)
@@ -81,7 +92,7 @@ class TestProductDesignCapability(unittest.TestCase):
     def test_prototype_guide_has_multi_platform_and_developer_sign_off_gate(self):
         proto_guide = self.root / "references" / "product_prototype.md"
         self.assertTrue(proto_guide.exists())
-        content = proto_guide.read_text(encoding="utf-8")
+        content = reference_content(self.root, "product_prototype.md")
         self.assertIn("Desktop / Mobile / Web", content)
         self.assertIn("UI 物理参数内联标注", content)
         self.assertIn("开发者可视化确认机制", content)
@@ -107,7 +118,7 @@ class TestProductDesignCapability(unittest.TestCase):
 
     def test_two_layer_decoupled_taste_architecture(self):
         # 1. 验证 references/product_design.md 与 references/design_md.md 具备解耦定义
-        prod_design = (self.root / "references" / "product_design.md").read_text(encoding="utf-8")
+        prod_design = reference_content(self.root, "product_design.md")
         self.assertIn("两层解耦", prod_design)
         self.assertIn("第一层：宏观品味宪章", prod_design)
         self.assertIn("第二层：微观特性施工图", prod_design)
@@ -169,9 +180,9 @@ class TestProductDesignCapability(unittest.TestCase):
         idx = SkillRefIndex(self.root)
         idx.rebuild()
         for kw, target in [
-            ("设计语言", "product_design.md"),
-            ("JTBD", "product_design.md"),
-            ("渐进式披露", "product_design.md"),
+            ("设计语言", "references/product"),
+            ("JTBD", "references/product"),
+            ("渐进式披露", "references/product"),
             ("ASCII线框", "product_prototype.md"),
         ]:
             hits = idx.search(kw, limit=5)
