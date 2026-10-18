@@ -13,5 +13,3 @@
 - [E7 Mock服务构建](e7_mock_services/README.md)
 - [E8 配置体系构建](e8_configuration/README.md)
 - [E9 工程准备度核验](e9_readiness_review/README.md)
-
-验收统一调用[验收服务](../../references/core/acceptance.md)，展示进度导航、材料卡片和结果摘要。登记待审文档，支持勾选或明确回答逐份确认；未通过逐项沟通暂不处理或继续修复，记录原因及下一动作，暂缓不记通过。内部清单和模式确认仍须满足。

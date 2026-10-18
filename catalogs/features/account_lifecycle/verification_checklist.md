@@ -2,7 +2,7 @@
 
 | ID | 检查问题 | 证据要求 |
 |---|---|---|
-| account_lifecycle.verification.1 | 激活冻结注销状态是否完整 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| account_lifecycle.verification.2 | 各状态行为约束是否明确 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| account_lifecycle.verification.3 | 关联数据处理是否明确 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| account_lifecycle.verification.4 | 恢复和重复请求是否验证 | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| account_lifecycle.verification.1 | 哪些行为测试验证设计检查项 1，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| account_lifecycle.verification.2 | 哪些行为测试验证设计检查项 2，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| account_lifecycle.verification.3 | 哪些行为测试验证设计检查项 3，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| account_lifecycle.verification.4 | 哪些行为测试验证设计检查项 4，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |

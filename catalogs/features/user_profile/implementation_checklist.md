@@ -2,7 +2,7 @@
 
 | ID | 检查问题 | 证据要求 |
 |---|---|---|
-| user_profile.implementation.1 | 字段与可见范围是否明确 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| user_profile.implementation.2 | 编辑权限和校验是否明确 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| user_profile.implementation.3 | 删除或脱敏生命周期是否明确 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| user_profile.implementation.4 | 异常与权限场景是否验证 | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| user_profile.implementation.1 | 实现如何落实设计检查项 1，对应哪些代码符号？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| user_profile.implementation.2 | 实现如何落实设计检查项 2，对应哪些代码符号？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| user_profile.implementation.3 | 实现如何落实设计检查项 3，对应哪些代码符号？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| user_profile.implementation.4 | 实现如何落实设计检查项 4，对应哪些代码符号？ | 代码符号及实际运行结果；绑定版本，NA需理由 |

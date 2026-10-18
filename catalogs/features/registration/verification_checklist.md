@@ -2,7 +2,7 @@
 
 | ID | 检查问题 | 证据要求 |
 |---|---|---|
-| registration.verification.1 | 注册资格及唯一性规则是否明确 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| registration.verification.2 | 验证、重复注册及失败恢复如何处理 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| registration.verification.3 | 个人信息、同意及账号初始状态是否明确 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| registration.verification.4 | 并发注册和异常路径是否被验证 | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| registration.verification.1 | 哪些行为测试验证设计检查项 1，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| registration.verification.2 | 哪些行为测试验证设计检查项 2，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| registration.verification.3 | 哪些行为测试验证设计检查项 3，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| registration.verification.4 | 哪些行为测试验证设计检查项 4，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |

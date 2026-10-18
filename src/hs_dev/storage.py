@@ -41,6 +41,10 @@ def local(root, relative):
 
 
 def atomic(path, data):
+    from .workspace import CURRENT, Workspace
+    permit = CURRENT.get()
+    if permit:
+        Workspace(permit.root).assert_owner(permit)
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     if isinstance(data, str):
@@ -51,6 +55,8 @@ def atomic(path, data):
             stream.write(data)
             stream.flush()
             os.fsync(stream.fileno())
+        if permit:
+            Workspace(permit.root).assert_owner(permit)
         os.replace(temporary, path)
     finally:
         if os.path.exists(temporary):
@@ -82,10 +88,12 @@ def managed_files(root, runtime=False):
         base = Path(directory)
         rel = base.relative_to(root)
         dirs[:] = sorted(d for d in dirs if d not in IGNORED and not d.endswith(".egg-info") and not (base / d).is_symlink())
+        if not runtime:
+            dirs[:] = [d for d in dirs if d != "history"]
         if not runtime and rel == Path("."):
             dirs[:] = [d for d in dirs if d != CONTROL]
         if runtime and rel == Path(CONTROL):
-            dirs[:] = [d for d in dirs if d in {"task", "config", "state"}]
+            dirs[:] = [d for d in dirs if d in {"tasks", "config"}]
         for name in sorted(files):
             path = base / name
             if path.is_symlink() or name.startswith(".hs-write-") or name == ".coverage":
@@ -104,22 +112,13 @@ def managed_directories(root):
         rel = base.relative_to(root)
         dirs[:] = sorted(d for d in dirs if d not in IGNORED and not d.endswith(".egg-info") and not (base / d).is_symlink())
         if rel == Path(CONTROL):
-            dirs[:] = [d for d in dirs if d in {"task", "config", "state"}]
+            dirs[:] = [d for d in dirs if d in {"tasks", "config"}]
         if rel != Path("."):
             yield base
 
 
 @contextmanager
-def workspace_lock(root):
-    path = Path(root) / CONTROL / "mutation.lock"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-    except FileExistsError:
-        raise ValueError("Workspace mutation is locked; inspect/recover the interrupted operation") from None
-    try:
-        with os.fdopen(fd, "w") as stream:
-            json.dump({"pid": os.getpid(), "created_at": now()}, stream)
-        yield
-    finally:
-        path.unlink(missing_ok=True)
+def workspace_lock(root, recovery=False, initialize=False, operation_id=None, fence=None, task_id=None):
+    from .workspace import operation
+    with operation(root, recovery=recovery, initialize=initialize, operation_id=operation_id, fence=fence, task_id=task_id) as permit:
+        yield permit

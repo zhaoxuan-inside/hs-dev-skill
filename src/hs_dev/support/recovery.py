@@ -44,7 +44,7 @@ def capture(root, task_id, kind="task"):
     from ..config import resolve
     settings = resolve(root, task_id)["values"]["retention"]
     protected = {snapshot_id}
-    for task_file in (root / CONTROL / "task").glob("*/task.json"):
+    for task_file in (root / CONTROL / "tasks").glob("*/task.json"):
         task = read_json(task_file)
         if task.get("status") == TaskStatus.ACTIVE and task.get("snapshot_id"):
             protected.add(task["snapshot_id"])
@@ -170,6 +170,10 @@ def commit(root, task_id, changes, verification):
     for relative, content in changes.items():
         path = local(root, relative)
         rel = path.relative_to(root)
+        from ..workspace import CURRENT
+        permit = CURRENT.get()
+        if permit and permit.scope and not any(str(rel) == p or str(rel).startswith(p.rstrip("/") + "/") for p in permit.scope):
+            raise ValueError("Change is outside the UUID scope: " + str(rel))
         if rel.parts[0] in {CONTROL, ".git"} or path.name in {"file_index.jsonl", "content_index.jsonl"}:
             raise ValueError("Cannot directly mutate runtime state or derived indices")
         if not isinstance(content, (str, type(None))):
@@ -211,16 +215,20 @@ def commit(root, task_id, changes, verification):
                 objects.append({"path": relative, "symbol": "file"})
         operation["affected_objects"] = objects
         write_json(operation_path, operation)
-        affected = root / CONTROL / "task" / task_id / "affected_objects.md"
+        affected = root / CONTROL / "tasks" / task_id / "affected_objects.md"
         previous_text = affected.read_text(encoding="utf-8") if affected.exists() else "# 实际修改对象\n\n| 操作 | 文件 | 符号 |\n|---|---|---|\n"
         atomic(affected, previous_text + "".join(f"| {operation_id} | {obj['path']} | {obj['symbol']} |\n" for obj in objects))
         from ..indexing.engine import inventory
         before_checks = inventory(root)
+        from ..workspace import Workspace, CURRENT
+        workspace, permit = Workspace(root), CURRENT.get()
+        workspace.transition(permit, "VERIFYING")
         checks = run_checks(root, verification, task_id)
         if not checks["ok"] or inventory(root) != before_checks:
             raise ValueError("Behavior verification failed; operation remains recoverable")
         operation["state"] = OperationState.VERIFIED
         write_json(operation_path, operation)
+        workspace.transition(permit, "PUBLISHING")
         with Index(root) as index:
             index.publish()
         verify_workspace(root, require_clean=True, ignore_operation=operation_id)
@@ -251,6 +259,8 @@ def rollback_operation(root, operation_id):
     operation = read_json(path)
     if not operation or not operation.get("recovery_available"):
         raise ValueError("Operation recovery data unavailable")
+    from ..workspace import Workspace, CURRENT
+    Workspace(root).transition(CURRENT.get(), "ROLLING_BACK")
     snapshot = manifest(root, operation["snapshot_id"])
     expected = {}
     for relative in operation["paths"]:

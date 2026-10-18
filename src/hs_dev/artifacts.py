@@ -9,7 +9,7 @@ def evidence_path(root, relative):
     if original.is_file():
         return original
     parts = Path(relative).parts
-    if len(parts) > 3 and parts[:2] == (CONTROL, "task"):
+    if len(parts) > 3 and parts[:2] == (CONTROL, "tasks"):
         archived = local(root, str(Path(CONTROL) / "evidence_archive" / Path(*parts[2:])))
         if archived.is_file():
             return archived

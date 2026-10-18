@@ -4,7 +4,8 @@ import json
 from pathlib import Path
 from urllib.parse import quote
 
-from . import workflow
+from . import task_store as workflow
+from .dependencies import dependency_digest
 from .artifacts import evidence_path
 from .contracts import CheckResult, ExecutionMode, TaskStatus
 from .storage import atomic, local, now, sha
@@ -32,13 +33,6 @@ def material_id(activity, path):
 def materials(root, task, activities):
     """Derive evidence cards, enriched by explicitly registered deliverables."""
     definitions = {m["id"]: dict(m) for m in task.get("materials", []) if m["activity"] in activities}
-    for activity in activities:
-        for row in workflow.checks(root, task["task_id"], activity):
-            if row[4]:
-                path = row[4]
-                key = material_id(activity, path)
-                definitions.setdefault(key, {"id": key, "activity": activity, "path": path,
-                                             "title": Path(path).name, "focus": "核对本活动结论与检查证据"})
     reviews = task.get("material_reviews", {})
     result = []
     for key, item in definitions.items():
@@ -157,9 +151,11 @@ def approval_valid(root, task, scope):
     approval = task["approvals"].get(scope)
     if not approval:
         return False
-    from .storage import CONTROL, read_json
-    publication = read_json(Path(root) / CONTROL / "state/publication.json")
-    return (approval["source_generation"] == publication["generation"]
+    try:
+        workflow.validate_checks(root, task, activities)
+    except ValueError:
+        return False
+    return (approval.get("dependency_digest") == dependency_digest(root, task, activities)
             and approval["checklist_digest"] == workflow.approval_digest(root, task, activities)
             and approval.get("material_digest") == digest(root, task, activities)
             and all(m["status"] == CheckResult.PASS for m in materials(root, task, activities)))
@@ -194,7 +190,7 @@ def view(root, task_id, scope=None):
             "materials": items, "summary": summary, "view_digest": digest(root, task, selected),
             "check_errors": errors, "workspace_errors": consistent["errors"],
             "approved": scope in completed,
-            "ready": bool(items) and all(m["status"] == CheckResult.PASS for m in items) and not errors and consistent["ok"]}
+            "ready": all(m["status"] == CheckResult.PASS for m in items) and not errors and consistent["ok"]}
 
 
 def plain(value):
@@ -224,11 +220,11 @@ def render(value, root):
             lines.append("  请恢复材料；缺失材料不能验收通过。")
         lines.append("")
     if not value["materials"]:
-        lines.extend(["尚无验收材料：请登记文档或绑定检查证据。", ""])
+        lines.extend(["无单独交付材料；依据检查项结果及证据验收。", ""])
     if value["approved"]:
         lines.append("本范围已验收通过。")
     elif value["ready"]:
-        lines.append("材料已通过，等待本范围最终确认。")
+        lines.append("检查结果已就绪，可确认本范围。")
     else:
         lines.append("本范围尚未通过；暂不处理仍保留未通过状态。")
     lines.extend(["", "可勾选后确认，也可回复：‘1、3通过；2不通过，原因……，继续沟通修复’。未提及材料保留原结果。",
@@ -249,4 +245,4 @@ def render(value, root):
 def refresh(root, task):
     """Persist one derived overview after every check, material or scope decision."""
     value = view(root, task["task_id"])
-    atomic(workflow.task_path(root, task["task_id"]) / "acceptance.md", render(value, root))
+    atomic(workflow.task_path(root, task["task_id"]) / "acceptance/overview.md", render(value, root))

@@ -2,7 +2,7 @@
 
 | ID | 检查问题 | 证据要求 |
 |---|---|---|
-| tenancy.verification.1 | 租户识别来源是否可信 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| tenancy.verification.2 | 数据和资源隔离是否明确 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| tenancy.verification.3 | 跨租户管理权限是否明确 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| tenancy.verification.4 | 切换及隔离失败是否验证 | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| tenancy.verification.1 | 哪些行为测试验证设计检查项 1，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| tenancy.verification.2 | 哪些行为测试验证设计检查项 2，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| tenancy.verification.3 | 哪些行为测试验证设计检查项 3，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| tenancy.verification.4 | 哪些行为测试验证设计检查项 4，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |

@@ -8,5 +8,3 @@
 - [F2 任务详细设计](f2_task_details/README.md)
 - [F3 上下文装配](f3_context_assembly/README.md)
 - [F4 恢复准备](f4_recovery_preparation/README.md)
-
-验收统一调用[验收服务](../../references/core/acceptance.md)，展示进度导航、材料卡片和结果摘要。登记待审文档，支持勾选或明确回答逐份确认；未通过逐项沟通暂不处理或继续修复，记录原因及下一动作，暂缓不记通过。内部清单和模式确认仍须满足。

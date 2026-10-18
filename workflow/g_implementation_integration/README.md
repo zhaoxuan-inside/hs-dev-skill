@@ -8,5 +8,3 @@
 - [G2 切片验证](g2_slice_verification/README.md)
 - [G3 增量集成](g3_incremental_integration/README.md)
 - [G4 一致性提交](g4_consistent_commit/README.md)
-
-验收统一调用[验收服务](../../references/core/acceptance.md)，展示进度导航、材料卡片和结果摘要。登记待审文档，支持勾选或明确回答逐份确认；未通过逐项沟通暂不处理或继续修复，记录原因及下一动作，暂缓不记通过。内部清单和模式确认仍须满足。

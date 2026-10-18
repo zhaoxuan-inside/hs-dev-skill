@@ -1,10 +1,11 @@
 """Build the 5.0 activity book from one reviewed contract catalog; no network access."""
 
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "5.0.0.0"
+VERSION = "5.1.0.0"
 UPSTREAM = {
     "A1": [], "A2": ["A1"], "A3": ["A1", "A2"],
     "B1": ["A3"], "B2": ["B1"], "B3": ["B2", "A2"], "B4": ["B2", "B3"], "B5": ["B1", "B4"],
@@ -173,12 +174,11 @@ STAGES = [
 
 
 def write(relative, text):
-    if relative.startswith("workflow/") and Path(relative).name in {"README.md", "guide.md"}:
-        target = "../" * len(Path(relative).parent.parts) + "references/core/acceptance.md"
-        text += ("\n验收统一调用[验收服务](" + target + ")，展示进度导航、材料卡片和结果摘要。"
-                 "登记待审文档，支持勾选或明确回答逐份确认；未通过逐项沟通暂不处理或继续修复，"
-                 "记录原因及下一动作，暂缓不记通过。内部清单和模式确认仍须满足。\n")
     path = ROOT / relative
+    if "--check" in sys.argv:
+        if not path.is_file() or path.read_text(encoding="utf-8") != text:
+            raise ValueError("Generated asset drift: " + relative)
+        return
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
 
@@ -199,13 +199,10 @@ def build():
                         "outputs": ["本活动结论及适用产物", "清单结果、证据及交接"]}
             stage["activities"].append(activity)
             navigation.append(f"- [{aid} {atitle}]({aid.lower()}_{aslug}/README.md)")
-            write(directory + "/activity.json", json.dumps(activity, ensure_ascii=False, indent=2) + "\n")
-            write(directory + "/README.md", f"# {aid} {atitle}\n\n定位：{title}中的独立工程目标。内部活动是验收单元，执行步骤不单独建立阶段。\n\n输入：有效需求、相关上游契约、现状证据与明确决定。输出：本活动产物、证据及下一动作。\n\n边界：按实际影响执行，复用有效结论，不扩大范围；历史过程默认只保留引用。\n\n- [执行规则](guide.md)\n- [验收清单](checklist.md)\n- [机器契约](activity.json)\n- [阶段定位](../README.md)\n")
+            write(directory + "/README.md", f"# {aid} {atitle}\n\n定位：{title}中的独立工程目标。内部活动是验收单元，执行步骤不单独建立阶段。\n\n输入：有效需求、相关上游契约、现状证据与明确决定。输出：本活动产物、证据及下一动作。\n\n边界：按实际影响执行，复用有效结论，不扩大范围；历史过程默认只保留引用。\n\n- [验收清单](checklist.md)\n- [阶段定位](../README.md)\n")
             checklist = f"# {aid} 验收规则\n\n| ID | 内部活动 | 通过标准 | 验证方式 |\n|---|---|---|---|\n"
             checklist += "".join(f"| {c['id']} | {c['title']} | {c['criterion']} | {c['method']} |\n" for c in checks)
             write(directory + "/checklist.md", checklist)
-            write(directory + "/guide.md", f"# {atitle}执行指导\n\n先核验入口连续性、源版本和适用性，再装配当前工作集。上游结论：{', '.join(UPSTREAM[aid]) or '现状与用户输入'}。这些是输入依赖，可以引用已验收有效基线，不强制本轮重做；不适用时记录理由。\n\n" + "\n\n".join(f"## {c['id']} {c['title']}\n\n{c['criterion']}。\n\n形成可定位产物，并在任务清单中绑定证据摘要；未完成项保持PENDING或FAIL，不以目录存在代替验收。" for c in checks) + "\n\n修改前建立恢复依据；先更新业务内容并验证，再发布索引及失效缓存。按模式提交确认。\n")
-            write(directory + "/templates/output.md", f"# {aid} 产物\n\n<!-- hs: {{\"stage\":\"{sid}\",\"activity\":\"{aid}\",\"tags\":[]}} -->\n\n## 当前结论\n\n记录已核验的事实及决定，未知内容显式标记。\n\n## 设计详情\n\n按本活动清单填写适用字段，结构化内容用Markdown表格，关系用Mermaid。\n\n## 来源与关联\n\n记录对象ID、源文件及修订，引用完整历史而不复制。\n\n## 证据与未决项\n\n逐检查项引用任务证据及未完成原因。\n")
         write(stage_path + "/README.md", f"# {sid} {title}\n\n本阶段组织同一抽象层次的活动；通过条件为适用内部活动清单全部通过，且验收模式要求满足。\n\n活动之间按输入依赖和影响范围连接，不按编号强制重做。\n\n" + "\n".join(navigation) + "\n")
         stages.append(stage)
     write("src/hs_dev/data/workflow.json", json.dumps({"version": VERSION, "stages": stages}, ensure_ascii=False, indent=2) + "\n")
@@ -241,7 +238,7 @@ def build_features():
         links.append(f"- [{title}]({slug}/README.md)")
         write(base + "/README.md", f"# {title}\n\n候选功能检查库，不默认启用。本轮功能台账必须记录纳入、排除或延期依据。\n\n- [设计](design_checklist.md)\n- [实现](implementation_checklist.md)\n- [验证](verification_checklist.md)\n")
         for phase in ("design", "implementation", "verification"):
-            write(base + f"/{phase}_checklist.md", f"# {title} {phase}\n\n| ID | 检查问题 | 证据要求 |\n|---|---|---|\n" + "".join(f"| {slug}.{phase}.{i} | {q} | {'设计规则及场景' if phase == 'design' else '代码符号及实际运行结果'}；绑定版本，NA需理由 |\n" for i, q in enumerate(questions, 1)))
+            write(base + f"/{phase}_checklist.md", f"# {title} {phase}\n\n| ID | 检查问题 | 证据要求 |\n|---|---|---|\n" + "".join(f"| {slug}.{phase}.{i} | {q if phase == 'design' else ('实现如何落实设计检查项 ' + str(i) + '，对应哪些代码符号？' if phase == 'implementation' else '哪些行为测试验证设计检查项 ' + str(i) + '，实际结果如何？')} | {'设计规则及场景' if phase == 'design' else '代码符号及实际运行结果'}；绑定版本，NA需理由 |\n" for i, q in enumerate(questions, 1)))
     write("catalogs/features/README.md", "# 通用功能清单\n\n" + "\n".join(links) + "\n")
     practices = {"ddd": "复杂领域使用统一语言、限界上下文、聚合和不变量；无领域复杂度时采用更轻结构。",
                  "tdd": "以可观察行为构建失败测试，最小实现后重构；测试不镜像内部调用。不可直接自动测试的变更记录适用验证。",

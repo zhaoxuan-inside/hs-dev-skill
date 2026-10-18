@@ -9,5 +9,3 @@
 - [B3 逐功能交互设计](b3_feature_interaction/README.md)
 - [B4 整体结构与功能关联](b4_structure_connections/README.md)
 - [B5 产品完整性验证](b5_product_completeness/README.md)
-
-验收统一调用[验收服务](../../references/core/acceptance.md)，展示进度导航、材料卡片和结果摘要。登记待审文档，支持勾选或明确回答逐份确认；未通过逐项沟通暂不处理或继续修复，记录原因及下一动作，暂缓不记通过。内部清单和模式确认仍须满足。

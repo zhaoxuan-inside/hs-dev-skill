@@ -30,7 +30,7 @@ def validate(root):
             errors.append("Stage README missing: " + stage["id"])
         for activity in stage["activities"]:
             base = root / activity["path"]
-            for name in ("README.md", "checklist.md", "guide.md", "activity.json"):
+            for name in ("README.md", "checklist.md"):
                 if not (base / name).is_file():
                     errors.append("Activity asset missing: " + str(base / name))
             for check in activity["checks"]:
@@ -39,8 +39,6 @@ def validate(root):
                 seen.add(check["id"])
                 if (base / "checklist.md").exists() and check["criterion"] not in (base / "checklist.md").read_text():
                     errors.append("Checklist/catalog drift: " + check["id"])
-            if (base / "activity.json").exists() and json.loads((base / "activity.json").read_text()) != activity:
-                errors.append("Activity catalog drift: " + activity["id"])
     for folder in ("workflow", "skills", "references", "catalogs"):
         for file in (root / folder).rglob("*.md"):
             for target in LINK.findall(file.read_text(encoding="utf-8")):

@@ -5,6 +5,7 @@ from ..contracts import TaskStatus
 import json
 import os
 import socket
+import sqlite3
 from pathlib import Path
 from ..config import resolve
 from ..storage import CONTROL, now, read_json, sha
@@ -29,14 +30,16 @@ class Resident:
     def refresh(self):
         selected = {}
         used = 0
-        for task_file in sorted((self.root / CONTROL / "task").glob("*/task.json"), reverse=True):
+        for task_file in sorted((self.root / CONTROL / "tasks").glob("*/task.json"), reverse=True):
             task = read_json(task_file)
             if task.get("status") != TaskStatus.ACTIVE:
                 continue
             directory = task_file.parent
-            candidates = [directory / "context/current.md", directory / "handoff.md"]
+            candidates = [directory / "current.md", directory / "plan.md"]
+            candidates.extend(self.root / dep["path"] for dep in task.get("dependencies", [])
+                              if dep["consumer"] == task.get("current_activity"))
             if task.get("current_activity") in task["activities"]:
-                candidates.append(directory / "activities" / task["current_activity"] / "checklist.md")
+                candidates.append(directory / "activities" / task["current_activity"] / "results.json")
             for path in candidates:
                 if not path.is_file() or path.stat().st_size > MAX_REQUEST:
                     continue
@@ -66,9 +69,23 @@ class Resident:
 
 
 def dispatch(index, resident, request):
+    with index.read_session():
+        return _dispatch(index, resident, request)
+
+
+def _dispatch(index, resident, request):
+    from ..workspace import Workspace
+    if not isinstance(request, dict):
+        raise ValueError("Service request must be an object")
+    Workspace(index.root).ticket(timeout=1)
     if resolve(index.root)["values"]["index"] != index.config:
         raise ValueError("Effective task/project index budgets changed; restart the service before querying")
     action = request.get("action")
+    if action == "context":
+        from ..context import ContextProvider
+        return ContextProvider(index.root, index, resident).obtain(
+            request.get("paths", []), request.get("task_id"), query=request.get("query"),
+            required=request.get("required", []))
     if action == "search":
         rows = index.search(request.get("query", ""), request.get("filters"), request.get("limit", 10), request.get("match", "terms"))
         hot = [] if request.get("filters") else resident.search(request.get("query", ""), request.get("limit", 10), request.get("task_id"))
@@ -119,7 +136,7 @@ def serve(root, socket_path=None):
                         payload = json.dumps(result, ensure_ascii=False).encode()
                         if len(payload) > MAX_RESPONSE:
                             raise ValueError("Response too large; narrow the query")
-                    except (ValueError, KeyError, OSError, MemoryError) as error:
+                    except (ValueError, TypeError, KeyError, OSError, MemoryError, sqlite3.Error) as error:
                         index.cache.clear()
                         payload = json.dumps({"ok": False, "error": str(error)}).encode()
                     connection.sendall(payload + b"\n")

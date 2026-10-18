@@ -11,13 +11,17 @@ DEFAULTS = {
     "index": {"memory_bytes": MEMORY_LIMIT, "lru_bytes": 48_000_000, "resident_bytes": 16_000_000,
               "sqlite_cache_kib": 24_000, "max_file_bytes": 2_000_000, "max_results": 100},
     "retention": {"hours": 48, "tasks": 5, "snapshots": 5},
-    "trace": {"enabled": False},
+    "trace": {"enabled": False, "max_file_bytes": 1_000_000, "max_files": 5, "max_event_bytes": 4096,
+              "max_age_hours": 48},
+    "intent": {"threshold": 0.85, "margin": 0.15},
+    "workspace": {"wait_seconds": 1.0},
+    "context": {"max_bytes": 48_000},
 }
 
 
 def resolve(root, task_id=None, direct=None, home=None):
     if task_id is None:
-        active = [p.parent.name for p in (Path(root) / CONTROL / "task").glob("*/task.json")
+        active = [p.parent.name for p in (Path(root) / CONTROL / "tasks").glob("*/task.json")
                   if read_json(p).get("status") == "ACTIVE"]
         if len(active) == 1:
             task_id = active[0]
@@ -26,7 +30,7 @@ def resolve(root, task_id=None, direct=None, home=None):
     locations = [(Path(home or Path.home()) / ".hs-dev-skill/config/config.json", "host"),
                  (Path(root) / CONTROL / "config/config.json", "project")]
     if task_id:
-        locations.append((local(root, f"{CONTROL}/task/{task_id}/config/config.json"), "task"))
+        locations.append((local(root, f"{CONTROL}/tasks/{task_id}/config/config.json"), "task"))
 
     def merge(data, label):
         if not isinstance(data, dict):
@@ -46,6 +50,17 @@ def resolve(root, task_id=None, direct=None, home=None):
     merge(direct or {}, "direct")
     if values["execution"]["mode"] not in MODES:
         raise ValueError("execution.mode must be mute, stage or activity")
+    if not 0 <= values["workspace"]["wait_seconds"] <= 60:
+        raise ValueError("Workspace wait must be between 0 and 60 seconds")
+    if not 1 <= values["context"]["max_bytes"] <= 48_000:
+        raise ValueError("Context budget must be between 1 and 48000 bytes")
+    for key in ("threshold", "margin"):
+        if not 0 < values["intent"][key] <= 1:
+            raise ValueError("Intent thresholds must be in (0,1]")
+    if any(v <= 0 for k, v in values["trace"].items() if k != "enabled"):
+        raise ValueError("Trace budgets must be positive")
+    if values["trace"]["max_event_bytes"] > values["trace"]["max_file_bytes"]:
+        raise ValueError("Trace event budget cannot exceed file budget")
     for section in ("index", "retention"):
         if any(value <= 0 for value in values[section].values()):
             raise ValueError("Numeric budgets must be positive")

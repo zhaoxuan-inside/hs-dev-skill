@@ -3,7 +3,6 @@
 from .contracts import OperationState
 
 import json
-import os
 import subprocess
 from pathlib import Path
 from .storage import CONTROL, identifier, local, now, read_json, write_json
@@ -14,7 +13,7 @@ COMMAND_TIMEOUT = 120
 def run_checks(root, commands, task_id):
     if not commands or not all(isinstance(c, list) and c and all(isinstance(a, str) and a for a in c) for c in commands):
         raise ValueError("Checks require nonempty argv arrays, never shell strings")
-    base = local(root, f"{CONTROL}/task/{task_id}/evidence/{identifier()}")
+    base = local(root, f"{CONTROL}/tasks/{task_id}/evidence/{identifier()}")
     base.mkdir(parents=True, exist_ok=False)
     results = []
     for number, command in enumerate(commands):
@@ -39,12 +38,23 @@ def run_checks(root, commands, task_id):
 
 def verify_workspace(root, require_clean=False, ignore_operation=None):
     from .indexing.engine import Index
+    from .workspace import Workspace, CURRENT, BUSY
+    workspace = Workspace(root)
+    owner = CURRENT.get()
+    state = workspace.inspect()
+    if not owner and state["status"] in BUSY:
+        result = {"ok": False, "errors": ["Workspace " + state["status"]],
+                  "generation": state.get("revision"), "operation_id": state.get("operation_id")}
+        if require_clean:
+            raise ValueError(result["errors"][0])
+        return result
     with Index(root) as index:
         status = index.verify()
-    owner = read_json(Path(root) / CONTROL / "mutation.lock")
-    if owner and owner.get("pid") != os.getpid():
-        status["errors"].append("Mutation lock requires owner completion or explicit recover-lock")
-    graph = read_json(Path(root) / "hs_dev_docs/_00_foundation/object_graph.json")
+    if not owner and state["status"] != "SAFE":
+        status["errors"].append("Workspace " + state["status"])
+    elif owner:
+        workspace.assert_owner(owner)
+    graph = read_json(Path(root) / "hs_dev_docs/foundation/object_graph.json")
     if graph is not None:
         result = coverage(graph["objects"], graph["relations"])
         status["errors"].extend(result["errors"])
@@ -53,6 +63,11 @@ def verify_workspace(root, require_clean=False, ignore_operation=None):
         if operation["operation_id"] != ignore_operation and operation["state"] in {OperationState.PREPARED, OperationState.VERIFIED, OperationState.INTERRUPTED}:
             status["errors"].append("Interrupted operation: " + operation["operation_id"])
     status["ok"] = not status["errors"]
+    if not status["ok"] and not owner and state["status"] == "SAFE":
+        def invalidate(value):
+            if value["status"] == "SAFE":
+                value.update(status="RECOVERY_REQUIRED", reason="Published workspace drift")
+        workspace.update(invalidate)
     if require_clean and not status["ok"]:
         raise ValueError("Consistency gate blocked: " + "; ".join(status["errors"][:10]))
     return status

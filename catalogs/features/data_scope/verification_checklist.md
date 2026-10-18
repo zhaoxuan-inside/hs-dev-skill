@@ -2,7 +2,7 @@
 
 | ID | 检查问题 | 证据要求 |
 |---|---|---|
-| data_scope.verification.1 | 归属及可访问范围是否明确 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| data_scope.verification.2 | 查询写入导出是否统一约束 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| data_scope.verification.3 | 跨主体操作是否隔离 | 代码符号及实际运行结果；绑定版本，NA需理由 |
-| data_scope.verification.4 | 漏过滤及篡改标识是否验证 | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| data_scope.verification.1 | 哪些行为测试验证设计检查项 1，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| data_scope.verification.2 | 哪些行为测试验证设计检查项 2，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| data_scope.verification.3 | 哪些行为测试验证设计检查项 3，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |
+| data_scope.verification.4 | 哪些行为测试验证设计检查项 4，实际结果如何？ | 代码符号及实际运行结果；绑定版本，NA需理由 |

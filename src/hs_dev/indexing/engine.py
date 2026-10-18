@@ -3,23 +3,22 @@
 import ast
 import hashlib
 import json
-import os
 import re
 import sqlite3
+from contextlib import contextmanager
 from functools import wraps
 from pathlib import Path
 from ..config import resolve
-from ..storage import CONTROL, atomic, identifier, local, managed_files, now, read_json, sha, write_json, workspace_lock
+from ..storage import CONTROL, atomic, identifier, local, managed_files, now, read_json, sha, write_json
 from .cache import ByteLRU
 
-FILE_INDEX = "hs_dev_docs/file_index.jsonl"
-PUBLICATION = f"{CONTROL}/state/publication.json"
-DATABASE = f"{CONTROL}/cache/search.sqlite"
+FILE_INDEX = f"{CONTROL}/index/files.jsonl"
+PUBLICATION = f"{CONTROL}/index/publication.json"
+DATABASE = f"{CONTROL}/index/catalog.sqlite"
 TEXT_SUFFIXES = {".md", ".py", ".json", ".yaml", ".yml", ".toml", ".sql", ".txt", ".html", ".js", ".ts", ".tsx", ".go", ".java", ".env"}
 TOKEN_PATTERN = re.compile(r"[A-Za-z0-9_]+|[\u3400-\u9fff]+")
 METADATA = re.compile(r"^<!--\s*hs:\s*(\{[^\n]*\})\s*-->\s*$", re.MULTILINE)
-OBJECT_IDS = re.compile(r"\b(?:REQ|FEAT|RULE|SCN|MOD|API|DATA|METHOD|TASK|TEST|EVIDENCE)-[A-Za-z0-9_-]+\b")
-METADATA_FIELDS = {"id", "activity", "stage", "tags", "status", "relations", "module", "kind"}
+METADATA_FIELDS = {"id", "activity", "stage", "tags", "status", "relations", "module", "kind", "tier"}
 SOURCE_STATES = {"current", "draft", "superseded"}
 MAX_SOURCE_FILES = 50_000
 SOURCE_READ_BLOCK_BYTES = 65_536
@@ -28,22 +27,24 @@ MAX_QUERY_CHARACTERS = 1024
 MAX_QUERY_TERMS = 16
 MAX_PHRASE_TERMS = 32
 DEFAULT_RESULT_LIMIT = 10
-PARSER_REVISION = 2
-OBJECT_GRAPH = "hs_dev_docs/_00_foundation/object_graph.json"
+PARSER_REVISION = 3
+OBJECT_GRAPH = "hs_dev_docs/foundation/object_graph.json"
 
 
 def consistent_read(function):
     @wraps(function)
     def guarded(self, *args, **kwargs):
-        lock = read_json(self.root / CONTROL / "mutation.lock")
-        if lock and lock.get("pid") == os.getpid():
+        if self.read_depth:
             return function(self, *args, **kwargs)
-        with workspace_lock(self.root):
-            result = function(self, *args, **kwargs)
-            if not self.verify()["ok"]:
-                self.cache.clear()
-                raise ValueError("Source changed during query; no result published")
-            return result
+        from ..workspace import Workspace
+        workspace = Workspace(self.root)
+        ticket = workspace.ticket(timeout=1)
+        result = function(self, *args, **kwargs)
+        workspace.validate_ticket(ticket)
+        if not self.verify()["ok"]:
+            self.cache.clear()
+            raise ValueError("Source changed during query; discard results")
+        return result
     return guarded
 
 
@@ -120,6 +121,7 @@ class Index:
         self.verified_sources = {}
         self.verified_indices = {}
         self.verified_database = None
+        self.read_depth = 0
 
     def __enter__(self):
         return self
@@ -127,17 +129,36 @@ class Index:
     def __exit__(self, *_):
         self.close()
 
-    def connect(self):
+    @contextmanager
+    def read_session(self):
+        """Share one safety check across related context reads; validate at the end."""
+        from ..workspace import Workspace
+        workspace = Workspace(self.root)
+        ticket = workspace.ticket(timeout=1)
+        self.ensure()
+        self.read_depth += 1
+        try:
+            yield self
+            workspace.validate_ticket(ticket)
+            if not self.verify()["ok"]:
+                raise ValueError("Source changed during read session")
+        finally:
+            self.read_depth -= 1
+
+    def connect(self, create=False):
         if self.db is None:
             path = self.root / DATABASE
+            if not create and not path.is_file():
+                raise ValueError("Index missing; request explicit repair")
             path.parent.mkdir(parents=True, exist_ok=True)
-            self.db = sqlite3.connect(path)
+            self.db = sqlite3.connect(path) if create else sqlite3.connect(f"file:{path}?mode=ro", uri=True)
             self.db.row_factory = sqlite3.Row
             self.db.execute(f"PRAGMA cache_size=-{self.config['sqlite_cache_kib']}")
             self.db.execute("PRAGMA mmap_size=0")
             self.db.execute("PRAGMA temp_store=FILE")
             self.db.execute("PRAGMA busy_timeout=3000")
-            self.db.executescript('''
+            if create:
+                self.db.executescript('''
                 CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY, value TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS items(
                     key TEXT PRIMARY KEY, path TEXT NOT NULL, title TEXT NOT NULL,
@@ -171,7 +192,7 @@ class Index:
     def normalize_tags(self, values):
         if not isinstance(values, list) or any(not isinstance(v, str) for v in values):
             raise ValueError("tags must be an array of strings")
-        aliases = read_json(self.root / "hs_dev_docs/_00_foundation/tag_aliases.json", {})
+        aliases = read_json(self.root / "hs_dev_docs/foundation/tag_aliases.json", {})
         if not isinstance(aliases, dict) or any(not isinstance(v, str) for v in aliases.values()):
             raise ValueError("Tag aliases must map strings to canonical strings")
         result = []
@@ -188,18 +209,25 @@ class Index:
         return result
 
     def publish(self):
+        from ..workspace import Workspace, CURRENT
+        Workspace(self.root).assert_owner(CURRENT.get())
+        if self.db is not None:
+            self.close()
         stamp, generation = now(), identifier()
         source = inventory(self.root, self.verified_sources)
         previous = read_json(self.root / PUBLICATION, {})
-        db = self.connect()
+        db = self.connect(create=True)
         stored = db.execute("SELECT value FROM meta WHERE key='generation'").fetchone()
         intact = bool(stored and stored[0] == previous.get("generation") and previous.get("parser_revision") == PARSER_REVISION
                       and self.logical_digest() == previous.get("database_digest"))
         changed = {p for p in set(source) | set(previous.get("sources", {})) if source.get(p) != previous.get("sources", {}).get(p)} if intact else set(source)
-        if "hs_dev_docs/_00_foundation/tag_aliases.json" in changed:
+        if not changed and intact and all((self.root / p).is_file() and fingerprint(self.root / p) == digest
+                                          for p, digest in previous.get("indices", {}).items()):
+            self.generation = previous["generation"]
+            return {"generation": self.generation, "files": len(source), "changed_files": 0}
+        if "hs_dev_docs/foundation/tag_aliases.json" in changed:
             changed.update(source)
         db.execute("BEGIN")
-        groups = {"hs_dev_docs": []}
         try:
             if not intact:
                 for table in ("items", "attributes", "relations", "text_fts"):
@@ -211,9 +239,9 @@ class Index:
                     db.execute("DELETE FROM items WHERE path=?", (relative,))
                     db.execute("DELETE FROM relations WHERE path=?", (relative,))
             for relative, digest in source.items():
+                if relative not in changed:
+                    continue
                 path = self.root / relative
-                if relative.startswith("hs_dev_docs/"):
-                    groups.setdefault(str(path.parent.relative_to(self.root)), [])
                 if path.suffix not in TEXT_SUFFIXES or path.stat().st_size > self.config["max_file_bytes"]:
                     continue
                 text = path.read_text(encoding="utf-8", errors="replace")
@@ -233,27 +261,22 @@ class Index:
                     raise ValueError("Unknown metadata field or source status: " + relative)
                 properties = {"kind": path.suffix.lstrip("."), "status": "current", **{key: value for key, value in meta.items() if key != "relations"}}
                 properties["tags"] = self.normalize_tags(properties.get("tags", []))
+                tier = meta.get("tier", "warm")
+                if tier not in {"warm", "cold"}:
+                    raise ValueError("tier must be warm or cold")
+                properties["tier"] = tier
                 archived = "history" in Path(relative).parts
                 if archived:
                     properties["status"] = "archived"
-                entries = []
                 for chunk in chunks(relative, text):
-                    entry = {k: v for k, v in chunk.items() if k != "body"}
-                    source_time = previous.get("timestamps", {}).get(relative, stamp) if previous.get("sources", {}).get(relative) == digest else stamp
-                    entry.update(source_digest=digest, properties=properties, content_updated_at=source_time)
-                    entries.append(entry)
-                    if relative not in changed:
-                        continue
                     db.execute("INSERT INTO items VALUES(?,?,?,?,?,?,?)", (chunk["key"], relative, chunk["title"],
                                chunk["start"], chunk["end"], digest, json.dumps(properties, ensure_ascii=False)))
-                    db.execute("INSERT INTO text_fts VALUES(?,?,?,?)", (chunk["key"], " ".join(tokens(chunk["title"])), " ".join(tokens(chunk["body"])), " ".join(grams(chunk["body"]))))
+                    db.execute("INSERT INTO text_fts VALUES(?,?,?,?)", (chunk["key"], " ".join(tokens(chunk["title"])), " ".join(tokens(chunk["body"])) if tier == "warm" else "", " ".join(grams(chunk["body"])) if tier == "warm" else ""))
                     for name, value in properties.items():
                         if isinstance(value, dict) or name == "relations":
                             continue
                         for field in value if isinstance(value, list) else [value]:
                             db.execute("INSERT OR IGNORE INTO attributes VALUES(?,?,?)", (name, str(field).casefold(), chunk["key"]))
-                if relative.startswith("hs_dev_docs/"):
-                    groups.setdefault(str(path.parent.relative_to(self.root)), []).extend(entries)
                 if graph is not None and relative in changed:
                     for obj in graph["objects"]:
                         key = relative + "#object:" + obj["id"]
@@ -289,43 +312,34 @@ class Index:
                         raise ValueError("Relations require source, target and kind")
                     if relative in changed:
                         db.execute("INSERT OR IGNORE INTO relations VALUES(?,?,?,?)", (relation["source"], relation["target"], relation["kind"], relative))
-            # Empty stage/activity directories also receive a valid empty index.
-            for directory in (self.root / "hs_dev_docs").rglob("*"):
-                if directory.is_dir() and not directory.is_symlink() and "history" not in directory.relative_to(self.root).parts:
-                    groups.setdefault(str(directory.relative_to(self.root)), [])
-            documents = {}
-            for directory, entries in groups.items():
-                relative = directory + "/content_index.jsonl"
-                data = "\n".join(json.dumps(row, ensure_ascii=False) for row in [
-                    {"schema_version": 1, "generation": generation, "scope": directory, "recursive": False,
-                     "complete": True, "indexed_at": stamp}, *entries]) + "\n"
-                atomic(local(self.root, relative), data)
-                documents[relative] = sha(data.encode())
             data = "\n".join(json.dumps(row, ensure_ascii=False) for row in [
-                {"schema_version": 1, "generation": generation, "indexed_at": stamp, "complete": True},
-                *({"path": p, "source_digest": d,
-                   "content_index": str(Path(p).parent / "content_index.jsonl") if p.startswith("hs_dev_docs/") and Path(p).suffix in TEXT_SUFFIXES else None,
-                   "locator": "symbol" if p.endswith(".py") else "content" if p.startswith("hs_dev_docs/") and Path(p).suffix in TEXT_SUFFIXES else "exact",
-                   "content_updated_at":
-                   previous.get("timestamps", {}).get(p, stamp) if previous.get("sources", {}).get(p) == d else stamp}
-                  for p, d in sorted(source.items()))]) + "\n"
+                {"schema_version": 2, "generation": generation, "complete": True},
+                *({"path": p, "source_digest": d} for p, d in sorted(source.items()))]) + "\n"
             atomic(self.root / FILE_INDEX, data)
-            documents[FILE_INDEX] = sha(data.encode())
+            documents = {FILE_INDEX: sha(data.encode())}
             if inventory(self.root, self.verified_sources) != source:
                 raise ValueError("Workspace changed while publishing; index not valid")
             db.execute("INSERT OR REPLACE INTO meta VALUES('generation',?)", (generation,))
             db.commit()
             timestamps = {p: previous.get("timestamps", {}).get(p, stamp) if previous.get("sources", {}).get(p) == d else stamp for p, d in source.items()}
             write_json(self.root / PUBLICATION, {"schema_version": 1, "generation": generation, "published_at": stamp,
-                       "parser_revision": PARSER_REVISION, "sources": source, "timestamps": timestamps, "indices": documents, "database_digest": self.logical_digest()})
+                       "parser_revision": PARSER_REVISION, "sources": source, "timestamps": timestamps, "indices": documents, "database_digest": self.logical_digest(), "database_file_digest": fingerprint(self.root / DATABASE)})
             self.generation = generation
             self.cache.clear()
-            return {"generation": generation, "files": len(source), "content_indices": len(groups), "changed_files": len(changed)}
+            return {"generation": generation, "files": len(source), "changed_files": len(changed)}
         except Exception:
             db.rollback()
             raise
 
     def verify(self):
+        from ..workspace import Workspace, CURRENT
+        workspace = Workspace(self.root)
+        permit = CURRENT.get()
+        state = workspace.inspect()
+        if permit:
+            workspace.assert_owner(permit)
+        elif state["status"] not in {"SAFE", "UNINITIALIZED", "RECOVERY_REQUIRED"}:
+            return {"ok": False, "errors": ["Workspace " + state["status"]]}
         published = read_json(self.root / PUBLICATION)
         if not published:
             return {"ok": False, "errors": ["No committed publication; initialize explicitly"]}
@@ -351,9 +365,9 @@ class Index:
         if self.verified_database and self.verified_database[0] == database_stamp:
             actual_database = self.verified_database[1]
         else:
-            actual_database = self.logical_digest()
+            actual_database = fingerprint(self.root / DATABASE)
             self.verified_database = (database_stamp, actual_database)
-        if not generation or generation[0] != published["generation"] or actual_database != published["database_digest"]:
+        if not generation or generation[0] != published["generation"] or actual_database != published["database_file_digest"]:
             errors.append("SQLite generation/content drift")
         if self.generation != published["generation"]:
             self.cache.clear()
@@ -361,17 +375,22 @@ class Index:
         return {"ok": not errors, "errors": errors, "generation": published["generation"]}
 
     def ensure(self):
-        status = self.verify()
-        # Missing/damaged derived content can be rebuilt only when the source baseline is intact.
-        if not status["ok"] and not any(e.startswith("Source drift") or e.startswith("No committed") for e in status["errors"]):
-            owner = read_json(self.root / CONTROL / "mutation.lock")
-            if owner and owner.get("pid") == os.getpid():
-                self.publish()
-            else:
-                with workspace_lock(self.root):
-                    self.publish()
+        if self.read_depth:
+            return
+        from ..workspace import Workspace, CURRENT
+        def invalidate():
+            if CURRENT.get() is None:
+                def change(value):
+                    if value["status"] == "SAFE":
+                        value.update(status="RECOVERY_REQUIRED", reason="Index/source verification failed")
+                Workspace(self.root).update(change)
+        try:
             status = self.verify()
+        except (ValueError, OSError, sqlite3.Error):
+            invalidate()
+            raise
         if not status["ok"]:
+            invalidate()
             self.cache.clear()
             raise ValueError("Inconsistent workspace; continue repair or rollback: " + "; ".join(status["errors"][:8]))
 
@@ -439,24 +458,10 @@ class Index:
     @consistent_read
     def exact(self, path, start=1, end=None):
         self.ensure()
+        if path.startswith(CONTROL + "/") or "history" in Path(path).parts:
+            raise ValueError("Runtime/recovery paths require the dedicated context provider")
         file = local(self.root, path)
         published = read_json(self.root / PUBLICATION)
-        if path in published["indices"]:
-            source = published["indices"][path]
-            if start < 1 or (end is not None and end < start):
-                raise ValueError("Invalid index range")
-            stop = min(end or start + CONTENT_CHUNK_LINES - 1, start + CONTENT_CHUNK_LINES - 1)
-            selected = []
-            with file.open(encoding="utf-8") as stream:
-                for number, line in enumerate(stream, 1):
-                    if number > stop:
-                        break
-                    if number >= start:
-                        selected.append(line)
-            if fingerprint(file) != source:
-                raise ValueError("Index changed during reading")
-            return {"path": path, "generation": self.generation, "source_digest": source,
-                    "text": "".join(selected), "start": start, "end": stop, "next_start": stop + 1}
         if file.stat().st_size > self.config["max_file_bytes"]:
             raise ValueError("Read requires a smaller source file")
         data = file.read_bytes()
