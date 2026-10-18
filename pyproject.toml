@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hs-dev-skill"
+version = "5.0.0.0"
+description = "Activity contracts, consistent project knowledge and recoverable development"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = []
+
+[project.scripts]
+hs-dev = "hs_dev.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+hs_dev = ["data/**/*.json", "data/**/*.md"]

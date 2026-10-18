@@ -1,0 +1,37 @@
+{
+  "id": "G2",
+  "title": "切片验证",
+  "path": "workflow/g_implementation_integration/g2_slice_verification",
+  "checks": [
+    {
+      "id": "G2.1",
+      "title": "行为验证",
+      "criterion": "正常边界异常和不变量有实际执行结果；必要时按TDD红绿推进",
+      "method": "产物逐项审阅及适用的可执行验证"
+    },
+    {
+      "id": "G2.2",
+      "title": "工程检查",
+      "criterion": "适用静态、语言、资源和安全检查无未解释失败",
+      "method": "产物逐项审阅及适用的可执行验证"
+    },
+    {
+      "id": "G2.3",
+      "title": "证据",
+      "criterion": "记录基线、时间、环境、退出码和输出，Mock不冒充真实边界",
+      "method": "产物逐项审阅及适用的可执行验证"
+    }
+  ],
+  "upstream": [
+    "G1",
+    "E5"
+  ],
+  "inputs": [
+    "当前有效需求及相关上游契约",
+    "现状证据和已确认决定"
+  ],
+  "outputs": [
+    "本活动结论及适用产物",
+    "清单结果、证据及交接"
+  ]
+}

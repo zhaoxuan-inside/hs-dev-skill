@@ -1,2 +1,0 @@
-{"version": "1.0", "category": "payment_method", "root": "_01_payment"}
-{"id": "method_payment_process", "title": "支付处理方法", "path": "_01_payment_process_design.md", "status": "active", "digest": "b88a7d92"}

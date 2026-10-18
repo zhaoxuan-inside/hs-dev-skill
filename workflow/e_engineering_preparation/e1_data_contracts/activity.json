@@ -1,0 +1,37 @@
+{
+  "id": "E1",
+  "title": "数据契约设计",
+  "path": "workflow/e_engineering_preparation/e1_data_contracts",
+  "checks": [
+    {
+      "id": "E1.1",
+      "title": "数据详情",
+      "criterion": "表结构以Markdown表格说明字段、类型、空值、默认、约束和含义",
+      "method": "产物逐项审阅及适用的可执行验证"
+    },
+    {
+      "id": "E1.2",
+      "title": "数据生命周期",
+      "criterion": "关系、查询、索引、保留和写入归属对应业务规则",
+      "method": "产物逐项审阅及适用的可执行验证"
+    },
+    {
+      "id": "E1.3",
+      "title": "迁移恢复",
+      "criterion": "适用的DDL、正反向迁移及限制可执行验证；无存储时说明不适用",
+      "method": "产物逐项审阅及适用的可执行验证"
+    }
+  ],
+  "upstream": [
+    "D1",
+    "D2"
+  ],
+  "inputs": [
+    "当前有效需求及相关上游契约",
+    "现状证据和已确认决定"
+  ],
+  "outputs": [
+    "本活动结论及适用产物",
+    "清单结果、证据及交接"
+  ]
+}

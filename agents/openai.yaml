@@ -1,0 +1,6 @@
+interface:
+  display_name: "HS 开发活动"
+  short_description: "需求、设计、开发、修复和重构的可恢复执行流程"
+  default_prompt: "使用 hs-dev-skill 检查任务连续性及代码、文档、索引一致性，再执行当前开发活动。"
+policy:
+  allow_implicit_invocation: true

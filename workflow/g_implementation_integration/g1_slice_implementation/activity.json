@@ -1,0 +1,36 @@
+{
+  "id": "G1",
+  "title": "切片实现",
+  "path": "workflow/g_implementation_integration/g1_slice_implementation",
+  "checks": [
+    {
+      "id": "G1.1",
+      "title": "契约实现",
+      "criterion": "按当前有效需求契约实现，正式代码不含旧格式兼容和Mock兜底",
+      "method": "产物逐项审阅及适用的可执行验证"
+    },
+    {
+      "id": "G1.2",
+      "title": "实际修改",
+      "criterion": "新增修改删除方法及资源进入实际修改集合，无魔法业务值",
+      "method": "产物逐项审阅及适用的可执行验证"
+    },
+    {
+      "id": "G1.3",
+      "title": "文档同步",
+      "criterion": "代码行为和文档一致，偏离已确认业务时先处理变更",
+      "method": "产物逐项审阅及适用的可执行验证"
+    }
+  ],
+  "upstream": [
+    "F4"
+  ],
+  "inputs": [
+    "当前有效需求及相关上游契约",
+    "现状证据和已确认决定"
+  ],
+  "outputs": [
+    "本活动结论及适用产物",
+    "清单结果、证据及交接"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "H3",
+  "title": "验收",
+  "path": "workflow/h_delivery_feedback/h3_developer_acceptance",
+  "checks": [
+    {
+      "id": "H3.1",
+      "title": "模式",
+      "criterion": "mute模型验收、stage阶段人工、activity逐活动人工；入口恢复决策不免除",
+      "method": "产物逐项审阅及适用的可执行验证"
+    },
+    {
+      "id": "H3.2",
+      "title": "证据有效",
+      "criterion": "验收绑定对象、范围、源版本和清单摘要，变更使相关确认失效",
+      "method": "产物逐项审阅及适用的可执行验证"
+    },
+    {
+      "id": "H3.3",
+      "title": "完成",
+      "criterion": "适用项通过、阻断清零、验收责任满足才标记任务完成",
+      "method": "产物逐项审阅及适用的可执行验证"
+    }
+  ],
+  "upstream": [
+    "H1",
+    "H2"
+  ],
+  "inputs": [
+    "当前有效需求及相关上游契约",
+    "现状证据和已确认决定"
+  ],
+  "outputs": [
+    "本活动结论及适用产物",
+    "清单结果、证据及交接"
+  ]
+}

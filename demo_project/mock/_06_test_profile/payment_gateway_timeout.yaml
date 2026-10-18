@@ -1,7 +1,0 @@
-profile: "payment_gateway_timeout"
-description: "模拟支付渠道扣款超时场景"
-dataset: "payment_base"
-scenario: "channel_timeout"
-error_inject: "gateway_timeout"
-delay_inject: "slow_alipay"
-contract_ref: "hs_dev_docs/_04_engineering_contract/_03_mock_contract/payment_gateway.json"

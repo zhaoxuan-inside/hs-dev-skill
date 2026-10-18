@@ -1,6 +1,0 @@
-# hs-dev-skill 项目级 Skill 执行配置 (Skill Execution Config)
-# 开关与轨迹记录均按工程隔离；skill_trace 缺省关闭
-version: "1.0"
-
-features:
-  skill_trace: true   # Skill 执行轨迹记录（开启后按会话写入 hs_dev_docs/_06_dev_process/_05_skill_trace/sessions）

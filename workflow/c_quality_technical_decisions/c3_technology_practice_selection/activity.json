@@ -1,0 +1,36 @@
+{
+  "id": "C3",
+  "title": "技术与方法决策",
+  "path": "workflow/c_quality_technical_decisions/c3_technology_practice_selection",
+  "checks": [
+    {
+      "id": "C3.1",
+      "title": "沿用或换型",
+      "criterion": "先判断现有选型是否妨碍目标；换型比较迁移、学习、运行及退出成本",
+      "method": "产物逐项审阅及适用的可执行验证"
+    },
+    {
+      "id": "C3.2",
+      "title": "方法适用性",
+      "criterion": "DDD、TDD、契约式设计、信息隐藏等按问题选用，说明采纳与不适用依据",
+      "method": "产物逐项审阅及适用的可执行验证"
+    },
+    {
+      "id": "C3.3",
+      "title": "决策记录",
+      "criterion": "实际采用版本、取舍及边界可追溯，落选方案不混入执行契约",
+      "method": "产物逐项审阅及适用的可执行验证"
+    }
+  ],
+  "upstream": [
+    "C2"
+  ],
+  "inputs": [
+    "当前有效需求及相关上游契约",
+    "现状证据和已确认决定"
+  ],
+  "outputs": [
+    "本活动结论及适用产物",
+    "清单结果、证据及交接"
+  ]
+}

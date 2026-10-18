@@ -1,0 +1,37 @@
+{
+  "id": "D4",
+  "title": "框架与目录约定",
+  "path": "workflow/d_architecture/d4_framework_conventions",
+  "checks": [
+    {
+      "id": "D4.1",
+      "title": "资源隔离",
+      "criterion": "代码、配置、测试、Mock数据和Mock服务分开；正式代码无模拟分支",
+      "method": "产物逐项审阅及适用的可执行验证"
+    },
+    {
+      "id": "D4.2",
+      "title": "可维护性",
+      "criterion": "目录表达职责，命名可理解，无无意义抽象和魔法业务值",
+      "method": "产物逐项审阅及适用的可执行验证"
+    },
+    {
+      "id": "D4.3",
+      "title": "文档约定",
+      "criterion": "阶段和活动有README，人工文档优先Markdown表格与Mermaid，机器契约保持单源",
+      "method": "产物逐项审阅及适用的可执行验证"
+    }
+  ],
+  "upstream": [
+    "D2",
+    "D3"
+  ],
+  "inputs": [
+    "当前有效需求及相关上游契约",
+    "现状证据和已确认决定"
+  ],
+  "outputs": [
+    "本活动结论及适用产物",
+    "清单结果、证据及交接"
+  ]
+}
