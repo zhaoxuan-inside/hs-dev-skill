@@ -7,7 +7,7 @@ description: >-
 license: MIT
 metadata:
   author: hardstone
-  version: "5.1.0.0"
+  version: "6.0.0.0"
   runtime: "Python >= 3.11, SQLite FTS5; install complete bundle"
 ---
 
@@ -24,7 +24,7 @@ metadata:
 - 信号提取与意图决策分离；无信号、低置信度或冲突时，使用宿主模型通过 classify --model 返回意图及理由。权限与安全门禁独立执行。
 - 新任务按实际影响明确选择活动，续做复用 task_id。上游可以来自本任务已完成结果或明确绑定的已验收产物，不强制重走 A～H。
 - 咨询不建任务、不修改业务内容、不自动修复索引。协调状态读取与可选 trace 不等同业务修改。
-- 内容通过 context 获取，必要约束用 --required 标明。恢复快照和恢复历史不提供给模型。
+- 内容通过 `context @request.json` 获取，选择器用 `required: true` 标明必要约束；先检查 status 与 coverage，再使用 body。恢复快照和恢复历史不提供给模型。
 
 ## 修改与确认
 

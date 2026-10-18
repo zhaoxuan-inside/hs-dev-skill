@@ -10,6 +10,8 @@ from .artifacts import evidence_path
 from .contracts import CheckResult, ExecutionMode, TaskStatus
 from .storage import atomic, local, now, sha
 from .verification import verify_workspace
+from .indexing.semantic import file_id
+from .indexing.units import resolve_units
 
 LABELS = {"PENDING": "待审阅", "PASS": "已通过", "FAIL": "需修改", "STALE": "待复验", "MISSING": "材料缺失"}
 DECISIONS = {"pass", "reject", "defer", "repair"}
@@ -35,24 +37,37 @@ def materials(root, task, activities):
     definitions = {m["id"]: dict(m) for m in task.get("materials", []) if m["activity"] in activities}
     reviews = task.get("material_reviews", {})
     result = []
+    unit_ids = [item.get("unit_id", file_id(item["path"])) for item in definitions.values()]
+    try:
+        units = resolve_units(root, unit_ids)
+    except (ValueError, OSError):
+        units = {}
     for key, item in definitions.items():
         path = evidence_path(root, item["path"])
         source = sha(path.read_bytes()) if path.is_file() else None
-        checklist = workflow.approval_digest(root, task, [item["activity"]])
-        binding = sha(json.dumps([source, checklist, item["title"], item["focus"]], ensure_ascii=False).encode())
+        checklist = sha(json.dumps([row.to_dict() for row in workflow.checks(
+            root, task["task_id"], item["activity"])], sort_keys=True, ensure_ascii=False).encode())
+        unit_id = item.get("unit_id", file_id(item["path"]))
+        unit = units.get(unit_id)
+        unit_revision = unit["unit_revision"] if unit else None
+        binding = sha(json.dumps([unit_revision, checklist, item["title"], item["focus"]], ensure_ascii=False).encode())
         review = reviews.get(key)
         status = CheckResult.PENDING
-        if source is None:
+        if source is None or unit_revision is None:
             status = "MISSING"
         elif review:
             status = review["result"] if review["binding"] == binding else "STALE"
-        result.append({**item, "source_digest": source, "binding": binding, "status": status,
+        result.append({**item, "unit_id": unit_id, "unit_revision": unit_revision,
+                       "source_digest": source, "binding": binding, "status": status,
                        "review": review, "number": len(result) + 1})
     return result
 
 
 def digest(root, task, activities):
-    return sha(json.dumps(materials(root, task, activities), sort_keys=True, ensure_ascii=False).encode())
+    cards = materials(root, task, activities)
+    stable = [{key: item[key] for key in ("id", "unit_id", "unit_revision", "binding", "status")}
+              for item in cards]
+    return sha(json.dumps(stable, sort_keys=True, ensure_ascii=False).encode())
 
 
 def mutable_task(root, task_id):
@@ -69,7 +84,7 @@ def invalidate(task, activity):
     task["verification"] = None
 
 
-def register(root, task_id, activity, path, title, focus):
+def register(root, task_id, activity, path, title, focus, unit_id):
     task = mutable_task(root, task_id)
     if activity not in task["activities"]:
         raise ValueError("Material activity is outside task scope")
@@ -79,7 +94,11 @@ def register(root, task_id, activity, path, title, focus):
     if not file.is_file():
         raise ValueError("Material must be an existing workspace file")
     path = str(file.relative_to(Path(root).resolve()))
-    item = {"id": material_id(activity, path), "activity": activity, "path": path, "title": title, "focus": focus}
+    unit = resolve_units(root, [unit_id])[unit_id]
+    if unit["path"] != path:
+        raise ValueError("Acceptance unit must belong to the registered material file")
+    item = {"id": material_id(activity, path), "unit_id": unit_id,
+            "activity": activity, "path": path, "title": title, "focus": focus}
     registered = task.setdefault("materials", [])
     previous = next((m for m in registered if m["id"] == item["id"]), None)
     if previous == item:
@@ -104,6 +123,7 @@ def record(root, task, item, decision, actor, confirmation, reason="", next_acti
     result = CheckResult.PASS if decision == "pass" else CheckResult.FAIL
     event = {"material_id": item["id"], "result": result, "decision": decision, "actor": actor,
              "confirmation": confirmation, "reason": reason, "next_action": next_action,
+             "unit_id": item["unit_id"], "unit_revision": item["unit_revision"],
              "binding": item["binding"], "source_digest": item["source_digest"], "recorded_at": now()}
     task.setdefault("material_reviews", {})[item["id"]] = event
     task.setdefault("acceptance_history", []).append(event)

@@ -15,7 +15,8 @@ DEFAULTS = {
               "max_age_hours": 48},
     "intent": {"threshold": 0.85, "margin": 0.15},
     "workspace": {"wait_seconds": 1.0},
-    "context": {"max_bytes": 48_000},
+    "context": {"max_output_bytes": 48_000, "max_output_tokens": 0, "tokenizer": "",
+                "max_read_bytes": 8_000_000, "max_units": 128, "max_candidates": 20, "max_dependency_depth": 8},
 }
 
 
@@ -52,8 +53,15 @@ def resolve(root, task_id=None, direct=None, home=None):
         raise ValueError("execution.mode must be mute, stage or activity")
     if not 0 <= values["workspace"]["wait_seconds"] <= 60:
         raise ValueError("Workspace wait must be between 0 and 60 seconds")
-    if not 1 <= values["context"]["max_bytes"] <= 48_000:
-        raise ValueError("Context budget must be between 1 and 48000 bytes")
+    context = values["context"]
+    if not 1024 <= context["max_output_bytes"] <= 48_000:
+        raise ValueError("Context output budget must be between 1024 and 48000 bytes")
+    if context["max_output_tokens"] < 0 or context["tokenizer"] not in {"", "cl100k_base", "o200k_base"}:
+        raise ValueError("Invalid context token configuration")
+    if not 1 <= context["max_units"] <= 512 or not 1 <= context["max_candidates"] <= 100 or not 1 <= context["max_dependency_depth"] <= 32:
+        raise ValueError("Invalid context selection bounds")
+    if not 1 <= context["max_read_bytes"] <= 16_000_000:
+        raise ValueError("Invalid context read budget")
     for key in ("threshold", "margin"):
         if not 0 < values["intent"][key] <= 1:
             raise ValueError("Intent thresholds must be in (0,1]")

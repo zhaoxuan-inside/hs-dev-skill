@@ -32,8 +32,13 @@ def render(result, meta):
         lines.append("待继续或回退的任务：" + ", ".join(result["pending_tasks"]))
     if result.get("requires_model"):
         lines.append("下一步：宿主依据候选与信号作最终判断，通过 --model 提交意图及理由。")
-    if result.get("missing_requirements"):
-        lines.append("缺少必要上下文：" + ", ".join(result["missing_requirements"]))
+    if result.get("missing"):
+        lines.append("缺少上下文：" + str(result["missing"]))
+    if "body" in result:
+        for block in result["body"]:
+            lines.extend(["", f"{block['path']}:{block['start']}-{block['end']}", block["text"]])
+        if result.get("deferred"):
+            lines.append("延迟材料：" + str(result["deferred"]))
     if result.get("confirmation"):
         lines.append("确认：" + str(result["confirmation"]))
     if "events" in result:

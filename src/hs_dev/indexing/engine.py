@@ -1,6 +1,5 @@
 """Exact, tag, FTS5 and relationship search. Published indices are derived artifacts."""
 
-import ast
 import hashlib
 import json
 import re
@@ -11,6 +10,7 @@ from pathlib import Path
 from ..config import resolve
 from ..storage import CONTROL, atomic, identifier, local, managed_files, now, read_json, sha, write_json
 from .cache import ByteLRU
+from .semantic import units
 
 FILE_INDEX = f"{CONTROL}/index/files.jsonl"
 PUBLICATION = f"{CONTROL}/index/publication.json"
@@ -22,12 +22,11 @@ METADATA_FIELDS = {"id", "activity", "stage", "tags", "status", "relations", "mo
 SOURCE_STATES = {"current", "draft", "superseded"}
 MAX_SOURCE_FILES = 50_000
 SOURCE_READ_BLOCK_BYTES = 65_536
-CONTENT_CHUNK_LINES = 80
 MAX_QUERY_CHARACTERS = 1024
 MAX_QUERY_TERMS = 16
 MAX_PHRASE_TERMS = 32
 DEFAULT_RESULT_LIMIT = 10
-PARSER_REVISION = 3
+PARSER_REVISION = 5
 OBJECT_GRAPH = "hs_dev_docs/foundation/object_graph.json"
 
 
@@ -99,16 +98,7 @@ def inventory(root, verified=None, maximum=MAX_SOURCE_FILES):
 
 
 def chunks(path, text):
-    """Bounded heading sections; locations are verified against the source digest."""
-    lines = text.splitlines()
-    starts = [0] + [i for i, line in enumerate(lines) if i and re.match(r"^#{1,6}\s", line)]
-    for ordinal, start in enumerate(starts):
-        stop = starts[ordinal + 1] if ordinal + 1 < len(starts) else len(lines)
-        # Bound each chunk even when the author has not provided headings.
-        for offset in range(start, max(start + 1, stop), CONTENT_CHUNK_LINES):
-            end = min(offset + CONTENT_CHUNK_LINES, stop)
-            yield {"key": f"{path}#{offset + 1}", "title": lines[start].lstrip("# ") if lines else path,
-                   "start": offset + 1, "end": end, "body": "\n".join(lines[offset:end])}
+    return units(path, text)
 
 
 class Index:
@@ -122,6 +112,7 @@ class Index:
         self.verified_indices = {}
         self.verified_database = None
         self.read_depth = 0
+        self.read_revision = None
 
     def __enter__(self):
         return self
@@ -136,6 +127,7 @@ class Index:
         workspace = Workspace(self.root)
         ticket = workspace.ticket(timeout=1)
         self.ensure()
+        self.read_revision = ticket.revision
         self.read_depth += 1
         try:
             yield self
@@ -230,6 +222,7 @@ class Index:
         db.execute("BEGIN")
         try:
             if not intact:
+                db.execute("DROP TABLE IF EXISTS sources")
                 for table in ("items", "attributes", "relations", "text_fts"):
                     db.execute(f"DELETE FROM {table}")
             else:
@@ -269,14 +262,25 @@ class Index:
                 if archived:
                     properties["status"] = "archived"
                 for chunk in chunks(relative, text):
+                    unit_properties = {**properties, **chunk["properties"]}
+                    if unit_properties["unit_kind"] == "file":
+                        unit_properties["unit_revision"] = digest
+                    if unit_properties["unit_kind"] == "symbol":
+                        unit_properties.update(kind="symbol", name=chunk["title"].split(".")[-1],
+                                               symbol=relative + ":" + chunk["title"])
                     db.execute("INSERT INTO items VALUES(?,?,?,?,?,?,?)", (chunk["key"], relative, chunk["title"],
-                               chunk["start"], chunk["end"], digest, json.dumps(properties, ensure_ascii=False)))
+                               chunk["start"], chunk["end"], digest, json.dumps(unit_properties, ensure_ascii=False)))
                     db.execute("INSERT INTO text_fts VALUES(?,?,?,?)", (chunk["key"], " ".join(tokens(chunk["title"])), " ".join(tokens(chunk["body"])) if tier == "warm" else "", " ".join(grams(chunk["body"])) if tier == "warm" else ""))
-                    for name, value in properties.items():
+                    for name, value in unit_properties.items():
                         if isinstance(value, dict) or name == "relations":
                             continue
                         for field in value if isinstance(value, list) else [value]:
                             db.execute("INSERT OR IGNORE INTO attributes VALUES(?,?,?)", (name, str(field).casefold(), chunk["key"]))
+                    for kind in ("requires", "references", "calls_unresolved"):
+                        for target in unit_properties.get(kind, []):
+                            db.execute("INSERT OR IGNORE INTO relations VALUES(?,?,?,?)", (chunk["key"], target, kind, relative))
+                    if unit_properties["parent_id"]:
+                        db.execute("INSERT OR IGNORE INTO relations VALUES(?,?,?,?)", (chunk["key"], unit_properties["parent_id"], "parent", relative))
                 if graph is not None and relative in changed:
                     for obj in graph["objects"]:
                         key = relative + "#object:" + obj["id"]
@@ -289,31 +293,13 @@ class Index:
                             for field in value if isinstance(value, list) else [value]:
                                 if field is not None:
                                     db.execute("INSERT INTO attributes VALUES(?,?,?)", (name, str(field).casefold(), key))
-                if path.suffix == ".py" and not archived and relative in changed:
-                    tree = ast.parse(text, filename=relative)
-                    for node in ast.walk(tree):
-                        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                            continue
-                        symbol = relative + ":" + node.name + ":" + str(node.lineno)
-                        props = {"kind": "symbol", "name": node.name, "module": relative, "symbol": relative + ":" + node.name, "status": "current"}
-                        db.execute("INSERT INTO items VALUES(?,?,?,?,?,?,?)", (symbol, relative, node.name,
-                                   node.lineno, node.end_lineno, digest, json.dumps(props)))
-                        description = ast.get_docstring(node) or ""
-                        db.execute("INSERT INTO text_fts VALUES(?,?,?,?)", (symbol, " ".join(tokens(node.name)), " ".join(tokens(description)), " ".join(grams(description))))
-                        for name, value in props.items():
-                            db.execute("INSERT INTO attributes VALUES(?,?,?)", (name, value.casefold(), symbol))
-                        if not isinstance(node, ast.ClassDef):
-                            for call in ast.walk(node):
-                                if isinstance(call, ast.Call):
-                                    db.execute("INSERT OR IGNORE INTO relations VALUES(?,?,?,?)", (relative + ":" + node.name,
-                                               ast.unparse(call.func), "calls_unresolved", relative))
                 for relation in meta.get("relations", []):
                     if not isinstance(relation, dict) or not all(relation.get(k) for k in ("source", "target", "kind")):
                         raise ValueError("Relations require source, target and kind")
                     if relative in changed:
                         db.execute("INSERT OR IGNORE INTO relations VALUES(?,?,?,?)", (relation["source"], relation["target"], relation["kind"], relative))
             data = "\n".join(json.dumps(row, ensure_ascii=False) for row in [
-                {"schema_version": 2, "generation": generation, "complete": True},
+                {"schema_version": 3, "generation": generation, "complete": True},
                 *({"path": p, "source_digest": d} for p, d in sorted(source.items()))]) + "\n"
             atomic(self.root / FILE_INDEX, data)
             documents = {FILE_INDEX: sha(data.encode())}
@@ -322,7 +308,7 @@ class Index:
             db.execute("INSERT OR REPLACE INTO meta VALUES('generation',?)", (generation,))
             db.commit()
             timestamps = {p: previous.get("timestamps", {}).get(p, stamp) if previous.get("sources", {}).get(p) == d else stamp for p, d in source.items()}
-            write_json(self.root / PUBLICATION, {"schema_version": 1, "generation": generation, "published_at": stamp,
+            write_json(self.root / PUBLICATION, {"schema_version": 2, "generation": generation, "published_at": stamp,
                        "parser_revision": PARSER_REVISION, "sources": source, "timestamps": timestamps, "indices": documents, "database_digest": self.logical_digest(), "database_file_digest": fingerprint(self.root / DATABASE)})
             self.generation = generation
             self.cache.clear()
@@ -440,7 +426,7 @@ class Index:
             sql = "SELECT i.*,0 AS score FROM items i WHERE 1=1"
         if conditions:
             sql += " AND " + " AND ".join(conditions)
-        sql += " ORDER BY score,i.key LIMIT ?"
+        sql += " ORDER BY score,(i.end-i.start),i.key LIMIT ?"
         rows = [dict(row) for row in self.connect().execute(sql, [*parameters, limit])]
         for row in rows:
             row["properties"] = json.loads(row["properties"])

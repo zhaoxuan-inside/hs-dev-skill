@@ -1,4 +1,4 @@
-# hs-dev-skill 5.1.0.0
+# hs-dev-skill 6.0.0.0
 
 以安全版本、活动依赖和有效证据协调软件开发的 Skill。Python 3.11+，SQLite FTS5，无第三方运行依赖。安装需保留完整包；Skill 程序与目标工程运行数据分开。
 
@@ -36,13 +36,13 @@ commit 与 reconcile 均按活动核验前置依赖，并将变更登记到活�
 
 验证报告记录受管源文件摘要及验证期间是否变化；发布前后均复核该摘要，防止接受未验证版本。验证参数在修改代码前校验，路径别名归一化后登记，重复目标拒绝提交。活动输出登记成功后才将恢复日志标为已提交；登记中断仍需恢复。任务完成前再次核对检查证据和确认，最终验证不能悄悄改写此前证据。
 
-本任务未执行的必要上游，通过 `dependency-bind TASK_ID CONSUMER PRODUCER path --actor human --confirmation '实际确认原文'` 引用有效产物。活动执行按依赖检查，不按列表位置强制串行。
+本任务未执行的必要上游，通过 `dependency-bind TASK_ID CONSUMER PRODUCER unit_id --actor human --confirmation '实际确认原文'` 引用有效产物，例如 `file:contract.md` 或 `unit:contract.api`。活动执行按依赖检查，不按列表位置强制串行。
 
 check 记录检查项及证据；acceptance-material 登记需要审阅的交付材料；acceptance 展示统一视图；approve 确认活动或阶段。逐材料决定全部通过且清单就绪时完成同一范围确认，不额外要求重复交互。日志不自动变成主要材料卡。
 
 ## 上下文与追踪
 
-`context --task TASK_ID --query '接口' --required hs_dev_docs/api.md` 装配当前任务和必要片段。热数据有界常驻，温数据正文进入 FTS，冷数据使用 `<!-- hs: {"tier":"cold"} -->` 标记后按磁盘读取。恢复数据排除检索。
+`context @request.json` 使用统一 JSON 请求装配语义上下文。文件、Markdown 章节、Python 限定符号和显式行区间均可定位；必要材料及其依赖整体交付，重叠正文合并，预算不足不返回部分必要正文。CLI 与服务共用预算配置。请求、结果、离线 tokenizer 与版本切换详见[上下文协议](references/context/README.md)。冷数据使用 `<!-- hs: {"tier":"cold"} -->` 标记，正文不进入 FTS；恢复数据排除检索。
 
 trace 默认关闭，全局 --trace 临时开启，也可配置 trace.enabled。`trace-query --task-id TASK_ID` 返回有界摘要事件；trace 不影响确认模式、恢复或业务结果。
 

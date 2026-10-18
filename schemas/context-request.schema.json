@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "context-request.schema.json",
+  "title": "Semantic Context Request v2",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "goal": {
+      "type": "string",
+      "maxLength": 1024
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "query": {
+      "type": "string",
+      "maxLength": 1024
+    },
+    "delivery": {
+      "enum": [
+        "full",
+        "delta"
+      ]
+    },
+    "selectors": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "unit_id"
+            ],
+            "properties": {
+              "unit_id": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "scope"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "scope": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "const": "file"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "start",
+                      "end"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "const": "lines"
+                      },
+                      "start": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "end": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "name"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "const": "symbol"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "title"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "const": "section"
+                      },
+                      "title": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_output_bytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 48000
+        },
+        "max_output_tokens": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "held": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "unit_id",
+          "unit_revision"
+        ],
+        "properties": {
+          "unit_id": {
+            "type": "string"
+          },
+          "unit_revision": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

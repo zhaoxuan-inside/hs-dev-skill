@@ -58,6 +58,7 @@ def parser():
     q.add_argument("task")
     q.add_argument("activity")
     q.add_argument("path")
+    q.add_argument("--unit-id", required=True)
     q.add_argument("--title", required=True)
     q.add_argument("--focus", required=True)
     q = sub.add_parser("acceptance-decide")
@@ -105,10 +106,7 @@ def parser():
     q = sub.add_parser("relations")
     q.add_argument("object")
     q = sub.add_parser("context")
-    q.add_argument("paths", nargs="*")
-    q.add_argument("--query")
-    q.add_argument("--required", action="append", default=[])
-    q.add_argument("--task")
+    q.add_argument("request", help="Context request JSON or @JSON-file")
     q = sub.add_parser("service-query")
     q.add_argument("payload")
     q = sub.add_parser("connect")
@@ -128,7 +126,7 @@ def parser():
     q.add_argument("task")
     q.add_argument("consumer")
     q.add_argument("producer")
-    q.add_argument("path")
+    q.add_argument("unit_id")
     q.add_argument("--actor", choices=["human", "model"], required=True)
     q.add_argument("--confirmation", required=True)
     q = sub.add_parser("trace-query")
@@ -179,7 +177,11 @@ def main(argv=None):
         ok = not isinstance(result, dict) or result.get("ok") is not False
         emit(args.root, "command", {"name": args.command, "ok": ok, "duration_ms": round((time.monotonic()-started)*1000, 3)})
         if args.output == "json":
-            print(json.dumps({"meta": meta, "result": result}, ensure_ascii=False, indent=2))
+            if args.command == "context":
+                from .context_budget import encode
+                print(encode({"meta": meta, "result": result}))
+            else:
+                print(json.dumps({"meta": meta, "result": result}, ensure_ascii=False, indent=2))
         else:
             print(render(result, meta).split("\n", 1)[1].lstrip("\n"))
         return 0 if ok else 1

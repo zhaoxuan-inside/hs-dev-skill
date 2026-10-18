@@ -69,23 +69,25 @@ class Resident:
 
 
 def dispatch(index, resident, request):
+    # ContextProvider owns the single consistent read session for this action.
+    # Wrapping it here would repeat workspace tickets and whole-index verification.
+    if isinstance(request, dict) and request.get("action") == "context":
+        return _dispatch(index, resident, request)
     with index.read_session():
         return _dispatch(index, resident, request)
 
 
 def _dispatch(index, resident, request):
-    from ..workspace import Workspace
     if not isinstance(request, dict):
         raise ValueError("Service request must be an object")
-    Workspace(index.root).ticket(timeout=1)
     if resolve(index.root)["values"]["index"] != index.config:
         raise ValueError("Effective task/project index budgets changed; restart the service before querying")
     action = request.get("action")
     if action == "context":
         from ..context import ContextProvider
-        return ContextProvider(index.root, index, resident).obtain(
-            request.get("paths", []), request.get("task_id"), query=request.get("query"),
-            required=request.get("required", []))
+        if set(request) != {"action", "request"}:
+            raise ValueError("Context service requires action and request")
+        return ContextProvider(index.root, index, resident).obtain(request["request"])
     if action == "search":
         rows = index.search(request.get("query", ""), request.get("filters"), request.get("limit", 10), request.get("match", "terms"))
         hot = [] if request.get("filters") else resident.search(request.get("query", ""), request.get("limit", 10), request.get("task_id"))
@@ -133,7 +135,8 @@ def serve(root, socket_path=None):
                             if len(data) > MAX_REQUEST:
                                 raise ValueError("Request too large")
                         result = dispatch(index, resident, json.loads(data.split(b"\n", 1)[0]))
-                        payload = json.dumps(result, ensure_ascii=False).encode()
+                        from ..context_budget import encode
+                        payload = encode(result).encode()
                         if len(payload) > MAX_RESPONSE:
                             raise ValueError("Response too large; narrow the query")
                     except (ValueError, TypeError, KeyError, OSError, MemoryError, sqlite3.Error) as error:

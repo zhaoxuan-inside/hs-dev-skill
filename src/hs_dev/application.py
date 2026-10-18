@@ -51,7 +51,7 @@ def execute(args):
             return index.publish()
     if name == "dependency-bind":
         from .dependencies import bind
-        return bind(root, args.task, args.consumer, args.producer, args.path, args.actor, args.confirmation)
+        return bind(root, args.task, args.consumer, args.producer, args.unit_id, args.actor, args.confirmation)
     if name == "trace-query":
         from .support.trace import query
         return query(root, args.limit, run_id=args.run_id, task_id=args.task_id, operation_id=args.operation_id,
@@ -93,7 +93,7 @@ def execute(args):
     if name in {"acceptance", "acceptance-material", "acceptance-decide"}:
         from . import acceptance
         if name == "acceptance-material":
-            return acceptance.register(root, args.task, args.activity, args.path, args.title, args.focus)
+            return acceptance.register(root, args.task, args.activity, args.path, args.title, args.focus, args.unit_id)
         if name == "acceptance-decide":
             result = acceptance.decide(root, args.task, args.scope, args.materials.split(","), args.decision,
                                        args.actor, args.confirmation, args.reason, args.next_action, args.view_digest)
@@ -221,8 +221,7 @@ def execute(args):
         with Index(root) as index:
             return index.search(args.query, json_value(args.filters), args.limit, args.match) if name == "search" else index.exact(args.path, args.start, args.end)
     if name == "context":
-        budget = resolve(root, args.task)["values"]["context"]["max_bytes"]
-        return assemble(root, args.paths, args.task, maximum=budget, query=args.query, required=args.required)
+        return assemble(root, json_value(args.request))
     if name == "connect":
         package = Path(args.skill_root).resolve() if args.skill_root else Path(__file__).resolve().parents[2]
         if not (package / "SKILL.md").is_file():

@@ -67,8 +67,8 @@ class SystemTests(unittest.TestCase):
         task = self.start()
         rows = store.checks(self.root, task, "H1")
         self.assertEqual(rows[0].check_id, "H1.1")
-        result = self.call("context", "--task", task)
-        self.assertIn("测试任务", result["active"][0]["text"])
+        result = self.call("context", json.dumps({"task_id": task}))
+        self.assertIn("测试任务", result["body"][0]["text"])
         self.assertTrue(result["ok"])
 
     def test_complete_all_modes(self):
@@ -127,7 +127,7 @@ class SystemTests(unittest.TestCase):
 
     def test_recovery_data_excluded(self):
         task = self.start()
-        self.call("context", f"hs-dev-skill/recovery/snapshots/private", "--task", task, success=False)
+        self.call("context", json.dumps({"task_id": task, "selectors": [{"path": "hs-dev-skill/recovery/snapshots/private", "scope": {"kind": "file"}}]}), success=False)
         self.call("read", "hs-dev-skill/recovery/audit.jsonl", success=False)
 
     def test_commit_recovery_and_source_bound_approval(self):
@@ -324,13 +324,27 @@ class SystemTests(unittest.TestCase):
         self.assertEqual(self.call("search", "--query", "privatecoldword"), [])
         self.assertIn("privatecoldword", self.call("read", "cold.md")["text"])
 
+    def test_repair_removes_legacy_duplicate_source_table(self):
+        with Index(self.root) as index:
+            index.connect(create=True).execute("CREATE TABLE sources(path TEXT PRIMARY KEY, digest TEXT NOT NULL)")
+        publication = json.loads((self.root / PUBLICATION).read_text())
+        publication["parser_revision"] = 4
+        (self.root / PUBLICATION).write_text(json.dumps(publication))
+        self.call("repair-index")
+        with Index(self.root) as index:
+            exists = index.connect().execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='sources'").fetchone()
+        self.assertIsNone(exists)
+
     def test_real_dependency_preserves_upstream_and_tracks_changed_baseline(self):
+        baseline = '# Contract\n## API\n<!-- hs-unit: {"id":"contract.api"} -->\naccepted baseline\n## Notes\ninitial notes'
+        with operation(self.root):
+            (self.root / "baseline.md").write_text(baseline)
+            with Index(self.root) as index:
+                index.publish()
         task = self.start("H3,H1", mode="activity")
-        self.call("commit", task, "--activity", "H1", "--changes", '{"baseline.md":"accepted baseline"}',
-                  "--checks", json.dumps([[sys.executable,"-c","print('baseline')"]]))
         self.pass_na(task)
         self.call("approve", task, "H1", "--actor", "human", "--confirmation", "用户：H1通过")
-        self.call("dependency-bind", task, "H3", "H2", "baseline.md", "--actor", "human",
+        self.call("dependency-bind", task, "H3", "H2", "unit:contract.api", "--actor", "human",
                   "--confirmation", "用户：引用已验收的恢复验证基线")
         self.call("commit", task, "--activity", "H3", "--changes", '{"later.md":"downstream result"}',
                   "--checks", json.dumps([[sys.executable,"-c","print('downstream')"]]))
@@ -338,20 +352,28 @@ class SystemTests(unittest.TestCase):
         self.pass_na(task, "H3")
         self.call("approve", task, "H3", "--actor", "human", "--confirmation", "用户：H3通过")
         self.assertTrue(approval_valid(self.root, store.load_task(self.root, task), "H3"))
-        (self.root/"baseline.md").write_text("changed contract")
+        (self.root/"baseline.md").write_text(baseline.replace("initial notes", "updated notes"))
+        self.assertTrue(approval_valid(self.root, store.load_task(self.root, task), "H3"))
+        (self.root/"baseline.md").write_text(baseline.replace("accepted baseline", "changed contract"))
         self.assertFalse(approval_valid(self.root, store.load_task(self.root, task), "H3"))
 
     def test_material_pass_is_one_scope_confirmation(self):
         task = self.start()
-        self.call("commit", task, "--activity", "H1", "--changes", '{"design.md":"review this result"}',
+        design = '# Design\n## Result\n<!-- hs-unit: {"id":"design.result"} -->\nreview this result\n## Notes\ninitial note'
+        self.call("commit", task, "--activity", "H1", "--changes", json.dumps({"design.md": design}),
                   "--checks", json.dumps([[sys.executable,"-c","print('ok')"]]))
         self.pass_na(task)
-        self.call("acceptance-material", task, "H1", "design.md", "--title", "结果", "--focus", "行为是否符合")
+        self.call("acceptance-material", task, "H1", "design.md", "--unit-id", "unit:design.result", "--title", "结果", "--focus", "行为是否符合")
         view = self.call("acceptance", task)
         result = self.call("acceptance-decide", task, "H", "--materials", view["materials"][0]["id"],
                            "--decision", "pass", "--actor", "human", "--confirmation", "用户：展示的结果通过",
                            "--view-digest", view["view_digest"])
         self.assertTrue(result["approved"])
+        view_digest = result["view_digest"]
+        (self.root / "design.md").write_text(design.replace("initial note", "updated note"))
+        refreshed = self.call("acceptance", task)
+        self.assertEqual(refreshed["materials"][0]["status"], "PASS")
+        self.assertEqual(refreshed["view_digest"], view_digest)
 
     def test_evidence_is_not_a_material_card(self):
         task = self.start()
@@ -366,23 +388,24 @@ class SystemTests(unittest.TestCase):
             (self.root/"big.md").write_text("required constraint\n"*4000)
             with Index(self.root) as index:
                 index.publish()
-        result = ContextProvider(self.root).obtain(required=["big.md"], maximum=100)
+        result = ContextProvider(self.root).obtain({"selectors": [{"path": "big.md", "scope": {"kind": "file"}, "required": True}], "budget": {"max_output_bytes": 1024}})
         self.assertFalse(result["ok"])
-        self.assertIn("big.md", result["missing_requirements"])
+        self.assertEqual(result["status"], "insufficient_budget")
+        self.assertEqual(result["body"], [])
 
     def test_query_reads_matching_slice_beyond_first_page(self):
         with operation(self.root):
             (self.root/"long.md").write_text("line\n"*100 + "needlecontext\n" + "tail\n"*20)
             with Index(self.root) as index:
                 index.publish()
-        result = self.call("context", "--query", "needlecontext")
-        self.assertTrue(any("needlecontext" in c["text"] for c in result["active"]))
+        result = self.call("context", json.dumps({"query": "needlecontext"}))
+        self.assertTrue(any("needlecontext" in c["text"] for c in result["body"]))
 
-    def test_resident_context_uses_hot_original(self):
+    def test_service_context_includes_current_task(self):
         task = self.start()
         with Index(self.root) as index:
-            result = dispatch(index, Resident(self.root, 100_000), {"action":"context", "task_id":task})
-        self.assertEqual(result["active"][0]["source"], "hot")
+            result = dispatch(index, Resident(self.root, 100_000), {"action":"context", "request":{"task_id":task}})
+        self.assertEqual(result["units"][0]["kind"], "task")
 
     def test_cancel_and_stale_read_ticket(self):
         workspace = Workspace(self.root)

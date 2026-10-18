@@ -4,11 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hs-dev-skill"
-version = "5.1.0.0"
+version = "6.0.0.0"
 description = "Activity contracts, consistent project knowledge and recoverable development"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 dependencies = []
+
+[project.optional-dependencies]
+tokens = ["tiktoken>=0.7,<1"]
 
 [project.scripts]
 hs-dev = "hs_dev.cli:main"
