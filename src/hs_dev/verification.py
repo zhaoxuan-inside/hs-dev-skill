@@ -5,14 +5,31 @@ from .contracts import OperationState
 import json
 import subprocess
 from pathlib import Path
-from .storage import CONTROL, identifier, local, now, read_json, write_json
+from .storage import CONTROL, identifier, local, now, read_json, sha, write_json
 
 COMMAND_TIMEOUT = 120
 
 
-def run_checks(root, commands, task_id):
-    if not commands or not all(isinstance(c, list) and c and all(isinstance(a, str) and a for a in c) for c in commands):
+def validate_commands(commands):
+    if not isinstance(commands, list) or not commands or not all(
+            isinstance(c, list) and c and all(isinstance(a, str) and a and "\0" not in a for a in c)
+            for c in commands):
         raise ValueError("Checks require nonempty argv arrays, never shell strings")
+
+
+def source_digest(root):
+    from .indexing.engine import inventory
+    return sha(json.dumps(inventory(root), sort_keys=True, ensure_ascii=False).encode())
+
+
+def require_verified_sources(root, report):
+    if not report["ok"] or report.get("source_digest") != source_digest(root):
+        raise ValueError("Verified sources changed; run verification again before publishing")
+
+
+def run_checks(root, commands, task_id):
+    validate_commands(commands)
+    baseline = source_digest(root)
     base = local(root, f"{CONTROL}/tasks/{task_id}/evidence/{identifier()}")
     base.mkdir(parents=True, exist_ok=False)
     results = []
@@ -31,7 +48,9 @@ def run_checks(root, commands, task_id):
         from .indexing.engine import fingerprint
         digest = fingerprint(output)
         results.append({"argv": command, "exit_code": code, "output": str(output.relative_to(root)), "sha256": digest})
-    report = {"created_at": now(), "ok": all(r["exit_code"] == 0 for r in results), "results": results}
+    unchanged = source_digest(root) == baseline
+    report = {"created_at": now(), "ok": unchanged and all(r["exit_code"] == 0 for r in results),
+              "source_digest": baseline, "sources_unchanged": unchanged, "results": results}
     write_json(base / "result.json", report)
     return {**report, "evidence": str((base / "result.json").relative_to(root))}
 

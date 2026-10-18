@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from hs_dev.cli import main
@@ -19,6 +20,7 @@ from hs_dev.indexing.engine import Index, PUBLICATION, DATABASE
 from hs_dev.support import trace
 from hs_dev.context import ContextProvider
 from hs_dev.indexing.service import Resident, dispatch
+from hs_dev.verification import run_checks, require_verified_sources
 
 
 def contender(root, queue):
@@ -153,6 +155,158 @@ class SystemTests(unittest.TestCase):
         self.call("rollback", op["operation_id"], "--decision", "rollback")
         self.assertFalse((self.root/"bad.txt").exists())
         self.assertEqual(Workspace(self.root).inspect()["status"], "SAFE")
+
+    def test_external_submission_binds_outputs(self):
+        task = self.start(mode="activity")
+        self.pass_na(task)
+        self.call("approve", task, "H1", "--actor", "human", "--confirmation", "用户：通过")
+        permit = self.call("operation-start", "--task", task, "--scope", "example.py")
+        credentials = ("--operation", permit["operation_id"], "--fence", str(permit["fence"]))
+        self.call("snapshot", "--task", task, global_args=credentials)
+        (self.root / "example.py").write_text("value = 1\n")
+        self.call("reconcile", "--task", task, "--activity", "H1", "--decision", "continue",
+                  "--checks", json.dumps([[sys.executable, "-c", "import example; assert example.value == 1"]]),
+                  global_args=credentials)
+        current = store.load_task(self.root, task)
+        self.assertEqual(current["outputs"]["H1"], ["example.py"])
+        self.assertFalse(approval_valid(self.root, current, "H1"))
+        self.call("operation-finish", global_args=credentials)
+
+    def test_external_submission_rejects_scope_escape(self):
+        task = self.start()
+        permit = self.call("operation-start", "--task", task, "--scope", "allowed")
+        credentials = ("--operation", permit["operation_id"], "--fence", str(permit["fence"]))
+        self.call("snapshot", "--task", task, global_args=credentials)
+        (self.root / "outside.py").write_text("value = 1\n")
+        error = self.call("reconcile", "--task", task, "--activity", "H1", "--decision", "continue",
+                          "--checks", json.dumps([[sys.executable, "-c", "print('ok')"]]),
+                          global_args=credentials, success=False)
+        self.assertIn("UUID scope", error)
+        self.assertNotIn("outside.py", json.loads((self.root / PUBLICATION).read_text())["sources"])
+
+    def test_commit_rejects_unrecoverable_paths(self):
+        task = self.start()
+        for path in ("build/source.py", "history/source.py", ".git/config"):
+            self.call("commit", task, "--activity", "H1", "--changes", json.dumps({path: "value = 1"}),
+                      "--checks", json.dumps([[sys.executable, "-c", "print('ok')"]]), success=False)
+            self.assertFalse((self.root / path).exists())
+            self.assertEqual(Workspace(self.root).inspect()["status"], "SAFE")
+
+    def test_external_verification_cannot_publish_its_own_edits(self):
+        task = self.start()
+        permit = self.call("operation-start", "--task", task)
+        credentials = ("--operation", permit["operation_id"], "--fence", str(permit["fence"]))
+        self.call("snapshot", "--task", task, global_args=credentials)
+        (self.root / "example.py").write_text("value = 1\n")
+        self.call("reconcile", "--task", task, "--activity", "H1", "--decision", "continue",
+                  "--checks", json.dumps([[sys.executable, "-c",
+                      "from pathlib import Path; Path('example.py').write_text('value = 2\\n')"]]),
+                  global_args=credentials, success=False)
+        self.assertNotIn("example.py", json.loads((self.root / PUBLICATION).read_text())["sources"])
+        self.assertEqual(Workspace(self.root).inspect()["status"], "RECOVERY_REQUIRED")
+
+    def test_external_submission_requires_upstream(self):
+        task = self.start("H3")
+        permit = self.call("operation-start", "--task", task)
+        credentials = ("--operation", permit["operation_id"], "--fence", str(permit["fence"]))
+        self.call("snapshot", "--task", task, global_args=credentials)
+        (self.root / "example.py").write_text("value = 1\n")
+        error = self.call("reconcile", "--task", task, "--activity", "H3", "--decision", "continue",
+                          "--checks", json.dumps([[sys.executable, "-c", "print('ok')"]]),
+                          global_args=credentials, success=False)
+        self.assertIn("Bind an accepted baseline", error)
+        self.assertNotIn("example.py", json.loads((self.root / PUBLICATION).read_text())["sources"])
+
+    def test_verification_evidence_is_bound_to_sources(self):
+        task = self.start()
+        report = run_checks(self.root, [[sys.executable, "-c", "print('ok')"]], task)
+        self.assertTrue(report["sources_unchanged"])
+        require_verified_sources(self.root, report)
+        (self.root / "later.py").write_text("value = 2\n")
+        with self.assertRaisesRegex(ValueError, "Verified sources changed"):
+            require_verified_sources(self.root, report)
+
+    def test_commit_rejects_edits_between_verification_and_publication(self):
+        task = self.start()
+        publish = Index.publish
+        def drift(index):
+            (self.root / "example.py").write_text("value = 2\n")
+            return publish(index)
+        with patch.object(Index, "publish", drift):
+            error = self.call("commit", task, "--activity", "H1", "--changes", '{"example.py":"value = 1\\n"}',
+                              "--checks", json.dumps([[sys.executable, "-c", "import example; assert example.value == 1"]]),
+                              success=False)
+        self.assertIn("Verified sources changed", error)
+        self.assertEqual(Workspace(self.root).inspect()["status"], "RECOVERY_REQUIRED")
+        journal = next((self.root / "hs-dev-skill/recovery/operations").glob("*.json"))
+        record = json.loads(journal.read_text())
+        self.assertEqual(record["state"], "INTERRUPTED")
+        self.call("rollback", record["operation_id"], "--decision", "rollback")
+        self.assertFalse((self.root / "example.py").exists())
+
+    def test_invalid_commands_do_not_write_code_or_create_recovery_journal(self):
+        task = self.start()
+        for commands in (["echo ok"], [["bad\0command"]], {"argv": ["echo", "ok"]}):
+            self.call("commit", task, "--activity", "H1", "--changes", '{"example.py":"value = 1"}',
+                      "--checks", json.dumps(commands), success=False)
+            self.assertFalse((self.root / "example.py").exists())
+            self.assertEqual(Workspace(self.root).inspect()["status"], "SAFE")
+        self.assertFalse(list((self.root / "hs-dev-skill/recovery/operations").glob("*.json")))
+
+    def test_submission_normalizes_paths_and_rejects_alias_collisions(self):
+        task = self.start()
+        permit = self.call("operation-start", "--task", task, "--scope", "./allowed/")
+        credentials = ("--operation", permit["operation_id"], "--fence", str(permit["fence"]))
+        checks = json.dumps([[sys.executable, "-c", "print('ok')"]])
+        self.call("commit", task, "--activity", "H1", "--changes", '{"./allowed/example.py":"value = 1"}',
+                  "--checks", checks, global_args=credentials)
+        self.assertEqual(store.load_task(self.root, task)["outputs"]["H1"], ["allowed/example.py"])
+        self.call("commit", task, "--activity", "H1",
+                  "--changes", '{"allowed/example.py":"value = 2","./allowed/example.py":"value = 3"}',
+                  "--checks", checks, global_args=credentials, success=False)
+        self.assertEqual((self.root / "allowed/example.py").read_text(), "value = 1")
+        self.call("operation-finish", global_args=credentials)
+
+    def test_publication_registration_failure_remains_recoverable(self):
+        task = self.start()
+        checks = json.dumps([[sys.executable, "-c", "print('ok')"]])
+        with patch("hs_dev.submission.register", side_effect=ValueError("registration interrupted")):
+            self.call("commit", task, "--activity", "H1", "--changes", '{"example.py":"value = 1"}',
+                      "--checks", checks, success=False)
+        self.assertEqual(Workspace(self.root).inspect()["status"], "RECOVERY_REQUIRED")
+        self.call("reconcile", "--task", task, "--activity", "H1", "--decision", "continue", "--checks", checks)
+        self.assertEqual(store.load_task(self.root, task)["outputs"]["H1"], ["example.py"])
+        self.assertEqual(Workspace(self.root).inspect()["status"], "SAFE")
+
+    def test_external_submission_does_not_treat_snapshot_history_as_code(self):
+        history = self.root / "history/old.py"
+        history.parent.mkdir()
+        history.write_text("old_value = 1\n")
+        task = self.start()
+        permit = self.call("operation-start", "--task", task)
+        credentials = ("--operation", permit["operation_id"], "--fence", str(permit["fence"]))
+        self.call("snapshot", "--task", task, global_args=credentials)
+        (self.root / "example.py").write_text("value = 1\n")
+        self.call("reconcile", "--task", task, "--activity", "H1", "--decision", "continue",
+                  "--checks", json.dumps([[sys.executable, "-c", "print('ok')"]]), global_args=credentials)
+        self.call("operation-finish", global_args=credentials)
+        self.assertEqual(store.load_task(self.root, task)["outputs"]["H1"], ["example.py"])
+        self.assertEqual(history.read_text(), "old_value = 1\n")
+
+    def test_final_verification_rechecks_existing_evidence(self):
+        task = self.start(mode="activity")
+        self.pass_na(task)
+        relative = f"hs-dev-skill/tasks/{task}/evidence/baseline.txt"
+        evidence = self.root / relative
+        evidence.parent.mkdir(parents=True, exist_ok=True)
+        evidence.write_text("original evidence")
+        self.call("check", task, "H1", "H1.1", "PASS", "--evidence", relative)
+        self.call("approve", task, "H1", "--actor", "human", "--confirmation", "用户：通过")
+        self.call("complete", task, "--checks", json.dumps([[sys.executable, "-c",
+                  "from pathlib import Path; Path(" + repr(relative) + ").write_text('changed evidence')"]]),
+                  success=False)
+        self.assertEqual(store.load_task(self.root, task)["status"], "ACTIVE")
+        self.assertFalse(approval_valid(self.root, store.load_task(self.root, task), "H1"))
 
     def test_trace_off_and_explicit_on(self):
         self.assertFalse((self.root/"hs-dev-skill/trace").exists())

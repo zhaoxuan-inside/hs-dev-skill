@@ -24,13 +24,17 @@ python /skill/scripts/hs_dev.py --root /project --output json operation-start
 # 保存返回的 operation_id 与 fence；编辑前建立恢复点
 python /skill/scripts/hs_dev.py --root /project --operation UUID --fence 1 snapshot --task TASK_ID
 # 在该操作范围内编辑文件
-python /skill/scripts/hs_dev.py --root /project --operation UUID --fence 1 reconcile --task TASK_ID --decision continue --checks @checks.json
+python /skill/scripts/hs_dev.py --root /project --operation UUID --fence 1 reconcile --task TASK_ID --activity G1 --decision continue --checks @checks.json
 python /skill/scripts/hs_dev.py --root /project --operation UUID --fence 1 operation-finish
 ```
 
 `operation-status` 查看安全状态，`operation-revoke --reason ...` 只撤销已退出的持有者，保持待恢复。`rollback OPERATION_ID --decision rollback` 恢复单次操作；task-rollback 显式恢复整个任务。repair-index 只修复源基线未变的索引，查询不会自动重建。
 
 ## 依赖与确认
+
+commit 与 reconcile 均按活动核验前置依赖，并将变更登记到活动输出、撤销该范围旧确认。reconcile 必须指定 --activity，拒绝操作范围外的变更；验证命令不得修改受管源文件。commit 拒绝被快照和源清单排除的路径（例如 build、dist、history），这些路径不能作为受管代码提交目标。这里的提交是受管文件发布，不会创建 Git commit。
+
+验证报告记录受管源文件摘要及验证期间是否变化；发布前后均复核该摘要，防止接受未验证版本。验证参数在修改代码前校验，路径别名归一化后登记，重复目标拒绝提交。活动输出登记成功后才将恢复日志标为已提交；登记中断仍需恢复。任务完成前再次核对检查证据和确认，最终验证不能悄悄改写此前证据。
 
 本任务未执行的必要上游，通过 `dependency-bind TASK_ID CONSUMER PRODUCER path --actor human --confirmation '实际确认原文'` 引用有效产物。活动执行按依赖检查，不按列表位置强制串行。
 

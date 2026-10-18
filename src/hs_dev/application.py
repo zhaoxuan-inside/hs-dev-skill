@@ -9,7 +9,7 @@ from .indexing.engine import Index
 from .intake import classify
 from .storage import CONTROL, append_event, atomic, identifier, local, now, read_json, write_json
 from .support import recovery
-from .verification import run_checks, verify_workspace
+from .verification import run_checks, verify_workspace, require_verified_sources
 
 
 
@@ -30,7 +30,8 @@ def execute(args):
                 workflow.load_task(root, args.task)
             for relative in args.scope:
                 local(root, relative)
-            return asdict(workspace.acquire(task_id=args.task, scope=args.scope))
+            scope = [str(local(root, relative).relative_to(root)) for relative in args.scope]
+            return asdict(workspace.acquire(task_id=args.task, scope=scope))
         if name == "operation-revoke":
             return workspace.revoke(args.reason)
         if name in {"operation-finish", "operation-cancel"}:
@@ -112,12 +113,7 @@ def execute(args):
             raise ValueError("Commit activity is outside task scope")
         workflow.enter_activity(root, task, args.activity)
         changes = json_value(args.changes)
-        result = recovery.commit(root, args.task, changes, json_value(args.checks))
-        outputs = task.setdefault("outputs", {})
-        outputs[args.activity] = sorted(set(outputs.get(args.activity, [])) | set(changes))
-        task["approvals"].pop(args.activity if task["mode"] == "activity" else args.activity[0], None)
-        workflow.save_task(root, task)
-        return result
+        return recovery.commit(root, args.task, args.activity, changes, json_value(args.checks))
     if name == "rollback":
         return recovery.rollback_operation(root, args.recovery_operation)
     if name == "recover-lock":
@@ -141,9 +137,18 @@ def execute(args):
         return {"snapshot_id": recovery.capture(root, args.task)}
     if name == "reconcile":
         # User's explicit continue is required; verification must precede any new baseline.
-        workflow.load_task(root, args.task)
+        task = workflow.load_task(root, args.task)
+        if task["status"] != TaskStatus.ACTIVE or args.activity not in task["activities"]:
+            raise ValueError("Reconcile requires an active task activity")
+        workflow.enter_activity(root, task, args.activity)
+        from .indexing.engine import inventory, PUBLICATION
+        from .submission import validate_paths, register
+        before_checks = inventory(root)
+        previous = read_json(root / PUBLICATION)["sources"]
+        changed = {p for p in set(before_checks) | set(previous) if before_checks.get(p) != previous.get(p)}
+        validate_paths(root, changed)
         result = run_checks(root, json_value(args.checks), args.task)
-        if not result["ok"]:
+        if not result["ok"] or inventory(root) != before_checks:
             raise ValueError("Repair checks failed; indices were not published")
         pending = []
         from .indexing.engine import inventory
@@ -154,10 +159,11 @@ def execute(args):
                 continue
             if operation["task_id"] != args.task:
                 raise ValueError("Another task has an interrupted operation")
-            before = recovery.manifest(root, operation["snapshot_id"])["files"]
-            altered = {p for p in set(current) | set(before) if not p.startswith(CONTROL + "/")
-                       and Path(p).name not in {"file_index.jsonl", "content_index.jsonl"}
-                       and current.get(p) != (before[p]["sha256"] if p in before else None)}
+            if operation.get("activity", args.activity) != args.activity:
+                raise ValueError("Interrupted operation belongs to a different activity")
+            before = recovery.source_files(recovery.manifest(root, operation["snapshot_id"]))
+            altered = {p for p in set(current) | set(before) if current.get(p) != before.get(p)}
+            validate_paths(root, set(operation["paths"]) | altered)
             operation["paths"] = sorted(set(operation["paths"]) | altered)
             operation["postimage"] = {p: current.get(p) for p in operation["paths"]}
             operation["state"] = OperationState.VERIFIED
@@ -172,22 +178,24 @@ def execute(args):
                     saved = read_json(snapshot_file)
                     if saved["task_id"] != args.task:
                         continue
-                    source_before = {p: value["sha256"] for p, value in saved["files"].items()
-                                     if not p.startswith(CONTROL + "/") and Path(p).name not in {"file_index.jsonl", "content_index.jsonl"}}
+                    source_before = recovery.source_files(saved)
                     if source_before == previous:
                         selected = recovery.manifest(root, saved["snapshot_id"])
                         break
                 if selected is None:
                     raise ValueError("No exact prechange snapshot; restore or establish a reviewed recovery plan before rebasing")
                 operation_id = identifier()
-                operation = {"operation_id": operation_id, "task_id": args.task, "snapshot_id": selected["snapshot_id"],
+                operation = {"operation_id": operation_id, "task_id": args.task, "activity": args.activity, "snapshot_id": selected["snapshot_id"],
                              "created_at": now(), "state": OperationState.VERIFIED, "recovery_available": True,
                              "paths": sorted(altered), "postimage": {p: current.get(p) for p in altered}, "origin": "external_edit"}
                 file = root / CONTROL / "recovery/operations" / (operation_id + ".json")
                 write_json(file, operation)
                 pending.append((file, operation))
+        require_verified_sources(root, result)
         with Index(root) as index:
             publication = index.publish()
+        require_verified_sources(root, result)
+        register(root, task, args.activity, changed | {p for _, item in pending for p in item["paths"]})
         for file, operation in pending:
             operation.update(state=OperationState.COMMITTED, committed_at=now(), evidence=result["evidence"], resolution="explicit_continue")
             write_json(file, operation)

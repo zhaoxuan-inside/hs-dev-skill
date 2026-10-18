@@ -13,6 +13,13 @@ from ..contracts import TaskStatus
 RECOVERY = f"{CONTROL}/recovery"
 
 
+def source_files(saved):
+    """Project source baseline; snapshots also retain runtime and history files."""
+    return {p: entry["sha256"] for p, entry in saved["files"].items()
+            if not p.startswith(CONTROL + "/") and "history" not in Path(p).parts[:-1]
+            and Path(p).name not in {"file_index.jsonl", "content_index.jsonl"}}
+
+
 def capture(root, task_id, kind="task"):
     root = Path(root).resolve()
     snapshot_id = identifier()
@@ -158,31 +165,30 @@ def retain(root, hours=48, maximum=5, protected=()):
     return removed
 
 
-def commit(root, task_id, changes, verification):
+def commit(root, task_id, activity, changes, verification):
     """A recoverable publish protocol, not a claim of filesystem-wide atomicity."""
     from ..indexing.engine import Index
-    from ..verification import run_checks, verify_workspace
+    from ..verification import run_checks, verify_workspace, validate_commands, require_verified_sources
     root = Path(root).resolve()
-    if not changes or not verification:
+    if not isinstance(changes, dict) or not changes:
         raise ValueError("Commit requires changes and real verification commands")
+    validate_commands(verification)
     verify_workspace(root, require_clean=True)
+    from ..submission import validate_paths
+    validate_paths(root, changes)
     normalized = {}
     for relative, content in changes.items():
         path = local(root, relative)
         rel = path.relative_to(root)
-        from ..workspace import CURRENT
-        permit = CURRENT.get()
-        if permit and permit.scope and not any(str(rel) == p or str(rel).startswith(p.rstrip("/") + "/") for p in permit.scope):
-            raise ValueError("Change is outside the UUID scope: " + str(rel))
-        if rel.parts[0] in {CONTROL, ".git"} or path.name in {"file_index.jsonl", "content_index.jsonl"}:
-            raise ValueError("Cannot directly mutate runtime state or derived indices")
         if not isinstance(content, (str, type(None))):
             raise ValueError("Changes must contain UTF-8 strings or null (delete)")
+        if str(rel) in normalized:
+            raise ValueError("Duplicate normalized submission path: " + str(rel))
         normalized[str(rel)] = content
     snapshot_id = capture(root, task_id, "operation")
     operation_id = identifier()
     operation_path = root / RECOVERY / "operations" / (operation_id + ".json")
-    operation = {"operation_id": operation_id, "task_id": task_id, "snapshot_id": snapshot_id,
+    operation = {"operation_id": operation_id, "task_id": task_id, "activity": activity, "snapshot_id": snapshot_id,
                  "created_at": now(), "state": OperationState.PREPARED, "recovery_available": True,
                  "paths": list(normalized), "postimage": {}}
     write_json(operation_path, operation)
@@ -229,9 +235,14 @@ def commit(root, task_id, changes, verification):
         operation["state"] = OperationState.VERIFIED
         write_json(operation_path, operation)
         workspace.transition(permit, "PUBLISHING")
+        require_verified_sources(root, checks)
         with Index(root) as index:
             index.publish()
         verify_workspace(root, require_clean=True, ignore_operation=operation_id)
+        require_verified_sources(root, checks)
+        from ..submission import register
+        from ..task_store import load_task
+        register(root, load_task(root, task_id), activity, normalized)
         operation["state"] = OperationState.COMMITTED
         operation["committed_at"] = now()
         operation["evidence"] = checks["evidence"]
@@ -242,10 +253,8 @@ def commit(root, task_id, changes, verification):
         # Include verification side effects in the actual recovery set.
         from ..indexing.engine import inventory
         current = inventory(root)
-        saved = manifest(root, snapshot_id)["files"]
-        altered = {p for p in set(current) | set(saved) if not p.startswith(CONTROL + "/")
-                   and Path(p).name not in {"content_index.jsonl", "file_index.jsonl"}
-                   and current.get(p) != (saved[p]["sha256"] if p in saved else None)}
+        saved = source_files(manifest(root, snapshot_id))
+        altered = {p for p in set(current) | set(saved) if current.get(p) != saved.get(p)}
         operation["paths"] = sorted(set(operation["paths"]) | altered)
         operation["postimage"].update({p: current.get(p) for p in altered})
         operation["state"] = OperationState.INTERRUPTED

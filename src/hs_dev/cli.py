@@ -80,6 +80,7 @@ def parser():
     q.add_argument("--checks", required=True)
     q = sub.add_parser("reconcile")
     q.add_argument("--task", required=True)
+    q.add_argument("--activity", required=True)
     q.add_argument("--decision", choices=["continue"], required=True)
     q.add_argument("--checks", required=True)
     q = sub.add_parser("rollback")

@@ -9,7 +9,7 @@ from pathlib import Path
 from .config import resolve
 from .storage import CONTROL, atomic, identifier, local, now, read_json, sha, write_json
 from .support import recovery
-from .verification import run_checks, verify_workspace
+from .verification import run_checks, verify_workspace, require_verified_sources
 
 from .models import CheckExecution
 from .task_store import (catalog, task_path, load_task, save_task, tasks, refresh_task_index,
@@ -153,6 +153,15 @@ def finish(root, task_id, commands):
         raise ValueError("Final verification failed")
     # Verification commands may themselves mutate the workspace.
     verify_workspace(root, require_clean=True)
+    require_verified_sources(root, result)
+    # Commands can alter evidence in runtime directories without source drift.
+    task = load_task(root, task_id)
+    if task["status"] != TaskStatus.ACTIVE:
+        raise ValueError("Task changed during final verification")
+    validate_checks(root, task, task["activities"])
+    for scope in scopes:
+        if not approval_valid(root, task, scope):
+            raise ValueError("Missing/stale approval after verification: " + scope)
     task.update(status=TaskStatus.COMPLETED, completed_at=now(), verification=result["evidence"])
     save_task(root, task)
     return task
