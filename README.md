@@ -194,8 +194,20 @@ WORKSPACE STATUS
 | 入口 | 工作流程 |
 | :--- | :--- |
 | [产品](hs-dev-skill/references/skills/domain/hs-dev-product/SKILL.md) | 明确业务目标与边界 → 设计功能和业务流程 → 整理产品产物与审阅依据。 |
-| [架构](hs-dev-skill/references/skills/domain/hs-dev-architecture/SKILL.md) | 核验产品与质量约束 → 划分系统边界和模块职责 → 设计协作关系与技术方案。 |
-| [前端](hs-dev-skill/references/skills/domain/hs-dev-frontend/SKILL.md) | 核验交互与接口约束 → 设计界面、状态及模块 → 实施并验证前端行为。 |
+| [前端框架设计](hs-dev-skill/references/skills/domain/hs-dev-framework-frontend/SKILL.md) | 选择 Web 前端框架 → 设计应用模块、路由、状态和服务端调用边界。 |
+| [后端框架设计](hs-dev-skill/references/skills/domain/hs-dev-framework-backend/SKILL.md) | 设计服务端模块分层、依赖方向、运行模型和外部适配边界。 |
+| [客户端框架基础](hs-dev-skill/references/skills/domain/hs-dev-framework-client-base/SKILL.md) | 提供各客户端平台的共通框架设计原则；按目标端配合平台入口使用。 |
+| [Android 客户端框架](hs-dev-skill/references/skills/domain/hs-dev-framework-client-android/SKILL.md) | 设计 Android 应用组件、进程生命周期、系统能力适配和构建边界。 |
+| [iOS 客户端框架](hs-dev-skill/references/skills/domain/hs-dev-framework-client-ios/SKILL.md) | 设计 iOS 应用与 Scene 生命周期、状态恢复、系统能力及构建边界。 |
+| [Windows 客户端框架](hs-dev-skill/references/skills/domain/hs-dev-framework-client-windows/SKILL.md) | 设计 Windows 应用窗口/进程模型、系统集成、打包和更新边界。 |
+| [Linux 客户端框架](hs-dev-skill/references/skills/domain/hs-dev-framework-client-linux/SKILL.md) | 设计 Linux 桌面应用运行环境、桌面集成、分发和更新边界。 |
+| [前端基础](hs-dev-skill/references/skills/domain/hs-dev-frontend-base/SKILL.md) | 提供各端通用的界面、组件、交互、可访问性和实现要求；配合具体平台入口使用。 |
+| [Web 前端](hs-dev-skill/references/skills/domain/hs-dev-frontend-web/SKILL.md) | 应用浏览器布局、输入、导航、响应式和浏览器兼容特性。 |
+| [Android 前端](hs-dev-skill/references/skills/domain/hs-dev-frontend-android/SKILL.md) | 应用 Android 导航、生命周期、权限、系统返回和设备适配特性。 |
+| [iOS 前端](hs-dev-skill/references/skills/domain/hs-dev-frontend-ios/SKILL.md) | 应用 iOS 导航、安全区、权限、生命周期和辅助功能特性。 |
+| [Windows 前端](hs-dev-skill/references/skills/domain/hs-dev-frontend-windows/SKILL.md) | 应用 Windows 窗口、输入、系统集成、辅助功能和打包特性。 |
+| [macOS 前端](hs-dev-skill/references/skills/domain/hs-dev-frontend-mac/SKILL.md) | 应用 macOS 窗口、菜单、快捷键、系统集成、辅助功能和分发特性。 |
+| [Linux 前端](hs-dev-skill/references/skills/domain/hs-dev-frontend-linux/SKILL.md) | 应用 Linux 桌面环境、显示协议、输入方式、辅助功能和系统集成特性。 |
 | [后端](hs-dev-skill/references/skills/domain/hs-dev-backend/SKILL.md) | 核验业务与数据约束 → 设计数据、接口及方法契约 → 实施并验证后端行为。 |
 | [测试](hs-dev-skill/references/skills/domain/hs-dev-testing/SKILL.md) | 识别适用检查 → 执行行为、契约、集成或回归验证 → 记录证据与未决问题。 |
 | [治理](hs-dev-skill/references/skills/domain/hs-dev-governance/SKILL.md) | 核验已启用的规范 → 维护文档索引、术语、版本与打包一致性 → 检查治理结果。 |
@@ -286,7 +298,7 @@ hs-dev-skill/
 | `hs-dev-skill/scripts/hs_dev/` | 任务、配置、索引、上下文、验证与恢复等程序实现；`data/` 保存随包活动数据。 |
 | `hs-dev-skill/scripts/tests/` | 辅助程序的自动化测试。 |
 
-进一步阅读：[场景与领域索引](hs-dev-skill/references/skills/README.md) · [活动地图](hs-dev-skill/references/workflow/README.md) · [参考资料](hs-dev-skill/references/README.md) · [文档体系](hs-dev-doc/README.md)
+进一步阅读：[场景与领域索引](hs-dev-skill/references/skills/skills.idx) · [活动地图](hs-dev-skill/references/workflow/README.md) · [参考资料](hs-dev-skill/references/README.md) · [文档体系](hs-dev-doc/README.md)
 
 ## 产出目录
 
