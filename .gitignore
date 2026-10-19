@@ -38,7 +38,15 @@ htmlcov/
 _compare_skills/
 
 # Local task state, recovery objects and evidence; long-lived reports belong in hs_dev_docs
-hs-dev-skill/
+/hs-dev-skill/config/
+/hs-dev-skill/state/
+/hs-dev-skill/tasks/
+/hs-dev-skill/task_index.jsonl
+/hs-dev-skill/index/
+/hs-dev-skill/cache/
+/hs-dev-skill/recovery/
+/hs-dev-skill/trace/
+/hs-dev-skill/evidence_archive/
 *.sock
 
 # IDE & OS

@@ -13,13 +13,13 @@ metadata:
 
 # hs-dev-skill
 
-第一项工程操作执行 `python <安装根>/scripts/hs_dev.py --root <工程根> status`。修改或回退进行中等待；中断或漂移进入恢复，不读取混合版本。首次工程显式 init；不以重建索引代替验收。
+第一项工程操作执行 `python <安装根>/hs-dev-skill/scripts/hs_dev.py --root <工程根> status`。修改或回退进行中等待；中断或漂移进入恢复，不读取混合版本。首次工程显式 init；不以重建索引代替验收。
 
 开始逻辑任务时展示 `hs-dev-skill | 版本 | 场景 | 确认模式 | trace on/off`。宿主集成只展示一次；底层命令 JSON 通过 meta 标识来源。
 
 ## 当前目标与路径
 
-读取[场景入口](skills/README.md)中的一个过程 Skill，再按实际触达领域读取专业入口。仅加载[活动地图](workflow/README.md)相关内容。
+读取[场景入口](hs-dev-skill/references/skills/README.md)中的一个过程 Skill，再按实际触达领域读取专业入口。仅加载[活动地图](hs-dev-skill/references/workflow/README.md)相关内容。
 
 - 信号提取与意图决策分离；无信号、低置信度或冲突时，使用宿主模型通过 classify --model 返回意图及理由。权限与安全门禁独立执行。
 - 新任务按实际影响明确选择活动，续做复用 task_id。上游可以来自本任务已完成结果或明确绑定的已验收产物，不强制重走 A～H。
@@ -38,4 +38,4 @@ metadata:
 
 正式代码、配置、测试、Mock 数据与服务分开；外部 Mock 遵循真实协议，通过地址配置替换。无魔法业务值，不因流程扩展业务需求。
 
-详见[执行协议](references/core/execution.md)、[验收协议](references/core/acceptance.md)、[索引与上下文](references/indexing/protocol.md)、[追踪](references/support/trace.md)及[命令说明](README.md)。完整[目标设计](docs/skill-redesign.md)供体系审阅，不要求每次执行通读。
+详见[执行协议](hs-dev-skill/references/core/execution.md)、[验收协议](hs-dev-skill/references/core/acceptance.md)、[索引与上下文](hs-dev-skill/references/indexing/protocol.md)、[追踪](hs-dev-skill/references/support/trace.md)及[命令说明](README.md)。完整[目标设计](hs-dev-doc/skill-redesign.md)供体系审阅，不要求每次执行通读。
