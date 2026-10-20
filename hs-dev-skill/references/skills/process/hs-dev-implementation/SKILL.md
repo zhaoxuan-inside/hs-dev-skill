@@ -32,6 +32,22 @@ license: MIT
 | 与其他切片或模块存在集成边界 | [G3 增量集成](../../../workflow/g_implementation_integration/g3_incremental_integration/checklist.md) |
 | 准备发布本次受管变更 | [G4 一致性提交](../../../workflow/g_implementation_integration/g4_consistent_commit/checklist.md) |
 
+### 平台范例选择
+
+多平台产品按已接受的交付切片逐端实现。全平台支持范围或平台矩阵不代表本轮要并行实现或加载所有端资料；先从当前任务/切片确认目标端，再只加载该端专业 Skill 和对应 G 阶段范例。没有目标端的共享层任务只读取共用契约与共享代码，不猜测平台。
+
+| 当前切片目标 | 本轮范例 |
+|---|---|
+| Web 前端 | [G Web 实现](../../../workflow/examples/g_implementation_frontend_web.md) |
+| Windows 前端 | [G Windows 实现](../../../workflow/examples/g_implementation_frontend_windows.md) |
+| macOS 前端 | [G macOS 实现](../../../workflow/examples/g_implementation_frontend_mac.md) |
+| Linux 前端 | [G Linux 实现](../../../workflow/examples/g_implementation_frontend_linux.md) |
+| iOS 前端 | [G iOS 实现](../../../workflow/examples/g_implementation_frontend_ios.md) |
+| Android 前端 | [G Android 实现](../../../workflow/examples/g_implementation_frontend_android.md) |
+| 后端 | [G 后端实现](../../../workflow/examples/g_implementation_backend.md) |
+
+只有当前切片包含或暴露了尚未解决的架构决定时，才追加读取对应 `d_architecture_*.md`；已接受的架构结论从任务/契约引用，不为实现重复加载其他端或整套 D 范例。端到端切片依实际涉及的客户端与服务端边界读取对应范例。
+
 ## 上下文边界
 
 遵循[主入口](../../../../../SKILL.md)的安全与读取协议；已在上下文中的共同约束不重复加载。活动清单只定义标准，任务代码和产物另按对象定位。扩读前说明缺失的决定或证据及其影响；没有具体缺口时不读取相邻活动、阶段目录或整个 workflow。

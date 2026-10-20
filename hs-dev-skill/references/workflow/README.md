@@ -14,3 +14,5 @@
 - [H 交付、验收与反馈](h_delivery_feedback/README.md)
 
 场景入口和依赖核验见主Skill；每个清单实例在项目任务目录中执行。
+
+完整示例按阶段归档于[workflow 范例](examples/README.md)，文件名以阶段代码开头；平台专项分别给出 D 架构设计和 G 实现验证范例，展示同一决定如何贯穿设计与开发。
