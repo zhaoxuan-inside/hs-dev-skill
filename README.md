@@ -1,4 +1,4 @@
-```text
+<pre align="center">
   _   _ ____          ____  _______     __
  | | | / ___|        |  _ \| ____\ \   / /
  | |_| \___ \  _____ | | | |  _|  \ \ / /
@@ -7,7 +7,7 @@
 
                  S K I L L
        AI -> DOCUMENTS -> CODE
-```
+</pre>
 
 <div align="center">
 
