@@ -1,0 +1,21 @@
+# workflow 阅读索引
+
+本页用于查找未知活动或审阅全流程结构，不是每次任务的必读资料。过程入口按任务条件直接选择具体活动清单；目录中的链接不构成加载要求
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [a_product_intent](a_product_intent/a_product_intent.idx) — 明确当前产品问题、价值、定位和宏观能力边界，为后续功能设计提供依据；不在本阶段默认安排优先级、分期或技术方案。A1 明确问题与价值，A2 明确定位与调性，A3 明确能力与责任边界，按实际缺口选择，不要求局部任务全部重做。
+- [b_product_design](b_product_design/b_product_design.idx) — 将有效产品能力转化为功能、可判断的行为、交互及整体旅程，并对约定范围核验完整性。B1 建立功能基线，B2 明确业务行为，B3 表达操作与反馈，B4 串联结构和旅程，B5 对账整体覆盖；按实际缺口及依赖选择，不要求每次从 B1 重做。
+- [c_quality_technical_decisions](c_quality_technical_decisions/c_quality_technical_decisions.idx) — 把本次质量要求、技术限制和未知转化为有依据的技术决定。C1 定义目标与判据，C2 核实约束及风险，C3 决定沿用或选择技术/方法；按实际问题和依赖选择，不把三个活动当作每次必做流水线。
+- [d_architecture](d_architecture/d_architecture.idx) — 把有效业务和技术决定落实为职责边界、协作结构、质量机制及框架约定。D1 明确概念与归属，D2 表达结构和运行协作，D3 落实质量与演进机制，D4 约定框架和资源组织；按本次缺口选择，不把全部活动强加给局部任务。
+- [e_engineering_preparation](e_engineering_preparation/e_engineering_preparation.idx) — 将有效设计细化为本次需要的数据、接口、方法、运行及验证契约。E1～E4 定义相关工程语义，E5 明确用例，E6/E7 仅按需要提供测试数据与替代服务，E8 定义适用配置，E9 核验指定实施准备；按缺口及依赖选择，不要求每个任务建立全部产物或环境。
+- [examples](examples/examples.idx) — > 虚构案例；本阶段只说明问题与目标，不替代 B 阶段行为定义。
+- [f_delivery_planning](f_delivery_planning/f_delivery_planning.idx) — 把有效范围和设计落实为可执行任务及必要准备。F1 安排切片和依赖，F2 明确当前任务契约，F3 装配版本有效的最小上下文，F4 核实适用恢复准备；按缺口选择，不为局部任务强制重做计划或创建全部任务正文。
+- [g_implementation_integration](g_implementation_integration/g_implementation_integration.idx) — 实现当前有效任务并取得行为、集成及一致发布证据。G1 落实切片修改，G2 验证相关行为和工程检查，G3 核验实际协作及回归，G4 发布受管一致修订；按实际依赖迭代，不推迟到最后首次集成，也不要求局部任务全量重跑。
+- [h_delivery_feedback](h_delivery_feedback/h_delivery_feedback.idx) — 对本次指定交付范围核验成果、可用性、确认和后续责任。H1 对账现状与覆盖，H2 验证实际交付及适用恢复，H3 按模式完成验收责任，H4 分类反馈并交接下一动作；按实际问题选择，不重做产生材料的全部活动。
+
+## 文件
+
+- [workflow-map.md](workflow-map.md) — 本页用于查找未知活动或审阅全流程结构，不是每次任务的必读资料。过程入口按任务条件直接选择具体活动清单；目录中的链接不构成加载要求。

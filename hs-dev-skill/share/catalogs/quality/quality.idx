@@ -1,0 +1,15 @@
+# quality 阅读索引
+
+质量属性参考目录。将适用属性转成情境、期望响应、可测指标和实际证据，不以名称宣称达标。
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [accessibility](accessibility/accessibility.idx) — 辅助技术、键盘操作、语义和可感知反馈。
+- [availability](availability/availability.idx) — 可用性目标、故障情境、恢复和服务边界。
+- [extensibility](extensibility/extensibility.idx) — 扩展点、变化情境和兼容边界。
+- [maintainability](maintainability/maintainability.idx) — 维护目标、代码变化及可验证指标。
+- [performance](performance/performance.idx) — 负载、响应时间、资源消耗和基线。
+- [readability](readability/readability.idx) — 可读性目标、读者任务和维护证据。
+- [security](security/security.idx) — 威胁情境、信任边界、控制措施和验证证据。

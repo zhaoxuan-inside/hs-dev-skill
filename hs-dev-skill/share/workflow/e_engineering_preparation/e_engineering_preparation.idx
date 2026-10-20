@@ -1,0 +1,21 @@
+# e_engineering_preparation 阅读索引
+
+将有效设计细化为本次需要的数据、接口、方法、运行及验证契约。E1～E4 定义相关工程语义，E5 明确用例，E6/E7 仅按需要提供测试数据与替代服务，E8 定义适用配置，E9 核验指定实施准备；按缺口及依赖选择，不要求每个任务建立全部产物或环境
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [e1_data_contracts](e1_data_contracts/e1_data_contracts.idx) — 把本次业务信息语义和归属落实为明确的数据契约及适用存储约束。按实际数据模型选择关系表、文档、文件或内存/交换对象，不默认所有项目需要数据库；只设计受影响对象，复用有效模型。
+- [e2_interface_contracts](e2_interface_contracts/e2_interface_contracts.idx) — 为本次受影响的调用边界定义双方可遵循、可判断的接口契约。按实际协议处理 HTTP、消息、命令或其他交互，不默认新增 Web API 或协议层；只展开相关操作及消费者，复用有效契约。
+- [e3_method_component_contracts](e3_method_component_contracts/e3_method_component_contracts.idx) — 把本次模块与接口决定细化到可实现、可验证的方法或组件边界。只处理关键和受影响对象，不为每个私有函数编写完整设计，不把方法拆分数量或抽象层数当作质量目标。
+- [e4_runtime_failure_design](e4_runtime_failure_design/e4_runtime_failure_design.idx) — 为本次相关操作定义可解释的运行顺序、失败结果和一致性/恢复机制。仅展开实际涉及时序、并发或多步骤更新的对象，不为局部顺序逻辑强加事务、状态机、日志或分布式机制。
+- [e5_test_cases](e5_test_cases/e5_test_cases.idx) — 为本次任务建立能判断有效契约的验证用例及执行条件。按行为和风险选择，不强制所有局部修改新增测试或构建完整测试体系；优先复用仍有效的用例，具体专业方法由 testing 提供。
+- [e6_mock_data](e6_mock_data/e6_mock_data.idx) — 为本次已选验证场景准备安全、可重复的数据。Mock 数据包含测试夹具、生成规则或模拟服务所需数据，不等于必须建立外部服务。已有数据满足用例时直接复用；无数据缺口可说明不适用，不为清单建立数据平台。
+- [e7_mock_services](e7_mock_services/e7_mock_services.idx) — 仅在本次用例需要验证跨协议客户端行为，且已有设施不能满足替代需求时构建 Mock 服务。外部暂不可用不自动触发独立服务；纯方法测试可使用合适替身，无替代需求说明不适用，不额外增加技术栈。
+- [e8_configuration](e8_configuration/e8_configuration.idx) — 为本次运行参数、环境及资源选择建立明确配置契约。复用项目现有配置体系，只补实际缺口；不把本工具自身的环境枚举强加所有项目，不默认创建六套文件、秘密管理服务或部署环境。
+- [e9_readiness_review](e9_readiness_review/e9_readiness_review.idx) — 核验指定范围是否具备实施所需的契约、验证和环境条件。仅在用户要求或实际准备度缺口涉及本活动时使用，不作为每项局部修改必走门禁；不因 E9 引用多个上游就重做 E1～E8。
+
+## 文件
+
+- [stage-overview.md](stage-overview.md) — 将有效设计细化为本次需要的数据、接口、方法、运行及验证契约。E1～E4 定义相关工程语义，E5 明确用例，E6/E7 仅按需要提供测试数据与替代服务，E8 定义适用配置，E9 核验指定实施准备；按缺口及依赖选择，不要求每个任务建立全部产物或环境。

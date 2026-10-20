@@ -5,12 +5,12 @@
       "id": "A",
       "slug": "product_intent",
       "title": "产品构想与宏观信息收集",
-      "path": "hs-dev-skill/references/workflow/a_product_intent",
+      "path": "hs-dev-skill/share/workflow/a_product_intent",
       "activities": [
         {
           "id": "A1",
           "title": "问题、愿景与价值",
-          "path": "hs-dev-skill/references/workflow/a_product_intent/a1_problem_vision_value",
+          "path": "hs-dev-skill/share/workflow/a_product_intent/a1_problem_vision_value",
           "checks": [
             {
               "id": "A1.1",
@@ -44,7 +44,7 @@
         {
           "id": "A2",
           "title": "定位与产品调性",
-          "path": "hs-dev-skill/references/workflow/a_product_intent/a2_positioning_product_character",
+          "path": "hs-dev-skill/share/workflow/a_product_intent/a2_positioning_product_character",
           "checks": [
             {
               "id": "A2.1",
@@ -80,7 +80,7 @@
         {
           "id": "A3",
           "title": "核心能力与业务边界",
-          "path": "hs-dev-skill/references/workflow/a_product_intent/a3_capabilities_business_boundary",
+          "path": "hs-dev-skill/share/workflow/a_product_intent/a3_capabilities_business_boundary",
           "checks": [
             {
               "id": "A3.1",
@@ -120,12 +120,12 @@
       "id": "B",
       "slug": "product_design",
       "title": "功能体系与产品行为设计",
-      "path": "hs-dev-skill/references/workflow/b_product_design",
+      "path": "hs-dev-skill/share/workflow/b_product_design",
       "activities": [
         {
           "id": "B1",
           "title": "完整功能提取",
-          "path": "hs-dev-skill/references/workflow/b_product_design/b1_feature_inventory",
+          "path": "hs-dev-skill/share/workflow/b_product_design/b1_feature_inventory",
           "checks": [
             {
               "id": "B1.1",
@@ -161,7 +161,7 @@
         {
           "id": "B2",
           "title": "逐功能行为设计",
-          "path": "hs-dev-skill/references/workflow/b_product_design/b2_feature_behavior",
+          "path": "hs-dev-skill/share/workflow/b_product_design/b2_feature_behavior",
           "checks": [
             {
               "id": "B2.1",
@@ -197,7 +197,7 @@
         {
           "id": "B3",
           "title": "逐功能交互设计",
-          "path": "hs-dev-skill/references/workflow/b_product_design/b3_feature_interaction",
+          "path": "hs-dev-skill/share/workflow/b_product_design/b3_feature_interaction",
           "checks": [
             {
               "id": "B3.1",
@@ -234,7 +234,7 @@
         {
           "id": "B4",
           "title": "整体结构与功能关联",
-          "path": "hs-dev-skill/references/workflow/b_product_design/b4_structure_connections",
+          "path": "hs-dev-skill/share/workflow/b_product_design/b4_structure_connections",
           "checks": [
             {
               "id": "B4.1",
@@ -271,7 +271,7 @@
         {
           "id": "B5",
           "title": "产品完整性验证",
-          "path": "hs-dev-skill/references/workflow/b_product_design/b5_product_completeness",
+          "path": "hs-dev-skill/share/workflow/b_product_design/b5_product_completeness",
           "checks": [
             {
               "id": "B5.1",
@@ -311,12 +311,12 @@
       "id": "C",
       "slug": "quality_technical_decisions",
       "title": "质量约束与技术决策",
-      "path": "hs-dev-skill/references/workflow/c_quality_technical_decisions",
+      "path": "hs-dev-skill/share/workflow/c_quality_technical_decisions",
       "activities": [
         {
           "id": "C1",
           "title": "质量目标定义",
-          "path": "hs-dev-skill/references/workflow/c_quality_technical_decisions/c1_quality_attributes",
+          "path": "hs-dev-skill/share/workflow/c_quality_technical_decisions/c1_quality_attributes",
           "checks": [
             {
               "id": "C1.1",
@@ -353,7 +353,7 @@
         {
           "id": "C2",
           "title": "技术约束与风险",
-          "path": "hs-dev-skill/references/workflow/c_quality_technical_decisions/c2_constraints_risks",
+          "path": "hs-dev-skill/share/workflow/c_quality_technical_decisions/c2_constraints_risks",
           "checks": [
             {
               "id": "C2.1",
@@ -389,7 +389,7 @@
         {
           "id": "C3",
           "title": "技术与方法决策",
-          "path": "hs-dev-skill/references/workflow/c_quality_technical_decisions/c3_technology_practice_selection",
+          "path": "hs-dev-skill/share/workflow/c_quality_technical_decisions/c3_technology_practice_selection",
           "checks": [
             {
               "id": "C3.1",
@@ -428,12 +428,12 @@
       "id": "D",
       "slug": "architecture",
       "title": "架构与框架设计",
-      "path": "hs-dev-skill/references/workflow/d_architecture",
+      "path": "hs-dev-skill/share/workflow/d_architecture",
       "activities": [
         {
           "id": "D1",
           "title": "领域与职责划分",
-          "path": "hs-dev-skill/references/workflow/d_architecture/d1_domain_responsibilities",
+          "path": "hs-dev-skill/share/workflow/d_architecture/d1_domain_responsibilities",
           "checks": [
             {
               "id": "D1.1",
@@ -470,7 +470,7 @@
         {
           "id": "D2",
           "title": "结构与协作设计",
-          "path": "hs-dev-skill/references/workflow/d_architecture/d2_structure_collaboration",
+          "path": "hs-dev-skill/share/workflow/d_architecture/d2_structure_collaboration",
           "checks": [
             {
               "id": "D2.1",
@@ -506,7 +506,7 @@
         {
           "id": "D3",
           "title": "质量与演进机制",
-          "path": "hs-dev-skill/references/workflow/d_architecture/d3_quality_evolution",
+          "path": "hs-dev-skill/share/workflow/d_architecture/d3_quality_evolution",
           "checks": [
             {
               "id": "D3.1",
@@ -543,7 +543,7 @@
         {
           "id": "D4",
           "title": "框架与目录约定",
-          "path": "hs-dev-skill/references/workflow/d_architecture/d4_framework_conventions",
+          "path": "hs-dev-skill/share/workflow/d_architecture/d4_framework_conventions",
           "checks": [
             {
               "id": "D4.1",
@@ -560,7 +560,7 @@
             {
               "id": "D4.3",
               "title": "文档约定",
-              "criterion": "本次需要的文档有可定位的有效来源，结构和表达服从项目约定，机器契约与派生说明单源一致；不强制每个项目建立阶段/活动 README、表格或 Mermaid，不以文件数量证明完整",
+              "criterion": "本次需要的文档有可定位的有效来源，结构和表达服从项目约定，机器契约与派生说明单源一致；不强制每个项目建立阶段说明/活动指南、表格或 Mermaid，不以文件数量证明完整",
               "method": "核对适用文档入口、契约来源、生成关系及链接，检查重复定义和失效引用；人工示例与机器契约对照，不在生成文件单独修补造成漂移"
             }
           ],
@@ -583,12 +583,12 @@
       "id": "E",
       "slug": "engineering_preparation",
       "title": "工程契约与验证环境构建",
-      "path": "hs-dev-skill/references/workflow/e_engineering_preparation",
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation",
       "activities": [
         {
           "id": "E1",
           "title": "数据契约设计",
-          "path": "hs-dev-skill/references/workflow/e_engineering_preparation/e1_data_contracts",
+          "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e1_data_contracts",
           "checks": [
             {
               "id": "E1.1",
@@ -625,7 +625,7 @@
         {
           "id": "E2",
           "title": "接口契约设计",
-          "path": "hs-dev-skill/references/workflow/e_engineering_preparation/e2_interface_contracts",
+          "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e2_interface_contracts",
           "checks": [
             {
               "id": "E2.1",
@@ -663,7 +663,7 @@
         {
           "id": "E3",
           "title": "方法与组件设计",
-          "path": "hs-dev-skill/references/workflow/e_engineering_preparation/e3_method_component_contracts",
+          "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e3_method_component_contracts",
           "checks": [
             {
               "id": "E3.1",
@@ -700,7 +700,7 @@
         {
           "id": "E4",
           "title": "运行与失败机制设计",
-          "path": "hs-dev-skill/references/workflow/e_engineering_preparation/e4_runtime_failure_design",
+          "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e4_runtime_failure_design",
           "checks": [
             {
               "id": "E4.1",
@@ -738,7 +738,7 @@
         {
           "id": "E5",
           "title": "测试用例构建",
-          "path": "hs-dev-skill/references/workflow/e_engineering_preparation/e5_test_cases",
+          "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e5_test_cases",
           "checks": [
             {
               "id": "E5.1",
@@ -778,7 +778,7 @@
         {
           "id": "E6",
           "title": "Mock数据构建",
-          "path": "hs-dev-skill/references/workflow/e_engineering_preparation/e6_mock_data",
+          "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e6_mock_data",
           "checks": [
             {
               "id": "E6.1",
@@ -815,7 +815,7 @@
         {
           "id": "E7",
           "title": "Mock服务构建",
-          "path": "hs-dev-skill/references/workflow/e_engineering_preparation/e7_mock_services",
+          "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e7_mock_services",
           "checks": [
             {
               "id": "E7.1",
@@ -853,7 +853,7 @@
         {
           "id": "E8",
           "title": "配置体系构建",
-          "path": "hs-dev-skill/references/workflow/e_engineering_preparation/e8_configuration",
+          "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e8_configuration",
           "checks": [
             {
               "id": "E8.1",
@@ -891,7 +891,7 @@
         {
           "id": "E9",
           "title": "工程准备度核验",
-          "path": "hs-dev-skill/references/workflow/e_engineering_preparation/e9_readiness_review",
+          "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e9_readiness_review",
           "checks": [
             {
               "id": "E9.1",
@@ -937,12 +937,12 @@
       "id": "F",
       "slug": "delivery_planning",
       "title": "交付规划与执行准备",
-      "path": "hs-dev-skill/references/workflow/f_delivery_planning",
+      "path": "hs-dev-skill/share/workflow/f_delivery_planning",
       "activities": [
         {
           "id": "F1",
           "title": "交付切片规划",
-          "path": "hs-dev-skill/references/workflow/f_delivery_planning/f1_delivery_slices",
+          "path": "hs-dev-skill/share/workflow/f_delivery_planning/f1_delivery_slices",
           "checks": [
             {
               "id": "F1.1",
@@ -980,7 +980,7 @@
         {
           "id": "F2",
           "title": "任务详细设计",
-          "path": "hs-dev-skill/references/workflow/f_delivery_planning/f2_task_details",
+          "path": "hs-dev-skill/share/workflow/f_delivery_planning/f2_task_details",
           "checks": [
             {
               "id": "F2.1",
@@ -1016,7 +1016,7 @@
         {
           "id": "F3",
           "title": "上下文装配",
-          "path": "hs-dev-skill/references/workflow/f_delivery_planning/f3_context_assembly",
+          "path": "hs-dev-skill/share/workflow/f_delivery_planning/f3_context_assembly",
           "checks": [
             {
               "id": "F3.1",
@@ -1052,7 +1052,7 @@
         {
           "id": "F4",
           "title": "恢复准备",
-          "path": "hs-dev-skill/references/workflow/f_delivery_planning/f4_recovery_preparation",
+          "path": "hs-dev-skill/share/workflow/f_delivery_planning/f4_recovery_preparation",
           "checks": [
             {
               "id": "F4.1",
@@ -1091,12 +1091,12 @@
       "id": "G",
       "slug": "implementation_integration",
       "title": "实现、测试与增量集成",
-      "path": "hs-dev-skill/references/workflow/g_implementation_integration",
+      "path": "hs-dev-skill/share/workflow/g_implementation_integration",
       "activities": [
         {
           "id": "G1",
           "title": "切片实现",
-          "path": "hs-dev-skill/references/workflow/g_implementation_integration/g1_slice_implementation",
+          "path": "hs-dev-skill/share/workflow/g_implementation_integration/g1_slice_implementation",
           "checks": [
             {
               "id": "G1.1",
@@ -1132,7 +1132,7 @@
         {
           "id": "G2",
           "title": "切片验证",
-          "path": "hs-dev-skill/references/workflow/g_implementation_integration/g2_slice_verification",
+          "path": "hs-dev-skill/share/workflow/g_implementation_integration/g2_slice_verification",
           "checks": [
             {
               "id": "G2.1",
@@ -1169,7 +1169,7 @@
         {
           "id": "G3",
           "title": "增量集成",
-          "path": "hs-dev-skill/references/workflow/g_implementation_integration/g3_incremental_integration",
+          "path": "hs-dev-skill/share/workflow/g_implementation_integration/g3_incremental_integration",
           "checks": [
             {
               "id": "G3.1",
@@ -1205,7 +1205,7 @@
         {
           "id": "G4",
           "title": "一致性提交",
-          "path": "hs-dev-skill/references/workflow/g_implementation_integration/g4_consistent_commit",
+          "path": "hs-dev-skill/share/workflow/g_implementation_integration/g4_consistent_commit",
           "checks": [
             {
               "id": "G4.1",
@@ -1244,12 +1244,12 @@
       "id": "H",
       "slug": "delivery_feedback",
       "title": "交付、验收与反馈",
-      "path": "hs-dev-skill/references/workflow/h_delivery_feedback",
+      "path": "hs-dev-skill/share/workflow/h_delivery_feedback",
       "activities": [
         {
           "id": "H1",
           "title": "完整性对账与现状核验",
-          "path": "hs-dev-skill/references/workflow/h_delivery_feedback/h1_coverage_review",
+          "path": "hs-dev-skill/share/workflow/h_delivery_feedback/h1_coverage_review",
           "checks": [
             {
               "id": "H1.1",
@@ -1283,7 +1283,7 @@
         {
           "id": "H2",
           "title": "交付与恢复验证",
-          "path": "hs-dev-skill/references/workflow/h_delivery_feedback/h2_delivery_recovery_verification",
+          "path": "hs-dev-skill/share/workflow/h_delivery_feedback/h2_delivery_recovery_verification",
           "checks": [
             {
               "id": "H2.1",
@@ -1319,7 +1319,7 @@
         {
           "id": "H3",
           "title": "验收",
-          "path": "hs-dev-skill/references/workflow/h_delivery_feedback/h3_developer_acceptance",
+          "path": "hs-dev-skill/share/workflow/h_delivery_feedback/h3_developer_acceptance",
           "checks": [
             {
               "id": "H3.1",
@@ -1356,7 +1356,7 @@
         {
           "id": "H4",
           "title": "反馈与后续",
-          "path": "hs-dev-skill/references/workflow/h_delivery_feedback/h4_feedback_handoff",
+          "path": "hs-dev-skill/share/workflow/h_delivery_feedback/h4_feedback_handoff",
           "checks": [
             {
               "id": "H4.1",

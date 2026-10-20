@@ -1,0 +1,17 @@
+# b_product_design 阅读索引
+
+将有效产品能力转化为功能、可判断的行为、交互及整体旅程，并对约定范围核验完整性。B1 建立功能基线，B2 明确业务行为，B3 表达操作与反馈，B4 串联结构和旅程，B5 对账整体覆盖；按实际缺口及依赖选择，不要求每次从 B1 重做
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [b1_feature_inventory](b1_feature_inventory/b1_feature_inventory.idx) — 将本次有效宏观能力和角色任务转化为可追溯的功能基线。完整性以约定需求和能力为分母，不以候选功能库或竞品全部功能为分母。局部新增/调整只核对受影响项，复用其他有效功能，不重新提取整个产品。
+- [b2_feature_behavior](b2_feature_behavior/b2_feature_behavior.idx) — 为本次功能定义可判断的业务行为，使交互、工程契约和测试有共同依据。只设计受影响功能及必要关联规则，复用有效行为；功能范围或关键业务边界未定时返回具体缺口，不以猜测推进。
+- [b3_feature_interaction](b3_feature_interaction/b3_feature_interaction.idx) — 把本次已明确的功能行为表达为用户可理解、可操作且可核验的交互。只展开受影响功能和相关状态，复用既有设计系统与有效模式；不因进入本活动重做全部页面或建立新组件库。
+- [b4_structure_connections](b4_structure_connections/b4_structure_connections.idx) — 将本次相关功能组织成可达、可衔接的整体业务结构和角色旅程。局部改动只检查受影响节点、连接及必要上下文，不重做全部信息架构；已有有效关系可复用，但需核对是否受本次变化影响。
+- [b5_product_completeness](b5_product_completeness/b5_product_completeness.idx) — 核验本次约定范围的产品设计是否覆盖需求、内部一致且具备有效证据与确认。只核验指定对象及受影响关系，复用有效结果，不为检查完整性重新执行 A/B 全部活动；本活动不等于实现测试或最终交付验收。
+
+## 文件
+
+- [stage-overview.md](stage-overview.md) — 将有效产品能力转化为功能、可判断的行为、交互及整体旅程，并对约定范围核验完整性。B1 建立功能基线，B2 明确业务行为，B3 表达操作与反馈，B4 串联结构和旅程，B5 对账整体覆盖；按实际缺口及依赖选择，不要求每次从 B1 重做。

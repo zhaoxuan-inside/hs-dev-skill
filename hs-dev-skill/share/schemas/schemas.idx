@@ -1,0 +1,13 @@
+# schemas 阅读索引
+
+当前机器契约，未知字段拒绝
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 文件
+
+- [activity.schema.json](activity.schema.json) — { "$schema": "https://json-schema.org/draft/2020-12/schema", "type": "object", "properties": { "id": { "type": "string" }, "title"。
+- [context-request.schema.json](context-request.schema.json) — { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "context-request.schema.json", "title": "Semantic Context Requ。
+- [metadata.schema.json](metadata.schema.json) — { "$schema": "https://json-schema.org/draft/2020-12/schema", "type": "object", "properties": { "id": { "type": "string" }, "activi。
+- [relation.schema.json](relation.schema.json) — { "$schema": "https://json-schema.org/draft/2020-12/schema", "type": "object", "properties": { "source": { "type": "string" }, "ta。
+- [schema-catalog.md](schema-catalog.md) — 当前机器契约，未知字段拒绝。

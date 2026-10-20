@@ -1,0 +1,15 @@
+# a_product_intent 阅读索引
+
+明确当前产品问题、价值、定位和宏观能力边界，为后续功能设计提供依据；不在本阶段默认安排优先级、分期或技术方案。A1 明确问题与价值，A2 明确定位与调性，A3 明确能力与责任边界，按实际缺口选择，不要求局部任务全部重做
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [a1_problem_vision_value](a1_problem_vision_value/a1_problem_vision_value.idx) — 在当前问题、用户价值或成功预期需要明确时使用。已有有效结论直接复用，局部需求不重新发现整个产品；不要求先有完整需求文档才能开始。
+- [a2_positioning_product_character](a2_positioning_product_character/a2_positioning_product_character.idx) — 仅在本次需要明确或调整定位、产品调性，或核验相关主张时使用。已有有效定位和品牌约束直接复用；不因进入本活动强制调研所有竞品或重做视觉系统。
+- [a3_capabilities_business_boundary](a3_capabilities_business_boundary/a3_capabilities_business_boundary.idx) — 在本次核心能力、业务责任或外部协作边界需要明确时使用。只覆盖约定对象，复用有效问题、价值及定位结论，不重做全部产品发现；宏观能力清楚不代表详细功能已经设计完成。
+
+## 文件
+
+- [stage-overview.md](stage-overview.md) — 明确当前产品问题、价值、定位和宏观能力边界，为后续功能设计提供依据；不在本阶段默认安排优先级、分期或技术方案。A1 明确问题与价值，A2 明确定位与调性，A3 明确能力与责任边界，按实际缺口选择，不要求局部任务全部重做。

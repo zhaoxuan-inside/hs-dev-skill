@@ -1,0 +1,16 @@
+# d_architecture 阅读索引
+
+把有效业务和技术决定落实为职责边界、协作结构、质量机制及框架约定。D1 明确概念与归属，D2 表达结构和运行协作，D3 落实质量与演进机制，D4 约定框架和资源组织；按本次缺口选择，不把全部活动强加给局部任务
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [d1_domain_responsibilities](d1_domain_responsibilities/d1_domain_responsibilities.idx) — 为本次相关业务概念、规则和信息确定清晰职责及模块边界。新设计从有效业务契约出发，存量调整同时核对实际代码；局部问题只检查受影响边界，不默认重建全部领域模型。
+- [d2_structure_collaboration](d2_structure_collaboration/d2_structure_collaboration.idx) — 将本次职责边界落实为清晰的依赖、运行协作及必要部署关系。只展开受影响模块、进程和外部边界，复用有效结构；不为完整视图扩大成全系统架构重建或基础设施建设。
+- [d3_quality_evolution](d3_quality_evolution/d3_quality_evolution.idx) — 为本次有效质量目标选择有责任归属、可测试且可演进的机制。只处理相关场景与变化，不为未来可能性默认增加缓存、消息系统、隔离层、遥测或迁移设施；沿用仍满足目标的现有机制。
+- [d4_framework_conventions](d4_framework_conventions/d4_framework_conventions.idx) — 将本次已选框架和架构决定落实为可维护的代码/资源组织及文档约定。沿用项目现有合理结构，只处理实际缺口；不把工作流自身的阶段目录布局强加给业务项目。
+
+## 文件
+
+- [stage-overview.md](stage-overview.md) — 把有效业务和技术决定落实为职责边界、协作结构、质量机制及框架约定。D1 明确概念与归属，D2 表达结构和运行协作，D3 落实质量与演进机制，D4 约定框架和资源组织；按本次缺口选择，不把全部活动强加给局部任务。

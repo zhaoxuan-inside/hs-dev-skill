@@ -1,0 +1,15 @@
+# c_quality_technical_decisions 阅读索引
+
+把本次质量要求、技术限制和未知转化为有依据的技术决定。C1 定义目标与判据，C2 核实约束及风险，C3 决定沿用或选择技术/方法；按实际问题和依赖选择，不把三个活动当作每次必做流水线
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [c1_quality_attributes](c1_quality_attributes/c1_quality_attributes.idx) — 将本次相关质量要求转成可判断、可验证的目标，为技术决策和后续验证提供依据。按风险选择性能、可用性、安全、可维护性、可访问性等实际涉及属性，不加载全部质量目录；已有有效目标直接复用，局部变更仅复核受影响条件。
+- [c2_constraints_risks](c2_constraints_risks/c2_constraints_risks.idx) — 核实本次会影响技术决定的约束和未知，避免后续设计建立在关键猜测上。只调查当前对象与风险，不自动开展全项目审计、全面压测或新技术选型；有效现状和已有核验结果可按版本及条件复用。
+- [c3_technology_practice_selection](c3_technology_practice_selection/c3_technology_practice_selection.idx) — 解决本次确有缺口的技术或工程方法决定。没有实际选型问题时说明沿用依据，不重新比较整套技术栈；技术名称和方法目录只提供候选，不代表默认推荐或强制采用。
+
+## 文件
+
+- [stage-overview.md](stage-overview.md) — 把本次质量要求、技术限制和未知转化为有依据的技术决定。C1 定义目标与判据，C2 核实约束及风险，C3 决定沿用或选择技术/方法；按实际问题和依赖选择，不把三个活动当作每次必做流水线。

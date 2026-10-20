@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "description": "Build manifest for independently publishable hs-dev Skills.",
+  "main": {
+    "name": "hs-dev-skill",
+    "source": "hs-dev-skill/SKILL.md",
+    "license": "LICENSE",
+    "references": "hs-dev-skill/share",
+    "scripts": "hs-dev-skill/scripts",
+    "skill_docs": "hs-dev-docs"
+  },
+  "children_root": "hs-dev-skill/skills",
+  "categories": {
+    "process": [
+      "hs-dev-acceptance", "hs-dev-continuity", "hs-dev-debugging", "hs-dev-design",
+      "hs-dev-discovery", "hs-dev-exploration", "hs-dev-implementation", "hs-dev-planning",
+      "hs-dev-refactoring", "hs-dev-reverse"
+    ],
+    "domain": [
+      "hs-dev-backend", "hs-dev-framework-backend", "hs-dev-framework-client-android",
+      "hs-dev-framework-client-base", "hs-dev-framework-client-ios", "hs-dev-framework-client-linux",
+      "hs-dev-framework-client-windows", "hs-dev-framework-frontend", "hs-dev-frontend-android",
+      "hs-dev-frontend-base", "hs-dev-frontend-ios", "hs-dev-frontend-linux", "hs-dev-frontend-mac",
+      "hs-dev-frontend-web", "hs-dev-frontend-windows", "hs-dev-governance", "hs-dev-product",
+      "hs-dev-testing"
+    ],
+    "support": ["hs-dev-recovery", "hs-dev-trace", "hs-dev-update"]
+  },
+  "output": "output/skills",
+  "resource_policy": {
+    "source_of_truth": "hs-dev-skill/share",
+    "include_linked_resources": true,
+    "include_mandatory_shared_resources": true,
+    "include_related_skill_packages": false,
+    "rewrite_cross_skill_links_as_optional_names": true
+  },
+  "shared_resources": [
+    "hs-dev-skill/share/core/execution.md",
+    "hs-dev-skill/share/core/acceptance.md"
+  ]
+}

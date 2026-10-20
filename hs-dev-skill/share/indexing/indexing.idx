@@ -1,0 +1,9 @@
+# indexing 阅读索引
+
+索引集中于 hs-dev-skill/index/。files.jsonl 是源清单，catalog.sqlite 保存正文片段、属性、符号和依赖定位，publication.json 标识有效发布。索引是可重建派生数据
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 文件
+
+- [protocol.md](protocol.md) — 索引集中于 hs-dev-skill/index/。files.jsonl 是源清单，catalog.sqlite 保存正文片段、属性、符号和依赖定位，publication.json 标识有效发布。索引是可重建派生数据。

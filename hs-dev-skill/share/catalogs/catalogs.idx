@@ -1,0 +1,11 @@
+# catalogs 阅读索引
+
+工程目录候选检查资料总索引。功能库帮助发现需求覆盖，质量目录定义可测质量目标，实践目录提供可选择的工程方法。
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [features](features/features.idx) — 常见业务功能的设计、实现和验证检查库。
+- [practices](practices/practices.idx) — DDD、TDD、契约设计等工程实践参考。
+- [quality](quality/quality.idx) — 安全、性能、可访问性等质量属性参考。

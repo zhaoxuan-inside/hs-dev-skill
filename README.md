@@ -70,17 +70,31 @@ AI 将沟通中的目标、需求、约束和决策整理为持续维护的项�
 
 需要 **Python 3.11 或以上版本**，且 Python 的 SQLite 支持 **FTS5**。宿主 Agent 需要能够读取 Skill 文件并执行本地 Python 命令。
 
-### 2. 安装完整仓库
+### 2. 构建并安装标准 Skill 包
 
-将完整仓库放到宿主支持的 Skill 安装目录，目录名使用 `hs-dev-skill`。以宿主配置的 Skill 目录为准；若该目录为 `~/.codex/skills`，可执行：
+先在仓库根目录构建发布包：
 
 ```bash
-git clone https://github.com/zhaoxuan-inside/hs-dev-skill.git ~/.codex/skills/hs-dev-skill
+python3 hs-dev-skill/scripts/build_skill_packages.py
 ```
 
-其他 Agent 使用其对应的 Skill 目录或本地加载机制。安装后按宿主要求重新加载 Skill。
+将 `output/skills/hs-dev-skill/` 复制到宿主支持的 Skill 安装目录。若该目录为 `~/.codex/skills`，目标路径为 `~/.codex/skills/hs-dev-skill/`。只需使用总控的用户可以只安装此包；需要单独调用的专业 Skill，再将对应同级目录（如 `output/skills/hs-dev-implementation/`）也安装到 Skill 目录。其他 Agent 使用对应的 Skill 目录或本地加载机制。安装后按宿主要求重新加载 Skill。
 
-> 安装时保留完整目录。主入口依赖 `hs-dev-skill/references/` 与 `hs-dev-skill/scripts/` 等内容，单独复制 `SKILL.md` 无法提供完整能力。
+每个 `output/skills/<skill-name>/` 都是完整目录，包含 `SKILL.md` 和它需要的资料；不要只复制 `SKILL.md`。`output/skills/catalog.json` 记录总控与子 Skill 的分类关系。
+
+## 独立发布子 Skill
+
+仓库中的 `hs-dev-skill/skills/<skill-name>/` 保存各子 Skill 的权威 `SKILL.md` 和专属资料；共用资料由 `hs-dev-skill/share/` 单点维护。要生成独立发布包，从仓库根目录运行：
+
+```bash
+python3 hs-dev-skill/scripts/build_skill_packages.py
+```
+
+构建器会在 `output/skills/` 生成 32 个标准 Skill 目录：总控 `hs-dev-skill/` 和 31 个流程、领域及支撑 Skill。每个目录都包含自己的 `SKILL.md` 和完整的本地资料引用闭包，可单独复制、压缩和发布；`catalog.json` 记录总控与子 Skill 的层级。生成时会校验 frontmatter 及包内 Markdown 链接，构建失败时不会得到通过校验的结果。
+
+共用的执行和验收协议由 `hs-dev-skill/share/core/` 集中维护，清单位于 `hs-dev-skill/skill-packages.json`；构建时复制到每个子 Skill 的 `references/core/`。其他资料按各 Skill 的实际引用装入，不会把整套工作流或所有平台范例塞进每个包。子 Skill 提到的其他专业入口属于可选协作关系，不是该包的文件或安装依赖。
+
+`output/` 是可再生成的发布产物，不作为第二份权威源维护。修改源 Skill 或共享协议后重新构建即可更新相应包。
 
 ### 3. 在目标工程中接入
 
@@ -99,8 +113,8 @@ git clone https://github.com/zhaoxuan-inside/hs-dev-skill.git ~/.codex/skills/hs
 Agent 先检查工作区状态；首次使用时显式初始化目标工程。手动接入时，可执行以下命令，路径替换为实际安装位置和工程位置：
 
 ```bash
-python /path/to/skill-root/hs-dev-skill/scripts/hs_dev.py --root /path/to/project status
-python /path/to/skill-root/hs-dev-skill/scripts/hs_dev.py --root /path/to/project init
+python /path/to/skill-root/scripts/hs_dev.py --root /path/to/project status
+python /path/to/skill-root/scripts/hs_dev.py --root /path/to/project init
 ```
 
 `init` 仅用于尚未初始化的工程。已有任务通过状态检查选择继续或恢复。Skill 程序保留在安装位置，项目文档和运行数据保存在目标工程内。
@@ -133,7 +147,7 @@ python /path/to/skill-root/hs-dev-skill/scripts/hs_dev.py --root /path/to/projec
 
 ### 主入口：从目标选择路径
 
-[SKILL.md](SKILL.md) 是宿主加载的主入口，负责安全检查、意图判断和入口选择。信号不足或冲突时，由宿主模型结合当前目标判断路径。
+[SKILL.md](hs-dev-skill/SKILL.md) 是宿主加载的主入口，负责安全检查、意图判断和入口选择。信号不足或冲突时，由宿主模型结合当前目标判断路径。
 
 ```text
 USER REQUEST
@@ -154,7 +168,7 @@ WORKSPACE STATUS
 
 ### 活动地图：从构想到交付
 
-下图展示完整开发路径，字母对应[活动地图](hs-dev-skill/references/workflow/README.md)。它用于定位工作阶段；具体任务按依赖选择活动，允许复用已有产物。
+下图展示完整开发路径，字母对应[活动地图](hs-dev-skill/share/workflow/workflow-map.md)。它用于定位工作阶段；具体任务按依赖选择活动，允许复用已有产物。
 
 ```text
  [ A ] --> [ B ] --> [ C ] --> [ D ]
@@ -176,16 +190,16 @@ WORKSPACE STATUS
 
 | 入口 | 何时进入 | 工作流程 |
 | :--- | :--- | :--- |
-| [需求与产品设计](hs-dev-skill/references/skills/process/hs-dev-discovery/SKILL.md) | 新产品、新功能、需求梳理 | 收集问题、愿景与边界（A）→ 提取功能 → 逐功能设计行为与交互 → 串联整体产品（B）。 |
-| [工程设计](hs-dev-skill/references/skills/process/hs-dev-design/SKILL.md) | 技术选型、架构、契约与验证环境 | 核验产品输入 → 明确质量约束与技术选择（C）→ 设计架构与协作（D）→ 准备数据、接口、测试、Mock 与配置（E）。 |
-| [任务规划](hs-dev-skill/references/skills/process/hs-dev-planning/SKILL.md) | 将设计转成可执行任务 | 核验设计输入 → 划分交付切片 → 映射需求、任务与方法 → 装配上下文 → 准备恢复依据（F）。 |
-| [实现与集成](hs-dev-skill/references/skills/process/hs-dev-implementation/SKILL.md) | 实施已明确的工程任务 | 核验契约及依赖 → 按切片实现 → 真实验证 → 增量集成 → 核验文档、代码、索引与任务记录的一致性（G）。 |
-| [验收](hs-dev-skill/references/skills/process/hs-dev-acceptance/SKILL.md) | 检查活动或阶段的交付结果 | 核对检查项 → 展示材料、证据与问题 → 按模式记录决定 → 通过后供下游使用；未通过则保留原因及下一动作。 |
-| [缺陷修复](hs-dev-skill/references/skills/process/hs-dev-debugging/SKILL.md) | 实际报错、超时、失败或缺陷 | 复现并建立现状基线（H1）→ 核验需求与契约 → 定位根因 → 选择受影响活动 → 修复并执行回归验证。 |
-| [结构重构](hs-dev-skill/references/skills/process/hs-dev-refactoring/SKILL.md) | 保持行为并改善结构 | 阅读真实代码并建立行为保护（H1）→ 核验业务边界（A/B）→ 调整受影响设计与实现（C～G）→ 验证行为保持一致。 |
-| [存量调查](hs-dev-skill/references/skills/process/hs-dev-reverse/SKILL.md) | 接手已有工程、重建可证实的契约 | 现状取证 → 区分观察与推断 → 重建契约与关系 → 标记未知需求 → 按活动逐步纳管。 |
-| [只读探索](hs-dev-skill/references/skills/process/hs-dev-exploration/SKILL.md) | 理解代码、解释设计、分析现有流程 | 检查工作区状态 → 只读定位 → 整理位置证据 → 返回结论；不创建任务、快照或业务文档。 |
-| [任务续做](hs-dev-skill/references/skills/process/hs-dev-continuity/SKILL.md) | 继续任务、评估变更影响或回退 | 复用任务 ID → 核对未完成项及一致性 → 识别受影响范围 → 继续执行或按决定回退 → 更新任务状态。 |
+| [需求与产品设计](hs-dev-skill/skills/hs-dev-discovery/SKILL.md) | 新产品、新功能、需求梳理 | 收集问题、愿景与边界（A）→ 提取功能 → 逐功能设计行为与交互 → 串联整体产品（B）。 |
+| [工程设计](hs-dev-skill/skills/hs-dev-design/SKILL.md) | 技术选型、架构、契约与验证环境 | 核验产品输入 → 明确质量约束与技术选择（C）→ 设计架构与协作（D）→ 准备数据、接口、测试、Mock 与配置（E）。 |
+| [任务规划](hs-dev-skill/skills/hs-dev-planning/SKILL.md) | 将设计转成可执行任务 | 核验设计输入 → 划分交付切片 → 映射需求、任务与方法 → 装配上下文 → 准备恢复依据（F）。 |
+| [实现与集成](hs-dev-skill/skills/hs-dev-implementation/SKILL.md) | 实施已明确的工程任务 | 核验契约及依赖 → 按切片实现 → 真实验证 → 增量集成 → 核验文档、代码、索引与任务记录的一致性（G）。 |
+| [验收](hs-dev-skill/skills/hs-dev-acceptance/SKILL.md) | 检查活动或阶段的交付结果 | 核对检查项 → 展示材料、证据与问题 → 按模式记录决定 → 通过后供下游使用；未通过则保留原因及下一动作。 |
+| [缺陷修复](hs-dev-skill/skills/hs-dev-debugging/SKILL.md) | 实际报错、超时、失败或缺陷 | 复现并建立现状基线（H1）→ 核验需求与契约 → 定位根因 → 选择受影响活动 → 修复并执行回归验证。 |
+| [结构重构](hs-dev-skill/skills/hs-dev-refactoring/SKILL.md) | 保持行为并改善结构 | 阅读真实代码并建立行为保护（H1）→ 核验业务边界（A/B）→ 调整受影响设计与实现（C～G）→ 验证行为保持一致。 |
+| [存量调查](hs-dev-skill/skills/hs-dev-reverse/SKILL.md) | 接手已有工程、重建可证实的契约 | 现状取证 → 区分观察与推断 → 重建契约与关系 → 标记未知需求 → 按活动逐步纳管。 |
+| [只读探索](hs-dev-skill/skills/hs-dev-exploration/SKILL.md) | 理解代码、解释设计、分析现有流程 | 检查工作区状态 → 只读定位 → 整理位置证据 → 返回结论；不创建任务、快照或业务文档。 |
+| [任务续做](hs-dev-skill/skills/hs-dev-continuity/SKILL.md) | 继续任务、评估变更影响或回退 | 复用任务 ID → 核对未完成项及一致性 → 识别受影响范围 → 继续执行或按决定回退 → 更新任务状态。 |
 
 ### 专业入口：按涉及领域协作
 
@@ -193,32 +207,32 @@ WORKSPACE STATUS
 
 | 入口 | 工作流程 |
 | :--- | :--- |
-| [产品](hs-dev-skill/references/skills/domain/hs-dev-product/SKILL.md) | 明确业务目标与边界 → 设计功能和业务流程 → 整理产品产物与审阅依据。 |
-| [前端框架设计](hs-dev-skill/references/skills/domain/hs-dev-framework-frontend/SKILL.md) | 选择 Web 前端框架 → 设计应用模块、路由、状态和服务端调用边界。 |
-| [后端框架设计](hs-dev-skill/references/skills/domain/hs-dev-framework-backend/SKILL.md) | 设计服务端模块分层、依赖方向、运行模型和外部适配边界。 |
-| [客户端框架基础](hs-dev-skill/references/skills/domain/hs-dev-framework-client-base/SKILL.md) | 提供各客户端平台的共通框架设计原则；按目标端配合平台入口使用。 |
-| [Android 客户端框架](hs-dev-skill/references/skills/domain/hs-dev-framework-client-android/SKILL.md) | 设计 Android 应用组件、进程生命周期、系统能力适配和构建边界。 |
-| [iOS 客户端框架](hs-dev-skill/references/skills/domain/hs-dev-framework-client-ios/SKILL.md) | 设计 iOS 应用与 Scene 生命周期、状态恢复、系统能力及构建边界。 |
-| [Windows 客户端框架](hs-dev-skill/references/skills/domain/hs-dev-framework-client-windows/SKILL.md) | 设计 Windows 应用窗口/进程模型、系统集成、打包和更新边界。 |
-| [Linux 客户端框架](hs-dev-skill/references/skills/domain/hs-dev-framework-client-linux/SKILL.md) | 设计 Linux 桌面应用运行环境、桌面集成、分发和更新边界。 |
-| [前端基础](hs-dev-skill/references/skills/domain/hs-dev-frontend-base/SKILL.md) | 提供各端通用的界面、组件、交互、可访问性和实现要求；配合具体平台入口使用。 |
-| [Web 前端](hs-dev-skill/references/skills/domain/hs-dev-frontend-web/SKILL.md) | 应用浏览器布局、输入、导航、响应式和浏览器兼容特性。 |
-| [Android 前端](hs-dev-skill/references/skills/domain/hs-dev-frontend-android/SKILL.md) | 应用 Android 导航、生命周期、权限、系统返回和设备适配特性。 |
-| [iOS 前端](hs-dev-skill/references/skills/domain/hs-dev-frontend-ios/SKILL.md) | 应用 iOS 导航、安全区、权限、生命周期和辅助功能特性。 |
-| [Windows 前端](hs-dev-skill/references/skills/domain/hs-dev-frontend-windows/SKILL.md) | 应用 Windows 窗口、输入、系统集成、辅助功能和打包特性。 |
-| [macOS 前端](hs-dev-skill/references/skills/domain/hs-dev-frontend-mac/SKILL.md) | 应用 macOS 窗口、菜单、快捷键、系统集成、辅助功能和分发特性。 |
-| [Linux 前端](hs-dev-skill/references/skills/domain/hs-dev-frontend-linux/SKILL.md) | 应用 Linux 桌面环境、显示协议、输入方式、辅助功能和系统集成特性。 |
-| [后端](hs-dev-skill/references/skills/domain/hs-dev-backend/SKILL.md) | 核验业务与数据约束 → 设计数据、接口及方法契约 → 实施并验证后端行为。 |
-| [测试](hs-dev-skill/references/skills/domain/hs-dev-testing/SKILL.md) | 识别适用检查 → 执行行为、契约、集成或回归验证 → 记录证据与未决问题。 |
-| [治理](hs-dev-skill/references/skills/domain/hs-dev-governance/SKILL.md) | 核验已启用的规范 → 维护文档索引、术语、版本与打包一致性 → 检查治理结果。 |
+| [产品](hs-dev-skill/skills/hs-dev-product/SKILL.md) | 明确业务目标与边界 → 设计功能和业务流程 → 整理产品产物与审阅依据。 |
+| [前端框架设计](hs-dev-skill/skills/hs-dev-framework-frontend/SKILL.md) | 选择 Web 前端框架 → 设计应用模块、路由、状态和服务端调用边界。 |
+| [后端框架设计](hs-dev-skill/skills/hs-dev-framework-backend/SKILL.md) | 设计服务端模块分层、依赖方向、运行模型和外部适配边界。 |
+| [客户端框架基础](hs-dev-skill/skills/hs-dev-framework-client-base/SKILL.md) | 提供各客户端平台的共通框架设计原则；按目标端配合平台入口使用。 |
+| [Android 客户端框架](hs-dev-skill/skills/hs-dev-framework-client-android/SKILL.md) | 设计 Android 应用组件、进程生命周期、系统能力适配和构建边界。 |
+| [iOS 客户端框架](hs-dev-skill/skills/hs-dev-framework-client-ios/SKILL.md) | 设计 iOS 应用与 Scene 生命周期、状态恢复、系统能力及构建边界。 |
+| [Windows 客户端框架](hs-dev-skill/skills/hs-dev-framework-client-windows/SKILL.md) | 设计 Windows 应用窗口/进程模型、系统集成、打包和更新边界。 |
+| [Linux 客户端框架](hs-dev-skill/skills/hs-dev-framework-client-linux/SKILL.md) | 设计 Linux 桌面应用运行环境、桌面集成、分发和更新边界。 |
+| [前端基础](hs-dev-skill/skills/hs-dev-frontend-base/SKILL.md) | 提供各端通用的界面、组件、交互、可访问性和实现要求；配合具体平台入口使用。 |
+| [Web 前端](hs-dev-skill/skills/hs-dev-frontend-web/SKILL.md) | 应用浏览器布局、输入、导航、响应式和浏览器兼容特性。 |
+| [Android 前端](hs-dev-skill/skills/hs-dev-frontend-android/SKILL.md) | 应用 Android 导航、生命周期、权限、系统返回和设备适配特性。 |
+| [iOS 前端](hs-dev-skill/skills/hs-dev-frontend-ios/SKILL.md) | 应用 iOS 导航、安全区、权限、生命周期和辅助功能特性。 |
+| [Windows 前端](hs-dev-skill/skills/hs-dev-frontend-windows/SKILL.md) | 应用 Windows 窗口、输入、系统集成、辅助功能和打包特性。 |
+| [macOS 前端](hs-dev-skill/skills/hs-dev-frontend-mac/SKILL.md) | 应用 macOS 窗口、菜单、快捷键、系统集成、辅助功能和分发特性。 |
+| [Linux 前端](hs-dev-skill/skills/hs-dev-frontend-linux/SKILL.md) | 应用 Linux 桌面环境、显示协议、输入方式、辅助功能和系统集成特性。 |
+| [后端](hs-dev-skill/skills/hs-dev-backend/SKILL.md) | 核验业务与数据约束 → 设计数据、接口及方法契约 → 实施并验证后端行为。 |
+| [测试](hs-dev-skill/skills/hs-dev-testing/SKILL.md) | 识别适用检查 → 执行行为、契约、集成或回归验证 → 记录证据与未决问题。 |
+| [治理](hs-dev-skill/skills/hs-dev-governance/SKILL.md) | 核验已启用的规范 → 维护文档索引、术语、版本与打包一致性 → 检查治理结果。 |
 
 ### 支撑入口：恢复、更新与追踪
 
 | 入口 | 工作流程 |
 | :--- | :--- |
-| [恢复](hs-dev-skill/references/skills/support/hs-dev-recovery/SKILL.md) | 保存快照与变更记录 → 检测中断及冲突 → 恢复 → 核验一致性 → 按保留策略清理。 |
-| [更新](hs-dev-skill/references/skills/support/hs-dev-update/SKILL.md) | 获得明确更新授权 → 校验当前完整包 → 暂存与替换 → 失败时恢复。 |
-| [追踪](hs-dev-skill/references/skills/support/hs-dev-trace/SKILL.md) | 按需启用 → 记录本项目摘要事件 → 有界查询与轮转；默认关闭。 |
+| [恢复](hs-dev-skill/skills/hs-dev-recovery/SKILL.md) | 保存快照与变更记录 → 检测中断及冲突 → 恢复 → 核验一致性 → 按保留策略清理。 |
+| [更新](hs-dev-skill/skills/hs-dev-update/SKILL.md) | 获得明确更新授权 → 校验当前完整包 → 暂存与替换 → 失败时恢复。 |
+| [追踪](hs-dev-skill/skills/hs-dev-trace/SKILL.md) | 按需启用 → 记录本项目摘要事件 → 有界查询与轮转；默认关闭。 |
 
 ### Trace：从任务执行中改进 Skill
 
@@ -240,65 +254,72 @@ trace 随任务记录，事件通过任务 ID 关联；文件按项目集中存�
 
 ## Skill 目录
 
-安装根保留主入口与项目说明，`hs-dev-doc/` 保存 Skill 自身的文档体系，内部 `hs-dev-skill/` 集中保存参考资料和辅助程序。
+`hs-dev-skill/SKILL.md` 是总控 Skill 源入口；`hs-dev-skill/skills/<skill-name>/` 保存各同级子 Skill 及其专属资料；共享工作流与运行时公共资料集中在 `hs-dev-skill/share/`。产品文档集中在 `hs-dev-docs/`，独立发布包由构建器生成到 `output/skills/`。
+
+`hs-dev-skill/share/share.idx` 是共享资料总索引；`share/` 下每一级目录均有一个与目录同名的 `.idx` 阅读索引，列出该目录的直接子目录和文件及其用途。按任务从最近的索引逐层定位，只加载相关资料；索引用于导航，不替代源文档。
+
+Skill 文档中的相对链接使用 Markdown 标准的正斜杠写法（例如 `../../stage-overview.md`），Windows、macOS 和 Linux 均可识别。构建脚本用 Python `pathlib` 解析本机路径，并把生成包内的链接统一写为正斜杠。
 
 ```text
 hs-dev-skill/
 |-- SKILL.md
+|-- skill-packages.json
+|-- skills/
+|   |-- hs-dev-discovery/
+|   |   |-- SKILL.md
+|   |   `-- references/
+|   |-- hs-dev-implementation/
+|   |   |-- SKILL.md
+|   |   `-- references/
+|   `-- <other hs-dev-* packages>/
+|-- share/
+|   |-- workflow/
+|   |   |-- workflow-map.md
+|   |   |-- <stage>/stage-overview.md
+|   |   `-- <stage>/<activity>/activity-guide.md
+|   |-- catalogs/
+|   |   |-- features/feature-catalog.md
+|   |   `-- <catalog-entry>/<purpose>-guide.md
+|   |-- schemas/
+|   |-- templates/
+|   |-- core/
+|   `-- support/
+`-- scripts/
+    |-- hs_dev.py
+    |-- build_docs.py
+    |-- build_skill_packages.py
+    |-- pyproject.toml
+    `-- tests/
+
+hs-dev-docs/
 |-- README.md
-|-- LICENSE
-|-- hs-dev-doc/
-|   |-- README.md
-|   |-- skill-redesign.md
-|   |-- implementation-verification.md
-|   |-- directory-layout.md
-|   `-- host-adapters/
-`-- hs-dev-skill/
-    |-- references/
-    |   |-- README.md
-    |   |-- skills/
-    |   |   |-- process/
-    |   |   |-- domain/
-    |   |   `-- support/
-    |   |-- workflow/
-    |   |-- catalogs/
-    |   |-- schemas/
-    |   |-- templates/
-    |   |-- core/
-    |   |-- product/
-    |   |-- architecture/
-    |   |-- engineering/
-    |   |-- testing/
-    |   |-- context/
-    |   |-- indexing/
-    |   `-- support/
-    `-- scripts/
-        |-- hs_dev.py
-        |-- build_docs.py
-        |-- benchmark_context.py
-        |-- pyproject.toml
-        |-- hs_dev/
-        |   |-- data/
-        |   |-- indexing/
-        |   `-- support/
-        `-- tests/
+|-- skill-redesign.md
+|-- implementation-verification.md
+|-- directory-layout.md
+`-- host-adapters/
+
+output/skills/
+|-- hs-dev-skill/
+`-- <other hs-dev-* packages>/
 ```
 
 | 路径 | 说明 |
 | :--- | :--- |
-| `SKILL.md` | 主入口与执行约束，宿主从这里理解如何使用 Skill。 |
-| `hs-dev-doc/` | Skill 自身的设计、演进与验证资料；可选宿主适配示例保留在 `host-adapters/`，核心运行不依赖它。 |
-| `hs-dev-skill/references/skills/` | 过程、专业领域及恢复、更新、追踪入口。 |
-| `hs-dev-skill/references/workflow/` | A～H 阶段及内部活动的定义和检查依据。 |
-| `hs-dev-skill/references/catalogs/` | 通用功能、质量属性与工程实践参考。 |
-| `hs-dev-skill/references/schemas/` | 活动、元数据、关系与上下文请求的数据格式约束。 |
-| `hs-dev-skill/references/templates/` | 设计与交接等文档模板。 |
-| `hs-dev-skill/references/` 的其他分类 | 执行、验收、上下文、恢复等协议及产品、架构、测试等专题参考。 |
+| `hs-dev-skill/SKILL.md` | 主入口与执行约束，宿主从这里理解如何使用 Skill。 |
+| `hs-dev-docs/` | Skill 自身的设计、演进与验证资料；可选宿主适配示例保留在 `host-adapters/`，核心运行不依赖它。 |
+| `hs-dev-skill/skills/<skill-name>/` | 各子 Skill 的权威源目录，包含 SKILL.md 和本 Skill 专属 references。 |
+| `hs-dev-skill/skill-packages.json` | 主包内容、子 Skill 源目录和共用资料的发布清单。 |
+| `hs-dev-skill/scripts/build_skill_packages.py` | 将主入口和子 Skill 组装成独立标准包，并验证包内链接。 |
+| `hs-dev-skill/share/workflow/` | A～H 阶段及内部活动的定义和检查依据。 |
+| `hs-dev-skill/share/catalogs/` | 通用功能、质量属性与工程实践参考。 |
+| `hs-dev-skill/share/schemas/` | 活动、元数据、关系与上下文请求的数据格式约束。 |
+| `hs-dev-skill/share/templates/` | 设计与交接等文档模板。 |
+| `hs-dev-skill/share/` 的其他分类 | 执行、验收、上下文、恢复等协议及产品、架构、测试等专题参考。 |
 | `hs-dev-skill/scripts/` | CLI 入口、构建和基准工具，以及 Python 包配置。 |
 | `hs-dev-skill/scripts/hs_dev/` | 任务、配置、索引、上下文、验证与恢复等程序实现；`data/` 保存随包活动数据。 |
 | `hs-dev-skill/scripts/tests/` | 辅助程序的自动化测试。 |
 
-进一步阅读：[场景与领域索引](hs-dev-skill/references/skills/skills.idx) · [活动地图](hs-dev-skill/references/workflow/README.md) · [参考资料](hs-dev-skill/references/README.md) · [文档体系](hs-dev-doc/README.md)
+进一步阅读：[场景与领域索引](hs-dev-skill/share/skills/skills.idx) · [活动地图](hs-dev-skill/share/workflow/workflow-map.md) · [参考资料](hs-dev-skill/share/shared-resources.md) · [文档体系](hs-dev-docs/README.md)
 
 ## 产出目录
 
@@ -365,4 +386,4 @@ project/
 
 应用代码、配置、测试及 Mock 内容仍放在目标工程对应位置。恢复历史不进入模型上下文，运行目录也不作为普通业务源参与索引发布。未完成任务的状态和恢复数据应通过相应命令管理，避免手动删除。
 
-有关使用细节，可继续查看[执行协议](hs-dev-skill/references/core/execution.md)、[验收协议](hs-dev-skill/references/core/acceptance.md)、[上下文协议](hs-dev-skill/references/context/README.md)和[恢复协议](hs-dev-skill/references/support/recovery.md)。
+有关使用细节，可继续查看[执行协议](hs-dev-skill/share/core/execution.md)、[验收协议](hs-dev-skill/share/core/acceptance.md)、[上下文协议](hs-dev-skill/share/context/context-protocol.md)和[恢复协议](hs-dev-skill/share/support/recovery.md)。

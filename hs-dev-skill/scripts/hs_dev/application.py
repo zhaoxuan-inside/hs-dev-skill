@@ -224,14 +224,19 @@ def execute(args):
         return assemble(root, json_value(args.request))
     if name == "connect":
         package = Path(args.skill_root).resolve() if args.skill_root else Path(__file__).resolve().parents[3]
+        if not (package / "SKILL.md").is_file() and (package / "hs-dev-skill/SKILL.md").is_file():
+            package = package / "hs-dev-skill"
         if not (package / "SKILL.md").is_file():
             raise ValueError("connect requires the complete bundle via --skill-root")
         target = local(root, args.target)
         text = target.read_text(encoding="utf-8") if target.exists() else ""
         marker = "<!-- hs-dev-skill:5 -->"
         if marker not in text:
+            entry = package / "scripts/hs_dev.py"
+            if not entry.is_file():
+                entry = package / "hs-dev-skill/scripts/hs_dev.py"
             text += ("\n" + marker + "\n## Development entry\n\nBefore project investigation or mutation, read `" + str(package / "SKILL.md") + "`. "
-                     "Run `python " + str(package / "hs-dev-skill/scripts/hs_dev.py") + " --root " + str(root) + " status`. "
+                     "Run `python " + str(entry) + " --root " + str(root) + " status`. "
                      "Run its status gate; unresolved work or code/document/index drift blocks new tasks. "
                      "Classify with deterministic signals, lexical NLP and model reasoning. "
                      "Use current activity contracts, recovery and consistency checks. Pure consultation creates no task.\n")

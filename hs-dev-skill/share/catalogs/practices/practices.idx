@@ -1,0 +1,13 @@
+# practices 阅读索引
+
+工程实践参考目录。按问题选择方法，记录适用依据、验证证据、代价及不采用理由。
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [contract_design](contract_design/contract_design.idx) — 以前置条件、后置条件、不变量、错误和副作用表达契约。
+- [ddd](ddd/ddd.idx) — 复杂业务领域的统一语言、边界上下文、聚合和不变量。
+- [deep_modules](deep_modules/deep_modules.idx) — 以小而稳定的接口隐藏内部复杂性。
+- [modularity](modularity/modularity.idx) — 按数据所有权和变化原因组织模块。
+- [tdd](tdd/tdd.idx) — 以行为测试驱动小步实现和重构。

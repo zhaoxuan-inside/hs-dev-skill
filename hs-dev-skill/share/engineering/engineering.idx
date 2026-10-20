@@ -1,0 +1,9 @@
+# engineering 阅读索引
+
+代码src、配置config、测试tests、Mock数据mock/data、Mock服务mock/services分别管理。运行参数配置化，业务状态和协议值用常量枚举，凭证注入。不机械配置正常语法初值
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 文件
+
+- [resources.md](resources.md) — 代码src、配置config、测试tests、Mock数据mock/data、Mock服务mock/services分别管理。运行参数配置化，业务状态和协议值用常量枚举，凭证注入。不机械配置正常语法初值。

@@ -1,0 +1,16 @@
+# h_delivery_feedback 阅读索引
+
+对本次指定交付范围核验成果、可用性、确认和后续责任。H1 对账现状与覆盖，H2 验证实际交付及适用恢复，H3 按模式完成验收责任，H4 分类反馈并交接下一动作；按实际问题选择，不重做产生材料的全部活动
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [h1_coverage_review](h1_coverage_review/h1_coverage_review.idx) — 对本次指定范围核对实际现状、覆盖和一致性。可服务交付核验，也可为修复/重构建立必要事实基线，但不因此启动全项目调查或读取全部 A～G 资料；已有有效映射和证据直接复用。
+- [h2_delivery_recovery_verification](h2_delivery_recovery_verification/h2_delivery_recovery_verification.idx) — 验证本次实际交付物能否按约定使用，以及本次要求的恢复保证是否有对应证据。按真实交付形态和风险选择检查，不强制局部文档改动验证安装包，也不因本活动自动回滚工作区或执行生产故障演练。
+- [h3_developer_acceptance](h3_developer_acceptance/h3_developer_acceptance.idx) — 按当前模式完成本次明确范围的验收责任，保留真实确认来源。规则、材料与决定以统一验收协议及其模块为准，本活动不另造确认机制，不把模型核验统一称为人工验收。
+- [h4_feedback_handoff](h4_feedback_handoff/h4_feedback_handoff.idx) — 把本次反馈转为有依据的后续处理，并保留足够续做的最小上下文。只处理实际反馈及影响，已有结果和任务有效时复用；没有新动作不为了闭环自动创建任务或重开所有阶段。
+
+## 文件
+
+- [stage-overview.md](stage-overview.md) — 对本次指定交付范围核验成果、可用性、确认和后续责任。H1 对账现状与覆盖，H2 验证实际交付及适用恢复，H3 按模式完成验收责任，H4 分类反馈并交接下一动作；按实际问题选择，不重做产生材料的全部活动。

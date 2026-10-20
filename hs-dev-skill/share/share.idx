@@ -1,0 +1,22 @@
+# share 阅读索引
+
+share 相关资料
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [catalogs](catalogs/catalogs.idx) — catalogs 相关资料。
+- [context](context/context.idx) — 权威源文件保持唯一；语义索引是可重建派生数据。任务与验收引用 file 单元身份并绑定内容版本，索引重建本身不撤销业务确认。
+- [core](core/core.idx) — 首次工程访问检查工作区安全状态。SAFE 才能获取读取凭据；在途修改等待，中断及漂移进入恢复。安全、任务完成度、验收有效性分别判断。
+- [engineering](engineering/engineering.idx) — 代码src、配置config、测试tests、Mock数据mock/data、Mock服务mock/services分别管理。运行参数配置化，业务状态和协议值用常量枚举，凭证注入。不机械配置正常语法初值。
+- [indexing](indexing/indexing.idx) — 索引集中于 hs-dev-skill/index/。files.jsonl 是源清单，catalog.sqlite 保存正文片段、属性、符号和依赖定位，publication.json 标识有效发布。索引是可重建派生数据。
+- [schemas](schemas/schemas.idx) — 当前机器契约，未知字段拒绝。
+- [skills](skills/skills.idx) — skills 相关资料。
+- [support](support/support.idx) — 本协议定义恢复数据及安全不变量；命令选择和执行清单见恢复技能，操作凭据与发布遵循执行协议。任务上下文续做由 continuity 组织，文件恢复不等于任务完成。
+- [templates](templates/templates.idx) — > 填写时按本次范围裁剪，并移除提示。优先更新现有设计；纯建议、有效决定和未验证假设分别标明。
+- [workflow](workflow/workflow.idx) — 本页用于查找未知活动或审阅全流程结构，不是每次任务的必读资料。过程入口按任务条件直接选择具体活动清单；目录中的链接不构成加载要求。
+
+## 文件
+
+- [shared-resources.md](shared-resources.md) — 共享详规。

@@ -1,0 +1,23 @@
+# examples 阅读索引
+
+> 虚构案例；本阶段只说明问题与目标，不替代 B 阶段行为定义
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 文件
+
+- [a_product_intent_draft_sync.md](a_product_intent_draft_sync.md) — > 虚构案例；本阶段只说明问题与目标，不替代 B 阶段行为定义。
+- [b_product_design_draft_sync.md](b_product_design_draft_sync.md) — > 虚构案例；业务规则先于平台设计，平台差异见各 D/G 专项范例。
+- [c_quality_decisions_draft_sync.md](c_quality_decisions_draft_sync.md) — > 虚构案例；量化目标、技术栈和运行约束需由实际项目提供。
+- [d_architecture_backend.md](d_architecture_backend.md) — > 虚构案例；产品规则、数据定义和客户端责任见 D 共用架构。实现验证见 G 后端实现。
+- [d_architecture_common.md](d_architecture_common.md) — > 虚构案例。产品范围和行为见 A 产品构想、B 产品设计 与 C 质量决策；数据/API 契约在 E 工程准备展开。
+- [d_architecture_frontend_android.md](d_architecture_frontend_android.md) — > 虚构案例；共用行为和服务端契约见 D 共用架构。实现验证见 G Android 实现。
+- [d_architecture_frontend_ios.md](d_architecture_frontend_ios.md) — > 虚构案例；共用行为和服务端契约见 D 共用架构。实现验证见 G iOS 实现。
+- [d_architecture_frontend_linux.md](d_architecture_frontend_linux.md) — > 虚构案例；共用行为和服务端契约见 D 共用架构。实现验证见 G Linux 实现。
+- [d_architecture_frontend_mac.md](d_architecture_frontend_mac.md) — > 虚构案例；共用行为和服务端契约见 D 共用架构。实现验证见 G macOS 实现。
+- [d_architecture_frontend_web.md](d_architecture_frontend_web.md) — > 虚构案例；共用产品行为和接口契约见 D 共用架构。实现验证见 G Web 实现。
+- [d_architecture_frontend_windows.md](d_architecture_frontend_windows.md) — > 虚构案例；共用行为和服务端契约见 D 共用架构。实现验证见 G Windows 实现。
+- [e_engineering_preparation_draft_sync.md](e_engineering_preparation_draft_sync.md) — > 虚构契约示例；总体边界见 D 架构范例。
+- [examples-index.md](examples-index.md) — 本组范例按 A–H 阶段展示同一个虚构“便笺”产品（离线草稿与同步）的产物如何保持一致：产品行为定义用户可见规则，框架设计确定平台职责和边界，任务拆分引用这些决定，开发与验证按同一契约执行。文件名以阶段代码开头，平台专项明确标注平台和阶段。
+- [f_delivery_planning_draft_sync.md](f_delivery_planning_draft_sync.md) — > 虚构任务示例；任务需绑定实际需求、契约版本和仓库基线。
+- [h_delivery_feedback_draft_sync.md](h_delivery_feedback_draft_sync.md) — > 虚构格式示例，不是实际交付证据。

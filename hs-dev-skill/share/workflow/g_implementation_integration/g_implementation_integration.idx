@@ -1,0 +1,16 @@
+# g_implementation_integration 阅读索引
+
+实现当前有效任务并取得行为、集成及一致发布证据。G1 落实切片修改，G2 验证相关行为和工程检查，G3 核验实际协作及回归，G4 发布受管一致修订；按实际依赖迭代，不推迟到最后首次集成，也不要求局部任务全量重跑
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [g1_slice_implementation](g1_slice_implementation/g1_slice_implementation.idx) — 落实当前已明确切片的必要代码和资源修改。按当前任务和实际影响工作，不加载未来切片或全部上游；实现过程由 implementation 编排，具体方法由相关领域技能指导，不在此重复其全套执行协议。
+- [g2_slice_verification](g2_slice_verification/g2_slice_verification.idx) — 验证当前已实现切片的适用行为及工程约束。复用 testing 的选择、失败分类和证据方法，先做针对性检查再按实际风险扩展；不把局部变更升级为全项目测试或全面安全审计，也不推迟必要集成到最后。
+- [g3_incremental_integration](g3_incremental_integration/g3_incremental_integration.idx) — 在当前切片具备条件时验证实际模块、资源及用户/业务路径的协作，尽早发现集成问题。只覆盖本次受影响边界及必要回归，不要求每个局部修改跑全系统或所有设备；没有集成边界变化时可复用有效证据并说明依据。
+- [g4_consistent_commit](g4_consistent_commit/g4_consistent_commit.idx) — 将本次受管变更发布为可核验一致修订，保护源、索引及证据的版本关系。具体顺序和权限以执行协议为准，本活动核验结果，不另造提交、锁或恢复流程。只读分析不执行发布。
+
+## 文件
+
+- [stage-overview.md](stage-overview.md) — 实现当前有效任务并取得行为、集成及一致发布证据。G1 落实切片修改，G2 验证相关行为和工程检查，G3 核验实际协作及回归，G4 发布受管一致修订；按实际依赖迭代，不推迟到最后首次集成，也不要求局部任务全量重跑。

@@ -1,0 +1,30 @@
+# features 阅读索引
+
+常见业务功能候选目录。先从功能目录判断相关条目，再进入单项索引；这些候选项不自动成为产品需求。
+
+按当前任务选择直接子目录或文件；未涉及的条目无需加载。
+
+## 子目录
+
+- [account_lifecycle](account_lifecycle/account_lifecycle.idx) — 账号激活、冻结、注销与恢复生命周期。
+- [audit](audit/audit.idx) — 审计事件、保留、访问及完整性要求。
+- [authorization](authorization/authorization.idx) — 主体、角色、资源、动作和越权检查。
+- [create_update_delete](create_update_delete/create_update_delete.idx) — 创建、更新、删除及重复提交/冲突语义。
+- [credential_recovery](credential_recovery/credential_recovery.idx) — 凭证找回、身份核验和旧会话处理。
+- [data_scope](data_scope/data_scope.idx) — 数据归属、查询写入和跨主体访问范围。
+- [import_export](import_export/import_export.idx) — 导入导出格式、部分失败、权限和资源边界。
+- [list_detail](list_detail/list_detail.idx) — 列表详情字段、状态、分页和上下文保持。
+- [login](login/login.idx) — 登录身份、凭证、会话和拒绝行为。
+- [navigation](navigation/navigation.idx) — 导航入口、路由、返回和未保存保护。
+- [notification](notification/notification.idx) — 通知触发、受众、渠道、重复和退订。
+- [registration](registration/registration.idx) — 注册资格、验证、唯一性和初始状态。
+- [search_filter_sort_pagination](search_filter_sort_pagination/search_filter_sort_pagination.idx) — 搜索、筛选、稳定排序和分页边界。
+- [session](session/session.idx) — 会话存续、续期、失效、退出和重复操作。
+- [settings](settings/settings.idx) — 设置默认值、权限、生效时点和重置恢复。
+- [tenancy](tenancy/tenancy.idx) — 租户识别、隔离和跨租户管理边界。
+- [upload_download](upload_download/upload_download.idx) — 文件格式、大小、权限、失败重试和清理。
+- [user_profile](user_profile/user_profile.idx) — 用户资料字段、编辑权限、可见范围和脱敏。
+
+## 文件
+
+- [feature-catalog.md](feature-catalog.md) — 常见功能候选入口；用于适用性判断，不自动纳入需求。

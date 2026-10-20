@@ -25,7 +25,7 @@ class LayoutTests(unittest.TestCase):
             for _ in range(2):
                 self.assertTrue(install(ROOT, target)["ok"])
                 self.assertTrue(validate(target)["ok"])
-                self.assertTrue((target / "hs-dev-skill/references/workflow/README.md").is_file())
+                self.assertTrue((target / "hs-dev-skill/share/workflow/workflow-map.md").is_file())
             entry = target / "hs-dev-skill/scripts/hs_dev.py"
             for command in ("init", "connect"):
                 result = subprocess.run(
@@ -41,7 +41,7 @@ class LayoutTests(unittest.TestCase):
                     self.assertIn("generation", payload)
             instructions = (project / "AGENTS.md").read_text()
             self.assertIn(str(entry), instructions)
-            self.assertIn(str(target / "SKILL.md"), instructions)
+            self.assertIn(str(target / "hs-dev-skill/SKILL.md"), instructions)
 
 
 if __name__ == "__main__":
