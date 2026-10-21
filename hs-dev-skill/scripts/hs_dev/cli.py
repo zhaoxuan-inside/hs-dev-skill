@@ -135,10 +135,16 @@ def parser():
     q.add_argument("--task-id")
     q.add_argument("--operation-id")
     q.add_argument("--activity-id")
+    q.add_argument("--stage-id")
+    q.add_argument("--context-id")
     q.add_argument("--event")
     q.add_argument("--outcome")
     q.add_argument("--since")
     q.add_argument("--until")
+    q = sub.add_parser("trace-graph")
+    q.add_argument("--task-id", required=True)
+    q.add_argument("--limit", type=int, default=1000)
+    q.add_argument("--format", choices=["json", "mermaid"], default="json")
     return p
 
 
@@ -175,7 +181,13 @@ def main(argv=None):
         settings = resolve(args.root)["values"]
         meta = metadata(args.command, settings["execution"]["mode"], args.trace or settings["trace"]["enabled"])
         ok = not isinstance(result, dict) or result.get("ok") is not False
-        emit(args.root, "command", {"name": args.command, "ok": ok, "duration_ms": round((time.monotonic()-started)*1000, 3)})
+        task_id = getattr(args, "task", None)
+        if not task_id and isinstance(result, dict) and args.command not in {"trace-query", "trace-graph"}:
+            nested_task = result.get("task")
+            task_id = result.get("task_id") or (nested_task.get("task_id") if isinstance(nested_task, dict) else None)
+        emit(args.root, "command", {"name": args.command, "task_id": task_id,
+             "activity_id": getattr(args, "activity", None), "ok": ok,
+             "duration_ms": round((time.monotonic()-started)*1000, 3)})
         if args.output == "json":
             if args.command == "context":
                 from .context_budget import encode
@@ -186,7 +198,8 @@ def main(argv=None):
             print(render(result, meta).split("\n", 1)[1].lstrip("\n"))
         return 0 if ok else 1
     except (ValueError, OSError, KeyError, SyntaxError, TypeError, sqlite3.Error) as error:
-        emit(args.root, "command", {"name": args.command, "ok": False, "reason_code": type(error).__name__})
+        emit(args.root, "command", {"name": args.command, "task_id": getattr(args, "task", None),
+             "activity_id": getattr(args, "activity", None), "ok": False, "reason_code": type(error).__name__})
         print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False), file=sys.stderr)
         return 1
     finally:

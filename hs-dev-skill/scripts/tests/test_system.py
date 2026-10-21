@@ -71,6 +71,33 @@ class SystemTests(unittest.TestCase):
         self.assertIn("测试任务", result["body"][0]["text"])
         self.assertTrue(result["ok"])
 
+    def test_trace_workflow_scopes_and_context_provenance(self):
+        task = self.call("task-start", "trace task", "--activities", "H1", "--mode", "activity",
+                         global_args=("--trace",))["task_id"]
+        context = self.call("context", json.dumps({"task_id": task}), global_args=("--trace",))
+        for check in store.definition("H1")["checks"]:
+            self.call("check", task, "H1", check["id"], "NA", "--reason", "not applicable",
+                      global_args=("--trace",))
+        self.call("approve", task, "H1", "--actor", "human", "--confirmation", "approved",
+                  global_args=("--trace",))
+        summaries = self.call("trace-query", "--task-id", task, "--stage-id", "H", "--event", "stage",
+                              "--outcome", "completed")["events"]
+        self.assertEqual(len(summaries), 1)
+        expected = sum(len(b["text"]) for b in context["body"])
+        self.assertEqual(summaries[0]["attributes"]["context_chars"], expected)
+        self.assertGreater(summaries[0]["attributes"]["duration_ms"], 0)
+        sources = self.call("trace-query", "--task-id", task, "--activity-id", "H1",
+                            "--event", "context_source")["events"]
+        self.assertEqual([e["attributes"]["source_path"] for e in sources], [b["path"] for b in context["body"]])
+        linked = self.call("trace-query", "--context-id", sources[0]["attributes"]["context_id"],
+                           "--event", "context")["events"]
+        self.assertEqual(linked[0]["attributes"]["context_chars"], expected)
+        execution = self.call("trace-graph", "--task-id", task)
+        self.assertTrue(execution["edges"])
+        self.assertIn("command", {n["event"] for n in execution["nodes"]})
+        diagram = self.call("trace-graph", "--task-id", task, "--format", "mermaid")
+        self.assertTrue(diagram.startswith("flowchart TD"))
+
     def test_complete_all_modes(self):
         task = self.start(mode="mute")
         self.pass_na(task)

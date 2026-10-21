@@ -152,9 +152,11 @@ def build(source_root: Path, output_root: Path) -> dict[str, object]:
         encoding="utf-8")
 
     def exclude_nonruntime_scripts(directory: str, names: list[str]) -> set[str]:
+        excluded = {name for name in names if name == "__pycache__" or name.endswith((".pyc", ".pyo"))}
         if Path(directory).resolve() == scripts_source:
-            return {name for name in names if name in {"tests", "build_docs.py", "benchmark_context.py", "build_skill_packages.py"}}
-        return set()
+            excluded.update(name for name in names if name in {
+                "tests", "build_docs.py", "benchmark_context.py", "build_skill_packages.py", "build_release.py"})
+        return excluded
 
     shutil.copytree(references_source, main_dest / "references")
     shutil.copytree(scripts_source, main_dest / "scripts", ignore=exclude_nonruntime_scripts)

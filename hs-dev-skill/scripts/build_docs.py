@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-VERSION = "6.0.0.0"
+VERSION = "6.0.1.0"
 UPSTREAM = {
     "A1": [], "A2": ["A1"], "A3": ["A1", "A2"],
     "B1": ["A3"], "B2": ["B1"], "B3": ["B2", "A2"], "B4": ["B2", "B3"], "B5": ["B1", "B4"],

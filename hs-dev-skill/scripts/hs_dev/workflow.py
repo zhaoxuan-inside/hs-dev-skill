@@ -54,6 +54,8 @@ def start(root, title, activities=None, direct=None, home=None):
         rows = [CheckExecution(c["id"], rule_digest(c)) for c in definitions[activity]["checks"]]
         write_checks(root, task_id, activity, rows)
     save_task(root, task)
+    from .support.trace_metrics import observe
+    observe(root, task_id, "enter", selected[0], selected=selected)
     task["snapshot_id"] = recovery.capture(root, task_id)
     save_task(root, task)
     from .acceptance import refresh
@@ -95,12 +97,16 @@ def record_check(root, task_id, activity, item, result, evidence=None, reason=""
     from .acceptance import refresh
     refresh(root, task)
     from .support.trace import emit
-    emit(root, "check", {"task_id": task_id, "activity_id": activity, "outcome": result})
+    emit(root, "check", {"task_id": task_id, "activity_id": activity, "check_id": item, "outcome": result})
+    from .support.trace_metrics import observe
+    observe(root, task_id, "check", activity, item=item, result=result)
     return {"task_id": task_id, "item": item, "result": result}
 
 
 def enter_activity(root, task, activity):
     require_upstream(root, task, activity)
+    from .support.trace_metrics import observe
+    observe(root, task["task_id"], "enter", activity, selected=task["activities"])
 
 
 def approve(root, task_id, scope, actor, confirmation):
@@ -133,7 +139,11 @@ def approve(root, task_id, scope, actor, confirmation):
     save_task(root, task)
     acceptance.refresh(root, task)
     from .support.trace import emit
-    emit(root, "confirmation", {"task_id": task_id, "scope": scope, "actor": actor, "outcome": "PASS"})
+    emit(root, "confirmation", {"task_id": task_id, "stage_id": selected[0][0],
+         "activity_id": selected[0] if mode == ExecutionMode.ACTIVITY else None,
+         "scope": scope, "actor": actor, "outcome": "PASS"})
+    from .support.trace_metrics import observe
+    observe(root, task_id, "approve", selected=selected)
     return task["approvals"][scope]
 
 

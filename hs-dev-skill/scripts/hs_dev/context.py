@@ -1,5 +1,6 @@
 """Semantic, complete, version-checked context delivery."""
 import json
+import time
 from contextlib import nullcontext
 from pathlib import Path
 
@@ -20,6 +21,8 @@ class ContextProvider:
         self.root, self.index, self.resident = Path(root).resolve(), index, resident
 
     def obtain(self, request):
+        started = time.monotonic()
+        activity = None
         if not isinstance(request, dict) or set(request) - {"goal", "task_id", "selectors", "query", "budget", "held", "delivery"}:
             raise ValueError("Invalid context request fields")
         if len(encode(request).encode()) > 65_536:
@@ -53,6 +56,7 @@ class ContextProvider:
             if task_id:
                 from .task_store import load_task
                 task = load_task(self.root, task_id)
+                activity = task["current_activity"]
                 path = f"{CONTROL}/tasks/{task_id}/current.md"
                 candidates.append((session.runtime(path), True, "current_task"))
                 for dep in task.get("dependencies", []):
@@ -209,8 +213,8 @@ class ContextProvider:
                     raise ValueError("Context budget cannot contain the result envelope")
                 result = render(chosen)
             session.verify()
-        from .support.trace import emit
-        emit(self.root, "context", {"fragment_count": len(result["body"]), "bytes": result["usage"]["output_bytes"], "outcome": result["status"], "task_id": task_id})
+        from .support.trace_metrics import record_context
+        record_context(self.root, task_id, activity, result, round((time.monotonic() - started) * 1000, 3))
         return result
 
 

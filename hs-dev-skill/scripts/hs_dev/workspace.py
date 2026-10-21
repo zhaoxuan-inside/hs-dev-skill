@@ -78,7 +78,7 @@ class Workspace:
                          task_id=task_id, scope=list(scope))
         state = self.update(take)
         from .support.trace import emit
-        emit(self.root, "operation_acquire", {"operation_id": operation_id, "outcome": "MUTATING"})
+        emit(self.root, "operation_acquire", {"operation_id": operation_id, "task_id": task_id, "outcome": "MUTATING"})
         return OperationPermit(str(self.root), operation_id, state["fence"], os.getpid(), task_id, tuple(scope))
 
     def writer(self, permit, release=False):
@@ -115,7 +115,7 @@ class Workspace:
                 value.update(operation_id=None, pid=None, writer_pid=None)
         state = self.update(move)
         from .support.trace import emit
-        emit(self.root, "workspace_transition", {"operation_id": permit.operation_id, "outcome": status})
+        emit(self.root, "workspace_transition", {"operation_id": permit.operation_id, "task_id": permit.task_id, "outcome": status})
         return state
 
     def revoke(self, reason):

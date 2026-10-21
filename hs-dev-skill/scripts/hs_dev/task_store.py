@@ -42,6 +42,10 @@ def save_task(root, task: TaskRecord):
     from .support.trace import emit
     emit(root, "task_state", {"task_id": task["task_id"], "activity_id": task["current_activity"],
                               "outcome": task["status"]})
+    from .contracts import TaskStatus
+    if task["status"] in {TaskStatus.COMPLETED, TaskStatus.ROLLED_BACK}:
+        from .support.trace_metrics import observe
+        observe(root, task["task_id"], "finish", result=task["status"])
 
 
 def tasks(root):

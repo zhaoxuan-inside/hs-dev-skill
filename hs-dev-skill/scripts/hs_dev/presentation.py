@@ -43,6 +43,9 @@ def render(result, meta):
         lines.append("确认：" + str(result["confirmation"]))
     if "events" in result:
         lines.extend(f"{event['timestamp']} {event['event']} {event['attributes']}" for event in result["events"])
+    if "nodes" in result and "edges" in result and "coverage" in result:
+        from .support.trace_graph import mermaid
+        lines.extend(["", mermaid(result), "", "仅含保留的已记录事件；不保证历史完整。"])
     if "values" in result:
         for section, values in result["values"].items():
             for key, value in values.items():

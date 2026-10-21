@@ -1,0 +1,40 @@
+name: Publish Skill packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify tag matches runtime version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          python3 - <<'PY'
+          import os, sys
+          sys.path.insert(0, 'hs-dev-skill/scripts')
+          from hs_dev import __version__
+          assert os.environ['RELEASE_TAG'] == 'v' + __version__, 'Tag and runtime version differ'
+          PY
+      - name: Run regression tests
+        run: python3 -m unittest discover -s hs-dev-skill/scripts/tests
+      - name: Build validated release assets
+        run: python3 hs-dev-skill/scripts/build_release.py
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create "$RELEASE_TAG" output/releases/"$RELEASE_TAG"/* \
+            --verify-tag --title "hs-dev-skill $RELEASE_TAG" \
+            --notes-file release-notes.md

@@ -52,10 +52,14 @@ def execute(args):
     if name == "dependency-bind":
         from .dependencies import bind
         return bind(root, args.task, args.consumer, args.producer, args.unit_id, args.actor, args.confirmation)
+    if name == "trace-graph":
+        from .support.trace_graph import graph, mermaid
+        result = graph(root, args.task_id, args.limit)
+        return mermaid(result) if args.format == "mermaid" else result
     if name == "trace-query":
         from .support.trace import query
         return query(root, args.limit, run_id=args.run_id, task_id=args.task_id, operation_id=args.operation_id,
-                     activity_id=args.activity_id, event=args.event, outcome=args.outcome,
+                     activity_id=args.activity_id, stage_id=args.stage_id, context_id=args.context_id, event=args.event, outcome=args.outcome,
                      since=args.since, until=args.until)
     if name == "init":
         from .project import initialize
