@@ -1,0 +1,1067 @@
+{
+  "version": "6.0.0.0",
+  "date": "2026-10-21",
+  "scope": "Current source snapshot; digests identify content, not runtime verification or human acceptance.",
+  "files": [
+    {
+      "path": "hs-dev-skill/SKILL.md",
+      "sha256": "fc495d785b242d6c8d5b0a1979fe262b83e34d72e2707e32a4430cde6b6d67b2"
+    },
+    {
+      "path": "hs-dev-skill/scripts/build_docs.py",
+      "sha256": "8746782035f1176c3cd302aae74ad2a344f4e046b09c29745332faa1bd384130"
+    },
+    {
+      "path": "hs-dev-skill/scripts/build_skill_packages.py",
+      "sha256": "1c726223014d5a4d7664e50a84a000a51b188858da5b907bceabd55a692ffc56"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/__init__.py",
+      "sha256": "84f253a570675875718d2f076985538b36dbfda16ef43d7bf4d9a551f47c4cc8"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/__main__.py",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/acceptance.py",
+      "sha256": "6338d0a87e58bd29243d0a583cd287f35719e4bb58a759604cb938d41e127dce"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/application.py",
+      "sha256": "6ea801d86971b1896b971f88232276cf8e77c0f43fff64e993ee29991ca22818"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/artifacts.py",
+      "sha256": "b2e1709685f5dcdde81faa3757f305ce9fd8a2a320c9d392c22f8926bd816a67"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/bundle.py",
+      "sha256": "5119521decf1d2ce8737bf0e698d3018daaff3c68f3e163b15c658fe751f3cfd"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/cli.py",
+      "sha256": "5ca8a79e8d29061acad88214ae8684465079901bfadd7f75eced74890eed10cd"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/cli_values.py",
+      "sha256": "32749fec62bbafd52d43f2cdf8f3e4f0a3c2b207016cfb5ab152ce9884efad70"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/config.py",
+      "sha256": "335eb650816d28b57e4fac716f21cb4ecd49264a1d1e6f3c208200d61d459134"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/confirmation.py",
+      "sha256": "96c1187a65fd6e2da0f13c953426010ac2add662633f8fd64917e0086717fff9"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/context.py",
+      "sha256": "1af2083ee3cd0138f19b809e8ea8811dd8cac2429ad689aa9040120155253d7c"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/context_budget.py",
+      "sha256": "c64897d5bc51c7dd33371b999a6e1a0d49a35126a2737385e18074202926f1c6"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/contracts.py",
+      "sha256": "51999f63a36be535a39e5101f08a8b1028f2ae0db1732998c69e5b57bc50e1d8"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/data/workflow.json",
+      "sha256": "37e2a70d83b8c2cfd311ba4392ded3e2a645f31ba6f60ca47bc025eb36e47665"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/dependencies.py",
+      "sha256": "d1f3d7594ef0fe4245555e63d88308d0822174982070531bb589439363a5132f"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/indexing/__init__.py",
+      "sha256": "b93db25da4fc8f02804d4f98821cac8d0435604068d69063b1318cc8248380cd"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/indexing/cache.py",
+      "sha256": "bd511cc954e0e1f3b3152e5b1ab9149888b5b4cea490f2476ff2e352e0bf3445"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/indexing/engine.py",
+      "sha256": "50a8a88dab7d070407d25b78f77f78dda3ec0c2cd63b4470a546b32641077ce2"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/indexing/semantic.py",
+      "sha256": "a32ee516f32df7357283c443a530206ca1d0e34b1a5d25782837aa35e6f8d36b"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/indexing/service.py",
+      "sha256": "30db09e498b998d083c2d43e3c8be659b8326c2f9a42736dc7894baa029ff2b4"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/indexing/units.py",
+      "sha256": "1264b63180041e6841577d11a663d6e1a5ed2d5041eaaa2c43de863e24e7baa5"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/intake.py",
+      "sha256": "d426309ef2f9da2f20a9eb5c4a8a14240fddc145664ac0b965e0f90bbfbba407"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/intent.py",
+      "sha256": "38b3383e8b80694d85cfe09db911ccfbddacd19744b003ca7fcdef39e6b9ea55"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/models.py",
+      "sha256": "0210c0e15f252b952eb905e5490e1cf8b53cd8ab1dd088ec3345519eb7609c27"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/presentation.py",
+      "sha256": "e1925aad16e8b821fa9bfb7cfe3990e2ccb90e7494119036d80e73c37d7cf544"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/project.py",
+      "sha256": "3d306b12dbc6e4b1722d2b63a5e238f344966315d592fdd595081db9bf07eed5"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/storage.py",
+      "sha256": "b47184f5ad160b5c14660616b0d7b8b11714dc0a118174a3692c33496426b68a"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/submission.py",
+      "sha256": "e9841030fc0baa2e02f76f18d2cc35a4fd216a6a4daa23cdfa4aa5b3cd85f66b"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/support/__init__.py",
+      "sha256": "bc86caa13c0db48476665c850a26b17d4fe2fcaba692815192b5551724b2cdde"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/support/recovery.py",
+      "sha256": "77f8b8a642df4723facd45fff981670fe06103a0f4973c63828158bcf9c41112"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/support/trace.py",
+      "sha256": "5b792d1861a05d607a2015a1a6c4c1aba8b01306401ac84d9fd290a5efadad6f"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/support/update.py",
+      "sha256": "0a0915c43a36c92e5cc28ae6183a2e5b4ad4bd7cf123e9ee05eb2a4ba4350931"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/task_store.py",
+      "sha256": "9addbd127d0b96a8e01817dce3e6205f519b06c096338ffe2238f8f9b90a5d99"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/verification.py",
+      "sha256": "dfc29784c032e34120612724332dc0698d8dc564f57f41e6790bb31b47f171a9"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/workflow.py",
+      "sha256": "5d4f5ddcb5488bedb40fb4494ab1e5d10a2c1fe8dc514d3f08353bb133a01edf"
+    },
+    {
+      "path": "hs-dev-skill/scripts/hs_dev/workspace.py",
+      "sha256": "f2e33dae3ddd5f56166e38ed3cc98c6ba04daa5cfc892997cc0c060e8620d010"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/account_lifecycle/design_checklist.md",
+      "sha256": "e1e9ad50f0ecd96a517d774d3091a8ccff7d22e7d891631df71851aa85d03d66"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/account_lifecycle/feature-guide.md",
+      "sha256": "4fbd60bd2b1f87aa75ef17bf8dfe9ea5681a0feeaf7c7af3e34b5b7d78602e36"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/account_lifecycle/implementation_checklist.md",
+      "sha256": "7fb8268df7859799bc978550fa7d295c0f4b1cb4e95c6dd94eb22f88dd4a17dd"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/account_lifecycle/verification_checklist.md",
+      "sha256": "e9aa565175fbd0fff1302c756c1690f6a5a02dcc71631a628914e1183eb0170e"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/audit/design_checklist.md",
+      "sha256": "510032d23e92c11c6da8a607288ed369256359467cd168b24a8d8adbe91c0116"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/audit/feature-guide.md",
+      "sha256": "0104b5a432278f1baebba1f970deb1ed9fe0ae1acaec17dc6555abcc8bbbb8fe"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/audit/implementation_checklist.md",
+      "sha256": "9b43a757a73284ce24b662aadd2622eb8e4f99865c5b1e921421b40e7bff55cd"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/audit/verification_checklist.md",
+      "sha256": "43b3a58d4f258a0438600b21f35f0c7db10d9b4426e6fece6d0b1f01f259ef18"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/authorization/design_checklist.md",
+      "sha256": "9b5f686d59c012c10340caf6a71c1297278e25c74972546534b4946e6540a0cc"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/authorization/feature-guide.md",
+      "sha256": "118d9da8897da3dfdedc2bec2af003aaea5873b7c34e37b9715dc883635d0659"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/authorization/implementation_checklist.md",
+      "sha256": "b2880c7869b4042cc892b7154dd8954c34876e1663d1626af81aac75e7cea7cd"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/authorization/verification_checklist.md",
+      "sha256": "a72cca23b853cf30b380464b7232906fa73aa1c10ef3b3281d82e244dd50dde1"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/create_update_delete/design_checklist.md",
+      "sha256": "a16afd4d46af747ac2beee4624813bc2ad4ba35e3c8ab51dfb1c9d2c2221a306"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/create_update_delete/feature-guide.md",
+      "sha256": "ccb459d7af6a2c3874ad901b9137a717d398f39178a8f7a3742f2c2b47c2f902"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/create_update_delete/implementation_checklist.md",
+      "sha256": "e4d0b794a0e2f1bbec8ec8aa7774b3b579ef9e7d33ea2408e0fbcc35341995cf"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/create_update_delete/verification_checklist.md",
+      "sha256": "38c5d9ef7394f70317e1de45b6367e174f84a281f53e506f958fa4da086befe7"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/credential_recovery/design_checklist.md",
+      "sha256": "645440cc86193d6b9984328d634aaafd116aadb585aca9e97ebd9f9361edda9c"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/credential_recovery/feature-guide.md",
+      "sha256": "d72a9eb262abfd2e0be3efd50577b3ca1237829ebbff73b5e3b9bc2c3bd77d65"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/credential_recovery/implementation_checklist.md",
+      "sha256": "9a87d3d0ef2828dacbcbe43d8b1e7703ebd9b38ca3fcf0b1c598f5b4eb931d86"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/credential_recovery/verification_checklist.md",
+      "sha256": "992f16aa5425d396d9c9cc820630be63faf2a45401a89b5ec197f3b4b46c9730"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/data_scope/design_checklist.md",
+      "sha256": "72231e19af455ca27acce25cf30577ff612db42b546b029c3b0b5c6324366baa"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/data_scope/feature-guide.md",
+      "sha256": "e2dd79466d9507af71f8d9243f34f9efa252690391a65bc8f31f9da41fa6e760"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/data_scope/implementation_checklist.md",
+      "sha256": "543a479404d4c861b043f8886bcc959e1c5c0efd05df7db5a0f3d533d197d5a3"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/data_scope/verification_checklist.md",
+      "sha256": "82fd350b0b91403e4449d3b1d9f35c2ce74375378d79d680bdb8fe2e610884ef"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/feature-catalog.md",
+      "sha256": "0f809c0cbcebb9ce4675f70e18b20205521d02956d9e884776ea041aa164308e"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/import_export/design_checklist.md",
+      "sha256": "ce1e683f90868f9023a64195d1efacb2ec55a48e72118e85bf0091cb547c311e"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/import_export/feature-guide.md",
+      "sha256": "a702bd1cec331c4eb91bdc6ff17adaf49229bca71571c95acb8dd65db14491a0"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/import_export/implementation_checklist.md",
+      "sha256": "23d66a5c6998e459751e09daef4e6216d6c5b488fb594e90cb7d48dd4dd697bb"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/import_export/verification_checklist.md",
+      "sha256": "9fc9742b94fb1c42f498276854539228b542bb2292d97ee940f493c0c85f14e4"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/list_detail/design_checklist.md",
+      "sha256": "dd155fa387df768f4ae3c7c4e8c10252d14f462d38fc787fbf92320f3aad4e3f"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/list_detail/feature-guide.md",
+      "sha256": "d527bd1686da17f72b4fd7d02036dd9ada080c607eb485eae93fcff467e3c201"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/list_detail/implementation_checklist.md",
+      "sha256": "e87d355d146f73f0bbe66a6dd2f30a15998707377539ac93ab0221001f8ac464"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/list_detail/verification_checklist.md",
+      "sha256": "e02a8e841ec7d469c291fe147ab031441d6e76e794df6836b36321d604fc268d"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/login/design_checklist.md",
+      "sha256": "154b73188ebfdb35633a39b5ea02961cbaa26097b4c76614c8b2019a00cb1756"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/login/feature-guide.md",
+      "sha256": "40db72cfca50e5c5029a488808887663c6d0f1f9dc40b5879ec27992b130a2ac"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/login/implementation_checklist.md",
+      "sha256": "5fc7610e1f1814ef35b104b74d672f440f8817c0bc272d696f0b8ef3cbdae252"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/login/verification_checklist.md",
+      "sha256": "ec387b34ddaddd1d65bbcc4f47c4a6b160906a2766acb0f2000d67f5b0779e1e"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/navigation/design_checklist.md",
+      "sha256": "1c4325d8543e5027b25991962c768bc71f684e0842e819f24c2c2c3a178d3c21"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/navigation/feature-guide.md",
+      "sha256": "ab68b0138e371237e4966aee5fe8e0a386cb8120e40a09c5e4ce39e4f48567d3"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/navigation/implementation_checklist.md",
+      "sha256": "be7a31ffb1cf0d4b4d495ce2fdc6827a45c409cfc8dadd4bebc715ef30055a2e"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/navigation/verification_checklist.md",
+      "sha256": "241b37d46e0dc282b47db218f4232a1a3297167c799cf4530043aa3795ab5c32"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/notification/design_checklist.md",
+      "sha256": "691ec9d04ed104d1264eedc0cf4fdd51024c39f38d31e7fccaea16f6fb69fbe2"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/notification/feature-guide.md",
+      "sha256": "4dc3fdf2f71c0a35f88e3192b825d12ba3cdc806292af1ec2679a41bd55a026c"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/notification/implementation_checklist.md",
+      "sha256": "ab7e508724aa6460365556d2a8c930961dc7aa801bdcc7231eadf7df5009633e"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/notification/verification_checklist.md",
+      "sha256": "e395e93af979c696647ec32839cf1a26e5583825f2609f0e74a35cd6b0db12cb"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/registration/design_checklist.md",
+      "sha256": "bb8be9a8dfa1d18e111c332e11603ed5fed4af1c47e28e94a1af4246517a2fd2"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/registration/feature-guide.md",
+      "sha256": "fb3de75dd52d0d4fa981aa543b1a7fb1c9f61488f3647eabec5f334ace599d0b"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/registration/implementation_checklist.md",
+      "sha256": "78b7ed4220ebff104cc62bfa870e305346a4d70be9761bd4316282a86542aa29"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/registration/verification_checklist.md",
+      "sha256": "29836c4e3b5038674e7b2e4cd1afa2874c39ec71b98c01a92918f32a06f415b7"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/search_filter_sort_pagination/design_checklist.md",
+      "sha256": "73f5b9ace126f6eebdc034b5f38435363343589177511c2101f8f12343204055"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/search_filter_sort_pagination/feature-guide.md",
+      "sha256": "b393c49643b649dc5d426e4d8d0b2933f6a00759abbb9cfd252cba0f441eec36"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/search_filter_sort_pagination/implementation_checklist.md",
+      "sha256": "c30d5d066f45482c11c1e0ab547ccc5d533932445dd173392d344e2a11102dad"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/search_filter_sort_pagination/verification_checklist.md",
+      "sha256": "83b3f6f4a37941e0251cb9fdf1edd2273d18cf25f7a356f99ce3e7d1edeb95f5"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/session/design_checklist.md",
+      "sha256": "3884b4e00b5301eff415e19eaacc8952a44503730a6f3f9dca7c36ca345eb02a"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/session/feature-guide.md",
+      "sha256": "b7334906a60ba7c8572a84f60fed9a33ecc1fb72c090e1c7faa687cfca72af76"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/session/implementation_checklist.md",
+      "sha256": "1b44534ef9c8d249f272c549a4cc317812638f0ba5be297a704d3a09313f814a"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/session/verification_checklist.md",
+      "sha256": "fd74160048835f7506b3bd3d427a96f5af7e46946226321af68b83c5684e17a2"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/settings/design_checklist.md",
+      "sha256": "c1121ccf093228291dbcbe9c41cca75ff188ea4a62c4983613086f129833879f"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/settings/feature-guide.md",
+      "sha256": "773b03fde8ee23730d7be471b09ff3673e825c5ec490499c6347206cde9d185e"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/settings/implementation_checklist.md",
+      "sha256": "eb930b6a73a8e9b24e48e8ede2ffcc8cae878ea84677ee4c773879387b5d3a94"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/settings/verification_checklist.md",
+      "sha256": "46577df7c98b71ca9c0d367be6107fbb64ba5b0ee1b312df95c347150ceda939"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/tenancy/design_checklist.md",
+      "sha256": "5cd18f6fba9b56a0648a99e1c5ce84061e12a1d974d59457d5dc1e9d5a532bdb"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/tenancy/feature-guide.md",
+      "sha256": "4c4130aa4bf13242e28caf6ecfe98b363705c9c0342fa86ca0b708bfa8170eb0"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/tenancy/implementation_checklist.md",
+      "sha256": "064d9175b90c4c23439f43648fa1a8e8da3e0cd71caa224e9adf24e2579dbfdf"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/tenancy/verification_checklist.md",
+      "sha256": "df8591cb826356d2b942866b5b1491241ee950c16c558ecca9ef76b9785ce42d"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/upload_download/design_checklist.md",
+      "sha256": "92406297f2c056d3c1e61c107cb65b21fa4d8e8c8a5f6c9a2608875e0f3956c3"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/upload_download/feature-guide.md",
+      "sha256": "eb32125101907bcc678c2b737cf302de6463ae105104076eb277349b277230a5"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/upload_download/implementation_checklist.md",
+      "sha256": "11aec39f4b04bdff919301f45e87d84300a96271c11d052843cd70bfc8d9e85b"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/upload_download/verification_checklist.md",
+      "sha256": "4556c7cbc9fa1936aebd2cf6333e8ef181fa6636696aa1e81a3b9a66e89fd988"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/user_profile/design_checklist.md",
+      "sha256": "3a331679f27434e90ca04e9decd7f118e8432e7ae83361b7baceda76e7dc5d60"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/user_profile/feature-guide.md",
+      "sha256": "a3a63f4f2134c189f7093f6f756ac8e056c418fd49d1026308c6ca4d12cd3ec9"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/user_profile/implementation_checklist.md",
+      "sha256": "1d4e362411d6004b59b15ff2f4009b1e0d132289e1674f8da4089cd3f41221c1"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/features/user_profile/verification_checklist.md",
+      "sha256": "5f7f1dce4587fcf41b6a0c03d0635c8cf33e351e0f4eb383b3fa6f5d8feeba4c"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/practices/contract_design/practice-guide.md",
+      "sha256": "72b3b5a464115a731876cb9402b42979ec3c2c254d3ecb08e32e31b85bd8d8eb"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/practices/ddd/practice-guide.md",
+      "sha256": "b02a151f5320059b98254a5584316084228fb24291706f9532a455a25f1c7df6"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/practices/deep_modules/practice-guide.md",
+      "sha256": "f0a51b8dc01958743d39178a1757abad457380f8fbd28edc0ca76b416c7da11d"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/practices/modularity/practice-guide.md",
+      "sha256": "7a3bd59f43a9d70bb78005500b214cf7169a3e821934ca92f963350f05566a1a"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/practices/tdd/practice-guide.md",
+      "sha256": "25e454c57145f5b4078a54cf07113cea687f4891cedf412332a52236f06e4e8f"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/quality/accessibility/quality-guide.md",
+      "sha256": "e3e26dcd36965390c0764743238deb41811f56265955b63f737c188a446b460b"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/quality/availability/quality-guide.md",
+      "sha256": "8adb1260720ad32da406078f908b5c5a1a329adb8e55e9ba2cfe3560cd84e094"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/quality/extensibility/quality-guide.md",
+      "sha256": "aa7bc8cbee027401c3412068d829c3ec92c9b29d5b7f91ad303d672e25972807"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/quality/maintainability/quality-guide.md",
+      "sha256": "b93e531122e0b90d81a6d9762943e8bbbac0548028206fae6b5213896cd920b4"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/quality/performance/quality-guide.md",
+      "sha256": "ffdcdd77acdfa510d301d4673fdc05742ec02175b58a9a1066f5ed7c76502c2e"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/quality/readability/quality-guide.md",
+      "sha256": "fb097a57a90be9e01a8db91e23ed0e5ac0d9190c1e82ba193ff1b721bbc331e5"
+    },
+    {
+      "path": "hs-dev-skill/share/catalogs/quality/security/quality-guide.md",
+      "sha256": "b9f8ec68c86b35ce5aad3503a30c9280b3482a323e0991d80fc61e28fa985a34"
+    },
+    {
+      "path": "hs-dev-skill/share/context/context-protocol.md",
+      "sha256": "dbe4aa995d43d4b171c21d9d9893e94fc5d4a6d22a52b2d0db5553d4e437ee47"
+    },
+    {
+      "path": "hs-dev-skill/share/core/acceptance.md",
+      "sha256": "94b4e0f97c5d5afdf65efad8f70448dd8d3cc1cd8e87a0a1eda532ec3ceae615"
+    },
+    {
+      "path": "hs-dev-skill/share/core/execution.md",
+      "sha256": "d3fa9bc3ee4d91d4b08dfd27291bce58d6777114dbbd30642ed607857ca87d3f"
+    },
+    {
+      "path": "hs-dev-skill/share/engineering/resources.md",
+      "sha256": "ee7e78e561e9a49c6c20585ba0148d6879748631021b9b88073f005522302f97"
+    },
+    {
+      "path": "hs-dev-skill/share/indexing/protocol.md",
+      "sha256": "4ae9cfca8c3d6702039b624f2dae044e958310635ba2abdb243f0d1e06600ee1"
+    },
+    {
+      "path": "hs-dev-skill/share/schemas/schema-catalog.md",
+      "sha256": "4e3caf9341f78dfc191fd1f685da9a1588591615c01707197f9e9db5bb16dfed"
+    },
+    {
+      "path": "hs-dev-skill/share/shared-resources.md",
+      "sha256": "4e25c0f2a712c1c029ea43ce4050727ad47e143fc2eb3c38225f8d6c3d4ee7a2"
+    },
+    {
+      "path": "hs-dev-skill/share/support/recovery.md",
+      "sha256": "46bd7a0f2d2988cf71609168b5e51de7f5eb3ace884585b677f684222ef23b06"
+    },
+    {
+      "path": "hs-dev-skill/share/support/trace.md",
+      "sha256": "b8dbe3923097a6702af8c36dfa66db2dcf12516a53171be3e538e0ce8e761753"
+    },
+    {
+      "path": "hs-dev-skill/share/support/update.md",
+      "sha256": "18b4f46c5d512a27046e1e2af3af03b941615322708718472b88e922e67f097b"
+    },
+    {
+      "path": "hs-dev-skill/share/templates/design.md",
+      "sha256": "fee7992292044c7f53189dadca6ff3beeda7d81e32b449603fbfb63e6f75add9"
+    },
+    {
+      "path": "hs-dev-skill/share/templates/handoff.md",
+      "sha256": "b8a9df7285db9ce675922d0c8a7157220d3012cfe45be5a50b4e9dbe4244f80e"
+    },
+    {
+      "path": "hs-dev-skill/share/templates/template-catalog.md",
+      "sha256": "fd3468eb83d58d1ce2eace66c3f79db52637c9930da01e10049f50f7a065fba6"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/a_product_intent/a1_problem_vision_value/activity-guide.md",
+      "sha256": "80222b9b07bd253df77879bc85d7de3cccd796639d2a95217bfca43d2b80f6b3"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/a_product_intent/a1_problem_vision_value/checklist.md",
+      "sha256": "f53904c380215c69cda34a96dbcb0e8ef5c9ba1b90a26cb7e31700d15baa8bfe"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/a_product_intent/a2_positioning_product_character/activity-guide.md",
+      "sha256": "15441a914fa78245481d2241f52fdfa0d1261da5d7cd75deb8151f72ebbecb37"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/a_product_intent/a2_positioning_product_character/checklist.md",
+      "sha256": "31f4c9e7d2c0a4dc92bc575e6fccb0bae4bd3e256fbca39e9a56efd4b31ac398"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/a_product_intent/a3_capabilities_business_boundary/activity-guide.md",
+      "sha256": "478559c615bf675709e11f3ce01d752f13f42612ae4e561260866051f007b86d"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/a_product_intent/a3_capabilities_business_boundary/checklist.md",
+      "sha256": "501fb9b788556553adcd7b43470739a4de534d73f90ea1994f82dc84555791cb"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/a_product_intent/stage-overview.md",
+      "sha256": "84446c9c9d2334f7a67005335fddb2457e9cd4e790914e72c9093761da5931ca"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/b_product_design/b1_feature_inventory/activity-guide.md",
+      "sha256": "bc6a41723cd0a240d3b26ba41d942b57cb1bd73392c8a1d37e5abd616e755d5e"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/b_product_design/b1_feature_inventory/checklist.md",
+      "sha256": "10313c3e681a0ea6d31b6e1c4f3f7b1e5e0bf1a754704bd64b2f31b5f4e410a7"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/b_product_design/b2_feature_behavior/activity-guide.md",
+      "sha256": "4dbf2b74ba283530d8c6e234bc5bf43cc027f7295330ead447dc6502d3b1c9fc"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/b_product_design/b2_feature_behavior/checklist.md",
+      "sha256": "d094a0084190cc2574811cca2a4b40750a5e4b1352331fecad1da66937d87f0f"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/b_product_design/b3_feature_interaction/activity-guide.md",
+      "sha256": "4dfdc3823a3fc9d9ea4a9a67f8257285e0967900d7260a861d04f0c1dc4f5153"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/b_product_design/b3_feature_interaction/checklist.md",
+      "sha256": "7211a19be53bec08d0153514348823e3cb4eff45f3e4adf0b4cf4ba09d3af14b"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/b_product_design/b4_structure_connections/activity-guide.md",
+      "sha256": "529eb864e51851b47ea913b27fe59795e3fcc066eb1d5b76bef588cb5845ad01"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/b_product_design/b4_structure_connections/checklist.md",
+      "sha256": "5c9099b3574718a532e4daf11f3b6b9b21a6a25539cf0ed7ef356468b98d2ee5"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/b_product_design/b5_product_completeness/activity-guide.md",
+      "sha256": "c41c188793bc970b2288565be3adc1a169a33e4db144f3b93359392827c0acb0"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/b_product_design/b5_product_completeness/checklist.md",
+      "sha256": "b7f6cf3693c22d6731daf8ad8b57a95a9ef2f4571f1c2187d02711a8a1f87fa0"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/b_product_design/stage-overview.md",
+      "sha256": "926de8556bf57caf4e2f54c95d3d46f3217acf58d2eefade110b4885ec7db109"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/c_quality_technical_decisions/c1_quality_attributes/activity-guide.md",
+      "sha256": "bdc6f6ba341110e12f26eb9e5f5518b836ddb74673eace1af360366c471a47d5"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/c_quality_technical_decisions/c1_quality_attributes/checklist.md",
+      "sha256": "e29e3c03fa3fa7a793a903997cf99491d60e9b29f6a09317146af968948b847b"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/c_quality_technical_decisions/c2_constraints_risks/activity-guide.md",
+      "sha256": "b27ca0d703d3d2be8cc9fa64936f89873d3b099dab765833c39d0346732587b0"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/c_quality_technical_decisions/c2_constraints_risks/checklist.md",
+      "sha256": "2cbe7c721526170c110e4d0c747fff87863c45fa65b08c594f3448ee4e100b37"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/c_quality_technical_decisions/c3_technology_practice_selection/activity-guide.md",
+      "sha256": "e7fbaf8ec03bbe1b9beb45d5798a82ca349bc1873a5ad09579f9c456d71ce282"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/c_quality_technical_decisions/c3_technology_practice_selection/checklist.md",
+      "sha256": "ec5368714cecdf2bfe1990c1c56d308fcdb26aad3a3bdc9a302317e590c91789"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/c_quality_technical_decisions/stage-overview.md",
+      "sha256": "6e50a022dc86dce0f999197dd519c8c9a32c51cde4d5e1232caa6396ead8a96f"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/d_architecture/d1_domain_responsibilities/activity-guide.md",
+      "sha256": "85d31e23f35eaeaa4d23e8cd4b0a46f26851947076fbaa2e2018c564eea15484"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/d_architecture/d1_domain_responsibilities/checklist.md",
+      "sha256": "5672ed5b8d86bfa1a6ec8c3ed4ddc655bb64f26af727de43b63fdd63003d4a1b"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/d_architecture/d2_structure_collaboration/activity-guide.md",
+      "sha256": "ac38d727655bab733e05407068c66713cc1c62fd8e5d3755769f583e4b20ca0e"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/d_architecture/d2_structure_collaboration/checklist.md",
+      "sha256": "0bd7bb5cb2051b4a4ffc188b974f33e80a776a5e9b598ec44506aa25f12cbae6"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/d_architecture/d3_quality_evolution/activity-guide.md",
+      "sha256": "db3e91ca4d35448dfcf1f0105a0284ccbc71e2e14df200f33bdcab6a24c3aff8"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/d_architecture/d3_quality_evolution/checklist.md",
+      "sha256": "d7e0f160f1a94000622fd1aa5de689f0ba8614b8eef383dc7fadb18d953a8bac"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/d_architecture/d4_framework_conventions/activity-guide.md",
+      "sha256": "747f49fef647a381acc0bd12628d45b435acab57adf19ae5b77537ce904de8f4"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/d_architecture/d4_framework_conventions/checklist.md",
+      "sha256": "ea646dd60f57ea9f4b598835395829dab0ffaff71e73a0d0e0880f0bb4fdee4f"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/d_architecture/stage-overview.md",
+      "sha256": "d0c27661eeb80f1ed82428bf2527f6a6e82e5d0f9aa6ac7b2f614b0695b14cc8"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e1_data_contracts/activity-guide.md",
+      "sha256": "83e8b68f02478660deac19e8b133899b04020b0baefa5cb7fd4524e32ffb4193"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e1_data_contracts/checklist.md",
+      "sha256": "99e1c2cde9d08243fc721610838a586f88061f4e9c87e5195f078e885ab40dfd"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e2_interface_contracts/activity-guide.md",
+      "sha256": "06081aba4ec4ea156967ded847e3e4a39803400a3762656c1b5d44c66e432064"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e2_interface_contracts/checklist.md",
+      "sha256": "0e7b298c88881787d1804396633d358c05f563c520a6c8734d8ef97f8665adcb"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e3_method_component_contracts/activity-guide.md",
+      "sha256": "3e514df4ba739a97f3d14f2bd26a180600f0b939deea4f2d38eefdfb760ed484"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e3_method_component_contracts/checklist.md",
+      "sha256": "129275602cb56274e5323753e0489bbf6eb16c9fa3d9b5a7467da7e08880b92a"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e4_runtime_failure_design/activity-guide.md",
+      "sha256": "120344b3c92304218a67d4a8727bead1a108259efaa93eef904f22d2c2bad73c"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e4_runtime_failure_design/checklist.md",
+      "sha256": "4524e7929120adb926c12e2ef26d89817a09a58192bf9d3f7fe6a88919e7fd06"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e5_test_cases/activity-guide.md",
+      "sha256": "6552d929762b1824887a7f2ac99d82d7adb963112212b968a18f33c3a7e15d96"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e5_test_cases/checklist.md",
+      "sha256": "e8ef3b61ec0340ae703fbafd3414ca926680bceaceb6a8cbc4763d9bc4ed1267"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e6_mock_data/activity-guide.md",
+      "sha256": "b695818b28010ee14e2c0bee8ceb9ea850a5eb408a3dc0e318f68539bbc339e6"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e6_mock_data/checklist.md",
+      "sha256": "97eb3be028e25fc5fcceb459c4bd3e1c50eed3857d933a80a05b9c4d4179e3a6"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e7_mock_services/activity-guide.md",
+      "sha256": "259655eefcb5e0cdfbbd72e3a276db8f835c8e60e734598618592bb72839f39a"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e7_mock_services/checklist.md",
+      "sha256": "6a8119dd78e1ef565c8b7bf0bfb80a120f7b898e169f408d2f8b4edd78bf48b2"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e8_configuration/activity-guide.md",
+      "sha256": "d35892aa44ed6a20d6e0b37c7a3233f948c654e31b12bec8428b7b1b4eb5f3d9"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e8_configuration/checklist.md",
+      "sha256": "93ded63f0844accad121b34a61f205ec58bc919dac04a45384a1844451a2d9c4"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e9_readiness_review/activity-guide.md",
+      "sha256": "8ec02f64eaec816d1b6d0a9027904f7ae2b697499d2dab3b3978b8e0fec67dbd"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/e9_readiness_review/checklist.md",
+      "sha256": "0acc3bfd651fc7e9fbf94e61effb716b1917287e93738c48d9053706211fa9e5"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/e_engineering_preparation/stage-overview.md",
+      "sha256": "5a0d517a3311b57ef772fa04ab2c0046e91b30fc1d38b4af16f40771b0ceb72e"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/a_product_intent_draft_sync.md",
+      "sha256": "442c3d8571f5a13adcdd6e6183f61959ebc2d93dfb884a01c6986d34bae2033b"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/b_product_design_draft_sync.md",
+      "sha256": "1191811639db09ffd9edd857916947417b4c05116a0afde6a0b011db48c9cd0e"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/c_quality_decisions_draft_sync.md",
+      "sha256": "58abb36a01bbd54ab77aee11675213f952636b38f93733f20e2788b888f60a1d"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/d_architecture_backend.md",
+      "sha256": "aa35896acf9638628003b1e1fade7b6d2d734279cc29f7cc6026000dc0ab5710"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/d_architecture_common.md",
+      "sha256": "c8dd52df71c3f72205ead498a2841fb586ec8123d7b19d9566324a9fdc02b6d2"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/d_architecture_frontend_android.md",
+      "sha256": "ef27989df63dba34f629b1142d4b5856f5186bcaa4c82fb080f3e9c01090b6ac"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/d_architecture_frontend_ios.md",
+      "sha256": "a4cff03c6032b61cde0491df24bbf72c640709fd28da6ac9b73ad272e4316cbe"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/d_architecture_frontend_linux.md",
+      "sha256": "41151bfa7200a82bd7167cef0245b31bf00944211382d7e98d939a6990ee0179"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/d_architecture_frontend_mac.md",
+      "sha256": "c6f4bd7c29644c3b287ab76dbd07625a22b6920331046a3354ddccb21c0ea404"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/d_architecture_frontend_web.md",
+      "sha256": "02c115b1fa9919b23cb1e1c8d2e03bd93c74f9c7e631cbce37ce16dd84f1dfb4"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/d_architecture_frontend_windows.md",
+      "sha256": "678a469ec479045f26cc1868bd9d06f99fe25adedbc8dbeff58ef7cb547939d7"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/e_engineering_preparation_draft_sync.md",
+      "sha256": "146522ecb361602ef7221777169eb607d520831f4694d644fb8ceea06036869b"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/examples-index.md",
+      "sha256": "602fd6e2e1ac31496a5591c05ae97183617996e29d9633a4005f79aaf9a602d7"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/f_delivery_planning_draft_sync.md",
+      "sha256": "df024e3f6767f8bcd4f7c302055122673a561b229723048df845a1b99f6b243e"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/examples/h_delivery_feedback_draft_sync.md",
+      "sha256": "0dbf905fc6f24ffa9b2705a9e75b60cee55b58859dd488e7543f34ca662f3f2c"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/f_delivery_planning/f1_delivery_slices/activity-guide.md",
+      "sha256": "b5241fdd647be8921b7d3c82b7d46637c24570f62b6e01457b481ec14f63f01c"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/f_delivery_planning/f1_delivery_slices/checklist.md",
+      "sha256": "9dba46b022efe11c82c68228a9ae869911f90f1421727198afc13bcffa2c1670"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/f_delivery_planning/f2_task_details/activity-guide.md",
+      "sha256": "540926fdd40d27c1a02545ac4d8791bd9a8377b6844bc86554b58077533be9af"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/f_delivery_planning/f2_task_details/checklist.md",
+      "sha256": "b7010bd325ccdab140ea4fad3a14a371666ab975c972f82e4cef55f019158a04"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/f_delivery_planning/f3_context_assembly/activity-guide.md",
+      "sha256": "ceab7842055bd166f420eb5ff6de5ffe2a0531d0205c28252af4dd19b6c36252"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/f_delivery_planning/f3_context_assembly/checklist.md",
+      "sha256": "d0652f681e7835405bc980339397be050570b9de0502b09b045654db8124ddaf"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/f_delivery_planning/f4_recovery_preparation/activity-guide.md",
+      "sha256": "26bde51e7a00f87e7e0d43cac30657c80216ee4703fea5b8f3ff2ca1f2a06cf4"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/f_delivery_planning/f4_recovery_preparation/checklist.md",
+      "sha256": "d6e50d5ea2f90b6703bbaa728b6607875e6a4c9f7d3a61ed0be027502580fd1d"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/f_delivery_planning/stage-overview.md",
+      "sha256": "a400e7009309d56657aba9f07518b0c10d9470abfd6c05f3f11bce8ab11d16cf"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/g_implementation_integration/g1_slice_implementation/activity-guide.md",
+      "sha256": "a381a20c5d698edc80daf63ca5cfa787dc2ab79946dd10dcbf75e47f3600bb6a"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/g_implementation_integration/g1_slice_implementation/checklist.md",
+      "sha256": "90d166397d6f9590537c02eff8ca9de548823801a356e833d27790d73bf80e3c"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/g_implementation_integration/g2_slice_verification/activity-guide.md",
+      "sha256": "398907d29b5b76a98f3c603531a2df44b91fc7fe4c63f1c1716e796ebd0ad5ee"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/g_implementation_integration/g2_slice_verification/checklist.md",
+      "sha256": "6998692b0e53a63046ee4496b520186d318b000eb32c4eb24c0bc591fe7a9013"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/g_implementation_integration/g3_incremental_integration/activity-guide.md",
+      "sha256": "941c52bbd6dd34a4fac60ad65669f06c41536ef04a88b3d8958b905ea96f05c6"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/g_implementation_integration/g3_incremental_integration/checklist.md",
+      "sha256": "ada8de053e6d5e166bb4fbef205c832ceb0d7cf058e1ea9ff80381762ecf14a7"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/g_implementation_integration/g4_consistent_commit/activity-guide.md",
+      "sha256": "f0d783ba9c508c71e1bcba6684beeb80c9b7fcb73d331ab905832cdd6fdba7ec"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/g_implementation_integration/g4_consistent_commit/checklist.md",
+      "sha256": "a696c52d31286febf232dacac4d364d3a64c36e91bc054ed8168cf91de8af2f2"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/g_implementation_integration/stage-overview.md",
+      "sha256": "92fc4ed2c94cc5ef31439f341025b4c519979405d1b6d06da81acad64a0a86c8"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/h_delivery_feedback/h1_coverage_review/activity-guide.md",
+      "sha256": "48c593d033b49b06cf8a264d87d94df7b0118dedab99412e9b067580b3bd7618"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/h_delivery_feedback/h1_coverage_review/checklist.md",
+      "sha256": "be174413b831d5d0c8cf8236e014e6b31bdf701f17c865387df90a58a812891d"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/h_delivery_feedback/h2_delivery_recovery_verification/activity-guide.md",
+      "sha256": "f8113ec3f973453d6770e7d9ab91f163ec9b26242cf6631a52fb016fc0922fdb"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/h_delivery_feedback/h2_delivery_recovery_verification/checklist.md",
+      "sha256": "81aedef71a50bf5f87ab656849cd72a1892025e7e1d85cf38b58ee5a1601086f"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/h_delivery_feedback/h3_developer_acceptance/activity-guide.md",
+      "sha256": "2800d92aad56202de86742ea20f5bdc83a5a504ac1a32c78626a6f3c0ce48432"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/h_delivery_feedback/h3_developer_acceptance/checklist.md",
+      "sha256": "44453fde759545b7954007bcdc2e5d1796476a6de4f44b2b94c616aa3d919bf6"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/h_delivery_feedback/h4_feedback_handoff/activity-guide.md",
+      "sha256": "77e7140031af623c1cd352590d9536d85f9b997be199ee76412bcf4bf72a1b91"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/h_delivery_feedback/h4_feedback_handoff/checklist.md",
+      "sha256": "1d30a24b7c5152b8d296ff81511c46b03e7082ec49b050f85bba3dabadbfdf09"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/h_delivery_feedback/stage-overview.md",
+      "sha256": "f3d6fc4ccd712152a31ec6df0a7e09e0c82b8a89f0510451197467248b85d2df"
+    },
+    {
+      "path": "hs-dev-skill/share/workflow/workflow-map.md",
+      "sha256": "1947b5f482064e96f6939dee229283251270b1a264187429e63ad0eb01ad6eb5"
+    },
+    {
+      "path": "hs-dev-skill/skill-packages.json",
+      "sha256": "54ea9ae65fe4efae2ff1e13512631f2ab43368be442f14f8a3490818fad6ffb3"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-acceptance/SKILL.md",
+      "sha256": "79d50888c1266217669598bda380343e939ae1b813b094a3b929e3a45b3f2d69"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-backend/SKILL.md",
+      "sha256": "a5b09bb67c36508c938120030bb3ca4bbccf24ed3b03295bc7a545b0ab9c0ae5"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-continuity/SKILL.md",
+      "sha256": "3df9f617975fb246571d0e44cb188a322f33b3f768f4e5f9ad85beeaf96d7bf8"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-debugging/SKILL.md",
+      "sha256": "616b02fa403872b190a4c8facaa721b11d57369bdd9dfef0dd194dc91f773677"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-design/SKILL.md",
+      "sha256": "a75948d4bda72d839d90efce2d23ef02611cf827d408037520dc11ebcbffe0f2"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-discovery/SKILL.md",
+      "sha256": "b61f3aceea4db1b41d9ad192ef13aad6ecd97c712a01f9f02097c37c633145ba"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-exploration/SKILL.md",
+      "sha256": "72c919bcde1d5f3159cd25dcc7ce2bfeeb8f6d40920e970c0b44324ca0839d34"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-framework-backend/SKILL.md",
+      "sha256": "d7b25c9d66860903ef933140204c40f4e6df3a43f815bbff9b88daa080e39c6a"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-framework-client-android/SKILL.md",
+      "sha256": "3336d88b06b77a93d090280a188a84baa092762f1825e3a7d3c5e50a50977b84"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-framework-client-base/SKILL.md",
+      "sha256": "dcb4e3c5f80f7ecfb25305add232edc3c6d68c12ce12393745e75a6d1bf7f301"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-framework-client-ios/SKILL.md",
+      "sha256": "4a188de6da33ff12c3c45d00556d03cfbdc416a8d8d8ef18674de49769fa50e3"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-framework-client-linux/SKILL.md",
+      "sha256": "d79fd299410a1ebb8dde4c7e467791edd9ef960bd04e4253d6db1e6d2ebfe4ff"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-framework-client-windows/SKILL.md",
+      "sha256": "1efc899eed61e121c1d23f296652972ae5292e4f694717c5034b661a2bf9f3c9"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-framework-frontend/SKILL.md",
+      "sha256": "b50d089f48414cc918f2abbdb367122f415e158dabefc527510e1570696532f9"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-frontend-android/SKILL.md",
+      "sha256": "50c5c11df6d9ac722f4636578e6d39ba77978f84725d75819a80135b4f9c2f49"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-frontend-base/SKILL.md",
+      "sha256": "33634d1aa0e9d69918e92a6eab2d5bd43d5dae97198d57d1569431e6ae85f939"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-frontend-ios/SKILL.md",
+      "sha256": "7b72845eb2401355d9153864dc15438cb0033b1994be707667c937ce7a71f251"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-frontend-linux/SKILL.md",
+      "sha256": "a20aac04a35c316718e0c8d033b9b58e351879016a374aa3e1240e242c8db801"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-frontend-mac/SKILL.md",
+      "sha256": "74fe9960a747c52b75f0aeccf6cbe0ed608a9bc92114beb6d4322d75fac8ea19"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-frontend-web/SKILL.md",
+      "sha256": "a4f53721e8292a15067a25c947992edcc60f339035d4421e521d607980e1b8fd"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-frontend-windows/SKILL.md",
+      "sha256": "ae644dbf030dccee2e700b1997dbe190cbb07f41081e7ef8ff20169cd226f39b"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-governance/SKILL.md",
+      "sha256": "f07da324fe7e65f5ca71ac04984ee675c5b2ea7bbc7b193af8b7ca3be6ade93e"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-implementation/SKILL.md",
+      "sha256": "f11903777382ade40dd9e455d8f2ce54adea12f27300f0c985abf88b7a8bc73d"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-planning/SKILL.md",
+      "sha256": "d32e02e1553ce8a88a136f15d5e69e39448f9b7bceaa247f6aeaf2c59ba58756"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-product/SKILL.md",
+      "sha256": "731c5b58cf3cb285cb6766ecd5a7abfa60fd95800cc773170139f95f167fa507"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-recovery/SKILL.md",
+      "sha256": "5876e2afe3d8539a8a9f7b7eba419fef0b862bdd5a2148d1e2d09102f7d704d5"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-refactoring/SKILL.md",
+      "sha256": "e665070815328c80e29037339a9f44e4ca5a8cf557a121d705187e4c500051a7"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-reverse/SKILL.md",
+      "sha256": "17243dc2bff90218fa348c3edaff4e74a5c53cc36064e5e597b91b8252388733"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-testing/SKILL.md",
+      "sha256": "06508b4f03d786c3998aad7bf03e7126fe2922debf43b19e7e1d0e38d6ff969b"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-trace/SKILL.md",
+      "sha256": "c4106626b6a0089b7ca1956653d07f16e4709fe1b037ef8d88cfcc92fbe3c104"
+    },
+    {
+      "path": "hs-dev-skill/skills/hs-dev-update/SKILL.md",
+      "sha256": "7c15def5a931f5d6e08f352dde804f08ecc1a704494c32418ef1eecac4c44e79"
+    }
+  ]
+}

@@ -1,34 +1,43 @@
-# 目录布局与维护
+# 目录与维护
 
-## 职责
+## 三种目录边界
 
-- hs-dev-skill/SKILL.md 和 hs-dev-skill/skills/ 保存总控与子 Skill 源码。
-- 安装根的 SKILL.md 是主入口，README.md 是使用说明。
-- hs-dev-docs/ 保存本 Skill 的设计、演进和验证资料。
-- hs-dev-skill/share/ 保存场景入口、活动、知识库、Schema、模板与协议。
-- hs-dev-skill/scripts/ 保存工具入口、hs_dev/ 实现包、tests/ 和 Python 打包配置。
-- output/skills/ 保存可重建的总控与子 Skill 发布包。
-- 原 agents/openai.yaml 保留为 host-adapters/openai.yaml 示例，核心运行不需要 agents/。
+| 场所 | 路径 | 用途 |
+|---|---|---|
+| 源码仓库 | `hs-dev-skill/SKILL.md` | 总控权威入口 |
+| 源码仓库 | `hs-dev-skill/skills/<name>/` | 31 个子 Skill 及专属资料 |
+| 源码仓库 | `hs-dev-skill/share/` | 共享协议、活动、索引、模板、Schema 与专题 |
+| 源码仓库 | `hs-dev-skill/scripts/` | CLI、Python 实现、测试、文档与包构建器 |
+| 源码仓库 | `hs-dev-docs/` | 本 Skill 的说明、分析与验证历史 |
+| 构建结果 | `output/skills/<name>/` | 可独立安装的完整 Skill 包 |
+| 目标工程 | `hs_dev_docs/` | 当前有效的需求、设计与契约 |
+| 目标工程 | `hs-dev-skill/` | 配置、任务、索引、证据、恢复与追踪数据 |
 
-目标工程的 hs-dev-skill/ 是运行数据目录，与源码中的 hs-dev-skill/ 不同。发布安装应使用 output/skills 下生成的独立 Skill 包；源码仓库布局不是安装包布局。目录迁移不更改目标工程运行数据格式，也不自动迁移已有工程或已安装旧包。
+源码路径不能直接当作目标工程运行目录。目标工程运行数据中，`config/` 保存配置，`state/` 保存工作区状态，`tasks/<task_id>/` 保存任务和活动记录，`index/` 保存派生索引，`recovery/` 保存恢复依据，`trace/` 保存可选摘要。实际生成文件以当前程序为准，不预建全部业务文档目录。
 
-## 命令
+## 源与派生物
 
-在源码仓库根执行：
+`hs-dev-skill/skill-packages.json`声明分类及打包策略。子 Skill 的权威入口位于 skills，共享规则在 share 单点维护；构建器复制所需引用闭包并改写安装包内链接。独立包具备本地资料，不等于运行时全部加载；跨 Skill 协作不自动成为安装依赖。
+
+`share/` 的 `.idx` 用于逐层导航。活动文档和机器 catalog 由 `hs-dev-skill/scripts/build_docs.py`中的活动定义生成；编辑这些派生内容时先确认生成源，避免下次构建覆盖修改。该脚本构建的是共享活动资料，并不重建本 `hs-dev-docs/` 说明体系。
+
+## 维护与检查
+
+从仓库根运行：
 
 ```bash
 python3 hs-dev-skill/scripts/hs_dev.py --version
 python3 hs-dev-skill/scripts/build_docs.py --check
+python3 hs-dev-skill/scripts/build_skill_packages.py
 python3 -m unittest discover -s hs-dev-skill/scripts/tests -v
 ```
 
-如需构建 Python 包，在 hs-dev-skill/scripts/ 下使用 pyproject.toml。Python 包仅提供工具程序；Agent 安装仍需包含 SKILL.md 和参考资料的完整 Skill 包。
+`--check` 核对已生成资料；不带它会写共享资料。包构建写入 `output/skills/`，不会安装到其他宿主。完整测试适用于运行时变更；纯文档调整优先检查本地链接、源覆盖、生成一致性和包引用。
 
-从 output/skills/ 安装时，使用对应完整包根。安装后的 CLI 路径为 scripts/hs_dev.py；源码仓库中的 CLI 路径为 hs-dev-skill/scripts/hs_dev.py。包校验和更新逻辑兼容两种布局，不会把源码目录和目标工程运行数据混为一谈。
+安装后的 CLI 通常位于包根 `scripts/hs_dev.py`，源码仓库 CLI 位于 `hs-dev-skill/scripts/hs_dev.py`。命令参数以当前 `--help` 为准，更新通过 install 执行，不猜测 update 子命令。
 
-## 迁移验证
+## 文档演进规则
 
-- 新目录下 75 项自动化测试通过，包含完整包首次安装、重复更新、异地启动和 connect 入口验证。
-- 发布包构建校验通过；活动文档生成器的 --check 当前会报告 A1 活动指南与生成模板不一致，需单独同步生成规则或确认该手工扩展内容。
-- 全部 Markdown 本地文件链接和 Python 语法检查通过。
-- 修正 connect 写入宿主指令后未发布索引的问题，确保生成指令后工作区可通过一致性检查。
+当前说明保留稳定入口；旧方案和旧验证移入 history，并明确日期、源版本和结论边界。新增或移除 Skill 同步核对 manifest、Skill 目录、加载矩阵及打包结果。来源清单保存内容摘要用于定位变化，不作为人工确认或运行通过证明。
+
+可选宿主配置见 [host-adapters](host-adapters/README.md)。本次重建记录见[验证记录](implementation-verification.md)。
