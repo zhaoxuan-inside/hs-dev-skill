@@ -12,5 +12,6 @@
 - [F 交付规划与执行准备](f_delivery_planning/stage-overview.md)
 - [G 实现、测试与增量集成](g_implementation_integration/stage-overview.md)
 - [H 交付、验收与反馈](h_delivery_feedback/stage-overview.md)
+- [R 技术评审与团队对齐](r_review/stage-overview.md)
 
 场景入口和依赖核验见主Skill；每个清单实例在项目任务目录中执行。

@@ -15,7 +15,8 @@ def validate(root):
     scripts = root / "scripts"
     if not references.is_dir():
         references = root / "hs-dev-skill/share"
-    if not scripts.is_dir():
+    # A root-level scripts/ that is not a bundle (e.g. legacy artifacts) must not shadow the bundle.
+    if not (scripts / "hs_dev/cli.py").is_file():
         scripts = root / "hs-dev-skill/scripts"
     docs = references / "skill-docs"
     if not docs.is_dir():

@@ -26,7 +26,7 @@ MAX_QUERY_CHARACTERS = 1024
 MAX_QUERY_TERMS = 16
 MAX_PHRASE_TERMS = 32
 DEFAULT_RESULT_LIMIT = 10
-PARSER_REVISION = 5
+PARSER_REVISION = 6
 OBJECT_GRAPH = "hs_dev_docs/foundation/object_graph.json"
 
 
@@ -244,10 +244,10 @@ class Index:
                 if relative == OBJECT_GRAPH:
                     from ..verification import coverage
                     graph = json.loads(text)
-                    result = coverage(graph["objects"], graph["relations"])
+                    result = coverage(graph.get("objects"), graph.get("relations"))
                     if not result["ok"]:
                         raise ValueError("Invalid object registry: " + "; ".join(result["errors"]))
-                    meta = {"kind": "registry", "tags": ["traceability"], "relations": graph["relations"]}
+                    meta = {"kind": "registry", "tags": ["traceability"], "relations": graph.get("relations", [])}
                 if not isinstance(meta, dict):
                     raise ValueError("Content metadata must be an object")
                 if set(meta) - METADATA_FIELDS or meta.get("status", "current") not in SOURCE_STATES:

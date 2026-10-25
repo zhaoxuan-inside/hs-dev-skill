@@ -6,8 +6,10 @@
 
 ## 文件
 
-- [activity.schema.json](activity.schema.json) — { "$schema": "https://json-schema.org/draft/2020-12/schema", "type": "object", "properties": { "id": { "type": "string" }, "title"。
-- [context-request.schema.json](context-request.schema.json) — { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "context-request.schema.json", "title": "Semantic Context Requ。
-- [metadata.schema.json](metadata.schema.json) — { "$schema": "https://json-schema.org/draft/2020-12/schema", "type": "object", "properties": { "id": { "type": "string" }, "activi。
-- [relation.schema.json](relation.schema.json) — { "$schema": "https://json-schema.org/draft/2020-12/schema", "type": "object", "properties": { "source": { "type": "string" }, "ta。
+- [contract-kernel.schema.json](contract-kernel.schema.json) — 文档内 :::contract 块的机器权威格式；链接字段对账见 kernel 命令。
+- [gates.schema.json](gates.schema.json) — 声明式验证门禁格式；登记后只接受 gate:<id> 选择符。
+- [context-request.schema.json](context-request.schema.json) — 语义上下文请求 v2。
+- [metadata.schema.json](metadata.schema.json) — 文件级 hs 元数据格式。
+- [activity.schema.json](activity.schema.json) — 活动目录条目格式。
+- [relation.schema.json](relation.schema.json) — 关系条目格式。
 - [schema-catalog.md](schema-catalog.md) — 当前机器契约，未知字段拒绝。

@@ -373,6 +373,8 @@ class SystemTests(unittest.TestCase):
         self.call("approve", task, "H1", "--actor", "human", "--confirmation", "用户：H1通过")
         self.call("dependency-bind", task, "H3", "H2", "unit:contract.api", "--actor", "human",
                   "--confirmation", "用户：引用已验收的恢复验证基线")
+        self.call("dependency-bind", task, "H3", "R1", "unit:contract.api", "--actor", "human",
+                  "--confirmation", "用户：引用已评审的契约基线")
         self.call("commit", task, "--activity", "H3", "--changes", '{"later.md":"downstream result"}',
                   "--checks", json.dumps([[sys.executable,"-c","print('downstream')"]]))
         self.assertTrue(approval_valid(self.root, store.load_task(self.root, task), "H1"))

@@ -14,7 +14,7 @@
     "process": [
       "hs-dev-acceptance", "hs-dev-continuity", "hs-dev-debugging", "hs-dev-design",
       "hs-dev-discovery", "hs-dev-exploration", "hs-dev-implementation", "hs-dev-planning",
-      "hs-dev-refactoring", "hs-dev-reverse"
+      "hs-dev-refactoring", "hs-dev-review", "hs-dev-reverse"
     ],
     "domain": [
       "hs-dev-backend", "hs-dev-framework-backend", "hs-dev-framework-client-android",

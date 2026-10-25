@@ -8,6 +8,67 @@ from ..storage import sha
 
 FORMAT_VERSION = 1
 UNIT_META = re.compile(r'<!--\s*hs-unit:\s*(\{[^\n]*\})\s*-->')
+CONTRACT_OPEN = re.compile(r'^\s{0,3}:::contract\s*$')
+CONTRACT_CLOSE = re.compile(r'^\s{0,3}:::\s*$')
+KERNEL_KINDS = ("feature", "behavior", "interface", "data", "method")
+KERNEL_ID = re.compile(r'^(feature|behavior|interface|data|method):([A-Za-z0-9][A-Za-z0-9._-]*)$')
+
+
+def contract_kernel(text, path):
+    """Extract :::contract blocks outside code fences; each block is one kernel unit.
+
+    The JSON payload is the machine authority of the surrounding Markdown section;
+    malformed JSON or IDs fail the publish itself instead of surfacing later.
+    """
+    blocks, fence, open_line = [], None, None
+    for i, line in enumerate(text.splitlines(), start=1):
+        marker = re.match(r'^\s{0,3}(`{3,}|~{3,})', line)
+        if marker:
+            value = marker.group(1)
+            if fence is None:
+                fence = value
+            elif value[0] == fence[0] and len(value) >= len(fence):
+                fence = None
+            continue
+        if fence is not None:
+            continue
+        if open_line is None and CONTRACT_OPEN.match(line):
+            open_line = i
+        elif open_line is not None and CONTRACT_CLOSE.match(line):
+            blocks.append((open_line, i))
+            open_line = None
+    if open_line is not None:
+        raise ValueError("Unterminated contract kernel block: " + path)
+    lines = text.splitlines()
+    kernels, seen = [], set()
+    for start, end in blocks:
+        payload_text = "\n".join(lines[start:end - 1])
+        try:
+            payload = json.loads(payload_text)
+        except json.JSONDecodeError as error:
+            raise ValueError("Contract kernel is not valid JSON (" + path + ":" + str(start) + "): " + str(error))
+        match = KERNEL_ID.match(payload.get("id", "")) if isinstance(payload, dict) else None
+        if not isinstance(payload, dict) or not match:
+            raise ValueError("Contract kernel requires an id like behavior:<name>: " + path + ":" + str(start))
+        if payload["id"] in seen:
+            raise ValueError("Duplicate contract kernel id in file: " + payload["id"])
+        seen.add(payload["id"])
+        links = {}
+        for field in ("feature", "contract", "scenarios", "covered_by", "implemented_by"):
+            value = payload.get(field)
+            if value is None:
+                continue
+            if isinstance(value, str) and field in ("feature", "contract"):
+                value = [value]
+            if not isinstance(value, list) or any(not isinstance(x, str) or not x for x in value):
+                raise ValueError("Contract kernel link fields must be ID arrays: " + payload["id"])
+            links[field] = value
+        references = sorted({target for values in links.values() for target in values})
+        if references or payload.get("unimplemented_reason") is not None:
+            links["references"] = references
+        kernels.append({"id": payload["id"], "kind": match.group(1), "start": start, "end": end,
+                        "body": "\n".join(lines[start - 1:end]), "payload": payload, "links": links})
+    return kernels
 
 
 def file_id(path):
@@ -116,6 +177,13 @@ def units(path, text):
                     [FORMAT_VERSION, section["own_revision"], child_revisions],
                     ensure_ascii=False, separators=(",", ":")).encode())
                 section["item"]["properties"]["unit_revision"] = section["revision"]
+        for entry in contract_kernel(text, path):
+            key = add("kernel:" + entry["id"], entry["kind"] + " " + entry["id"], entry["start"], entry["end"],
+                      "kernel", root, revision_body=entry["body"])
+            result[-1]["properties"].update(kernel_id=entry["id"], kernel_kind=entry["kind"],
+                                            **{field: value for field, value in entry["links"].items()
+                                               if field != "references"})
+            result[-1]["properties"]["references"] = entry["links"].get("references", [])
     elif path.endswith(".py"):
         tree = ast.parse(text, filename=path)
         definitions = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)

@@ -23,5 +23,11 @@ def initialize(root):
     foundation = root / "hs_dev_docs/foundation"
     foundation.mkdir(parents=True, exist_ok=True)
     create_document(foundation / "README.md", "# 项目基座\n\n术语、项目说明和权威产物登记。历史材料保留来源，不默认作为当前规则。\n")
+    create_document(foundation / "object_graph.json", '{\n  "objects": [],\n  "relations": []\n}\n')
+    create_document(root / "hs_dev_docs/foundation/contracts.json", '{\n  "schema_version": 1,\n  "contracts": []\n}\n')
+    create_document(foundation / "gates.json", '{\n  "schema_version": 1,\n  "entries": []\n}\n')
+    create_document(foundation / "decisions.jsonl", "")
+    from .decisions import refresh as refresh_decisions
+    refresh_decisions(root)
     with Index(root) as index:
         return index.publish()

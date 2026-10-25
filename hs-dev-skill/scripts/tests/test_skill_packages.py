@@ -15,8 +15,8 @@ def test_builds_self_contained_packages_for_all_skills(tmp_path):
     output = tmp_path / "skills"
     result = build(ROOT, output)
 
-    assert result["packages"] == 32
-    assert result["children"] == 31
+    assert result["packages"] == 33
+    assert result["children"] == 32
     assert validate(output) == []
 
 

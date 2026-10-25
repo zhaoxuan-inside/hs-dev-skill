@@ -2,7 +2,7 @@
 
 依据 [workflow.json](../hs-dev-skill/scripts/hs_dev/data/workflow.json)整理当前活动。阶段提供导航，活动组织工作，清单中的内部检查项是验收单元；上游表示活动依赖，不要求重复执行已有效完成的活动。
 
-当前共有 8 个阶段、36 个活动、108 个检查项。
+当前共有 9 个阶段、38 个活动、118 个检查项。
 
 ## A 产品构想与宏观信息收集
 
@@ -77,8 +77,15 @@
 |---|---|---|
 | [H1 完整性对账与现状核验](../hs-dev-skill/share/workflow/h_delivery_feedback/h1_coverage_review/activity-guide.md) | 无固定上游 | [检查清单](../hs-dev-skill/share/workflow/h_delivery_feedback/h1_coverage_review/checklist.md)；有来源的现状与约定差异、覆盖及一致性结论；遗漏/冲突/失效及未验证项、影响和下一动作 |
 | [H2 交付与恢复验证](../hs-dev-skill/share/workflow/h_delivery_feedback/h2_delivery_recovery_verification/activity-guide.md) | G4 | [检查清单](../hs-dev-skill/share/workflow/h_delivery_feedback/h2_delivery_recovery_verification/checklist.md)；实际交付路径及适用恢复检查结果；产物版本、环境、覆盖局限和阻断/下一动作 |
-| [H3 验收](../hs-dev-skill/share/workflow/h_delivery_feedback/h3_developer_acceptance/activity-guide.md) | H1, H2 | [检查清单](../hs-dev-skill/share/workflow/h_delivery_feedback/h3_developer_acceptance/checklist.md)；与当前材料和模式绑定的验收结果及确认记录；完成状态或拒绝/暂缓/修复项、阻断及下一动作 |
+| [H3 验收](../hs-dev-skill/share/workflow/h_delivery_feedback/h3_developer_acceptance/activity-guide.md) | H1, H2, R1 | [检查清单](../hs-dev-skill/share/workflow/h_delivery_feedback/h3_developer_acceptance/checklist.md)；与当前材料和模式绑定的验收结果及确认记录；完成状态或拒绝/暂缓/修复项、阻断及下一动作 |
 | [H4 反馈与后续](../hs-dev-skill/share/workflow/h_delivery_feedback/h4_feedback_handoff/activity-guide.md) | H3 | [检查清单](../hs-dev-skill/share/workflow/h_delivery_feedback/h4_feedback_handoff/checklist.md)；有来源及影响的反馈分类和负责过程/活动；最小续做上下文、下一动作、阻断及完成状态说明 |
+
+## R 技术评审与团队对齐
+
+| 活动 | 必要上游 | 输出定位 |
+|---|---|---|
+| [R1 契约对照评审](../hs-dev-skill/share/workflow/r_review/r1_contract_review/activity-guide.md) | 无固定上游 | [检查清单](../hs-dev-skill/share/workflow/r_review/r1_contract_review/checklist.md)；由变更集推导评审包并逐项对照契约内核；偏离清单（缺陷或契约变更）及移交对象 |
+| [R2 分歧与异议处理](../hs-dev-skill/share/workflow/r_review/r2_disagreement_resolution/activity-guide.md) | 无固定上游 | [检查清单](../hs-dev-skill/share/workflow/r_review/r2_disagreement_resolution/checklist.md)；绑定对象的异议登记与逐条裁决；回写结果与未决阻断范围 |
 
 ## 使用与交付
 

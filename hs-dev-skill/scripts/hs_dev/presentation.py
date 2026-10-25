@@ -30,6 +30,12 @@ def render(result, meta):
         lines.extend("- " + error for error in result["errors"])
     if result.get("pending_tasks"):
         lines.append("待继续或回退的任务：" + ", ".join(result["pending_tasks"]))
+    if isinstance(result.get("rows"), list):
+        for row in result["rows"]:
+            if isinstance(row, dict) and row.get("key"):
+                lines.append("- " + row["key"] + ("：" + row["reason"] if row.get("reason") else ""))
+    if "counts" in result and isinstance(result.get("counts"), dict):
+        lines.append(" · ".join(f"{key}：{value}" for key, value in result["counts"].items()))
     if result.get("requires_model"):
         lines.append("下一步：宿主依据候选与信号作最终判断，通过 --model 提交意图及理由。")
     if result.get("missing"):
@@ -43,6 +49,14 @@ def render(result, meta):
         lines.append("确认：" + str(result["confirmation"]))
     if "events" in result:
         lines.extend(f"{event['timestamp']} {event['event']} {event['attributes']}" for event in result["events"])
+    if "entries" in result:
+        labels = {"current": "现行", "stale": "内容已变化", "superseded": "已推翻", "superseding": "推翻记录"}
+        for entry in result["entries"]:
+            state = labels.get(entry.get("status"), entry.get("event", ""))
+            lines.append(f"{entry['decision_id']} · {state} · {entry['title']}")
+        if result.get("stale_count"):
+            lines.append(f"内容已变化的决策：{result['stale_count']} 条，应复核或补充推翻记录")
+        lines.append(f"记录总数：{result.get('count', 0)}")
     if "nodes" in result and "edges" in result and "coverage" in result:
         from .support.trace_graph import mermaid
         lines.extend(["", mermaid(result), "", "仅含保留的已记录事件；不保证历史完整。"])

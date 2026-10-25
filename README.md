@@ -17,7 +17,7 @@ AI -> DOCUMENTS -> CODE
 
 让 Agent 开发有依据，开发过程可观测、可追溯、知原委。
 
-`v6.0.1.0` · `Python 3.11+` · `SQLite FTS5` · `MIT`
+`v6.4.0.0` · `Python 3.11+` · `SQLite FTS5` · `MIT`
 
 [理念](#理念) · [核心亮点](#核心亮点) · [安装与接入](#安装与接入) · [模式](#模式) · [入口与工作流程](#入口与工作流程) · [Skill 目录](#skill-目录) · [产出目录](#产出目录)
 
@@ -174,15 +174,18 @@ WORKSPACE STATUS
  [ A ] --> [ B ] --> [ C ] --> [ D ]
                                  |
                                  v
- [ H ] <-- [ G ] <-- [ F ] <-- [ E ]
+ [ H ] <-- [ R ] <-- [ G ] <-- [ F ] <-- [ E ]
+              |
+              +--> 契约对照评审是验收（H3）的必要前置
 ```
 
 | 阶段 | 职责 | 阶段 | 职责 |
 | :--- | :--- | :--- | :--- |
-| A | 产品构想与宏观信息收集 | E | 工程契约与验证环境构建 |
-| B | 功能体系与产品行为设计 | F | 交付规划与执行准备 |
-| C | 质量约束与技术决策 | G | 实现、测试与增量集成 |
-| D | 架构与框架设计 | H | 交付、验收与反馈 |
+| A | 产品构想与宏观信息收集 | F | 交付规划与执行准备 |
+| B | 功能体系与产品行为设计 | G | 实现、测试与增量集成 |
+| C | 质量约束与技术决策 | H | 交付、验收与反馈 |
+| D | 架构与框架设计 | R | 技术评审与团队对齐 |
+| E | 工程契约与验证环境构建 | | |
 
 ### 场景入口：每条路径如何工作
 
@@ -194,6 +197,7 @@ WORKSPACE STATUS
 | [工程设计](hs-dev-skill/skills/hs-dev-design/SKILL.md) | 技术选型、架构、契约与验证环境 | 核验产品输入 → 明确质量约束与技术选择（C）→ 设计架构与协作（D）→ 准备数据、接口、测试、Mock 与配置（E）。 |
 | [任务规划](hs-dev-skill/skills/hs-dev-planning/SKILL.md) | 将设计转成可执行任务 | 核验设计输入 → 划分交付切片 → 映射需求、任务与方法 → 装配上下文 → 准备恢复依据（F）。 |
 | [实现与集成](hs-dev-skill/skills/hs-dev-implementation/SKILL.md) | 实施已明确的工程任务 | 核验契约及依赖 → 按切片实现 → 真实验证 → 增量集成 → 核验文档、代码、索引与任务记录的一致性（G）。 |
+| [技术评审](hs-dev-skill/skills/hs-dev-review/SKILL.md) | 评审变更集、处理团队分歧 | 由 diff 推导评审包（内核链+对象图）→ 逐项对照契约核验实现（R1）→ 分歧登记与裁决（R2）；评审是验收的必要前置。 |
 | [验收](hs-dev-skill/skills/hs-dev-acceptance/SKILL.md) | 检查活动或阶段的交付结果 | 核对检查项 → 展示材料、证据与问题 → 按模式记录决定 → 通过后供下游使用；未通过则保留原因及下一动作。 |
 | [缺陷修复](hs-dev-skill/skills/hs-dev-debugging/SKILL.md) | 实际报错、超时、失败或缺陷 | 复现并建立现状基线（H1）→ 核验需求与契约 → 定位根因 → 选择受影响活动 → 修复并执行回归验证。 |
 | [结构重构](hs-dev-skill/skills/hs-dev-refactoring/SKILL.md) | 保持行为并改善结构 | 阅读真实代码并建立行为保护（H1）→ 核验业务边界（A/B）→ 调整受影响设计与实现（C～G）→ 验证行为保持一致。 |
@@ -335,8 +339,13 @@ project/
 |   |-- foundation/
 |   |   |-- README.md
 |   |   |-- object_graph.json
+|   |   |-- contracts.json
+|   |   |-- blueprint.json
+|   |   |-- gates.json
+|   |   |-- decisions.jsonl
+|   |   |-- doc_debt_waivers.jsonl
 |   |   `-- tag_aliases.json
-|   `-- <activity-documents>/
+|   `-- <activity-documents>/   # 行为/设计文档可内嵌 :::contract 内核块
 `-- hs-dev-skill/
     |-- README.md
     |-- config/
@@ -371,7 +380,7 @@ project/
 | 路径 | 保存什么 |
 | :--- | :--- |
 | `hs_dev_docs/` | 当前有效的项目知识：需求、设计、契约、交付等文档；按活动需要组织，不预先铺满所有阶段。 |
-| `hs_dev_docs/foundation/` | 项目说明、术语与权威产物登记等基座资料；对象关系和标签别名在使用时维护。 |
+| `hs_dev_docs/foundation/` | 项目说明、术语与权威产物登记等基座资料：对象图、机器契约、行为蓝图、验证门禁、决策台账与文档债豁免；行为/设计文档中的 `:::contract` 内核块由 `kernel` 命令对账 ID 链。 |
 | `hs-dev-skill/config/` | 项目级 Skill 配置，包括确认模式。 |
 | `hs-dev-skill/state/` | 工作区安全状态及运行协调信息。 |
 | `hs-dev-skill/task_index.jsonl` | 任务状态、更新时间和元数据摘要索引。 |

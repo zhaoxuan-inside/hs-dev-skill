@@ -52,6 +52,17 @@ def execute(args):
     if name == "dependency-bind":
         from .dependencies import bind
         return bind(root, args.task, args.consumer, args.producer, args.unit_id, args.actor, args.confirmation)
+    if name in {"decision-record", "decision-list", "decision-supersede"}:
+        from . import decisions
+        if name == "decision-record":
+            return decisions.record(root, args.title, args.reason, args.actor, args.confirmation,
+                                    scope=args.scope, task_id=args.task, activity=args.activity,
+                                    alternatives=[a for a in args.alternatives.split("|") if a],
+                                    unit_ids=[u for u in args.units.split(",") if u],
+                                    supersedes=args.supersedes)
+        if name == "decision-supersede":
+            return decisions.supersede(root, args.id, args.reason, args.actor, args.confirmation, args.task)
+        return decisions.view(root)
     if name == "trace-graph":
         from .support.trace_graph import graph, mermaid
         result = graph(root, args.task_id, args.limit)
@@ -72,6 +83,21 @@ def execute(args):
         if graph is None:
             raise ValueError("Register objects and relationships in the foundation object_graph.json")
         return coverage(graph["objects"], graph["relations"])
+    if name == "blueprint":
+        from . import blueprint
+        return blueprint.report(root)
+    if name == "contracts":
+        from . import contract_registry
+        return contract_registry.report(root)
+    if name == "kernel":
+        from . import kernel
+        return kernel.report(root)
+    if name == "doc-debt":
+        from . import kernel
+        return kernel.debt_report(root)
+    if name == "doc-debt-waive":
+        from . import kernel
+        return kernel.waive(root, args.key, args.reason, args.actor)
     if name == "config":
         return resolve(root, args.task, json_value(args.direct))
     if name == "env":

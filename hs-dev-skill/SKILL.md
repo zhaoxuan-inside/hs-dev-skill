@@ -7,7 +7,7 @@ description: >-
 license: MIT
 metadata:
   author: hardstone
-  version: "6.0.1.0"
+  version: "7.0.0.0"
   runtime: "Python >= 3.11, SQLite FTS5; install complete bundle"
 ---
 
@@ -42,6 +42,7 @@ metadata:
 | 产品输入已明确，需要技术选型、架构、契约或验证环境设计 | [design](skills/hs-dev-design/SKILL.md) |
 | 设计已明确，需要拆解任务和依赖、安排交付顺序 | [planning](skills/hs-dev-planning/SKILL.md) |
 | 已有明确任务及必要设计，要求实现 | [implementation](skills/hs-dev-implementation/SKILL.md) |
+| 需要对照契约内核评审变更集，或登记/裁决团队分歧 | [review](skills/hs-dev-review/SKILL.md) |
 | 对照清单和标准核验交付、收集验收证据 | [acceptance](skills/hs-dev-acceptance/SKILL.md) |
 | 恢复已有任务、评估需求变化影响或回退检查点 | [continuity](skills/hs-dev-continuity/SKILL.md) |
 
@@ -53,6 +54,7 @@ metadata:
 - “修复并顺便重构”先定位缺陷；仅在重构范围和保留行为要求已明确时安排后续重构，不借修复扩大范围。
 - “了解现有项目”通常是 exploration；要求建立经过核实的项目知识和文档体系才进入 reverse。
 - “做前端”“改后端”只确定领域；仍需根据结果和已有条件选择过程。缺失的必要前置产物按实际需要补齐，不自动从头走 A～H。
+- 评审请求按对象分流：对照契约核验变更集或裁决分歧进入 review；“评审一下这段代码”若是解释诉求仍走 exploration。
 - 明确的需求梳理诉求可进入 discovery；不知道用户要解释、修改还是重建时，应先询问，不能把 discovery 当作所有不确定请求的默认入口。
 
 ## 按需加载与执行

@@ -18,9 +18,9 @@ class ReleaseTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             output = Path(temporary) / "release"
             result = release(root, output, __version__)
-            self.assertEqual(result["packages"], 32)
-            self.assertEqual(len(list(output.glob("*.zip"))), 33)
-            self.assertEqual(len(json.loads((output / "catalog.json").read_text())["skills"]), 32)
+            self.assertEqual(result["packages"], 33)
+            self.assertEqual(len(list(output.glob("*.zip"))), 34)
+            self.assertEqual(len(json.loads((output / "catalog.json").read_text())["skills"]), 33)
             for line in (output / "SHA256SUMS").read_text().splitlines():
                 checksum, name = line.split("  ", 1)
                 self.assertEqual(hashlib.sha256((output / name).read_bytes()).hexdigest(), checksum)

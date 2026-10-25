@@ -26,7 +26,9 @@ jobs:
           assert os.environ['RELEASE_TAG'] == 'v' + __version__, 'Tag and runtime version differ'
           PY
       - name: Run regression tests
-        run: python3 -m unittest discover -s hs-dev-skill/scripts/tests
+        run: |
+          python3 -m pip install --user pytest
+          python3 -m pytest hs-dev-skill/scripts/tests -q
       - name: Build validated release assets
         run: python3 hs-dev-skill/scripts/build_release.py
       - name: Publish GitHub Release

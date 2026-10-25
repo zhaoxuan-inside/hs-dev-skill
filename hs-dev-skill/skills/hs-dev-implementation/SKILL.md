@@ -46,7 +46,7 @@ license: MIT
 | Android 前端 | [G Android 实现](references/workflow/examples/g_implementation_frontend_android.md) |
 | 后端 | [G 后端实现](references/workflow/examples/g_implementation_backend.md) |
 
-只有当前切片包含或暴露了尚未解决的架构决定时，才追加读取对应 `d_architecture_*.md`；已接受的架构结论从任务/契约引用，不为实现重复加载其他端或整套 D 范例。端到端切片依实际涉及的客户端与服务端边界读取对应范例。
+只有当前切片包含或暴露了尚未解决的架构决定时，才追加读取对应架构范例（按端侧：[Web](../../share/workflow/examples/d_architecture_frontend_web.md)、[Android](../../share/workflow/examples/d_architecture_frontend_android.md)、[iOS](../../share/workflow/examples/d_architecture_frontend_ios.md)、[Windows](../../share/workflow/examples/d_architecture_frontend_windows.md)、[macOS](../../share/workflow/examples/d_architecture_frontend_mac.md)、[Linux](../../share/workflow/examples/d_architecture_frontend_linux.md)、[后端](../../share/workflow/examples/d_architecture_backend.md)或[通用](../../share/workflow/examples/d_architecture_common.md)）；已接受的架构结论从任务/契约引用，不为实现重复加载其他端或整套 D 范例。端到端切片依实际涉及的客户端与服务端边界读取对应范例。
 
 ## 上下文边界
 

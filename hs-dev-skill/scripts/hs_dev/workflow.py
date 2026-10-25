@@ -72,6 +72,19 @@ def record_check(root, task_id, activity, item, result, evidence=None, reason=""
         raise ValueError("Activity is not active in this task")
     verify_workspace(root, require_clean=True)
     enter_activity(root, task, activity)
+    if activity.startswith("E9"):
+        from . import blueprint
+        blueprint.require_ready(root)
+        from . import kernel
+        kernel.require_consistent(root)
+        kernel.require_no_debt(root)
+    elif activity.startswith("G4"):
+        from . import kernel
+        kernel.require_consistent(root)
+        kernel.require_no_debt(root)
+    elif activity.startswith(("E1", "E2")):
+        from . import contract_registry
+        contract_registry.require_consistent(root)
     if result not in {CheckResult.PASS, CheckResult.FAIL, CheckResult.NA}:
         raise ValueError("Unknown check result")
     if any("|" in str(v) or "\n" in str(v) for v in (evidence or "", reason)):
@@ -138,6 +151,17 @@ def approve(root, task_id, scope, actor, confirmation):
         "dependency_digest": dependency_digest(root, task, selected)}
     save_task(root, task)
     acceptance.refresh(root, task)
+    from . import decisions
+    materials = acceptance.materials(root, task, selected)
+    units = [{"unit_id": m["unit_id"], "unit_revision": m["unit_revision"]}
+             for m in materials if m.get("unit_revision")]
+    outputs = []
+    for activity in selected:
+        for relative in task.get("outputs", {}).get(activity, []):
+            file = local(root, relative)
+            outputs.append({"path": relative, "digest": sha(file.read_bytes()) if file.is_file() else None})
+    decisions.record_approval(root, task, scope, task["approvals"][scope], units, outputs,
+                              [m["path"] for m in materials])
     from .support.trace import emit
     emit(root, "confirmation", {"task_id": task_id, "stage_id": selected[0][0],
          "activity_id": selected[0] if mode == ExecutionMode.ACTIVITY else None,
@@ -151,6 +175,22 @@ def finish(root, task_id, commands):
     task = load_task(root, task_id)
     if task["status"] != TaskStatus.ACTIVE:
         raise ValueError("Only an active task can be completed")
+    from . import decisions
+    report = decisions.validate(root)
+    if not report["ok"]:
+        raise ValueError("Decision ledger corrupted: " + "; ".join(report["errors"]))
+    missing = decisions.missing_scopes(root, task)
+    if missing:
+        raise ValueError("Decision ledger missing approval records for: " + ", ".join(missing))
+    if any(a.startswith(("E5", "E9")) for a in task["activities"]):
+        from . import blueprint
+        blueprint.require_ready(root)
+    elif any(a.startswith(("E1", "E2")) for a in task["activities"]):
+        from . import contract_registry
+        contract_registry.require_consistent(root)
+    from . import kernel
+    kernel.require_consistent(root)
+    kernel.require_no_debt(root)
     verify_workspace(root, require_clean=True)
     validate_checks(root, task, task["activities"])
     scopes = task["activities"] if task["mode"] == ExecutionMode.ACTIVITY else sorted({a[0] for a in task["activities"]})
@@ -161,6 +201,10 @@ def finish(root, task_id, commands):
     result = run_checks(root, commands, task_id)
     if not result["ok"]:
         raise ValueError("Final verification failed")
+    from .verification import load_gates
+    reporting_gates = [entry for entry in load_gates(root)["entries"] if entry.get("report")]
+    if reporting_gates and any(a.startswith(("E5", "E9", "G")) for a in task["activities"]) and not result["reports"]:
+        raise ValueError("Engineering completion requires a machine test report from a declared gate")
     # Verification commands may themselves mutate the workspace.
     verify_workspace(root, require_clean=True)
     require_verified_sources(root, result)

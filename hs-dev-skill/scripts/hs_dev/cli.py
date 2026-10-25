@@ -21,8 +21,12 @@ def parser():
     p.add_argument("--wait", type=float)
     p.add_argument("--version", action="version", version=__version__)
     sub = p.add_subparsers(dest="command", required=True)
-    for name in ("init", "status", "verify", "retention", "serve", "coverage"):
+    for name in ("init", "status", "verify", "retention", "serve", "coverage", "blueprint", "contracts", "kernel", "doc-debt"):
         sub.add_parser(name)
+    q = sub.add_parser("doc-debt-waive")
+    q.add_argument("--key", required=True)
+    q.add_argument("--reason", required=True)
+    q.add_argument("--actor", choices=["human"], required=True)
     q = sub.add_parser("classify")
     q.add_argument("text")
     q.add_argument("--signals", default="{}")
@@ -129,6 +133,24 @@ def parser():
     q.add_argument("unit_id")
     q.add_argument("--actor", choices=["human", "model"], required=True)
     q.add_argument("--confirmation", required=True)
+    q = sub.add_parser("decision-record")
+    q.add_argument("--title", required=True)
+    q.add_argument("--reason", default="")
+    q.add_argument("--actor", choices=["human", "model"], required=True)
+    q.add_argument("--confirmation", required=True)
+    q.add_argument("--task")
+    q.add_argument("--activity")
+    q.add_argument("--scope", default="project")
+    q.add_argument("--alternatives", default="", help="Rejected options separated by |")
+    q.add_argument("--units", default="", help="Comma-separated index unit IDs bound to this decision")
+    q.add_argument("--supersedes")
+    q = sub.add_parser("decision-list")
+    q = sub.add_parser("decision-supersede")
+    q.add_argument("id")
+    q.add_argument("--reason", required=True)
+    q.add_argument("--actor", choices=["human", "model"], required=True)
+    q.add_argument("--confirmation", required=True)
+    q.add_argument("--task")
     q = sub.add_parser("trace-query")
     q.add_argument("--limit", type=int, default=20)
     q.add_argument("--run-id")
@@ -148,7 +170,7 @@ def parser():
     return p
 
 
-MUTATIONS = {"init", "task-start", "task-continue", "check", "approve", "complete", "commit", "rollback", "task-rollback", "snapshot", "reconcile", "retention", "connect", "acceptance-material", "acceptance-decide", "dependency-bind", "repair-index"}
+MUTATIONS = {"init", "task-start", "task-continue", "check", "approve", "complete", "commit", "rollback", "task-rollback", "snapshot", "reconcile", "retention", "connect", "acceptance-material", "acceptance-decide", "dependency-bind", "repair-index", "decision-record", "decision-supersede", "doc-debt-waive"}
 
 
 def main(argv=None):

@@ -5,7 +5,7 @@
 | 场所 | 路径 | 用途 |
 |---|---|---|
 | 源码仓库 | `hs-dev-skill/SKILL.md` | 总控权威入口 |
-| 源码仓库 | `hs-dev-skill/skills/<name>/` | 31 个子 Skill 及专属资料 |
+| 源码仓库 | `hs-dev-skill/skills/<name>/` | 32 个子 Skill 及专属资料 |
 | 源码仓库 | `hs-dev-skill/share/` | 共享协议、活动、索引、模板、Schema 与专题 |
 | 源码仓库 | `hs-dev-skill/scripts/` | CLI、Python 实现、测试、文档与包构建器 |
 | 源码仓库 | `hs-dev-docs/` | 本 Skill 的说明、分析与验证历史 |
@@ -14,6 +14,8 @@
 | 目标工程 | `hs-dev-skill/` | 配置、任务、索引、证据、恢复与追踪数据 |
 
 源码路径不能直接当作目标工程运行目录。目标工程运行数据中，`config/` 保存配置，`state/` 保存工作区状态，`tasks/<task_id>/` 保存任务和活动记录，`index/` 保存派生索引，`recovery/` 保存恢复依据，`trace/` 保存可选摘要。实际生成文件以当前程序为准，不预建全部业务文档目录。
+
+目标工程 `hs_dev_docs/foundation/` 另保存机械登记，是"照文档重写=行为一致"可信链的载体：`object_graph.json` 对象图（初始化即强制存在，缺失则工作区不可信）、`contracts.json` 机器契约登记（JSON Schema/OpenAPI 权威文件）、`blueprint.json` 功能/场景/用例蓝图（含 UI 权威文案登记）、`decisions.jsonl` 决策台账（哈希链只增不改，派生预览 `decisions.md`）。这些登记由 E1/E2/E9 与完成门禁机械对账；决策同时绑定文档单元与所描述代码的摘要，任一侧变更即标记"内容已变化"。
 
 ## 源与派生物
 

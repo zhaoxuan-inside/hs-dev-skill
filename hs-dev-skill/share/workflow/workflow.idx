@@ -15,6 +15,7 @@
 - [f_delivery_planning](f_delivery_planning/f_delivery_planning.idx) — 把有效范围和设计落实为可执行任务及必要准备。F1 安排切片和依赖，F2 明确当前任务契约，F3 装配版本有效的最小上下文，F4 核实适用恢复准备；按缺口选择，不为局部任务强制重做计划或创建全部任务正文。
 - [g_implementation_integration](g_implementation_integration/g_implementation_integration.idx) — 实现当前有效任务并取得行为、集成及一致发布证据。G1 落实切片修改，G2 验证相关行为和工程检查，G3 核验实际协作及回归，G4 发布受管一致修订；按实际依赖迭代，不推迟到最后首次集成，也不要求局部任务全量重跑。
 - [h_delivery_feedback](h_delivery_feedback/h_delivery_feedback.idx) — 对本次指定交付范围核验成果、可用性、确认和后续责任。H1 对账现状与覆盖，H2 验证实际交付及适用恢复，H3 按模式完成验收责任，H4 分类反馈并交接下一动作；按实际问题选择，不重做产生材料的全部活动。
+- [r_review](r_review/r_review.idx) — 把代码与文档一致、团队理解一致变成可执行的评审与裁决动作。R1 由变更集生成评审包逐项对照契约，R2 把分歧登记为可裁决事项并按路径处理；按实际问题选择，不重做产生材料的全部活动。 — 对本次指定交付范围核验成果、可用性、确认和后续责任。H1 对账现状与覆盖，H2 验证实际交付及适用恢复，H3 按模式完成验收责任，H4 分类反馈并交接下一动作；按实际问题选择，不重做产生材料的全部活动。
 
 ## 文件
 
