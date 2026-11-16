@@ -1,11 +1,21 @@
 """Boundary and crash-safe write primitives used by execution control."""
 from pathlib import Path
 import tempfile
+import stat
 import unittest
 from hsdev import store
 
 
 class StoreTests(unittest.TestCase):
+    def test_atomic_replacement_preserves_existing_permissions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / 'deploy.sh'
+            store.write(target, '#!/bin/sh\nexit 0\n')
+            for mode in (0o755, 0o600):
+                target.chmod(mode)
+                store.write(target, '#!/bin/sh\nexit 1\n')
+                self.assertEqual(stat.S_IMODE(target.stat().st_mode), mode)
+
     def test_containment_and_symlink_boundary(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)

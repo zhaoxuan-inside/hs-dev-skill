@@ -44,15 +44,19 @@ def path(root, relative):
     return p
 
 
-def write(file, value):
+def write(file, value, *, mode=None):
     file = Path(file)
     file.parent.mkdir(parents=True, exist_ok=True)
     payload = value if isinstance(value, bytes) else value.encode() if isinstance(value, str) else (json.dumps(value, ensure_ascii=False, indent=2) + "\n").encode()
     tmp = file.with_name(".write-" + uid())
+    if mode is None and file.is_file():
+        mode = stat.S_IMODE(file.stat().st_mode)
     try:
         with tmp.open("xb") as stream:
             stream.write(payload)
             stream.flush()
+            if mode is not None:
+                os.fchmod(stream.fileno(), mode)
             os.fsync(stream.fileno())
         os.replace(tmp, file)
     finally:

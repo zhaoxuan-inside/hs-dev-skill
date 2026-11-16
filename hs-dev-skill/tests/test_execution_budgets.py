@@ -1,6 +1,7 @@
 """Real checks, authorization boundaries and opt-in presentation after a product replay."""
 import copy
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -16,6 +17,43 @@ CLI = Path(__file__).resolve().parents[1] / 'scripts/hs-dev.py'
 
 
 class ExecutionBudgetTests(unittest.TestCase):
+    def test_run_records_leftover_process_as_failed_verification(self):
+        f = self.fixture()
+        leader = ("import subprocess,sys;subprocess.Popen("
+                  "[sys.executable,'-c','import time;time.sleep(60)'],"
+                  "stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)")
+        f.plan(checks=[{'id': 'child-cleanup', 'argv': [sys.executable, '-c', leader],
+                       'expected': 'The whole check must finish before evidence can pass.'}])
+        f.cmd('lock')
+        result = f.cmd('run')
+        self.assertFalse(result['ok'])
+        self.assertEqual(result['results'][0]['exit_code'], 126)
+        state = read(f.root / f'hs-dev/execution/deliveries/{f.delivery}.json')
+        self.assertEqual(state['verification'], result)
+        self.assertTrue((f.root / result['results'][0]['path']).is_file())
+
+    def test_successful_leader_cannot_leave_background_writer(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            # The child closes inherited pipes. Waiting for stdout EOF cannot detect it.
+            child = "import time;from pathlib import Path;time.sleep(1);Path('late-write').touch()"
+            leader = ("import subprocess,sys;"
+                      f"p=subprocess.Popen([sys.executable,'-c',{child!r}],"
+                      "stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);"
+                      "print(p.pid,flush=True)")
+            log = root / 'run.log'
+            try:
+                code = _run_check([sys.executable, '-c', leader], root, log)
+                time.sleep(1.2)
+                self.assertFalse((root / 'late-write').exists())
+                self.assertEqual(code, 126)
+            finally:
+                if log.exists() and log.read_text().splitlines():
+                    try:
+                        os.kill(int(log.read_text().splitlines()[0]), 9)
+                    except ProcessLookupError:
+                        pass
+
     def fixture(self):
         fixture = test_engine.EngineTests()
         fixture.setUp()

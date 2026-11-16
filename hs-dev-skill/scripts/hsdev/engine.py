@@ -8,6 +8,7 @@ from pathlib import Path
 import subprocess
 import os
 import signal
+import stat
 import time
 import selectors
 import re
@@ -551,7 +552,7 @@ def _execute(root, command, args):
         state.update(activity=activity["id"], status="active", outputs={}, assessment=None, plan=None,
                      authorization=None, verification=None, touched=[])
         state["cycle"] = state.get("cycle", 0) + 1
-        for key in ("snapshot", "tracked", "expected", "lock_token", "pending", "unlocked_at", "input_sources", "commit", "unlock_intent", "post_submit_drift") :
+        for key in ("snapshot", "snapshot_modes", "tracked", "expected", "lock_token", "pending", "unlocked_at", "input_sources", "commit", "unlock_intent", "post_submit_drift") :
             state.pop(key, None)
         _save(root, state)
         _audit(root, state, "advance")
@@ -737,7 +738,7 @@ def _execute(root, command, args):
         _authorized(root, state, control)
         if any(hash_file(path(root, p)) != h for p, h in state["plan"]["baseline"].items()):
             raise ValueError("Planned files changed after planning; reassess and replan")
-        tracked, snapshot, snapshot_size = {}, {}, 0
+        tracked, snapshot, snapshot_modes, snapshot_size = {}, {}, {}, 0
         for relative in state["plan"]["record"]["paths"]:
             file = path(root, relative)
             snapshot_size += file.stat().st_size if file.is_file() else 0
@@ -745,6 +746,7 @@ def _execute(root, command, args):
                 raise ValueError("Planned preimages exceed the 32 MB recovery bound; split the activity")
             tracked[relative] = hash_file(file)
             snapshot[relative] = base64.b64encode(file.read_bytes()).decode() if file.is_file() else None
+            snapshot_modes[relative] = stat.S_IMODE(file.stat().st_mode) if file.is_file() else None
         bindings = dict(state["assessment"]["bindings"])
         bindings.update(state["plan"]["bindings"])
         for q in _questions_ready(root, state):
@@ -757,7 +759,8 @@ def _execute(root, command, args):
             bindings.update(state["authorization"]["bindings"])
         state["input_sources"] = {sid: knowledge.source_state(root, sid) for sid in bindings}
         token = uid("L")
-        state.update(status="locking", lock_token=token, expected=_source_inventory(root), tracked=tracked, snapshot=snapshot, touched=[], verification=None)
+        state.update(status="locking", lock_token=token, expected=_source_inventory(root), tracked=tracked, snapshot=snapshot,
+                     snapshot_modes=snapshot_modes, touched=[], verification=None)
         _save(root, state)
         control["lock"] = {"delivery": state["id"], "token": token, "paths": list(tracked), "locked_at": now()}
         write(path(root, CONTROL), control)
@@ -866,7 +869,7 @@ def _execute(root, command, args):
             if snapshot is None:
                 file.unlink(missing_ok=True)
             else:
-                write(file, base64.b64decode(snapshot))
+                write(file, base64.b64decode(snapshot), mode=state.get("snapshot_modes", {}).get(relative))
             if hash_file(file) != (digest(base64.b64decode(snapshot)) if snapshot is not None else None):
                 raise ValueError("Rollback restoration failed: " + relative)
             _update_expected(state, relative, hash_file(file))
@@ -934,7 +937,17 @@ def _run_check(argv, root, log, *, timeout_seconds=30, overall_deadline=None):
                     break
             if failure:
                 os.killpg(process.pid, signal.SIGKILL)
-            return failure if failure else process.wait(timeout=max(0.1, deadline-time.monotonic()))
+            if failure:
+                return failure
+            code = process.wait(timeout=max(0.1, deadline-time.monotonic()))
+            try:
+                os.killpg(process.pid, 0)
+            except ProcessLookupError:
+                return code
+            # A successful leader is insufficient if children can still mutate the
+            # workspace after the final inventory. Reap the leader, reject leftovers
+            # and terminate its group before returning to the caller.
+            return code if code else 126
     except (subprocess.TimeoutExpired, ProcessLookupError):
         try:
             os.killpg(process.pid, signal.SIGKILL)
@@ -944,11 +957,10 @@ def _run_check(argv, root, log, *, timeout_seconds=30, overall_deadline=None):
     finally:
         selector.close()
         process.stdout.close()
-        if process.poll() is None:
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
         process.wait()
 
 

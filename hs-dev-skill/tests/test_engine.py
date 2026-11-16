@@ -7,6 +7,7 @@ import copy
 import json
 from pathlib import Path
 import sys
+import stat
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -16,6 +17,17 @@ from hsdev.store import write, read, hash_file
 
 
 class EngineTests(unittest.TestCase):
+    def test_apply_and_deleted_file_rollback_preserve_executable_mode(self):
+        target = self.root / 'src/add.py'
+        target.chmod(0o755)
+        self.locked()
+        self.cmd('apply', changes={'src/add.py': 'def add(a,b):\n    return a+b\n'})
+        self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o755)
+        self.cmd('apply', changes={'src/add.py': None})
+        self.cmd('rollback')
+        self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o755)
+        self.assertIn('a-b', target.read_text())
+
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
@@ -365,8 +377,8 @@ class EngineTests(unittest.TestCase):
         from hsdev import engine
         real_write=engine.write
         fired=[False]
-        def interrupted(file,value):
-            real_write(file,value)
+        def interrupted(file,value,**kwargs):
+            real_write(file,value,**kwargs)
             if Path(file)==self.root/'src/add.py' and not fired[0]:
                 fired[0]=True
                 raise OSError('synthetic rollback interruption')
