@@ -1,32 +1,18 @@
-name: Consistency gates
-
-on:
-  push:
-    branches: ['**']
-  pull_request:
-
-permissions:
-  contents: read
-
+name: validate
+on: [push, pull_request]
 jobs:
-  gates:
-    runs-on: ubuntu-24.04
+  stdlib:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          persist-credentials: false
-      - name: Install pytest
-        run: python3 -m pip install --user pytest
-      - name: Full regression suite (includes dogfood registries and declared gates)
-        run: python3 -m pytest hs-dev-skill/scripts/tests -q
-      - name: Bundle consistency (catalog, checklists, links, versions)
-        run: python3 - <<'PY'
-        import sys
-        sys.path.insert(0, 'hs-dev-skill/scripts')
-        from hs_dev.bundle import validate
-        result = validate('.')
-        print(result)
-        assert result['ok'], result['errors']
-        PY
-      - name: Build validated skill packages
-        run: python3 hs-dev-skill/scripts/build_skill_packages.py --output /tmp/skills
+          python-version: ${{ matrix.python }}
+      - run: python3 hs-dev-skill/scripts/check.py
+      - run: python3 -m unittest discover -s hs-dev-skill/tests -v
+        env:
+          PYTHONPATH: hs-dev-skill/scripts
+      - run: python3 hs-dev-skill/scripts/build.py --output "$RUNNER_TEMP/hs-dev-packages"
